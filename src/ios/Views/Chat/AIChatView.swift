@@ -3049,7 +3049,7 @@ struct AIChatView: View {
                     .font(.system(size: 34))
                     .foregroundStyle(.red)
             }
-        } else {
+        } else {    // 发送按钮
             Button { performSend() } label: {
                 Image(systemName: "arrow.up.circle.fill")
                     .font(.system(size: 34))
@@ -4112,8 +4112,24 @@ struct AIChatView: View {
     }
 
     /// Dismiss keyboard (commit dictation/marked text) before sending.
+    /*
+        performSend() 的职责概括为：
+        在界面层完成发送前的检查、键盘与语音状态的清理，然后调用
+         AIChatViewModel.send() ，将控制权交给 Agent 层。
+        该函数不构造模型的请求，不会访问 SQLite, 也不会执行请求
+
+        函数声明：
+        private 表示是内部实现，不作为对外的接口
+        没有写 `-> type` 表示这个函数没有返回值，相当于返回 void
+        没有写 `async`: 表示它是同步函数。
+         函数中的语句按照顺序立即执行。
+        没有 `throws`: 表示它不会将错误抛给调用者
+     */
     private func performSend() {
         // Intercept slash commands — execute instead of sending to LLM
+        // 判断输入框中的内容是不是 /memory, /compact 之类的本地斜杠命令
+        //  这个函数return true 代表命令在本地处理，则立刻结束 performSend()
+        //  return false 代表是普通消息，继续向下执行
         if vm.tryExecuteInputAsSlashCommand() { return }
 
         minisLogger.info("🔑DRAFT performSend vm=\(vm.vmInstanceId) vm.sessionId=\(vm.sessionId ?? "nil") draftId=\(draftId ?? "nil") inputText='\(String(vm.inputText.prefix(50)))' isProcessing=\(vm.isProcessing)")
