@@ -1,0 +1,55 @@
+{
+  "artifacts": {
+    "patches/base-to-worktree.patch": {
+      "executable": false,
+      "sha256": "fc6cf22f019781489a28bf8e85683fd7c393fd020ae136463e09f8267e03f073"
+    },
+    "patches/staged.patch": {
+      "executable": false,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "patches/unstaged.patch": {
+      "executable": false,
+      "sha256": "fc6cf22f019781489a28bf8e85683fd7c393fd020ae136463e09f8267e03f073"
+    },
+    "request.md": "28ed23ab41ade16a4cc6c734790ef23bfd18687a39596f8febe43fbab1518efe",
+    "requirements/task.md": {
+      "executable": false,
+      "sha256": "8486c625362de8515aba7a237c999a47aa4492da0e4971d5a396f3aa8d67f445"
+    },
+    "snapshot/classify.py": {
+      "executable": false,
+      "sha256": "796033289d6c26269f8d324b846f69b6582ef6bd13ecc62c135f9080b5a19521"
+    },
+    "snapshot/task.md": {
+      "executable": false,
+      "sha256": "8486c625362de8515aba7a237c999a47aa4492da0e4971d5a396f3aa8d67f445"
+    }
+  },
+  "repo": "/tmp/harness-pi-smoke-ggdbmjp0",
+  "schema": 1,
+  "snapshot_id": "16cd6d9672657764a1c798f5918d611db592f5d3ddd7ac395dbb4f7a9178fb7c",
+  "state": {
+    "base": "55f24d34e6a8a5c0f2f657b7c755a76728da31c5",
+    "branch": "master",
+    "excluded_gitlinks": {},
+    "exclusions": [],
+    "files": {
+      "classify.py": {
+        "executable": false,
+        "sha256": "796033289d6c26269f8d324b846f69b6582ef6bd13ecc62c135f9080b5a19521"
+      },
+      "task.md": {
+        "executable": false,
+        "sha256": "8486c625362de8515aba7a237c999a47aa4492da0e4971d5a396f3aa8d67f445"
+      }
+    },
+    "head": "55f24d34e6a8a5c0f2f657b7c755a76728da31c5",
+    "index_sha256": "fff450511041821d5bb5b1400ab3a3aa6804454eb6450be76a30e8193c267892",
+    "requirements": {
+      "task.md": "8486c625362de8515aba7a237c999a47aa4492da0e4971d5a396f3aa8d67f445"
+    },
+    "status": " M classify.py\u0000"
+  },
+  "task": "task.md"
+}

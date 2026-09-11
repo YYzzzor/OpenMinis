@@ -1,0 +1,21 @@
+{
+  "changed_existing_files": [
+    "docs/harness/review-guidance.md",
+    "docs/tasks/active/26-09-11 核对重连验收/proposal-001.md",
+    "docs/tasks/active/26-09-11 核对重连验收/task.md",
+    "docs/tasks/active/26-09-11 核对重连验收/task.checkpoint.json"
+  ],
+  "unexpected_files": [],
+  "matches_approved_text": true,
+  "head_unchanged": true,
+  "branch_unchanged": true,
+  "index_unchanged": true,
+  "inspect": {
+    "result": "match",
+    "changed": [],
+    "head": "a87fadb27f978ed4eb6bd063eb0d23fe0077ead4",
+    "branch": "exercise",
+    "status": " M docs/harness/review-guidance.md\u0000 M docs/tasks/active/26-09-11 核对重连验收/task.md\u0000?? docs/tasks/active/26-09-11 核对重连验收/proposal-001.md\u0000",
+    "operations": []
+  }
+}

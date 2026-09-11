@@ -1,0 +1,329 @@
+{
+  "artifacts": {
+    "patches/base-to-worktree.patch": {
+      "executable": false,
+      "sha256": "8bbd8b6cd35c6b35aa88d3b24320468b6b0db1c524b17c5758ec0c9a7e201800"
+    },
+    "patches/staged.patch": {
+      "executable": false,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "patches/unstaged.patch": {
+      "executable": false,
+      "sha256": "8bbd8b6cd35c6b35aa88d3b24320468b6b0db1c524b17c5758ec0c9a7e201800"
+    },
+    "request.md": "333fc6e6159cfd4435e4884d09331275fb0cc107702874dd75ba3d931f2dba42",
+    "requirements/docs/harness/design.md": {
+      "executable": false,
+      "sha256": "806f8f81a2cbf43628345346a3ffecff23f2798b62376423dee77f3acbe40790"
+    },
+    "requirements/docs/harness/spec-context.md": {
+      "executable": false,
+      "sha256": "4e3102cfe1ebf99a54eeb78d32332cb53b387813542d3be59891ac7628f5574c"
+    },
+    "requirements/docs/tasks/active/2026-09-11-harness/task.md": {
+      "executable": false,
+      "sha256": "d3dcfd293dff8f1b9b3bf446bfb12c83c1c13cb4de6597fce3095bb26077d854"
+    },
+    "snapshot/.agents/skills/resume-task/SKILL.md": {
+      "executable": false,
+      "sha256": "90fea16994b00ded44b811e5d2473073d3bfce46c37b60481ee8b11914ce98cb"
+    },
+    "snapshot/.agents/skills/review-task/SKILL.md": {
+      "executable": false,
+      "sha256": "9f181462df1f144cf75dd9a5d7d51d0f725869161835c4ccce73f052120d06e1"
+    },
+    "snapshot/AGENTS.md": {
+      "executable": false,
+      "sha256": "5cb8ae7642dd3c3bb78d9d2c84b521ef767d08bc71963abd35e80a7dbd2cdb3b"
+    },
+    "snapshot/docs/harness/design.md": {
+      "executable": false,
+      "sha256": "806f8f81a2cbf43628345346a3ffecff23f2798b62376423dee77f3acbe40790"
+    },
+    "snapshot/docs/harness/evidence/pi-smoke-001/manifest.json": {
+      "executable": false,
+      "sha256": "84bf66e8f82c62ee5dbfea7eb3fb1c9d2e1af47c0bb284917b86990f9b425705"
+    },
+    "snapshot/docs/harness/evidence/pi-smoke-001/patches/base-to-worktree.patch": {
+      "executable": false,
+      "sha256": "fc6cf22f019781489a28bf8e85683fd7c393fd020ae136463e09f8267e03f073"
+    },
+    "snapshot/docs/harness/evidence/pi-smoke-001/patches/staged.patch": {
+      "executable": false,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "snapshot/docs/harness/evidence/pi-smoke-001/patches/unstaged.patch": {
+      "executable": false,
+      "sha256": "fc6cf22f019781489a28bf8e85683fd7c393fd020ae136463e09f8267e03f073"
+    },
+    "snapshot/docs/harness/evidence/pi-smoke-001/report.json": {
+      "executable": false,
+      "sha256": "a1197df9bb78b2d1b151db1431b595c644ced04791babd1b286d46ebd1120f14"
+    },
+    "snapshot/docs/harness/evidence/pi-smoke-001/report.md": {
+      "executable": false,
+      "sha256": "0b6ab46288eb5cb747e4d9dabe989599fec364f62d31210153e50f6d67cc2579"
+    },
+    "snapshot/docs/harness/evidence/pi-smoke-001/report.txt": {
+      "executable": false,
+      "sha256": "7cdcc056d3121aa632ffd90734d1c274c561467808cd97fce4d03669708e7d3e"
+    },
+    "snapshot/docs/harness/evidence/pi-smoke-001/request.md": {
+      "executable": false,
+      "sha256": "28ed23ab41ade16a4cc6c734790ef23bfd18687a39596f8febe43fbab1518efe"
+    },
+    "snapshot/docs/harness/evidence/pi-smoke-001/requirements/task.md": {
+      "executable": false,
+      "sha256": "8486c625362de8515aba7a237c999a47aa4492da0e4971d5a396f3aa8d67f445"
+    },
+    "snapshot/docs/harness/evidence/pi-smoke-001/snapshot/classify.py": {
+      "executable": false,
+      "sha256": "796033289d6c26269f8d324b846f69b6582ef6bd13ecc62c135f9080b5a19521"
+    },
+    "snapshot/docs/harness/evidence/pi-smoke-001/snapshot/task.md": {
+      "executable": false,
+      "sha256": "8486c625362de8515aba7a237c999a47aa4492da0e4971d5a396f3aa8d67f445"
+    },
+    "snapshot/docs/harness/evidence/pi-smoke-001/status.json": {
+      "executable": false,
+      "sha256": "22aeb762aa1eb02d2338fe295d03344a188db63bb51cf18bb4aa3db4ec0f8002"
+    },
+    "snapshot/docs/harness/operations.md": {
+      "executable": false,
+      "sha256": "e9b9f8a5614391725fa7770c26958a82e893aace5419ff910a211df3039d2432"
+    },
+    "snapshot/docs/harness/proposals/001-bootstrap.md": {
+      "executable": false,
+      "sha256": "60868e2eb377114b6ec1821ee844e463fc6cbdee5f774ef7f899798ccb814c87"
+    },
+    "snapshot/docs/harness/proposals/002-instruction-scope.md": {
+      "executable": false,
+      "sha256": "14eadcc29b39c26321d70093e774215b25326d0c9d080b58b2e86b3d1b1accc2"
+    },
+    "snapshot/docs/harness/proposals/003-spec-context.md": {
+      "executable": false,
+      "sha256": "d3217feda58713d23a81734c012953e838174c4321a201aee07831e60a369ea2"
+    },
+    "snapshot/docs/harness/record-formats.md": {
+      "executable": false,
+      "sha256": "991c09ae125c77195dca302283a9c8c1190296ddf38a8374123b67021fac4550"
+    },
+    "snapshot/docs/harness/spec-context.md": {
+      "executable": false,
+      "sha256": "4e3102cfe1ebf99a54eeb78d32332cb53b387813542d3be59891ac7628f5574c"
+    },
+    "snapshot/docs/harness/validation.md": {
+      "executable": false,
+      "sha256": "55330178e5964b955aff31c15ba97598f4cd686c9bffe56fdd19f6fb43bc5a99"
+    },
+    "snapshot/docs/tasks/active/2026-09-11-harness/task.checkpoint.json": {
+      "executable": false,
+      "sha256": "955de529cf756f305720e151c5db1123c973e2d61c40564539514d4864b8be3c"
+    },
+    "snapshot/docs/tasks/active/2026-09-11-harness/task.md": {
+      "executable": false,
+      "sha256": "d3dcfd293dff8f1b9b3bf446bfb12c83c1c13cb4de6597fce3095bb26077d854"
+    },
+    "snapshot/scripts/harness/review.py": {
+      "executable": false,
+      "sha256": "e6efede0b98a1a8ccf91a6341cfe13236f86a3a19000f6947e8878da2abeb9cc"
+    },
+    "snapshot/scripts/harness/spec_context.py": {
+      "executable": false,
+      "sha256": "54bde54d0b183dc631f29691223f2df1da17257461dde33edef3089a539f49ba"
+    },
+    "snapshot/scripts/harness/task_state.py": {
+      "executable": false,
+      "sha256": "a78239ff425266323858b1751fedf12d33c24fbd3304ef1e3caa335d2010f600"
+    },
+    "snapshot/scripts/harness/test_review.py": {
+      "executable": false,
+      "sha256": "7f3e4f3da434ba4499723520f1005185f97d6d512d12470164f15faa8ad758df"
+    },
+    "snapshot/scripts/harness/test_spec_context.py": {
+      "executable": false,
+      "sha256": "a5297e2b30518168c3e1dcdd719c2c0d41a04ca9b000d3a42ee09ff9ef1a61e9"
+    },
+    "snapshot/scripts/harness/test_task_state.py": {
+      "executable": false,
+      "sha256": "9af424972ae387c3e39172f5dd467784ac4055a808a4c73a54d84b7eaa2c8b47"
+    }
+  },
+  "repo": "/home/huyz/Coding/Projects/OpenMinis",
+  "schema": 1,
+  "snapshot_id": "2dd42e97ef656aac4512b89e1713ce90b2f99968624f9140e238ab72d3444649",
+  "spec_selections": [],
+  "state": {
+    "base": "8399e1f9889f0d04629d560b5b0f881123524b78",
+    "branch": "ios-annotated",
+    "excluded_gitlinks": {
+      "deps/ish": {
+        "index_commit": "de124dd66124a15239cea1465164f74980ada245",
+        "worktree": "uninitialized"
+      },
+      "deps/proot": {
+        "index_commit": "8cf13e997cdc9472997aae19df8050c073c9a86c",
+        "worktree": "uninitialized"
+      }
+    },
+    "exclusions": [
+      ".github",
+      ".gitignore",
+      ".gitmodules",
+      "BUILDING.md",
+      "CONTRIBUTING.md",
+      "LICENSE",
+      "README.md",
+      "THIRD_PARTY_LICENSES.md",
+      "assets",
+      "deps",
+      "docs/specs",
+      "notes",
+      "scripts/gen_debug_skill.sh",
+      "scripts/gen_debug_skill_android.sh",
+      "scripts/install_alpine.sh",
+      "scripts/optimize_rootfs.sh",
+      "scripts/prepare_android_sandbox.sh",
+      "scripts/prepare_rootfs.sh",
+      "scripts/symbolicate_hang.py",
+      "scripts/update_models_dev.sh",
+      "src"
+    ],
+    "files": {
+      ".agents/skills/resume-task/SKILL.md": {
+        "executable": false,
+        "sha256": "90fea16994b00ded44b811e5d2473073d3bfce46c37b60481ee8b11914ce98cb"
+      },
+      ".agents/skills/review-task/SKILL.md": {
+        "executable": false,
+        "sha256": "9f181462df1f144cf75dd9a5d7d51d0f725869161835c4ccce73f052120d06e1"
+      },
+      "AGENTS.md": {
+        "executable": false,
+        "sha256": "5cb8ae7642dd3c3bb78d9d2c84b521ef767d08bc71963abd35e80a7dbd2cdb3b"
+      },
+      "docs/harness/design.md": {
+        "executable": false,
+        "sha256": "806f8f81a2cbf43628345346a3ffecff23f2798b62376423dee77f3acbe40790"
+      },
+      "docs/harness/evidence/pi-smoke-001/manifest.json": {
+        "executable": false,
+        "sha256": "84bf66e8f82c62ee5dbfea7eb3fb1c9d2e1af47c0bb284917b86990f9b425705"
+      },
+      "docs/harness/evidence/pi-smoke-001/patches/base-to-worktree.patch": {
+        "executable": false,
+        "sha256": "fc6cf22f019781489a28bf8e85683fd7c393fd020ae136463e09f8267e03f073"
+      },
+      "docs/harness/evidence/pi-smoke-001/patches/staged.patch": {
+        "executable": false,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "docs/harness/evidence/pi-smoke-001/patches/unstaged.patch": {
+        "executable": false,
+        "sha256": "fc6cf22f019781489a28bf8e85683fd7c393fd020ae136463e09f8267e03f073"
+      },
+      "docs/harness/evidence/pi-smoke-001/report.json": {
+        "executable": false,
+        "sha256": "a1197df9bb78b2d1b151db1431b595c644ced04791babd1b286d46ebd1120f14"
+      },
+      "docs/harness/evidence/pi-smoke-001/report.md": {
+        "executable": false,
+        "sha256": "0b6ab46288eb5cb747e4d9dabe989599fec364f62d31210153e50f6d67cc2579"
+      },
+      "docs/harness/evidence/pi-smoke-001/report.txt": {
+        "executable": false,
+        "sha256": "7cdcc056d3121aa632ffd90734d1c274c561467808cd97fce4d03669708e7d3e"
+      },
+      "docs/harness/evidence/pi-smoke-001/request.md": {
+        "executable": false,
+        "sha256": "28ed23ab41ade16a4cc6c734790ef23bfd18687a39596f8febe43fbab1518efe"
+      },
+      "docs/harness/evidence/pi-smoke-001/requirements/task.md": {
+        "executable": false,
+        "sha256": "8486c625362de8515aba7a237c999a47aa4492da0e4971d5a396f3aa8d67f445"
+      },
+      "docs/harness/evidence/pi-smoke-001/snapshot/classify.py": {
+        "executable": false,
+        "sha256": "796033289d6c26269f8d324b846f69b6582ef6bd13ecc62c135f9080b5a19521"
+      },
+      "docs/harness/evidence/pi-smoke-001/snapshot/task.md": {
+        "executable": false,
+        "sha256": "8486c625362de8515aba7a237c999a47aa4492da0e4971d5a396f3aa8d67f445"
+      },
+      "docs/harness/evidence/pi-smoke-001/status.json": {
+        "executable": false,
+        "sha256": "22aeb762aa1eb02d2338fe295d03344a188db63bb51cf18bb4aa3db4ec0f8002"
+      },
+      "docs/harness/operations.md": {
+        "executable": false,
+        "sha256": "e9b9f8a5614391725fa7770c26958a82e893aace5419ff910a211df3039d2432"
+      },
+      "docs/harness/proposals/001-bootstrap.md": {
+        "executable": false,
+        "sha256": "60868e2eb377114b6ec1821ee844e463fc6cbdee5f774ef7f899798ccb814c87"
+      },
+      "docs/harness/proposals/002-instruction-scope.md": {
+        "executable": false,
+        "sha256": "14eadcc29b39c26321d70093e774215b25326d0c9d080b58b2e86b3d1b1accc2"
+      },
+      "docs/harness/proposals/003-spec-context.md": {
+        "executable": false,
+        "sha256": "d3217feda58713d23a81734c012953e838174c4321a201aee07831e60a369ea2"
+      },
+      "docs/harness/record-formats.md": {
+        "executable": false,
+        "sha256": "991c09ae125c77195dca302283a9c8c1190296ddf38a8374123b67021fac4550"
+      },
+      "docs/harness/spec-context.md": {
+        "executable": false,
+        "sha256": "4e3102cfe1ebf99a54eeb78d32332cb53b387813542d3be59891ac7628f5574c"
+      },
+      "docs/harness/validation.md": {
+        "executable": false,
+        "sha256": "55330178e5964b955aff31c15ba97598f4cd686c9bffe56fdd19f6fb43bc5a99"
+      },
+      "docs/tasks/active/2026-09-11-harness/task.checkpoint.json": {
+        "executable": false,
+        "sha256": "955de529cf756f305720e151c5db1123c973e2d61c40564539514d4864b8be3c"
+      },
+      "docs/tasks/active/2026-09-11-harness/task.md": {
+        "executable": false,
+        "sha256": "d3dcfd293dff8f1b9b3bf446bfb12c83c1c13cb4de6597fce3095bb26077d854"
+      },
+      "scripts/harness/review.py": {
+        "executable": false,
+        "sha256": "e6efede0b98a1a8ccf91a6341cfe13236f86a3a19000f6947e8878da2abeb9cc"
+      },
+      "scripts/harness/spec_context.py": {
+        "executable": false,
+        "sha256": "54bde54d0b183dc631f29691223f2df1da17257461dde33edef3089a539f49ba"
+      },
+      "scripts/harness/task_state.py": {
+        "executable": false,
+        "sha256": "a78239ff425266323858b1751fedf12d33c24fbd3304ef1e3caa335d2010f600"
+      },
+      "scripts/harness/test_review.py": {
+        "executable": false,
+        "sha256": "7f3e4f3da434ba4499723520f1005185f97d6d512d12470164f15faa8ad758df"
+      },
+      "scripts/harness/test_spec_context.py": {
+        "executable": false,
+        "sha256": "a5297e2b30518168c3e1dcdd719c2c0d41a04ca9b000d3a42ee09ff9ef1a61e9"
+      },
+      "scripts/harness/test_task_state.py": {
+        "executable": false,
+        "sha256": "9af424972ae387c3e39172f5dd467784ac4055a808a4c73a54d84b7eaa2c8b47"
+      }
+    },
+    "head": "8399e1f9889f0d04629d560b5b0f881123524b78",
+    "index_sha256": "0cb7bee9f8ca341c0e2b8aa009391cf6fa2272dc127359deb8d016571011bc9b",
+    "requirements": {
+      "docs/harness/design.md": "806f8f81a2cbf43628345346a3ffecff23f2798b62376423dee77f3acbe40790",
+      "docs/harness/spec-context.md": "4e3102cfe1ebf99a54eeb78d32332cb53b387813542d3be59891ac7628f5574c",
+      "docs/tasks/active/2026-09-11-harness/task.md": "d3dcfd293dff8f1b9b3bf446bfb12c83c1c13cb4de6597fce3095bb26077d854"
+    },
+    "status": " M AGENTS.md\u0000?? .agents/skills/resume-task/SKILL.md\u0000?? .agents/skills/review-task/SKILL.md\u0000?? docs/harness/design.md\u0000?? docs/harness/evidence/pi-smoke-001/manifest.json\u0000?? docs/harness/evidence/pi-smoke-001/patches/base-to-worktree.patch\u0000?? docs/harness/evidence/pi-smoke-001/patches/staged.patch\u0000?? docs/harness/evidence/pi-smoke-001/patches/unstaged.patch\u0000?? docs/harness/evidence/pi-smoke-001/report.json\u0000?? docs/harness/evidence/pi-smoke-001/report.md\u0000?? docs/harness/evidence/pi-smoke-001/report.txt\u0000?? docs/harness/evidence/pi-smoke-001/request.md\u0000?? docs/harness/evidence/pi-smoke-001/requirements/task.md\u0000?? docs/harness/evidence/pi-smoke-001/snapshot/classify.py\u0000?? docs/harness/evidence/pi-smoke-001/snapshot/task.md\u0000?? docs/harness/evidence/pi-smoke-001/status.json\u0000?? docs/harness/operations.md\u0000?? docs/harness/proposals/001-bootstrap.md\u0000?? docs/harness/proposals/002-instruction-scope.md\u0000?? docs/harness/proposals/003-spec-context.md\u0000?? docs/harness/record-formats.md\u0000?? docs/harness/spec-context.md\u0000?? docs/harness/validation.md\u0000?? docs/tasks/active/2026-09-11-harness/task.checkpoint.json\u0000?? docs/tasks/active/2026-09-11-harness/task.md\u0000?? scripts/harness/review.py\u0000?? scripts/harness/spec_context.py\u0000?? scripts/harness/task_state.py\u0000?? scripts/harness/test_review.py\u0000?? scripts/harness/test_spec_context.py\u0000?? scripts/harness/test_task_state.py\u0000"
+  },
+  "task": "docs/tasks/active/2026-09-11-harness/task.md"
+}

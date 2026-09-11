@@ -1,0 +1,26 @@
+[
+  {
+    "cancelled": true,
+    "failed": true,
+    "expected": "cancelled",
+    "actual": "cancelled"
+  },
+  {
+    "cancelled": true,
+    "failed": false,
+    "expected": "cancelled",
+    "actual": "cancelled"
+  },
+  {
+    "cancelled": false,
+    "failed": true,
+    "expected": "failed",
+    "actual": "failed"
+  },
+  {
+    "cancelled": false,
+    "failed": false,
+    "expected": "done",
+    "actual": "done"
+  }
+]
