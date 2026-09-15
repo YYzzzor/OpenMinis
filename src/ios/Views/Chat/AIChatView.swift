@@ -369,8 +369,8 @@ struct AIChatView: View {
     @State private var titlePillEditSession: ChatSession?
     /// Default chat title for sessions without a generated title. Sourced
     /// from SOUL.md (`name`), falls back to "Minis". Refreshed on .soulMdChanged.
-    @State private var soulName: String = SoulStore.cachedMetadata.name.isEmpty
-        ? "Minis" : SoulStore.cachedMetadata.name
+    @State private var soulName: String = SoulStore.cachedMetadata.displayName.isEmpty
+        ? "MinisX" : SoulStore.cachedMetadata.displayName
 
     /// True when any sheet or fullScreenCover is presented (suppress auto-focus to avoid keyboard bugs).
     private var hasOverlayPresented: Bool {
@@ -1939,8 +1939,8 @@ struct AIChatView: View {
                     // re-introducing the top crop.
                     .padding(.top, legacyLayout ? 0 : 2)
                     .onReceive(NotificationCenter.default.publisher(for: .soulMdChanged)) { _ in
-                        let n = SoulStore.cachedMetadata.name
-                        soulName = n.isEmpty ? "Minis" : n
+                        let n = SoulStore.cachedMetadata.displayName
+                        soulName = n.isEmpty ? "MinisX" : n
                     }
             }
             .buttonStyle(.plain)

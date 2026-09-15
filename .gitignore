@@ -132,3 +132,13 @@ deps/lame-3.100/**/*.la
 deps/lame-3.100/**/*.lai
 deps/lame-3.100/**/.libs/
 deps/lame-3.100/**/.deps/
+
+# Native iOS Simulator dependencies and isolated source/build trees
+deps/simulator/
+
+# Python bytecode caches
+__pycache__/
+*.py[cod]
+
+# Machine-local provider customization (copy the tracked example)
+src/ios/Configs/ProviderCustomization.xcconfig

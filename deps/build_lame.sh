@@ -9,6 +9,7 @@ set -e
 #
 # Usage:
 #   ./build_lame.sh [clean]
+#   MINIS_SDK=iphonesimulator ./build_lame.sh [clean] (iOS 27.0+)
 #
 # Output:
 #   deps/lame-build/lib/libmp3lame.a
@@ -19,9 +20,12 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LAME_VERSION="3.100"
 LAME_TARBALL="lame-${LAME_VERSION}.tar.gz"
 LAME_SRC_DIR="$SCRIPT_DIR/lame-${LAME_VERSION}"
-LAME_BUILD_DIR="$SCRIPT_DIR/lame-build"
-
-IOS_DEPLOYMENT_TARGET="14.0"
+source "$SCRIPT_DIR/ios_build_target.sh"
+LAME_BUILD_DIR="$MINIS_DEPS_ROOT/lame-build"
+LAME_WORK_DIR="$LAME_SRC_DIR"
+if [ "$MINIS_SDK" = "iphonesimulator" ]; then
+    LAME_WORK_DIR="$MINIS_DEPS_ROOT/lame-source"
+fi
 
 # Colors for output
 RED='\033[0;31m'
@@ -38,7 +42,15 @@ log_error()   { echo -e "${RED}❌ $1${NC}"; exit 1; }
 # ============================================================================
 if [ "$1" == "clean" ]; then
     log_info "Cleaning LAME build artifacts..."
-    rm -rf "$LAME_SRC_DIR" "$LAME_BUILD_DIR"
+    if [ "$MINIS_SDK" = "iphonesimulator" ]; then
+        rm -rf "$LAME_WORK_DIR" "$LAME_BUILD_DIR"
+    else
+        # 源码受版本管理，不再将 clean 等同于删除源码。
+        if [ -f "$LAME_SRC_DIR/Makefile" ]; then
+            (cd "$LAME_SRC_DIR" && make distclean)
+        fi
+        rm -rf "$LAME_BUILD_DIR"
+    fi
     log_success "Clean completed"
     exit 0
 fi
@@ -63,16 +75,22 @@ fi
 # ============================================================================
 # Cross-compile for iOS arm64
 # ============================================================================
-log_info "Configuring LAME for iOS arm64..."
+if [ "$MINIS_SDK" = "iphonesimulator" ]; then
+    minis_copy_source "$LAME_SRC_DIR" "$LAME_WORK_DIR"
+    if [ -f "$LAME_WORK_DIR/Makefile" ]; then
+        (cd "$LAME_WORK_DIR" && make distclean)
+    fi
+fi
+log_info "Configuring LAME for $MINIS_TARGET..."
 
-IOS_SDK=$(xcrun --sdk iphoneos --show-sdk-path)
-CC="$(xcrun --sdk iphoneos -f clang)"
+IOS_SDK=$(xcrun --sdk "$MINIS_SDK" --show-sdk-path)
+CC="$(xcrun --sdk "$MINIS_SDK" -f clang)"
 
 export CC
-export CFLAGS="-arch arm64 -miphoneos-version-min=$IOS_DEPLOYMENT_TARGET -isysroot $IOS_SDK -fembed-bitcode -Oz -fPIC -Wno-implicit-function-declaration"
-export LDFLAGS="-arch arm64 -miphoneos-version-min=$IOS_DEPLOYMENT_TARGET -isysroot $IOS_SDK"
+export CFLAGS="-target $MINIS_TARGET -isysroot $IOS_SDK -Oz -fPIC -Wno-implicit-function-declaration"
+export LDFLAGS="-target $MINIS_TARGET -isysroot $IOS_SDK"
 
-cd "$LAME_SRC_DIR"
+cd "$LAME_WORK_DIR"
 
 ./configure \
     --prefix="$LAME_BUILD_DIR" \

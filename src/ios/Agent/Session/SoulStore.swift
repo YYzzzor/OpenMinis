@@ -22,6 +22,11 @@ struct SoulMetadata: Equatable {
     /// Settings preview card). Hard-coded — see comment on `emoji`.
     var displayEmoji: String { "✨" }
 
+    /// 兼容旧安装的默认名称；磁盘内容和其他自定义名称保持原样。
+    var displayName: String {
+        name.isEmpty || name == "Minis" ? "MinisX" : name
+    }
+
     static let `default` = SoulMetadata(
         name: "Minis",
         // Default emoji is intentionally empty — the UI uses the fixed
@@ -518,13 +523,13 @@ enum SystemPromptBuilder {
 /// any place that previously hard-coded "Minis" as a label.
 @MainActor
 struct AssistantSoulName: View {
-    @State private var name: String = SoulStore.cachedMetadata.name.isEmpty
-        ? "Minis" : SoulStore.cachedMetadata.name
+    @State private var name: String = SoulStore.cachedMetadata.displayName.isEmpty
+        ? "MinisX" : SoulStore.cachedMetadata.displayName
     var body: some View {
         Text(name)
             .onReceive(NotificationCenter.default.publisher(for: .soulMdChanged)) { _ in
-                let n = SoulStore.cachedMetadata.name
-                name = n.isEmpty ? "Minis" : n
+                let n = SoulStore.cachedMetadata.displayName
+                name = n.isEmpty ? "MinisX" : n
             }
     }
 }

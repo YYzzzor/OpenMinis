@@ -23,12 +23,12 @@ struct AboutView: View {
                                     .stroke(Color(UIColor.separator), lineWidth: 0.5)
                             )
                     }
-                    Text("Minis")
+                    Text(verbatim: "MinisX")
                         .font(.title2.bold())
                     Text("Version \(appVersion)")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
-                    Text("Minis is Your Fully Local, Fully Private On-Device Agent.")
+                    Text("MinisX is Your Fully Local, Fully Private On-Device Agent.")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }

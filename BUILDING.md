@@ -76,8 +76,8 @@ without setting this.
 | Tool | Version / notes |
 |---|---|
 | macOS | Apple Silicon strongly recommended (see the simulator note below) |
-| Xcode | With the iOS SDK; the project targets **iOS 26.2** and **Swift 6.0** |
-| Homebrew packages | `brew install ninja llvm libarchive pkg-config` |
+| Xcode | Xcode 27 with iOS 27.0 Simulator runtime; device minimum iOS 16.0 (widget 16.2), Swift 5 language mode |
+| Homebrew packages | `brew install ninja llvm lld libarchive pkg-config` |
 | Python 3 + Meson | `pip3 install meson` |
 
 `llvm` is needed to compile the guest VDSO, `libarchive` to unpack the rootfs,
@@ -128,11 +128,35 @@ xcodebuild -project src/ios/Minis.xcodeproj -scheme Minis \
            CODE_SIGNING_ALLOWED=NO build
 ```
 
-> **Simulator builds need simulator-architecture dependencies.** The scripts
-> above build for **device arm64**. Linking a simulator build against them
-> fails with `building for 'iOS-simulator', but linking in object file built
-> for 'iOS'` (or a missing-symbol error for x86_64 on Intel Macs). Build for a
-> device destination, or rebuild the native deps for the simulator SDK.
+### 3. Build for iOS 27.0 Simulator (Apple Silicon)
+
+After initializing submodules and copying the configuration templates above:
+
+```sh
+bash scripts/build_ios_simulator.sh
+# Later app-only builds, after the native dependencies are ready:
+bash scripts/build_ios_simulator.sh --skip-deps
+```
+
+The default destination is **iPhone 18 Pro / iOS 27.0**, with output at
+`build/ios-simulator/Build/Products/Debug-iphonesimulator/Minis.app`.
+Set `SIMULATOR_NAME`, `SIMULATOR_OS`, or `DERIVED_DATA_PATH` to choose another
+installed iOS 27+ simulator or output directory. `DEVELOPER_DIR` defaults to
+`/Applications/Xcode.app/Contents/Developer` for this script only.
+
+Native scripts select the simulator with `MINIS_SDK=iphonesimulator`; their
+simulator deployment target defaults to 27.0. Libraries, frameworks, headers,
+and isolated build trees live in `deps/simulator/`. Device outputs remain in
+their original directories. Xcode selects these paths automatically by SDK,
+so after preparing dependencies you can select an iOS 27 simulator in Xcode
+and press Run. Intel/x86_64 simulators are not supported by this build setup.
+
+The Linux guest rootfs and resource files are shared between destinations.
+Simulator builds use local ad-hoc signing to retain App Group entitlements;
+do not set `CODE_SIGNING_ALLOWED=NO` when running the app. No development team
+or device provisioning is needed.
+Building successfully does not verify every app feature; permissions, iCloud,
+hardware media acceleration, and extensions still need appropriate testing.
 
 ### Targets
 
