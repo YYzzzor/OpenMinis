@@ -5,7 +5,7 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 export DEVELOPER_DIR="${DEVELOPER_DIR:-/Applications/Xcode.app/Contents/Developer}"
 export MINIS_SDK=iphonesimulator
-export MINIS_IOS_DEPLOYMENT_TARGET=27.0
+export MINIS_IOS_DEPLOYMENT_TARGET=26.0
 SIMULATOR_NAME="${SIMULATOR_NAME:-iPhone 18 Pro}"
 SIMULATOR_OS="${SIMULATOR_OS:-27.0}"
 DERIVED_DATA_PATH="${DERIVED_DATA_PATH:-$REPO_ROOT/build/ios-simulator}"

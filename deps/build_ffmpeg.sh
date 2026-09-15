@@ -20,7 +20,7 @@ set -e
 #
 # Usage:
 #   ./build_ffmpeg.sh [clean]
-#   MINIS_SDK=iphonesimulator ./build_ffmpeg.sh [clean] (iOS 27.0+)
+#   MINIS_SDK=iphonesimulator ./build_ffmpeg.sh [clean] (iOS 26.0+)
 #
 # Output:
 #   deps/frameworks/FFmpeg.framework/

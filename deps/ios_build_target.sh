@@ -4,13 +4,13 @@ MINIS_SDK="${MINIS_SDK:-iphoneos}"
 case "$MINIS_SDK" in
     iphoneos)
         MINIS_DEPS_ROOT="$SCRIPT_DIR"
-        IOS_DEPLOYMENT_TARGET="${MINIS_IOS_DEPLOYMENT_TARGET:-14.0}"
+        IOS_DEPLOYMENT_TARGET="${MINIS_IOS_DEPLOYMENT_TARGET:-26.0}"
         MINIS_PLATFORM="iPhoneOS"
         MINIS_TARGET="arm64-apple-ios${IOS_DEPLOYMENT_TARGET}"
         ;;
     iphonesimulator)
         MINIS_DEPS_ROOT="$SCRIPT_DIR/simulator"
-        IOS_DEPLOYMENT_TARGET="${MINIS_IOS_DEPLOYMENT_TARGET:-27.0}"
+        IOS_DEPLOYMENT_TARGET="${MINIS_IOS_DEPLOYMENT_TARGET:-26.0}"
         MINIS_PLATFORM="iPhoneSimulator"
         MINIS_TARGET="arm64-apple-ios${IOS_DEPLOYMENT_TARGET}-simulator"
         ;;

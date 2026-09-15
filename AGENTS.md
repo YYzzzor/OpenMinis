@@ -2,6 +2,11 @@
 
 This file defines how to analyze, comment on, and modify code in this repository. Follow these rules unless the user gives more specific instructions in the current conversation.
 
+## Project Defaults
+
+- The forked app is named **MinisX**; use this name for user-facing app labels and discussion.
+- The minimum supported system is **iOS 26.0**, including app extensions and simulator builds. The SDK or simulator runtime may be newer; using iOS 27 for validation does not raise the minimum supported version.
+
 ## Task Execution
 
 - Within the confirmed goal and authorization, independently complete necessary reading, implementation, fixes and validation. Resolve reversible local implementation choices without asking again.

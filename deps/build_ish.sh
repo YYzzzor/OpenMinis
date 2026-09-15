@@ -19,7 +19,7 @@ set -e
 #
 # Usage:
 #   ./build_ish.sh [clean|debug|release]
-#   MINIS_SDK=iphonesimulator ./build_ish.sh [clean|debug|release] (iOS 27.0+)
+#   MINIS_SDK=iphonesimulator ./build_ish.sh [clean|debug|release] (iOS 26.0+)
 #
 # Output:
 #   deps/libs/      - Static libraries (.a files)

@@ -9,7 +9,7 @@ set -e
 #
 # Usage:
 #   ./build_lame.sh [clean]
-#   MINIS_SDK=iphonesimulator ./build_lame.sh [clean] (iOS 27.0+)
+#   MINIS_SDK=iphonesimulator ./build_lame.sh [clean] (iOS 26.0+)
 #
 # Output:
 #   deps/lame-build/lib/libmp3lame.a

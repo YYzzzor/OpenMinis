@@ -76,7 +76,7 @@ without setting this.
 | Tool | Version / notes |
 |---|---|
 | macOS | Apple Silicon strongly recommended (see the simulator note below) |
-| Xcode | Xcode 27 with iOS 27.0 Simulator runtime; device minimum iOS 16.0 (widget 16.2), Swift 5 language mode |
+| Xcode | Xcode 27 with iOS 27.0 Simulator runtime; minimum iOS 26.0 for the app and all extensions, Swift 5 language mode |
 | Homebrew packages | `brew install ninja llvm lld libarchive pkg-config` |
 | Python 3 + Meson | `pip3 install meson` |
 
@@ -141,11 +141,11 @@ bash scripts/build_ios_simulator.sh --skip-deps
 The default destination is **iPhone 18 Pro / iOS 27.0**, with output at
 `build/ios-simulator/Build/Products/Debug-iphonesimulator/Minis.app`.
 Set `SIMULATOR_NAME`, `SIMULATOR_OS`, or `DERIVED_DATA_PATH` to choose another
-installed iOS 27+ simulator or output directory. `DEVELOPER_DIR` defaults to
+installed iOS 26+ simulator or output directory. `DEVELOPER_DIR` defaults to
 `/Applications/Xcode.app/Contents/Developer` for this script only.
 
 Native scripts select the simulator with `MINIS_SDK=iphonesimulator`; their
-simulator deployment target defaults to 27.0. Libraries, frameworks, headers,
+deployment target defaults to 26.0 for both device and simulator. Libraries, frameworks, headers,
 and isolated build trees live in `deps/simulator/`. Device outputs remain in
 their original directories. Xcode selects these paths automatically by SDK,
 so after preparing dependencies you can select an iOS 27 simulator in Xcode
