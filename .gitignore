@@ -142,3 +142,10 @@ __pycache__/
 
 # Machine-local provider customization (copy the tracked example)
 src/ios/Configs/ProviderCustomization.xcconfig
+
+# Local Harness checkpoints and generated build/review evidence
+# Keep authored task descriptions, verification notes and review reports visible.
+docs/tasks/**/*.checkpoint.json
+docs/tasks/**/evidence/
+docs/tasks/**/*.tar.gz
+docs/tasks/**/bundle-location.json
