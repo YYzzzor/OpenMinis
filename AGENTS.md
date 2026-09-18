@@ -103,6 +103,18 @@ When explaining code at the user's request, explain the actual effect of relevan
 - Choose checks sufficient for the goal and relevant risks. Once they pass, do not repeat or broaden testing unless new changes, failures or unresolved concerns justify it. Record unavailable checks explicitly; unrelated tests do not substitute for them.
 - At the end of the task, explain what changed, what was validated, and whether any questions still require the user's judgment.
 
+## Project Skills
+
+Use the shared skills below when the task fits; read the linked SKILL.md before applying it. If automatic discovery is unavailable, load it directly. For new development, use plan-task to settle material goals, choices and acceptance before implementation. Reuse explicit prior approval; ordinary code questions do not start a planning workflow.
+
+| Skill | Use when |
+| --- | --- |
+| [plan-task](.agents/skills/plan-task/SKILL.md) | Clarifying a development goal, researching relevant constraints, comparing viable approaches and confirming the implementation and acceptance plan |
+| [resume-task](.agents/skills/resume-task/SKILL.md) | Resuming an existing task and verifying its records against current Git and code state |
+| [review-task](.agents/skills/review-task/SKILL.md) | Preparing, performing or resolving a review against fixed code and confirmed requirements |
+
+The user-facing guide is [项目技能使用说明](docs/harness/skills-guide.md). These skills use the Development Harness below for records, checkpoints and acceptance.
+
 ## Development Harness
 
 - Keep the compact Spec index below in project context; load Spec bodies only as needed, normally by complete section. Record mandatory sections and optional references in the task and pass them to delegates and reviewers. Retain scope, definitions, exceptions and dependent sections; use full text for short documents or when context is uncertain. See `docs/harness/spec-context.md` for section selection and version binding.

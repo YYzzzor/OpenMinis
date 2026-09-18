@@ -1,6 +1,6 @@
 # Harness 操作说明
 
-当前入口为项目根目录的 Python 脚本与 `.agents/skills/` 中的两项技能。Python 需要 3.9+，Git 必须有初始提交。Pi 已核验本机版本 0.85.1；模型通过命令参数指定。未自动修改全局 Pi 配置。
+当前入口为项目根目录的 Python 脚本与 `.agents/skills/` 中的三项技能（plan-task、resume-task、review-task）。面向用户的用途和示例见[项目技能使用说明](skills-guide.md)。Python 需要 3.9+，Git 必须有初始提交。Pi 已核验本机版本 0.85.1；模型通过命令参数指定。未自动修改全局 Pi 配置。
 
 路径含空格时，命令参数用引号包围。任务命名使用创建日期加名称：`YY-mm-dd Name`。
 
