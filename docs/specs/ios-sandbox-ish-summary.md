@@ -2,7 +2,7 @@
 
 ## Overview
 
-MinisApp uses a customized fork of [iSH](https://github.com/OpenMinis/ish-arm64) (OpenMinis/ish-arm64) to provide a full Linux sandbox execution environment on iOS. The iSH kernel runs an Alpine Linux (aarch64) guest inside the app process, giving the AI agent a real shell with networking, filesystem, and process management — while native offloads bridge guest commands to iOS frameworks for hardware and system access.
+MinisX uses a customized fork of [iSH](https://github.com/OpenMinis/ish-arm64) (OpenMinis/ish-arm64) to provide a full Linux sandbox execution environment on iOS. The iSH kernel runs an Alpine Linux (aarch64) guest inside the app process, giving the AI agent a real shell with networking, filesystem, and process management — while native offloads bridge guest commands to iOS frameworks for hardware and system access.
 
 ---
 
@@ -17,7 +17,7 @@ MinisApp uses a customized fork of [iSH](https://github.com/OpenMinis/ish-arm64)
 | Guest OS | Alpine Linux aarch64 |
 | Upstream Fork | `OpenMinis/ish-arm64`, branch `feature-arm64` |
 | Build System | Meson (cross-compile for iOS arm64) |
-| iOS Deployment Target | 14.0+ |
+| MinisX iOS Deployment Target | 26.0+ |
 
 **Feature flags**: `GUEST_ARM64=1`, `ENGINE_ASBESTOS=1`, `KERNEL_ISH=1`
 
@@ -144,52 +144,11 @@ Guest process calls execve("/usr/local/bin/apple-calendar", args)
         → JSON result returned via pipe
 ```
 
-### 4.2 Offload Handlers (22 total)
+### 4.2 Capabilities and Scope
 
-#### Media & Audio
+See [MinisX 手机数据与设备能力清单](ios-device-data-capabilities.md) for the current commands, data read/write capabilities, permission boundaries and implementation limits.
 
-| Handler | Guest Command | iOS Framework | Capabilities |
-|---|---|---|---|
-| FFmpegOffload | `ffmpeg` | FFmpeg.framework | Video/audio encode, transcode, network streams (HTTP/HLS/TLS) |
-| MediaOffload | `apple-media` | AVFoundation | Audio playback, recording |
-| SpeakOffload | `apple-speak` | AVSpeechSynthesizer | Text-to-speech |
-| SpeechOffload | `apple-speech` | SFSpeechRecognizer | Speech-to-text |
-| PlayerOffload | `apple-player` | AVFoundation | Advanced media playback |
-
-#### Apple Services
-
-| Handler | Guest Command | iOS Framework | Capabilities |
-|---|---|---|---|
-| CalendarOffload | `apple-calendar` | EventKit | Read/write calendar events |
-| ContactsOffload | `apple-contacts` | Contacts | Contact management |
-| MapsOffload | `apple-maps` | MapKit | Maps, directions, location search |
-| PhotosOffload | `apple-photos` | Photos | Photo/video library access |
-| HealthKitOffload | `apple-health` | HealthKit | Health data read/write |
-| HomeKitOffload | `apple-home` | HomeKit | Home automation control |
-
-#### System Access
-
-| Handler | Guest Command | iOS Framework | Capabilities |
-|---|---|---|---|
-| LocationOffload | `apple-location` | CoreLocation | GPS positioning |
-| DeviceOffload | `apple-device` | UIKit/various | Battery, model, system info |
-| ClipboardOffload | `apple-clipboard` | UIPasteboard | Copy/paste (text, images) |
-| WeatherOffload | `apple-weather` | WeatherKit | Local weather data |
-| NotificationOffload | `apple-notification` | UserNotifications | Schedule local notifications |
-| AlarmOffload | `apple-alarm` | EventKit (Reminders) | Alarms and reminders |
-
-#### Intelligence
-
-| Handler | Guest Command | iOS Framework | Capabilities |
-|---|---|---|---|
-| VisionOffload | `apple-vision` | Vision | Image recognition, OCR, text detection |
-| NLPOffload | `apple-nlp` | NaturalLanguage | Language detection, sentiment, tokenization |
-
-#### Utilities
-
-| Handler | Guest Command | iOS Framework | Capabilities |
-|---|---|---|---|
-| OpenOffload | `apple-open` | UIApplication | Open URLs, open in other apps |
+The registration entry point is [ISHKernel.m](../../src/ios/iSH/ISHKernel.m); command handlers live in [NativeOffloads](../../src/ios/NativeOffloads). This overview describes the bridge architecture; the linked capability document contains the capability inventory and its verification baseline.
 
 ### 4.3 Shared Utilities (`NativeOffloadUtils`)
 
@@ -209,7 +168,7 @@ Guest process calls execve("/usr/local/bin/apple-calendar", args)
 ┌─────────────────────────────────────────────────────┐
 │  iOS App (SwiftUI)                                  │
 │  └─ AIChatViewModel                                 │
-│     └─ tool_use: execute_command("pip install ...")  │
+│     └─ tool_use: shell_execute(command: "pip ...")   │
 └──────────────────┬──────────────────────────────────┘
                    ▼
 ┌─────────────────────────────────────────────────────┐

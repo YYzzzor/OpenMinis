@@ -134,6 +134,7 @@ The user-facing guide is [项目技能使用说明](docs/harness/skills-guide.md
 | --- | --- |
 | `docs/specs/debug-server-api.md` | Debug server connection/protocol, provider management, chat automation or browser/log debugging |
 | `docs/specs/ios-sandbox-ish-summary.md` | iSH integration, mounts, native offloads or Agent command execution |
+| `docs/specs/ios-device-data-capabilities.md` | Current iOS data read/write capabilities, Agent-facing commands, permissions and implementation limits |
 | `docs/specs/minis-url-scheme.md` | `minis://` URLs, session path resolution, tool result references or chat attachment rendering |
 
 These upstream documents mix descriptions, contracts and proposed enhancements. Check the selected section's status against current code; do not treat a planned feature or implementation description as an unconditional requirement. Update this index when adding or changing the scope of a Spec.
