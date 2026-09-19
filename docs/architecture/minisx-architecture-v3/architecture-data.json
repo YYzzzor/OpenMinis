@@ -1,0 +1,3734 @@
+{
+  "meta": {
+    "repo": "YYzzzor/OpenMinis",
+    "branch": "feat/minisx-branding",
+    "sha": "1fe22b29c7a80b386bb4635a26ef5172bcbedfd3",
+    "date": "2026-09-18",
+    "version": "阅读版 v3 · iSH 与原生能力",
+    "method": "固定提交下的源码静态阅读",
+    "boundaries": "沿用固定提交 1fe22b29：已阅读消息主线和 MCP 相关路径；本次补充 iSH 协调执行、会话文件路由、原生注册入口、JSON 公共封装、应用内权限，以及日历等代表处理器。27 组注册清单与项目能力文档逐项对照；每项列出本次核查深度。未编译运行 iOS 应用，未访问真实模型、设备数据或云端记录。"
+  },
+  "nodes": [
+    {
+      "id": "ui",
+      "title": "界面与输入",
+      "subtitle": "Views / Chat",
+      "parent": "ios",
+      "macro": "ui",
+      "summary": "用户输入内容后，界面把发送操作交给会话对象；会话数据发生变化时，界面接收更新信号。",
+      "role": "AIChatView 管理聊天界面。CachedViewModel 为它取得并持有会话对应的 AIChatViewModel，并转发 objectWillChange。",
+      "inputs": "输入框的 inputText、已准备的附件，以及用户的发送或停止操作。",
+      "outputs": "普通消息交给 vm.send()；界面层先检查本地斜杠命令。",
+      "states": "输入文本与附件；ChatMessage 的 content、blocks、error、isAwaitingModelResponse。",
+      "refs": [
+        {
+          "path": "src/ios/Views/Chat/AIChatView.swift",
+          "symbol": "AIChatView.performSend(); CachedViewModel; inputTextBinding",
+          "lines": null,
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/Chat/ChatModels.swift",
+          "symbol": "ChatMessage",
+          "lines": [
+            38,
+            112
+          ],
+          "kind": "源码"
+        }
+      ],
+      "level": "入口与相关实现已核实",
+      "runtime": "iOS 应用进程",
+      "drill": null
+    },
+    {
+      "id": "agent",
+      "title": "Agent 会话编排",
+      "subtitle": "Agent / Chat",
+      "parent": "ios",
+      "macro": "agent",
+      "summary": "一条消息可以触发多次模型请求。会话对象准备上下文、消费回复、调度工具，并控制本轮结束。",
+      "role": "AIChatViewModel.send() 负责发送入口；runAgentLoop() 负责模型与工具之间的迭代。",
+      "inputs": "当前用户消息、已有 agentHistory、会话配置与工具定义。",
+      "outputs": "流式 UI 状态、模型历史条目、工具调用、持久化请求以及完成或错误状态。",
+      "states": "messages、agentHistory、sessionId、isProcessing、isSuspended、canResume、currentTask、promptQueue。",
+      "refs": [
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel.swift",
+          "symbol": "send()",
+          "lines": [
+            2049,
+            2080
+          ],
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel.swift",
+          "symbol": "runAgentLoop()",
+          "lines": [
+            4207,
+            4338
+          ],
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel.swift",
+          "symbol": "工具并发与结果回填",
+          "lines": [
+            5260,
+            5384
+          ],
+          "kind": "源码"
+        }
+      ],
+      "level": "入口与相关实现已核实",
+      "runtime": "iOS 应用进程",
+      "drill": "agent"
+    },
+    {
+      "id": "providers",
+      "title": "模型接入",
+      "subtitle": "Providers",
+      "parent": "ios",
+      "macro": "providers",
+      "summary": "把应用使用的统一消息与工具定义交给具体模型提供方，并把回复转换为统一事件。",
+      "role": "AgentProvider 规定输入与输出接口；runAgentLoop() 通过 provider factory 和 fallback 路径选择具体实现。",
+      "inputs": "[AgentMessage]、systemPrompt、[AgentToolDefinition]、maxTokens、thinkingLevel。",
+      "outputs": "AsyncThrowingStream<AgentStreamEvent, Error>，包含文本增量、工具参数、工具调用完成与结束原因。",
+      "states": "选择的模型 entry、provider、统一 AgentStreamEvent 和 AgentStopReason。",
+      "refs": [
+        {
+          "path": "src/ios/Providers/AgentProvider.swift",
+          "symbol": "AgentProvider; AgentStreamEvent; AgentStopReason",
+          "lines": null,
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel.swift",
+          "symbol": "makeAgentProvider(); streamWithGroupFallback()",
+          "lines": [
+            4207,
+            4285
+          ],
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel.swift",
+          "symbol": "contextHistory 与 streamWithGroupFallback()",
+          "lines": [
+            4610,
+            4640
+          ],
+          "kind": "源码"
+        }
+      ],
+      "level": "统一接口及主循环接入已核实；各供应商网络实现待展开",
+      "runtime": "iOS 应用进程",
+      "drill": null
+    },
+    {
+      "id": "config",
+      "title": "配置与上下文",
+      "subtitle": "Agent / Session + Providers",
+      "parent": "ios",
+      "macro": "config",
+      "summary": "在请求发出之前，程序读取模型绑定、Skills、MCP 和记忆配置，组合这一轮的系统提示。",
+      "role": "这是导览中的职责分组。具体实现分别位于 ProviderConfigStore、SkillStore、MCPStore 及会话对象的记忆辅助方法。",
+      "inputs": "会话 ID、模型配置、各项启用设置、保存的元数据。",
+      "outputs": "模型能力提示、Skills 元数据、MCP 服务器摘要，以及按开关加入的记忆片段。",
+      "states": "用户全局默认与会话覆盖分别管理；MCP 有自己的 JSON 和 SQLite 覆盖表。",
+      "refs": [
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel.swift",
+          "symbol": "提示词拼接与 memoryEnabled 分支",
+          "lines": [
+            4265,
+            4310
+          ],
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/Session/MCPStore.swift",
+          "symbol": "isEnabledForSession(); systemPromptSnippet()",
+          "lines": [
+            584,
+            640
+          ],
+          "kind": "源码"
+        }
+      ],
+      "level": "入口与相关实现已核实",
+      "runtime": "iOS 应用进程",
+      "drill": "mcp"
+    },
+    {
+      "id": "storage",
+      "title": "消息持久化",
+      "subtitle": "Agent / Chat / ChatStore",
+      "parent": "ios",
+      "macro": "storage",
+      "summary": "用户消息和模型/工具历史通过持久化函数交给 ChatStore；恢复时需要重建界面消息。",
+      "role": "send() 与 runAgentLoop() 调用 persistAgentMessage()、buildRawMessage()、ChatStore.appendMessage(s)。本版核实这些调用处。",
+      "inputs": "AgentMessage、工具快照、工具终态、错误信息和使用量。",
+      "outputs": "可恢复的数据库消息，以及写回 agentHistory 的 dbMessageId。",
+      "states": "UI 的 ChatMessage、模型使用的 AgentMessage、数据库 RawMessage 是三个表示层；一条助手气泡可聚合多轮记录。",
+      "refs": [
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel.swift",
+          "symbol": "用户消息持久化",
+          "lines": [
+            2421,
+            2433
+          ],
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel.swift",
+          "symbol": "最终回复及错误写入",
+          "lines": [
+            5136,
+            5160
+          ],
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel.swift",
+          "symbol": "助手/工具结果批量写入",
+          "lines": [
+            5351,
+            5384
+          ],
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/Chat/ChatModels.swift",
+          "symbol": "sourceSortOrder; lastSourceSortOrder",
+          "lines": [
+            65,
+            79
+          ],
+          "kind": "源码"
+        }
+      ],
+      "level": "写入调用点已核实；ChatStore 内部事务与完整恢复路径待展开",
+      "runtime": "iOS 应用进程",
+      "drill": null
+    },
+    {
+      "id": "tools",
+      "title": "工具执行",
+      "subtitle": "Agent / Chat / +ConcurrentTools",
+      "parent": "ios",
+      "macro": "tools",
+      "summary": "模型返回工具名与参数，程序检查并执行调用，再按原始调用顺序收集结果。",
+      "role": "executeSingleToolUse() 处理单次调用；runAgentLoop() 用 TaskGroup 控制并发与结果归并。",
+      "inputs": "StreamResult.ToolEntry：工具 ID、名称、参数、界面块索引。",
+      "outputs": "ToolExecOutcome：toolResult、快照及取消标记。",
+      "states": "工具状态包括 streaming、running、success、failed、cancelled；当前 maxConcurrentTools = 10。",
+      "refs": [
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel+ConcurrentTools.swift",
+          "symbol": "maxConcurrentTools; executeSingleToolUse()",
+          "lines": [
+            19,
+            210
+          ],
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel.swift",
+          "symbol": "TaskGroup 与结果排序",
+          "lines": [
+            5260,
+            5331
+          ],
+          "kind": "源码"
+        }
+      ],
+      "level": "入口与相关实现已核实",
+      "runtime": "iOS 应用进程",
+      "drill": null
+    },
+    {
+      "id": "ish",
+      "title": "iSH 命令执行",
+      "subtitle": "Agent / ISH + iSH",
+      "parent": "ios",
+      "macro": "ish",
+      "summary": "把模型给出的命令放进当前会话的 Linux 执行环境，跟踪独立进程，并把输出和退出码交回 Agent。",
+      "role": "executeCommand() 处理命令兼容性；ISHExecutionCoordinator 准备共享挂载和会话 fsContext，再让 ISHShellExecutor 启动独立 /bin/sh。MinisFsRouter 把会话路径对应到各自的持久目录。",
+      "inputs": "sessionId、命令字符串、超时预算、输出行回调与 PID 回调；环境变量由 EnvVarStore 提供。",
+      "outputs": "执行中的文本行供界面更新；完成时返回 stdout/stderr 汇总与 exitCode；生成文件保存在当前会话可访问的目录。",
+      "states": "isBooted；fsContext ↔ sessionId；perSessionInflight 中的 PID；超时与终止状态。每次执行有独立进程和管道。",
+      "refs": [
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel+ConcurrentTools.swift",
+          "symbol": "shell_execute 权限检查、executeCommand 回调与结果处理",
+          "lines": [
+            217,
+            388
+          ],
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/ISH/ISHExecutionCoordinator.swift",
+          "symbol": "execute(); runCommand(); stopCurrentCommand(sessionId:)",
+          "lines": null,
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel+ISHCommand.swift",
+          "symbol": "executeCommand(); runRaw()",
+          "lines": [
+            17,
+            181
+          ],
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/ISH/MinisFsRouter.swift",
+          "symbol": "context(for:); installHook(); hostPath(forGuest:sid:)",
+          "lines": null,
+          "kind": "源码"
+        }
+      ],
+      "level": "协调执行、脚本包装、输出清理与会话路由已读；C 内核执行内部及设备运行待验证",
+      "runtime": "设备本地：应用内 iSH / Alpine 环境",
+      "drill": null
+    },
+    {
+      "id": "native",
+      "title": "原生能力桥接",
+      "subtitle": "NativeOffloads",
+      "parent": "ios",
+      "macro": "native",
+      "summary": "把 apple-calendar 等已注册命令及其参数交给本地 Objective-C / Swift 处理器，再封装系统或应用操作的结果。",
+      "role": "ISHKernel 启动时调用 27 组 *_offload_register()。例如 calendar_offload_register() 将命令名绑定到 calendar_handler；处理器解析 argv、检查操作与权限、调用 EventKit，并经 NativeOffloadUtils 输出 JSON。",
+      "inputs": "命令名、argc/argv、stdin/stdout/stderr 文件描述符；部分处理器还使用当前会话的文件路径。",
+      "outputs": "常见输出是含 ok、tool、action、data 或 error 的 JSON 与退出码；媒体工具也可输出文件、日志或特定格式。",
+      "states": "处理器注册表、应用内权限请求、系统授权结果、异步完成回调与操作错误。27 组注册包含系统能力、媒体处理及 MinisX 自身接口。",
+      "refs": [
+        {
+          "path": "src/ios/iSH/ISHKernel.m",
+          "symbol": "bootWithRootPath: 原生处理器注册",
+          "lines": [
+            413,
+            447
+          ],
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/NativeOffloads/CalendarOffload.m",
+          "symbol": "calendar_offload_register(); calendar_handler(); cmd_list()",
+          "lines": null,
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/NativeOffloads/NativeOffloadUtils.m",
+          "symbol": "noff_json_envelope(); noff_json_error(); noff_emit_json()",
+          "lines": [
+            131,
+            215
+          ],
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/Offload/OffloadPermissionManager.swift",
+          "symbol": "allCommands; extractOffloadCommand(); checkPermission()",
+          "lines": null,
+          "kind": "源码"
+        },
+        {
+          "path": "docs/specs/ios-device-data-capabilities.md",
+          "symbol": "第 3–6 节：已接入能力、接口缺口与边界",
+          "lines": null,
+          "kind": "项目文档"
+        }
+      ],
+      "level": "27 组注册逐项核对；代表处理器与公共层已读；其余功能范围对照项目清单，逐项标注依据",
+      "runtime": "iOS 应用进程",
+      "drill": null
+    },
+    {
+      "id": "sync",
+      "title": "同步协作",
+      "subtitle": "Agent / Sync",
+      "parent": "ios",
+      "macro": "sync",
+      "summary": "本地变更会进入待同步记录；收到远端变化后，会话层根据活动状态选择立即刷新或延后刷新。",
+      "role": "MCPStore 标记 MCPServerItem 变更；会话对象监听 cloudSyncDidFetchChanges，并在运行期间暂存刷新需求。",
+      "inputs": "本地消息或配置变更、远端变更通知。",
+      "outputs": "同步待办、远端应用后的配置、会话重载请求。",
+      "states": "pendingSyncReloadOnIdle、isProcessing、postStopSyncHoldUntil，以及 MCP 内容指纹。",
+      "refs": [
+        {
+          "path": "src/ios/Agent/Session/MCPStore.swift",
+          "symbol": "markServerDirty(); applyRemoteServerItem(); scanExternalChanges()",
+          "lines": null,
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel.swift",
+          "symbol": "beginPostStopSyncHold(); releasePostStopSyncHold(); syncChangeObserver",
+          "lines": [
+            94,
+            176
+          ],
+          "kind": "源码"
+        }
+      ],
+      "level": "MCP 同步接口与会话观察点已核实；SyncCore 内部协议待展开",
+      "runtime": "iOS 应用进程",
+      "drill": null
+    },
+    {
+      "id": "llm",
+      "title": "模型服务",
+      "subtitle": "外部 API / 配置的提供方",
+      "parent": "external",
+      "macro": "providers",
+      "summary": "模型根据本轮上下文生成文本、工具调用和结束信号。",
+      "role": "程序接收模型输出后决定如何执行、展示、保存和继续下一轮。",
+      "inputs": "系统提示、历史与当前消息、工具定义。",
+      "outputs": "回复文本或工具名与参数，以及供应商协议中的结束信息。",
+      "states": "服务端状态与本地状态分别管理；具体网络地址取决于模型配置。",
+      "refs": [
+        {
+          "path": "src/ios/Providers/AgentProvider.swift",
+          "symbol": "AgentProvider 接口与统一事件",
+          "lines": null,
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel.swift",
+          "symbol": "模型流请求接入",
+          "lines": [
+            4610,
+            4640
+          ],
+          "kind": "源码"
+        }
+      ],
+      "level": "本地接口已核实；服务端内部实现超出仓库范围",
+      "runtime": "配置的模型服务端",
+      "drill": null
+    },
+    {
+      "id": "cloud",
+      "title": "iCloud",
+      "subtitle": "设备之外的同步服务",
+      "parent": "external",
+      "macro": "sync",
+      "summary": "保存同步记录，供本机及其他设备接收。",
+      "role": "在本次已读实现中，MCP 使用逐服务器记录，修改通过本地 dirty 标记交给同步层。",
+      "inputs": "待上传记录与删除标记。",
+      "outputs": "远端记录和变更通知。",
+      "states": "每台设备仍有自己的内存状态和本地文件。",
+      "refs": [
+        {
+          "path": "src/ios/Agent/Session/MCPStore.swift",
+          "symbol": "逐服务器 MCPServerItem 同步区块",
+          "lines": null,
+          "kind": "源码"
+        }
+      ],
+      "level": "应用侧接口已核实；云端行为未做运行验证",
+      "runtime": "外部平台",
+      "drill": null
+    },
+    {
+      "id": "os",
+      "title": "iOS 系统框架",
+      "subtitle": "EventKit / Photos / HealthKit / …",
+      "parent": "external",
+      "macro": "native",
+      "summary": "苹果框架提供设备数据与系统功能的调用接口；原生处理器用这些接口发起请求，系统按授权、对象范围和运行条件返回结果。",
+      "role": "框架负责访问系统管理的数据或服务。项目处理器负责选择具体 API、提供参数并处理返回值；框架访问范围由相应授权和对象规则约束。天气、路线等服务还涉及联网条件。",
+      "inputs": "例如日历时间范围、照片资源 ID、健康数据类型或闹钟安排；由处理器转换成系统 API 需要的对象。",
+      "outputs": "数据对象、资源文件、操作结果、权限状态或 Error；部分接口通过完成回调或 async/await 返回。",
+      "states": "各框架的授权状态、已授权资源范围、硬件支持、服务可用性及 App 前后台条件。框架能力与项目已封装操作分别列出。",
+      "refs": [
+        {
+          "path": "src/ios/NativeOffloads/CalendarOffload.m",
+          "symbol": "EKEventStore; requestCalendarAccess(); cmd_list()",
+          "lines": null,
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/NativeOffloads/PhotosOffload.m",
+          "symbol": "Photos 导入、命令清单与授权入口",
+          "lines": [
+            9,
+            146
+          ],
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/NativeOffloads/HealthKitOffload.m",
+          "symbol": "HKHealthStore; 数据类型与读写入口",
+          "lines": null,
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/NativeOffloads/WeatherOffload.m",
+          "symbol": "WeatherOffloadBridge; 地理位置与天气请求",
+          "lines": [
+            8,
+            186
+          ],
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/NativeOffloads/AlarmOffloadBridge.swift",
+          "symbol": "AlarmManager; requestAuthorization(); scheduleAlarm()",
+          "lines": [
+            8,
+            110
+          ],
+          "kind": "源码"
+        },
+        {
+          "path": "docs/specs/ios-device-data-capabilities.md",
+          "symbol": "第 2 节框架与项目接口；第 6 节权限和范围",
+          "lines": null,
+          "kind": "项目文档"
+        }
+      ],
+      "level": "日历、照片、健康、天气、闹钟等代表接口已读；完整系统权限行为需设备验证",
+      "runtime": "设备本地：操作系统框架",
+      "drill": null
+    },
+    {
+      "id": "send",
+      "title": "发送入口",
+      "subtitle": "send()",
+      "parent": "agent",
+      "macro": "agent",
+      "summary": "校验输入、检查上下文容量，创建用户气泡并启动异步处理。",
+      "role": "将一次界面发送转为可持续执行的任务。",
+      "inputs": "inputText、attachments、isProcessing、remoteDeviceId。",
+      "outputs": "用户 ChatMessage、isProcessing = true、currentTask。",
+      "states": "空输入、正在处理与只读会话等条件会影响准入；上下文检查可转向压缩。",
+      "refs": [
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel.swift",
+          "symbol": "send() 准入",
+          "lines": [
+            2049,
+            2080
+          ],
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel.swift",
+          "symbol": "上下文检查",
+          "lines": [
+            2105,
+            2151
+          ],
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel.swift",
+          "symbol": "气泡、状态、异步任务",
+          "lines": [
+            2220,
+            2255
+          ],
+          "kind": "源码"
+        }
+      ],
+      "level": "入口与相关实现已核实",
+      "runtime": "iOS 应用进程",
+      "drill": null
+    },
+    {
+      "id": "session",
+      "title": "会话与历史",
+      "subtitle": "ensureSession() / agentHistory",
+      "parent": "agent",
+      "macro": "storage",
+      "summary": "草稿先取得真实会话，再把当前消息加入模型历史并保存。",
+      "role": "建立可归属的会话 ID，并保留后续上下文与恢复所需的数据。",
+      "inputs": "文本、附件元数据、现有会话或草稿。",
+      "outputs": "AgentMessage(role: .user)、数据库 ID、历史条目。",
+      "states": "用户界面消息先出现，持久化在随后的 Task 中进行。",
+      "refs": [
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel.swift",
+          "symbol": "ensureSession() 调用",
+          "lines": [
+            2244,
+            2258
+          ],
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel.swift",
+          "symbol": "agentHistory 与 persistAgentMessage()",
+          "lines": [
+            2421,
+            2433
+          ],
+          "kind": "源码"
+        }
+      ],
+      "level": "入口与相关实现已核实",
+      "runtime": "iOS 应用进程",
+      "drill": null
+    },
+    {
+      "id": "context",
+      "title": "请求上下文",
+      "subtitle": "模型 + Skills + MCP + 记忆",
+      "parent": "agent",
+      "macro": "config",
+      "summary": "按当前会话选择模型，拼接系统提示和有效历史。",
+      "role": "让模型知道当前任务、已有上下文以及可用工具。",
+      "inputs": "ProviderConfigStore、SkillStore、MCPStore、memoryEnabled、agentHistory。",
+      "outputs": "provider、tools、userSystemPrompt、contextHistory。",
+      "states": "effectiveAgentHistory() 给出用于当前请求的历史；压缩和预算内部算法留待后续展开。",
+      "refs": [
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel.swift",
+          "symbol": "模型、工具与提示词",
+          "lines": [
+            4207,
+            4310
+          ],
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel.swift",
+          "symbol": "effectiveAgentHistory()",
+          "lines": [
+            4610,
+            4640
+          ],
+          "kind": "源码"
+        }
+      ],
+      "level": "入口与相关实现已核实",
+      "runtime": "iOS 应用进程",
+      "drill": null
+    },
+    {
+      "id": "loop",
+      "title": "模型—工具循环",
+      "subtitle": "runAgentLoop()",
+      "parent": "agent",
+      "macro": "agent",
+      "summary": "每轮请求模型，消费事件；存在工具调用时执行工具并携结果继续。",
+      "role": "控制请求边界、结果归并和停止分支。",
+      "inputs": "统一事件流、StreamResult、当前历史。",
+      "outputs": "最终回复，或下一轮请求所需的工具结果历史。",
+      "states": "stopReason、toolEntries、committedBlockCount、canResume、promptQueue。",
+      "refs": [
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel.swift",
+          "symbol": "runAgentLoop()",
+          "lines": [
+            4207,
+            4230
+          ],
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel.swift",
+          "symbol": "无工具结束路径",
+          "lines": [
+            5052,
+            5190
+          ],
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel.swift",
+          "symbol": "工具结果回填",
+          "lines": [
+            5320,
+            5386
+          ],
+          "kind": "源码"
+        }
+      ],
+      "level": "入口与相关实现已核实",
+      "runtime": "iOS 应用进程",
+      "drill": null
+    },
+    {
+      "id": "stream",
+      "title": "流式事件处理",
+      "subtitle": "+SSEStream.processStreamEvents()",
+      "parent": "agent",
+      "macro": "agent",
+      "summary": "逐个消费文本增量和工具事件，并把可显示内容批量交给主执行域。",
+      "role": "模型分批传来内容时，保持界面更新与事件状态一致。",
+      "inputs": "AsyncThrowingStream<AgentStreamEvent, Error>。",
+      "outputs": "StreamResult；ChatMessage 中的文本块、工具块和等待状态。",
+      "states": "assistantText、toolEntries、stopReason；循环中设置了 120 秒无新事件等待超时。",
+      "refs": [
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel+SSEStream.swift",
+          "symbol": "StreamResult",
+          "lines": [
+            29,
+            68
+          ],
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel+SSEStream.swift",
+          "symbol": "processStreamEvents()",
+          "lines": [
+            212,
+            229
+          ],
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel+SSEStream.swift",
+          "symbol": "事件循环、等待超时、UI 更新",
+          "lines": [
+            271,
+            414
+          ],
+          "kind": "源码"
+        }
+      ],
+      "level": "入口与相关实现已核实",
+      "runtime": "iOS 应用进程",
+      "drill": null
+    },
+    {
+      "id": "mcp",
+      "title": "MCP 配置中心",
+      "subtitle": "Agent / Session / MCPStore",
+      "parent": "config",
+      "macro": "config",
+      "summary": "把已保存的 MCP 服务器配置连接到会话开关、模型提示和工具刷新界面。",
+      "role": "MCPStore.shared 提供配置 CRUD、会话覆盖、提示词片段、刷新工具入口与同步接口。",
+      "inputs": "配置表单、JSON 导入、会话开关、CLI 对共享文件的编辑、远端记录。",
+      "outputs": "servers、会话有效开关、系统提示片段、MCPToolInfo 列表和同步待办。",
+      "states": "servers 发布列表变化；sessionOverrideVersion 推动会话开关界面刷新。",
+      "refs": [
+        {
+          "path": "src/ios/Agent/Session/MCPStore.swift",
+          "symbol": "MCPStore; MCPServerConfig",
+          "lines": null,
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/Session/MCPStore.swift",
+          "symbol": "会话规则、提示词、刷新",
+          "lines": [
+            584,
+            699
+          ],
+          "kind": "源码"
+        }
+      ],
+      "level": "主要方法与相关界面调用已核实",
+      "runtime": "iOS 应用进程",
+      "drill": "mcp"
+    },
+    {
+      "id": "mcpui",
+      "title": "MCP 管理界面",
+      "subtitle": "Views / MCP",
+      "parent": "mcp",
+      "macro": "ui",
+      "summary": "添加、编辑、导入配置，或为特定会话调整开关。",
+      "role": "表单负责收集输入；Store 负责保存和计算有效状态。",
+      "inputs": "用户填写的配置、粘贴的 JSON、当前会话 ID。",
+      "outputs": "add()、parseImport()/commitImport()、setSessionOverride()、refreshTools() 调用。",
+      "states": "表单临时状态、导入预览、工具刷新 loading/error。",
+      "refs": [
+        {
+          "path": "src/ios/Views/MCP/MCPFormSheet.swift",
+          "symbol": "store_addAndSyncSecret()",
+          "lines": null,
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Views/MCP/MCPJSONImportSheet.swift",
+          "symbol": "parse(); commit()",
+          "lines": null,
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Views/MCP/SessionMCPsView.swift",
+          "symbol": "setOverride()",
+          "lines": null,
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Views/MCP/MCPIntegrationsView.swift",
+          "symbol": "MCPToolsSheet.refresh()",
+          "lines": null,
+          "kind": "源码"
+        }
+      ],
+      "level": "入口与相关实现已核实",
+      "runtime": "iOS 应用进程",
+      "drill": null
+    },
+    {
+      "id": "mcpdisk",
+      "title": "服务器配置文件",
+      "subtitle": "servers.json",
+      "parent": "mcp",
+      "macro": "storage",
+      "summary": "保存全部服务器的连接参数与全局默认启用状态；应用与 guest CLI 访问同一底层文件。",
+      "role": "load()/save() 在内存模型与 mcpServers JSON 之间转换。",
+      "inputs": "MCPServerConfig 数组，或 CLI 写入的配置。",
+      "outputs": "JSON 中以名称为键的服务器条目；重新加载后的 servers。",
+      "states": "HTTP 使用 url/headers，STDIO 使用 command/args/env；createdAt 与 updatedAt 各有用途。",
+      "refs": [
+        {
+          "path": "src/ios/Agent/Session/MCPStore.swift",
+          "symbol": "syncFileURL; ServersFile; readServersFromDisk(); save()",
+          "lines": null,
+          "kind": "源码"
+        }
+      ],
+      "level": "入口与相关实现已核实",
+      "runtime": "设备本地：MinisConfig/mcp-servers/servers.json",
+      "drill": null
+    },
+    {
+      "id": "override",
+      "title": "会话覆盖",
+      "subtitle": "skills.db / mcp_session_overrides",
+      "parent": "mcp",
+      "macro": "storage",
+      "summary": "查询时优先采用当前会话的覆盖值，再采用服务器全局默认。",
+      "role": "只保存相对全局默认的例外；设置与默认相同的值时删除覆盖记录。",
+      "inputs": "sessionId、serverId、enabled。",
+      "outputs": "isEnabledForSession() 的布尔结果，以及 sessionOverrideVersion 变化。",
+      "states": "以 session_id 与 server_id 为联合键保存覆盖。",
+      "refs": [
+        {
+          "path": "src/ios/Agent/Session/MCPStore.swift",
+          "symbol": "createTables(); dbSessionOverride()",
+          "lines": null,
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/Session/MCPStore.swift",
+          "symbol": "isEnabledForSession(); setSessionOverride()",
+          "lines": [
+            584,
+            599
+          ],
+          "kind": "源码"
+        }
+      ],
+      "level": "入口与相关实现已核实",
+      "runtime": "设备本地：Library/MinisChat/skills.db",
+      "drill": null
+    },
+    {
+      "id": "mcpsnippet",
+      "title": "提示词片段",
+      "subtitle": "systemPromptSnippet(for:)",
+      "parent": "mcp",
+      "macro": "config",
+      "summary": "将会话有效启用的服务器按添加时间排序，向模型介绍前 20 个。",
+      "role": "名称、备注和 CLI 使用指引帮助模型按需发现工具。",
+      "inputs": "servers、当前会话覆盖、createdAt、note。",
+      "outputs": "包含名称与备注的 String；会话对象追加到 userSystemPrompt。",
+      "states": "createdAt 降序、同时间按名称；备注保留前 200 字符并在截断时追加省略号。",
+      "refs": [
+        {
+          "path": "src/ios/Agent/Session/MCPStore.swift",
+          "symbol": "systemPromptSnippet(for:)",
+          "lines": [
+            608,
+            640
+          ],
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel.swift",
+          "symbol": "提示词实际接入点",
+          "lines": [
+            4274,
+            4290
+          ],
+          "kind": "源码"
+        }
+      ],
+      "level": "入口与相关实现已核实",
+      "runtime": "iOS 应用进程",
+      "drill": null
+    },
+    {
+      "id": "refresh",
+      "title": "刷新工具",
+      "subtitle": "refreshTools(server:)",
+      "parent": "mcp",
+      "macro": "config",
+      "summary": "点击刷新后，Store 在 guest 环境执行 minis-mcp-cli refresh 并解析返回的工具列表。",
+      "role": "把界面动作桥接到可执行命令，汇总 JSON 返回值或错误。",
+      "inputs": "服务器名；已启动的 iSH 内核。",
+      "outputs": "[MCPToolInfo]；kernelNotBooted、cliFailed 等错误。",
+      "states": "上下文 ID 为 mcp-settings，命令超时 120 秒，服务器名做 shell 引号处理。",
+      "refs": [
+        {
+          "path": "src/ios/Agent/Session/MCPStore.swift",
+          "symbol": "refreshTools(server:)",
+          "lines": [
+            670,
+            699
+          ],
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Views/MCP/MCPIntegrationsView.swift",
+          "symbol": "MCPToolsSheet.refresh()",
+          "lines": null,
+          "kind": "源码"
+        }
+      ],
+      "level": "入口与相关实现已核实",
+      "runtime": "iOS 应用进程",
+      "drill": null
+    },
+    {
+      "id": "mcpsync",
+      "title": "逐服务器同步",
+      "subtitle": "MCPServerItem",
+      "parent": "mcp",
+      "macro": "sync",
+      "summary": "界面编辑与 CLI 外部编辑都能进入同步流程；远端应用同时更新内容指纹。",
+      "role": "用每个服务器的更新时间与内容指纹协调配置变化。",
+      "inputs": "本地变更名称、共享文件变化、远端记录。",
+      "outputs": "dirty upsert/delete 标记；更新后的本地配置。",
+      "states": "语义指纹排除 createdAt/updatedAt；远端应用和本地编辑使用不同的同步入口。",
+      "refs": [
+        {
+          "path": "src/ios/Agent/Session/MCPStore.swift",
+          "symbol": "noteSyncedLocalChange(); scanExternalChanges(); applyRemoteServerItem()",
+          "lines": null,
+          "kind": "源码"
+        }
+      ],
+      "level": "入口与相关实现已核实",
+      "runtime": "iOS 应用进程",
+      "drill": null
+    },
+    {
+      "id": "cli",
+      "title": "MCP 命令行",
+      "subtitle": "minis-mcp-cli",
+      "parent": "mcp",
+      "macro": "ish",
+      "summary": "接收 tools / call / refresh 命令，承担 MCP 运行时交互。",
+      "role": "本版从 MCPStore 的命令生成与提示词核实其使用方式；CLI 内部协议实现待后续阅读。",
+      "inputs": "共享 servers.json、命令参数和运行时环境。",
+      "outputs": "供刷新界面或工具执行流程消费的结果。",
+      "states": "连接、协议握手与具体服务行为由 CLI 运行时处理。",
+      "refs": [
+        {
+          "path": "src/ios/Agent/Session/MCPStore.swift",
+          "symbol": "CLI 用法指引与 refresh 命令",
+          "lines": [
+            631,
+            698
+          ],
+          "kind": "源码"
+        }
+      ],
+      "level": "原生侧调用约定已核实；CLI 内部实现待展开",
+      "runtime": "设备本地：iSH guest",
+      "drill": null
+    }
+  ],
+  "scopes": {
+    "overview": {
+      "title": "整体运行架构",
+      "subtitle": "按职责组织；点击节点查看它在代码中的位置。",
+      "bounds": [
+        {
+          "x": 16,
+          "y": 38,
+          "w": 764,
+          "h": 660,
+          "label": "设备本地 · iOS 应用及内嵌执行环境"
+        },
+        {
+          "x": 800,
+          "y": 38,
+          "w": 228,
+          "h": 660,
+          "label": "外部服务 / 系统框架"
+        }
+      ],
+      "nodes": [
+        [
+          "ui",
+          45,
+          95,
+          210,
+          80
+        ],
+        [
+          "agent",
+          300,
+          95,
+          210,
+          80
+        ],
+        [
+          "providers",
+          550,
+          95,
+          210,
+          80
+        ],
+        [
+          "config",
+          45,
+          300,
+          210,
+          80
+        ],
+        [
+          "storage",
+          300,
+          300,
+          210,
+          80
+        ],
+        [
+          "tools",
+          550,
+          300,
+          210,
+          80
+        ],
+        [
+          "sync",
+          45,
+          525,
+          210,
+          80
+        ],
+        [
+          "native",
+          300,
+          525,
+          210,
+          80
+        ],
+        [
+          "ish",
+          550,
+          525,
+          210,
+          80
+        ],
+        [
+          "llm",
+          810,
+          95,
+          205,
+          80
+        ],
+        [
+          "cloud",
+          810,
+          300,
+          205,
+          80
+        ],
+        [
+          "os",
+          810,
+          525,
+          205,
+          80
+        ]
+      ],
+      "edges": [
+        {
+          "a": "ui",
+          "b": "agent",
+          "label": "发送 / 停止",
+          "kind": "call",
+          "refs": []
+        },
+        {
+          "a": "agent",
+          "b": "providers",
+          "label": "请求统一事件流",
+          "kind": "call",
+          "refs": []
+        },
+        {
+          "a": "providers",
+          "b": "llm",
+          "label": "请求 / 回复",
+          "kind": "io",
+          "refs": []
+        },
+        {
+          "a": "agent",
+          "b": "config",
+          "label": "读取会话策略",
+          "kind": "call",
+          "refs": []
+        },
+        {
+          "a": "agent",
+          "b": "storage",
+          "label": "保存 / 读取记录",
+          "kind": "io",
+          "refs": []
+        },
+        {
+          "a": "agent",
+          "b": "tools",
+          "label": "调度工具",
+          "kind": "call",
+          "refs": []
+        },
+        {
+          "a": "tools",
+          "b": "ish",
+          "label": "执行 shell 子路径",
+          "kind": "call",
+          "refs": []
+        },
+        {
+          "a": "ish",
+          "b": "native",
+          "label": "分发 apple-*",
+          "kind": "call",
+          "refs": []
+        },
+        {
+          "a": "native",
+          "b": "os",
+          "label": "系统能力调用",
+          "kind": "call",
+          "refs": []
+        },
+        {
+          "a": "storage",
+          "b": "sync",
+          "label": "消息同步协作",
+          "kind": "overview",
+          "refs": []
+        },
+        {
+          "a": "config",
+          "b": "sync",
+          "label": "配置变更标记",
+          "kind": "call",
+          "refs": []
+        },
+        {
+          "a": "sync",
+          "b": "cloud",
+          "label": "同步记录",
+          "kind": "io",
+          "refs": []
+        },
+        {
+          "a": "agent",
+          "b": "ui",
+          "label": "状态 / 更新信号",
+          "kind": "signal",
+          "refs": []
+        }
+      ],
+      "w": 1040,
+      "h": 730
+    },
+    "agent": {
+      "title": "进入 Agent：一条消息如何运行",
+      "subtitle": "同一会话对象连接输入、上下文、模型、工具和消息记录。",
+      "bounds": [
+        {
+          "x": 245,
+          "y": 45,
+          "w": 542,
+          "h": 628,
+          "label": "Agent / Chat · 按流程展开"
+        },
+        {
+          "x": 13,
+          "y": 45,
+          "w": 211,
+          "h": 628,
+          "label": "界面 / 存储"
+        },
+        {
+          "x": 810,
+          "y": 45,
+          "w": 215,
+          "h": 628,
+          "label": "协作模块"
+        }
+      ],
+      "nodes": [
+        [
+          "ui",
+          24,
+          110,
+          185,
+          78
+        ],
+        [
+          "send",
+          270,
+          110,
+          205,
+          78
+        ],
+        [
+          "session",
+          540,
+          110,
+          220,
+          78
+        ],
+        [
+          "context",
+          540,
+          300,
+          220,
+          78
+        ],
+        [
+          "loop",
+          270,
+          300,
+          205,
+          78
+        ],
+        [
+          "stream",
+          270,
+          535,
+          205,
+          78
+        ],
+        [
+          "storage",
+          24,
+          535,
+          185,
+          78
+        ],
+        [
+          "providers",
+          824,
+          300,
+          185,
+          78
+        ],
+        [
+          "tools",
+          824,
+          535,
+          185,
+          78
+        ]
+      ],
+      "edges": [
+        {
+          "a": "ui",
+          "b": "send",
+          "label": "performSend → send",
+          "kind": "call",
+          "refs": []
+        },
+        {
+          "a": "send",
+          "b": "session",
+          "label": "Task + await",
+          "kind": "call",
+          "refs": []
+        },
+        {
+          "a": "session",
+          "b": "context",
+          "label": "通过准入后准备请求",
+          "kind": "call",
+          "refs": []
+        },
+        {
+          "a": "context",
+          "b": "loop",
+          "label": "上下文与工具定义",
+          "kind": "call",
+          "refs": []
+        },
+        {
+          "a": "loop",
+          "b": "providers",
+          "label": "流式请求",
+          "kind": "call",
+          "refs": []
+        },
+        {
+          "a": "providers",
+          "b": "stream",
+          "label": "统一事件流",
+          "kind": "signal",
+          "refs": []
+        },
+        {
+          "a": "stream",
+          "b": "ui",
+          "label": "MainActor 状态更新",
+          "kind": "signal",
+          "refs": []
+        },
+        {
+          "a": "stream",
+          "b": "loop",
+          "label": "返回 StreamResult",
+          "kind": "call",
+          "refs": []
+        },
+        {
+          "a": "loop",
+          "b": "tools",
+          "label": "工具调用分支",
+          "kind": "call",
+          "refs": []
+        },
+        {
+          "a": "tools",
+          "b": "loop",
+          "label": "toolResult 回填",
+          "kind": "call",
+          "refs": []
+        },
+        {
+          "a": "loop",
+          "b": "storage",
+          "label": "提交历史",
+          "kind": "io",
+          "refs": []
+        }
+      ],
+      "w": 1040,
+      "h": 710
+    },
+    "mcp": {
+      "title": "进入 MCP：从配置到模型可见性",
+      "subtitle": "保留调用方、下游运行时与存储位置；每个节点均可点击。",
+      "bounds": [
+        {
+          "x": 238,
+          "y": 48,
+          "w": 545,
+          "h": 666,
+          "label": "Agent / Session · MCPStore 及其数据职责"
+        },
+        {
+          "x": 10,
+          "y": 48,
+          "w": 210,
+          "h": 666,
+          "label": "调用方"
+        },
+        {
+          "x": 803,
+          "y": 48,
+          "w": 225,
+          "h": 666,
+          "label": "协作模块"
+        }
+      ],
+      "nodes": [
+        [
+          "mcpui",
+          23,
+          110,
+          185,
+          80
+        ],
+        [
+          "mcp",
+          270,
+          110,
+          200,
+          80
+        ],
+        [
+          "mcpdisk",
+          542,
+          110,
+          215,
+          80
+        ],
+        [
+          "override",
+          542,
+          315,
+          215,
+          80
+        ],
+        [
+          "mcpsnippet",
+          270,
+          315,
+          200,
+          80
+        ],
+        [
+          "agent",
+          23,
+          315,
+          185,
+          80
+        ],
+        [
+          "refresh",
+          270,
+          545,
+          200,
+          80
+        ],
+        [
+          "mcpsync",
+          542,
+          545,
+          215,
+          80
+        ],
+        [
+          "ish",
+          818,
+          110,
+          192,
+          80
+        ],
+        [
+          "cli",
+          818,
+          315,
+          192,
+          80
+        ],
+        [
+          "sync",
+          818,
+          545,
+          192,
+          80
+        ]
+      ],
+      "edges": [
+        {
+          "a": "mcpui",
+          "b": "mcp",
+          "label": "配置与会话操作",
+          "kind": "call",
+          "refs": []
+        },
+        {
+          "a": "mcp",
+          "b": "mcpdisk",
+          "label": "load / save",
+          "kind": "io",
+          "refs": []
+        },
+        {
+          "a": "mcp",
+          "b": "override",
+          "label": "查询 / 写覆盖",
+          "kind": "io",
+          "refs": []
+        },
+        {
+          "a": "mcp",
+          "b": "mcpsnippet",
+          "label": "生成提示片段",
+          "kind": "call",
+          "refs": []
+        },
+        {
+          "a": "mcpsnippet",
+          "b": "agent",
+          "label": "追加系统提示",
+          "kind": "signal",
+          "refs": []
+        },
+        {
+          "a": "mcpui",
+          "b": "refresh",
+          "label": "刷新操作",
+          "kind": "call",
+          "refs": []
+        },
+        {
+          "a": "refresh",
+          "b": "ish",
+          "label": "await execute",
+          "kind": "call",
+          "refs": []
+        },
+        {
+          "a": "ish",
+          "b": "cli",
+          "label": "refresh 命令",
+          "kind": "call",
+          "refs": []
+        },
+        {
+          "a": "cli",
+          "b": "mcpdisk",
+          "label": "共用 JSON",
+          "kind": "io",
+          "refs": []
+        },
+        {
+          "a": "mcp",
+          "b": "mcpsync",
+          "label": "本地/远端同步",
+          "kind": "call",
+          "refs": []
+        },
+        {
+          "a": "mcpsync",
+          "b": "sync",
+          "label": "dirty 标记",
+          "kind": "call",
+          "refs": []
+        }
+      ],
+      "w": 1040,
+      "h": 750
+    }
+  },
+  "steps": [
+    {
+      "title": "点击发送",
+      "node": "ui",
+      "trigger": "用户在聊天界面提交一条普通文本消息。",
+      "owner": "AIChatView.performSend()；界面通过 cached.vm 取得会话对象。",
+      "input": "inputText 为“请解释什么是概率密度。”；示例选择无附件、无排队消息、上下文容量充足的路径。",
+      "process": "先调用 tryExecuteInputAsSlashCommand() 检查本地斜杠命令。普通消息继续调用 vm.send()。",
+      "output": "发送控制交给会话对象；inputText 此时仍包含原文。",
+      "connect": "直接同步调用：performSend() → vm.send()。",
+      "example": "同一条示例文本仍在输入框绑定的状态中。",
+      "refs": [
+        {
+          "path": "src/ios/Views/Chat/AIChatView.swift",
+          "symbol": "performSend(); inputTextBinding",
+          "lines": null,
+          "kind": "源码"
+        }
+      ]
+    },
+    {
+      "title": "准入与即时界面反馈",
+      "node": "send",
+      "trigger": "send() 被调用。",
+      "owner": "AIChatViewModel.send()。",
+      "input": "inputText、attachments、remoteDeviceId、isProcessing 和上下文使用量。",
+      "process": "清理附件状态并整理文本；检查只读、空输入、已有处理任务以及上下文容量。主路径追加用户 ChatMessage、清空输入、设置 isProcessing，并启动内核和后台处理准备。",
+      "output": "用户气泡出现在 messages；isProcessing = true；currentTask 启动。",
+      "connect": "同步状态变更后，创建 Task；任务内继续调用 await ensureSession()。",
+      "example": "屏幕出现“请解释什么是概率密度。”，发送栏进入处理中状态。",
+      "refs": [
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel.swift",
+          "symbol": "send() 入口",
+          "lines": [
+            2049,
+            2080
+          ],
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel.swift",
+          "symbol": "上下文容量检查",
+          "lines": [
+            2105,
+            2151
+          ],
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel.swift",
+          "symbol": "气泡与异步 Task",
+          "lines": [
+            2220,
+            2258
+          ],
+          "kind": "源码"
+        }
+      ]
+    },
+    {
+      "title": "建立会话与消息记录",
+      "node": "session",
+      "trigger": "currentTask 开始执行。",
+      "owner": "ensureSession()、AgentMessage 与 persistAgentMessage()。",
+      "input": "原文、既有 sessionId 或草稿状态；示例没有附件。",
+      "process": "先确保真实会话存在；把示例文本包装为 AgentContentPart.text，加入 role=user 的 AgentMessage，再追加到 agentHistory 并异步保存。",
+      "output": "agentHistory 新增用户条目；保存成功时将 dbMessageId 回写同一条历史记录。",
+      "connect": "await 等待持久化返回，随后检查内核状态并申请会话执行名额。",
+      "example": "同一句文本现在有界面表示和模型历史表示；保存成功后还关联数据库消息 ID。",
+      "refs": [
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel.swift",
+          "symbol": "ensureSession() 调用",
+          "lines": [
+            2244,
+            2258
+          ],
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel.swift",
+          "symbol": "AgentMessage 与保存",
+          "lines": [
+            2421,
+            2433
+          ],
+          "kind": "源码"
+        }
+      ]
+    },
+    {
+      "title": "运行条件与并发准入",
+      "node": "agent",
+      "trigger": "用户消息进入历史之后。",
+      "owner": "kernelStatus；SessionConcurrencyManager.acquireSlot()。",
+      "input": "当前内核状态、sessionId、正在运行的会话数及并发上限。",
+      "process": "等待内核启动；失败时显示错误并退出。申请会话执行名额，等待期间记录 isSuspended，取得名额后开始 Agent 循环。",
+      "output": "可以执行的 runAgentLoop()；或明确的内核错误 / 取消结果。",
+      "connect": "异步等待 acquireSlot()；成功后 try await runAgentLoop()；defer 释放名额。",
+      "example": "即使示例最终只输出文本，当前 send() 主路径仍经过内核和会话并发准入。",
+      "refs": [
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel.swift",
+          "symbol": "内核与会话并发门控",
+          "lines": [
+            2434,
+            2465
+          ],
+          "kind": "源码"
+        }
+      ]
+    },
+    {
+      "title": "准备模型请求",
+      "node": "context",
+      "trigger": "runAgentLoop() 开始。",
+      "owner": "resolveCurrentEntry()、makeAgentProvider()、makeAgentTools() 及各 Store。",
+      "input": "agentHistory、模型 entry、会话 Skills/MCP 配置、memoryEnabled 等。",
+      "process": "解析模型与提供方，建立工具定义；拼接基础提示、模型特性、Skills 和 MCP 元数据以及按开关加入的记忆。请求时取 effectiveAgentHistory()，交给 streamWithGroupFallback()。",
+      "output": "一个统一的 AgentStreamEvent 异步事件流；界面先有一个空助手候选消息。",
+      "connect": "通过 await 取得事件流；随后 await processStreamEvents(...) 消费它。",
+      "example": "发往模型的材料包含示例文本，以及应用组合的历史、系统提示和工具定义。",
+      "refs": [
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel.swift",
+          "symbol": "模型和提示词构建",
+          "lines": [
+            4207,
+            4338
+          ],
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel.swift",
+          "symbol": "有效历史与流请求",
+          "lines": [
+            4610,
+            4640
+          ],
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Providers/AgentProvider.swift",
+          "symbol": "AgentProvider",
+          "lines": null,
+          "kind": "源码"
+        }
+      ]
+    },
+    {
+      "title": "流式内容逐步显示",
+      "node": "stream",
+      "trigger": "模型提供方产生文本或工具相关事件。",
+      "owner": "processStreamEvents()；ChatMessage 与 AssistantBlock。",
+      "input": "contentBlockStart、textDelta、toolInputDelta、toolCallComplete、done 等统一事件。",
+      "process": "收到文本块起始事件时创建显示块；累积文本增量，按节奏将界面修改交给 MainActor。工具事件收集最终工具名和参数；事件循环检查取消和无新事件超时。",
+      "output": "持续更新的回复内容与块状态；本轮 StreamResult 汇总文本、工具调用、结束原因。",
+      "connect": "事件流 → switch 分发 → MainActor 状态更新；处理结束把 StreamResult 返回主循环。",
+      "example": "示意回复分段出现：“概率密度……”；这段文字为导览示意，未向真实模型发送请求。",
+      "refs": [
+        {
+          "path": "src/ios/Providers/AgentProvider.swift",
+          "symbol": "AgentStreamEvent; AgentStopReason",
+          "lines": null,
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel+SSEStream.swift",
+          "symbol": "StreamResult",
+          "lines": [
+            29,
+            68
+          ],
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel+SSEStream.swift",
+          "symbol": "事件循环与 UI 修改",
+          "lines": [
+            271,
+            414
+          ],
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel+SSEStream.swift",
+          "symbol": "textDelta 累积",
+          "lines": [
+            416,
+            470
+          ],
+          "kind": "源码"
+        }
+      ]
+    },
+    {
+      "title": "工具分支与下一轮",
+      "node": "tools",
+      "trigger": "StreamResult 中包含完整的工具调用。",
+      "owner": "runAgentLoop() 的 TaskGroup；executeSingleToolUse()。",
+      "input": "工具 ID、名称、最终参数以及对应显示块。",
+      "process": "程序处理取消、循环检测和参数校验，再执行工具。最多并发 10 个调用，全部结果按原工具调用顺序归并；生成 toolResult 消息并保存。",
+      "output": "工具结果加入 role=user 的内部 AgentMessage；下一次请求携带这些结果。",
+      "connect": "await TaskGroup 归并结果 → append agentHistory → 保存 → 满足继续条件时回到模型请求。",
+      "example": "示例采用模型直接回答分支；模型产生工具调用时，这一步会插入同一条消息流程。具体工具选择与调用次数由模型输出和程序门控共同决定。",
+      "refs": [
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel+ConcurrentTools.swift",
+          "symbol": "maxConcurrentTools; executeSingleToolUse()",
+          "lines": [
+            19,
+            210
+          ],
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel.swift",
+          "symbol": "TaskGroup、结果归并与持久化",
+          "lines": [
+            5260,
+            5386
+          ],
+          "kind": "源码"
+        }
+      ]
+    },
+    {
+      "title": "结束原因与最终保存",
+      "node": "loop",
+      "trigger": "本轮流处理结束，主循环检查 toolEntries 与 stopReason。",
+      "owner": "runAgentLoop() 的无工具结束路径。",
+      "input": "助手文本、工具调用列表、结束原因、使用量以及错误状态。",
+      "process": "工具列表为空时，清理旧的可恢复标记，再按结束原因区分正常结束、达到输出上限、流缺失终止原因、拒绝以及空回复。保存助手消息及错误信息。",
+      "output": "已保存的助手消息与相应 error / canResume；有排队消息时可继续处理新用户轮次。",
+      "connect": "await persistAgentMessage() 和 updateMessageErrorInfo()；无排队主路径退出循环。",
+      "example": "示例有正常结束信号且回复有内容，最后一段文字被提交到历史与数据库。",
+      "refs": [
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel.swift",
+          "symbol": "无工具结束及异常区分",
+          "lines": [
+            5052,
+            5135
+          ],
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel.swift",
+          "symbol": "保存和队列衔接",
+          "lines": [
+            5136,
+            5190
+          ],
+          "kind": "源码"
+        }
+      ]
+    },
+    {
+      "title": "收尾与回到可输入状态",
+      "node": "agent",
+      "trigger": "runAgentLoop() 返回到 send() 的任务。",
+      "owner": "send() 的收尾、drainQueuedPrompts() 和 ChatStore.loadMessages()。",
+      "input": "本轮运行状态、promptQueue、数据库消息基线。",
+      "process": "在任务仍有效时处理排队消息，并从数据库刷新数量、排序和顺序哈希基线；最后设置 isProcessing = false 并结束后台处理。",
+      "output": "界面结束处理中状态，后续输入可以开始新一轮。",
+      "connect": "状态更新经可观察对象与更新信号传到界面；defer 释放会话名额。",
+      "example": "示例回复保持在会话中。保存完成、模型循环完成与界面退出处理中分别有明确位置。",
+      "refs": [
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel.swift",
+          "symbol": "send() 收尾",
+          "lines": [
+            2501,
+            2536
+          ],
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Views/Chat/AIChatView.swift",
+          "symbol": "CachedViewModel.objectWillChange 转发",
+          "lines": null,
+          "kind": "源码"
+        }
+      ]
+    }
+  ],
+  "branches": [
+    {
+      "title": "模型决定与程序控制",
+      "text": "模型生成回答内容，以及工具名、参数和后续请求意图。程序控制准入、上下文构建、可用工具定义、参数校验、并发、取消、存储和界面刷新。每轮工具结果先经过程序处理，再成为模型下一轮的输入。",
+      "refs": [
+        {
+          "path": "src/ios/Providers/AgentProvider.swift",
+          "symbol": "消息、工具与统一事件",
+          "lines": null,
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel+ConcurrentTools.swift",
+          "symbol": "executeSingleToolUse()",
+          "lines": [
+            84,
+            210
+          ],
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel.swift",
+          "symbol": "工具结果回填",
+          "lines": [
+            5320,
+            5386
+          ],
+          "kind": "源码"
+        }
+      ]
+    },
+    {
+      "title": "失败与自动恢复入口",
+      "text": "streamWithGroupFallback() 和 processStreamEvents() 周围有重试与组内回退接入。流正常返回但缺少 stopReason 时，主循环标记异常中断并开放 Resume。具体重试次数、退避与供应商错误分类需要继续阅读 +Fallback.swift。",
+      "refs": [
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel.swift",
+          "symbol": "stream 与异常处理接入",
+          "lines": [
+            4610,
+            4730
+          ],
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel.swift",
+          "symbol": "nil stopReason / maxTokens 分支",
+          "lines": [
+            5052,
+            5100
+          ],
+          "kind": "源码"
+        }
+      ]
+    },
+    {
+      "title": "用户停止与排队消息",
+      "text": "cancel() 取消等待名额、请求当前命令停止，并取消 currentTask；它立即把 isProcessing 改为 false。取消清理按是否已有文本、工具结果与提交历史分别处理。promptQueue 中仍有消息时，代码会启动新的任务继续排队消息，因此停止后的下一次运行需要结合队列判断。",
+      "refs": [
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel.swift",
+          "symbol": "cancel(); resumeQueueAfterCancel()",
+          "lines": [
+            3434,
+            3561
+          ],
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel.swift",
+          "symbol": "部分文本保存与可恢复状态",
+          "lines": [
+            3980,
+            4147
+          ],
+          "kind": "源码"
+        }
+      ]
+    },
+    {
+      "title": "流式展示与数据库提交",
+      "text": "文本增量首先累积并修改显示块，助手历史在迭代提交点保存。工具调用与工具结果可以批量写入。排查内容丢失时，应分别观察屏幕块、agentHistory 与已保存 RawMessage 的对应关系。",
+      "refs": [
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel+SSEStream.swift",
+          "symbol": "文本块更新",
+          "lines": [
+            309,
+            414
+          ],
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel.swift",
+          "symbol": "最终及中间持久化",
+          "lines": [
+            5136,
+            5187
+          ],
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel.swift",
+          "symbol": "工具批量保存",
+          "lines": [
+            5351,
+            5384
+          ],
+          "kind": "源码"
+        }
+      ]
+    }
+  ],
+  "diagnostics": [
+    {
+      "title": "点击发送后没有反应",
+      "hypothesis": "假设发送没有通过入口检查，正在等待上下文处理，或者正在等待内核 / 会话名额。",
+      "checks": [
+        "先找 performSend() 是否触发、是否被斜杠命令分流；再看 send() GUARD FAILED 日志中的文本长度、附件数量和 isProcessing。",
+        "检查 [Context] 日志及 showCompactBeforeSendPrompt / showContextExhaustedPrompt，确认发送是否转入容量处理。",
+        "找到 send START 后，再确认 kernelStatus 与 isSuspended；取得名额后应出现 runAgentLoop START / ROUND BEGIN。"
+      ],
+      "proof": "用同一 sessionId 和 vmInstanceId 对齐入口日志。以“已进入哪个函数、在哪个 await 前后停留”为证据；这里列出的原因是待验证假设。",
+      "refs": [
+        {
+          "path": "src/ios/Views/Chat/AIChatView.swift",
+          "symbol": "performSend()",
+          "lines": null,
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel.swift",
+          "symbol": "send 准入与上下文检查",
+          "lines": [
+            2049,
+            2151
+          ],
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel.swift",
+          "symbol": "运行门控",
+          "lines": [
+            2434,
+            2465
+          ],
+          "kind": "源码"
+        }
+      ]
+    },
+    {
+      "title": "回复到一半停止",
+      "hypothesis": "假设服务流中断、达到输出上限、用户取消，或工具 / 后台流程正在等待。",
+      "checks": [
+        "检查 stopReason、toolEntries、messages 中的 error 和 canResume，区分正常收束、maxTokens、缺失终止事件。",
+        "比较 ToolLifecycle RECEIVED / DISPATCHED 和工具终态；有工具调用时，确认结果已经归并并进入 agentHistory。",
+        "查 cancel() START、userDidCancel、ROUND END；若界面仍处理中，继续核查 stream 无事件超时及等待后台恢复的入口。"
+      ],
+      "proof": "源码设置了 120 秒无新事件等待超时，但实际响应时间还与取消和网络适配实现相关。结合事件时间戳与返回错误确认，避免仅凭屏幕停顿定因。",
+      "refs": [
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel+SSEStream.swift",
+          "symbol": "stallTimeoutSeconds 与事件循环",
+          "lines": [
+            271,
+            296
+          ],
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel.swift",
+          "symbol": "结束原因",
+          "lines": [
+            5052,
+            5135
+          ],
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel.swift",
+          "symbol": "工具结果与后台等待",
+          "lines": [
+            5320,
+            5450
+          ],
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel.swift",
+          "symbol": "cancel()",
+          "lines": [
+            3434,
+            3527
+          ],
+          "kind": "源码"
+        }
+      ]
+    },
+    {
+      "title": "重新打开会话后记录异常",
+      "hypothesis": "假设界面缓存过期、已显示的内容尚处提交边界，或重建消息时的顺序/聚合出现问题。",
+      "checks": [
+        "先对比 ChatMessage 的块与 agentHistory 中 dbMessageId；用 PERSIST final / PERSIST mid-loop 日志确认写入阶段。",
+        "检查保存后的条数、sortOrder 与顺序哈希基线；使用相同会话 ID 读取实际数据库记录进行核对。",
+        "检查 CachedViewModel 的 stale flag 与 loadSession() 调用，留意生成期间暂缓的同步重载。完整重建流程需要下一轮阅读 +Persistence.swift 和 ChatStore.swift。"
+      ],
+      "proof": "界面、模型历史和数据库记录分别采证。建议后续增加“生成→停止→重开”“工具完成→重开”回归测试；本版未执行这些实机测试。",
+      "refs": [
+        {
+          "path": "src/ios/Views/Chat/AIChatView.swift",
+          "symbol": "CachedViewModel.init 与 stale flag",
+          "lines": [
+            16,
+            63
+          ],
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel.swift",
+          "symbol": "持久化与刷新基线",
+          "lines": [
+            2501,
+            2536
+          ],
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/Chat/ChatModels.swift",
+          "symbol": "消息与源排序范围",
+          "lines": [
+            38,
+            112
+          ],
+          "kind": "源码"
+        }
+      ]
+    }
+  ],
+  "roadmap": [
+    [
+      "1",
+      "启动应用与内核",
+      "src/ios/MinisApp.swift; AppDelegate.swift; iSH/RootfsManager.swift; iSH/ISHKernel.m",
+      "确认启动触发、根文件系统准备和内核状态更新。"
+    ],
+    [
+      "2",
+      "恢复历史会话",
+      "Agent/Chat/AIChatViewModel+Persistence.swift; ChatStore.swift; Views/Chat/AIChatView.swift",
+      "确认 RawMessage 如何重建为历史和气泡，以及缓存失效策略。"
+    ],
+    [
+      "3",
+      "具体模型网络适配",
+      "Agent/Chat/AIChatViewModel+ProviderFactory.swift; +Fallback.swift; Providers/ 下各实现",
+      "核查网络协议、凭据、重试、切换模型与终止事件映射。"
+    ],
+    [
+      "4",
+      "消息列表渲染",
+      "Agent/MessageList/; Views/Chat/AssistantBlockView.swift; ChatModels.swift",
+      "核查 UIKit/SwiftUI 之间的事件、列表快照和流式布局。"
+    ],
+    [
+      "5",
+      "配置、MCP 与 Skills 的扩展",
+      "Agent/Session/; src/shared/ 中 CLI 定位；Views/MCP/",
+      "展开 CLI 协议执行、OAuth、其他 Store 和配置加载顺序。"
+    ],
+    [
+      "6",
+      "同步与原生能力",
+      "Agent/Sync/; NativeOffloads/; Agent/ISH/MinisFsRouter.swift",
+      "核查云端合并、设备权限、命令桥接及文件上下文隔离。"
+    ]
+  ],
+  "capabilities": {
+    "registry": {
+      "path": "src/ios/iSH/ISHKernel.m",
+      "symbol": "bootWithRootPath: 原生处理器注册",
+      "lines": [
+        413,
+        447
+      ],
+      "kind": "源码"
+    },
+    "scope": "清单按 27 组原生处理器注册整理，列出常用操作与已知边界；具体参数以固定提交的处理器为准。所有条目均为静态核查，实机成功与授权状态待验证。",
+    "groups": [
+      {
+        "id": "personal",
+        "title": "个人数据",
+        "hint": "日历、照片、健康与当前位置等"
+      },
+      {
+        "id": "system",
+        "title": "系统与外部设备",
+        "hint": "闹钟、通知、家居与外设等"
+      },
+      {
+        "id": "media",
+        "title": "媒体与内容处理",
+        "hint": "语音、图片、文本与音视频"
+      },
+      {
+        "id": "app",
+        "title": "MinisX 应用内工具",
+        "hint": "浏览器、会话、配置、模型与日志"
+      }
+    ],
+    "items": [
+      {
+        "id": "calendar",
+        "title": "日历事件",
+        "command": "apple-calendar",
+        "group": "personal",
+        "platform": "EventKit",
+        "read": "calendars、list、freebusy：日历列表、事件和忙闲区间。",
+        "write": "create / update / delete：标题、时间、地点、备注与提前提醒。",
+        "gaps": [
+          "创建事件的重复规则参数。"
+        ],
+        "conditions": "需要日历授权。已有重复事件可用 occurrence-date 定位；span 的 future/all 在当前实现中采用当前及后续范围。",
+        "depth": "注册 + 处理器相关实现 + 项目清单",
+        "refs": [
+          {
+            "path": "src/ios/NativeOffloads/CalendarOffload.m",
+            "symbol": "命令入口 / 子命令处理；核查深度见本项",
+            "lines": null,
+            "kind": "源码"
+          },
+          {
+            "path": "docs/specs/ios-device-data-capabilities.md",
+            "symbol": "第 3–6 节对应能力与边界",
+            "lines": null,
+            "kind": "项目文档"
+          }
+        ],
+        "registration": "calendar_offload_register()"
+      },
+      {
+        "id": "reminders",
+        "title": "提醒事项",
+        "command": "apple-reminders",
+        "group": "personal",
+        "platform": "EventKit",
+        "read": "list：查询任务及其完成状态、截止时间等。",
+        "write": "create / update / delete；complete 与 complete --undo。",
+        "gaps": [
+          "独立创建提醒事项列表。",
+          "parent-id 子任务。"
+        ],
+        "conditions": "需要提醒事项授权。RemindersOffload 把命令转换后委托给 CalendarOffload。",
+        "depth": "注册 + 项目能力清单",
+        "refs": [
+          {
+            "path": "src/ios/NativeOffloads/RemindersOffload.m",
+            "symbol": "命令入口 / 子命令处理；核查深度见本项",
+            "lines": null,
+            "kind": "源码"
+          },
+          {
+            "path": "docs/specs/ios-device-data-capabilities.md",
+            "symbol": "第 3–6 节对应能力与边界",
+            "lines": null,
+            "kind": "项目文档"
+          },
+          {
+            "path": "src/ios/NativeOffloads/CalendarOffload.m",
+            "symbol": "remind / update-reminder / complete-reminder / delete-reminder",
+            "lines": null,
+            "kind": "源码"
+          }
+        ],
+        "registration": "reminders_offload_register()"
+      },
+      {
+        "id": "photos",
+        "title": "照片与视频库",
+        "command": "apple-photos",
+        "group": "personal",
+        "platform": "PhotoKit / Photos",
+        "read": "list、near、albums、album、stats、export：查询资源及相册，并导出可访问文件。",
+        "write": "import / save、create-album、add-to-album、favorite、delete。",
+        "gaps": [
+          "相册删除、重命名与移出相册。",
+          "库中照片的原位编辑。"
+        ],
+        "conditions": "授权可限于部分照片。delete 要求资源 ID 和 --confirm；该参数属于命令条件，用户意图应另行确认。",
+        "depth": "注册 + 处理器接口/授权入口 + 项目清单",
+        "refs": [
+          {
+            "path": "src/ios/NativeOffloads/PhotosOffload.m",
+            "symbol": "命令入口 / 子命令处理；核查深度见本项",
+            "lines": null,
+            "kind": "源码"
+          },
+          {
+            "path": "docs/specs/ios-device-data-capabilities.md",
+            "symbol": "第 3–6 节对应能力与边界",
+            "lines": null,
+            "kind": "项目文档"
+          }
+        ],
+        "registration": "photos_offload_register()"
+      },
+      {
+        "id": "health",
+        "title": "健康数据",
+        "command": "apple-healthkit",
+        "group": "personal",
+        "platform": "HealthKit",
+        "read": "步数、心率、睡眠、运动、体重等；types / batch；个人特征与部分特殊记录。",
+        "write": "log 写受支持的数量/分类样本；log-blood-pressure 写关联血压；delete 删除本 App 来源的受支持样本。",
+        "gaps": [
+          "生日、血型等个人特征修改。",
+          "完整运动、心电图、情绪记录的专门创建接口。",
+          "ecg 电压波形与 vision-rx 完整验光字段。"
+        ],
+        "conditions": "读写按数据类型分别授权；类型清单还需结合系统写入规则。delete 的范围为本 App 来源；血压通过专用关联写入命令处理。cadence 返回步行速度和步长，elevation 使用楼层数估算。",
+        "depth": "注册 + 处理器帮助/类型入口 + 项目清单",
+        "refs": [
+          {
+            "path": "src/ios/NativeOffloads/HealthKitOffload.m",
+            "symbol": "命令入口 / 子命令处理；核查深度见本项",
+            "lines": null,
+            "kind": "源码"
+          },
+          {
+            "path": "docs/specs/ios-device-data-capabilities.md",
+            "symbol": "第 3–6 节对应能力与边界",
+            "lines": null,
+            "kind": "项目文档"
+          }
+        ],
+        "registration": "healthkit_offload_register()"
+      },
+      {
+        "id": "clipboard",
+        "title": "剪贴板",
+        "command": "apple-clipboard",
+        "group": "personal",
+        "platform": "UIKit / UIPasteboard",
+        "read": "get：当前文本/URL；get --image：导出当前图片；status：内容类型。",
+        "write": "set 写文本；clear 清空。",
+        "gaps": [
+          "剪贴板历史。",
+          "将图片写入剪贴板的命令。"
+        ],
+        "conditions": "操作当前剪贴板内容；实际读取可能触发系统交互。",
+        "depth": "注册 + 项目能力清单",
+        "refs": [
+          {
+            "path": "src/ios/NativeOffloads/ClipboardOffload.m",
+            "symbol": "命令入口 / 子命令处理；核查深度见本项",
+            "lines": null,
+            "kind": "源码"
+          },
+          {
+            "path": "docs/specs/ios-device-data-capabilities.md",
+            "symbol": "第 3–6 节对应能力与边界",
+            "lines": null,
+            "kind": "项目文档"
+          }
+        ],
+        "registration": "clipboard_offload_register()"
+      },
+      {
+        "id": "location",
+        "title": "位置",
+        "command": "apple-location",
+        "group": "personal",
+        "platform": "CoreLocation",
+        "read": "current 当前坐标；geocode 坐标转地址；forward 地址转坐标。",
+        "write": "当前接口提供查询。",
+        "gaps": [
+          "历史轨迹查询、持续位置记录。",
+          "修改设备位置。"
+        ],
+        "conditions": "需要定位授权和可用位置服务。界面描述中的 location history 超过现有命令范围，按实现/清单理解。",
+        "depth": "注册 + 项目能力清单",
+        "refs": [
+          {
+            "path": "src/ios/NativeOffloads/LocationOffload.m",
+            "symbol": "命令入口 / 子命令处理；核查深度见本项",
+            "lines": null,
+            "kind": "源码"
+          },
+          {
+            "path": "docs/specs/ios-device-data-capabilities.md",
+            "symbol": "第 3–6 节对应能力与边界",
+            "lines": null,
+            "kind": "项目文档"
+          }
+        ],
+        "registration": "location_offload_register()"
+      },
+      {
+        "id": "alarm",
+        "title": "闹钟与倒计时",
+        "command": "apple-alarm",
+        "group": "system",
+        "platform": "AlarmKit",
+        "read": "list：本 App 创建的闹钟。",
+        "write": "set、timer、cancel；闹钟支持单次、每天、工作日。",
+        "gaps": [
+          "系统“时钟”App 全部闹钟的管理接口。"
+        ],
+        "conditions": "需要 AlarmKit 可用和授权；当前项目最低系统版本为 iOS 26.0。管理范围是本 App 通过 AlarmKit 创建的对象。",
+        "depth": "注册 + Swift 桥接/授权入口 + 项目清单",
+        "refs": [
+          {
+            "path": "src/ios/NativeOffloads/AlarmOffload.m",
+            "symbol": "命令入口 / 子命令处理；核查深度见本项",
+            "lines": null,
+            "kind": "源码"
+          },
+          {
+            "path": "docs/specs/ios-device-data-capabilities.md",
+            "symbol": "第 3–6 节对应能力与边界",
+            "lines": null,
+            "kind": "项目文档"
+          },
+          {
+            "path": "src/ios/NativeOffloads/AlarmOffloadBridge.swift",
+            "symbol": "requestAuthorization(); scheduleAlarm(); listAlarms()",
+            "lines": null,
+            "kind": "源码"
+          }
+        ],
+        "registration": "alarm_offload_register()"
+      },
+      {
+        "id": "notification",
+        "title": "本 App 通知",
+        "command": "apple-notification",
+        "group": "system",
+        "platform": "UserNotifications",
+        "read": "pending、delivered、settings：本 App 通知和通知设置。",
+        "write": "schedule 安排一次通知；cancel 取消待发送通知。",
+        "gaps": [
+          "重复通知参数。",
+          "其他 App 通知读取。"
+        ],
+        "conditions": "需要通知授权；安排入口当前使用 repeats:NO。通知送达与 Agent 重新推理属于不同流程。",
+        "depth": "注册 + 项目能力清单",
+        "refs": [
+          {
+            "path": "src/ios/NativeOffloads/NotificationOffload.m",
+            "symbol": "命令入口 / 子命令处理；核查深度见本项",
+            "lines": null,
+            "kind": "源码"
+          },
+          {
+            "path": "docs/specs/ios-device-data-capabilities.md",
+            "symbol": "第 3–6 节对应能力与边界",
+            "lines": null,
+            "kind": "项目文档"
+          }
+        ],
+        "registration": "notification_offload_register()"
+      },
+      {
+        "id": "home",
+        "title": "智能家居",
+        "command": "apple-homekit",
+        "group": "system",
+        "platform": "HomeKit",
+        "read": "list、search、get、scenes：配件、特征和已有场景。",
+        "write": "set 写可写特征；trigger 执行已有场景。",
+        "gaps": [
+          "新增/删除家庭、房间、配件、场景。",
+          "编辑自动化。"
+        ],
+        "conditions": "需要 HomeKit 授权和可访问设备；可写操作按特征的写入能力确定。",
+        "depth": "注册 + 项目能力清单",
+        "refs": [
+          {
+            "path": "src/ios/NativeOffloads/HomeKitOffload.m",
+            "symbol": "命令入口 / 子命令处理；核查深度见本项",
+            "lines": null,
+            "kind": "源码"
+          },
+          {
+            "path": "docs/specs/ios-device-data-capabilities.md",
+            "symbol": "第 3–6 节对应能力与边界",
+            "lines": null,
+            "kind": "项目文档"
+          }
+        ],
+        "registration": "homekit_offload_register()"
+      },
+      {
+        "id": "bluetooth",
+        "title": "蓝牙 BLE",
+        "command": "apple-bluetooth",
+        "group": "system",
+        "platform": "CoreBluetooth",
+        "read": "status、scan、services、read：状态、外设和特征值。",
+        "write": "connect、disconnect、write、notify：连接、写值与订阅。",
+        "gaps": [
+          "全体已配对设备内容读取。",
+          "任意经典蓝牙设备或协议的统一操作接口。"
+        ],
+        "conditions": "面向提供 BLE 服务/特征的外设，需要授权、连接和特征发现。无响应写入的返回表示提交动作，设备端执行结果应另行验证。",
+        "depth": "注册 + 项目能力清单",
+        "refs": [
+          {
+            "path": "src/ios/NativeOffloads/BluetoothOffload.m",
+            "symbol": "命令入口 / 子命令处理；核查深度见本项",
+            "lines": null,
+            "kind": "源码"
+          },
+          {
+            "path": "docs/specs/ios-device-data-capabilities.md",
+            "symbol": "第 3–6 节对应能力与边界",
+            "lines": null,
+            "kind": "项目文档"
+          }
+        ],
+        "registration": "bluetooth_offload_register()"
+      },
+      {
+        "id": "nfc",
+        "title": "NFC 标签与外部卡",
+        "command": "apple-nfc",
+        "group": "system",
+        "platform": "CoreNFC",
+        "read": "标签扫描、部分原始页/块读取、FeliCa、EMV 外部卡数据与内置词典查询。",
+        "write": "NDEF 写入、受支持标签的原始写入、外部智能卡命令。",
+        "gaps": [
+          "本机 Apple Wallet 卡片或安全芯片内容读取。",
+          "账户余额、交易历史查询。"
+        ],
+        "conditions": "依赖设备、标签/卡片协议和访问条件。read-emv 可能返回卡号、有效期等敏感字段，展示与传递时应单独审核。",
+        "depth": "注册 + 项目能力清单",
+        "refs": [
+          {
+            "path": "src/ios/NativeOffloads/NFCOffload.m",
+            "symbol": "命令入口 / 子命令处理；核查深度见本项",
+            "lines": null,
+            "kind": "源码"
+          },
+          {
+            "path": "docs/specs/ios-device-data-capabilities.md",
+            "symbol": "第 3–6 节对应能力与边界",
+            "lines": null,
+            "kind": "项目文档"
+          }
+        ],
+        "registration": "nfc_offload_register()"
+      },
+      {
+        "id": "device",
+        "title": "设备状态",
+        "command": "apple-device",
+        "group": "system",
+        "platform": "UIKit / Foundation / 系统信息接口",
+        "read": "info、battery、storage：设备/系统、电量、容量与本 App 内存等。",
+        "write": "当前接口提供状态查询。",
+        "gaps": [
+          "文件遍历或清理存储。",
+          "重启设备、任意修改系统设置。"
+        ],
+        "conditions": "结果限于处理器暴露的状态字段；存储容量统计与文件内容访问分别处理。",
+        "depth": "注册 + 项目能力清单",
+        "refs": [
+          {
+            "path": "src/ios/NativeOffloads/DeviceOffload.m",
+            "symbol": "命令入口 / 子命令处理；核查深度见本项",
+            "lines": null,
+            "kind": "源码"
+          },
+          {
+            "path": "docs/specs/ios-device-data-capabilities.md",
+            "symbol": "第 3–6 节对应能力与边界",
+            "lines": null,
+            "kind": "项目文档"
+          }
+        ],
+        "registration": "device_offload_register()"
+      },
+      {
+        "id": "maps",
+        "title": "地点与路线",
+        "command": "apple-maps",
+        "group": "system",
+        "platform": "MapKit / CoreLocation",
+        "read": "search、route、eta：地点搜索、路线与预计时间。",
+        "write": "当前接口提供查询。",
+        "gaps": [
+          "地图 App 的私人历史读取。"
+        ],
+        "conditions": "地点与路线服务受联网、地区覆盖和输入坐标/地址影响。",
+        "depth": "注册 + 处理器接口/框架入口 + 项目清单",
+        "refs": [
+          {
+            "path": "src/ios/NativeOffloads/MapsOffload.m",
+            "symbol": "命令入口 / 子命令处理；核查深度见本项",
+            "lines": null,
+            "kind": "源码"
+          },
+          {
+            "path": "docs/specs/ios-device-data-capabilities.md",
+            "symbol": "第 3–6 节对应能力与边界",
+            "lines": null,
+            "kind": "项目文档"
+          }
+        ],
+        "registration": "maps_offload_register()"
+      },
+      {
+        "id": "weather",
+        "title": "天气",
+        "command": "apple-weather",
+        "group": "system",
+        "platform": "WeatherKit / CoreLocation",
+        "read": "current、hourly、daily、alerts、report：当前天气、预报、预警和组合报告。",
+        "write": "当前接口提供查询。",
+        "gaps": [
+          "天气 App 私人数据或历史位置记录读取。"
+        ],
+        "conditions": "指定经纬度可直接发起天气请求；采用当前位置时还需定位。WeatherOffloadBridge 调用 WeatherKit，结果依赖天气服务可用性。",
+        "depth": "注册 + 处理器/桥接调用 + 项目清单",
+        "refs": [
+          {
+            "path": "src/ios/NativeOffloads/WeatherOffload.m",
+            "symbol": "命令入口 / 子命令处理；核查深度见本项",
+            "lines": null,
+            "kind": "源码"
+          },
+          {
+            "path": "docs/specs/ios-device-data-capabilities.md",
+            "symbol": "第 3–6 节对应能力与边界",
+            "lines": null,
+            "kind": "项目文档"
+          }
+        ],
+        "registration": "weather_offload_register()"
+      },
+      {
+        "id": "open",
+        "title": "打开链接或其他 App",
+        "command": "apple-open",
+        "group": "system",
+        "platform": "UIKit / URL 跳转",
+        "read": "接收系统支持的 URL。",
+        "write": "请求打开 URL、跳转目标 App 或设置页。",
+        "gaps": [
+          "通过跳转直接读取目标 App 的数据库。",
+          "以“打开成功”确认电话、邮件等后续动作完成。"
+        ],
+        "conditions": "返回值描述打开请求；后续交互由目标 App 和用户处理。",
+        "depth": "注册 + 项目能力清单",
+        "refs": [
+          {
+            "path": "src/ios/NativeOffloads/OpenOffload.m",
+            "symbol": "命令入口 / 子命令处理；核查深度见本项",
+            "lines": null,
+            "kind": "源码"
+          },
+          {
+            "path": "docs/specs/ios-device-data-capabilities.md",
+            "symbol": "第 3–6 节对应能力与边界",
+            "lines": null,
+            "kind": "项目文档"
+          }
+        ],
+        "registration": "open_offload_register()"
+      },
+      {
+        "id": "speech",
+        "title": "音频转文字",
+        "command": "apple-speech",
+        "group": "media",
+        "platform": "Speech / AVFoundation",
+        "read": "对音频文件或麦克风实时输入识别文字；查看语言、状态。",
+        "write": "启动一次语音识别。",
+        "gaps": [
+          "保存原始麦克风录音文件的命令。"
+        ],
+        "conditions": "麦克风默认 10 秒、上限 60 秒。--on-device 在设备支持时启用；离线执行需结合实际识别支持确认。",
+        "depth": "注册 + 项目能力清单",
+        "refs": [
+          {
+            "path": "src/ios/NativeOffloads/SpeechOffload.m",
+            "symbol": "命令入口 / 子命令处理；核查深度见本项",
+            "lines": null,
+            "kind": "源码"
+          },
+          {
+            "path": "docs/specs/ios-device-data-capabilities.md",
+            "symbol": "第 3–6 节对应能力与边界",
+            "lines": null,
+            "kind": "项目文档"
+          }
+        ],
+        "registration": "speech_offload_register()"
+      },
+      {
+        "id": "speak",
+        "title": "文字朗读",
+        "command": "apple-speak",
+        "group": "media",
+        "platform": "AVFoundation",
+        "read": "列出可用语音。",
+        "write": "朗读文本与停止朗读。",
+        "gaps": [
+          "生成并导出音频文件的接口。"
+        ],
+        "conditions": "实际播放受声音、音频会话和运行状态影响。",
+        "depth": "注册 + 项目能力清单",
+        "refs": [
+          {
+            "path": "src/ios/NativeOffloads/SpeakOffload.m",
+            "symbol": "命令入口 / 子命令处理；核查深度见本项",
+            "lines": null,
+            "kind": "源码"
+          },
+          {
+            "path": "docs/specs/ios-device-data-capabilities.md",
+            "symbol": "第 3–6 节对应能力与边界",
+            "lines": null,
+            "kind": "项目文档"
+          }
+        ],
+        "registration": "speak_offload_register()"
+      },
+      {
+        "id": "player",
+        "title": "本地媒体播放",
+        "command": "apple-player",
+        "group": "media",
+        "platform": "AVFoundation / AVKit",
+        "read": "查询本 App 播放会话。",
+        "write": "播放可访问本地音视频；暂停、恢复、跳转与停止。",
+        "gaps": [
+          "全手机媒体文件检索。"
+        ],
+        "conditions": "输入应是应用可访问的本地文件；由 PlayerOffloadBridge 衔接播放实现。",
+        "depth": "注册 + 项目能力清单",
+        "refs": [
+          {
+            "path": "src/ios/NativeOffloads/PlayerOffload.m",
+            "symbol": "命令入口 / 子命令处理；核查深度见本项",
+            "lines": null,
+            "kind": "源码"
+          },
+          {
+            "path": "docs/specs/ios-device-data-capabilities.md",
+            "symbol": "第 3–6 节对应能力与边界",
+            "lines": null,
+            "kind": "项目文档"
+          },
+          {
+            "path": "src/ios/NativeOffloads/PlayerOffloadBridge.swift",
+            "symbol": "本地播放桥接",
+            "lines": null,
+            "kind": "源码"
+          }
+        ],
+        "registration": "player_offload_register()"
+      },
+      {
+        "id": "ffmpeg",
+        "title": "音视频处理",
+        "command": "ffmpeg",
+        "group": "media",
+        "platform": "原生 FFmpeg 库",
+        "read": "读取应用可访问的输入媒体。",
+        "write": "转码与音视频处理，输出媒体文件。",
+        "gaps": [
+          "对任意编解码器或滤镜的完整支持保证。"
+        ],
+        "conditions": "处理范围由项目编译进来的 FFmpeg 功能、输入访问权和资源条件决定。此项使用原生第三方库。",
+        "depth": "注册 + 项目能力清单",
+        "refs": [
+          {
+            "path": "src/ios/NativeOffloads/FFmpegOffload.m",
+            "symbol": "命令入口 / 子命令处理；核查深度见本项",
+            "lines": null,
+            "kind": "源码"
+          },
+          {
+            "path": "docs/specs/ios-device-data-capabilities.md",
+            "symbol": "第 3–6 节对应能力与边界",
+            "lines": null,
+            "kind": "项目文档"
+          }
+        ],
+        "registration": "ffmpeg_offload_register()"
+      },
+      {
+        "id": "vision",
+        "title": "图片分析",
+        "command": "apple-vision",
+        "group": "media",
+        "platform": "Vision",
+        "read": "图片文字识别、条码、分类、矩形、人脸位置与多图相似度等。",
+        "write": "对传入图片文件执行分析。",
+        "gaps": [
+          "Agent 直接拍照命令。",
+          "由人脸检测得到具体身份的接口。"
+        ],
+        "conditions": "输入限于可访问图片。人脸位置检测与人员身份信息分别处理。",
+        "depth": "注册 + 项目能力清单",
+        "refs": [
+          {
+            "path": "src/ios/NativeOffloads/VisionOffload.m",
+            "symbol": "命令入口 / 子命令处理；核查深度见本项",
+            "lines": null,
+            "kind": "源码"
+          },
+          {
+            "path": "docs/specs/ios-device-data-capabilities.md",
+            "symbol": "第 3–6 节对应能力与边界",
+            "lines": null,
+            "kind": "项目文档"
+          }
+        ],
+        "registration": "vision_offload_register()"
+      },
+      {
+        "id": "nlp",
+        "title": "文本分析",
+        "command": "apple-nlp",
+        "group": "media",
+        "platform": "NaturalLanguage",
+        "read": "语言识别、分词、词性、实体、情感和词向量等。",
+        "write": "处理给定文本。",
+        "gaps": [
+          "自动读取手机个人数据库。",
+          "通用文档级向量服务的支持保证。"
+        ],
+        "conditions": "当前向量能力使用系统词级向量，语言和资源可用性需验证。",
+        "depth": "注册 + 项目能力清单",
+        "refs": [
+          {
+            "path": "src/ios/NativeOffloads/NLPOffload.m",
+            "symbol": "命令入口 / 子命令处理；核查深度见本项",
+            "lines": null,
+            "kind": "源码"
+          },
+          {
+            "path": "docs/specs/ios-device-data-capabilities.md",
+            "symbol": "第 3–6 节对应能力与边界",
+            "lines": null,
+            "kind": "项目文档"
+          }
+        ],
+        "registration": "nlp_offload_register()"
+      },
+      {
+        "id": "media",
+        "title": "系统音乐播放",
+        "command": "apple-media",
+        "group": "media",
+        "platform": "MediaPlayer",
+        "read": "now-playing、search、音量：播放器状态和媒体库查询。",
+        "write": "play-search、播放/暂停/切歌、音量调整等。",
+        "gaps": [
+          "任意第三方播放器控制。",
+          "全在线 Apple Music 曲库搜索。",
+          "歌曲或播放列表增删编辑。"
+        ],
+        "conditions": "当前实现使用系统音乐播放器及媒体库查询；受授权与现有媒体来源限制。",
+        "depth": "注册 + 项目能力清单",
+        "refs": [
+          {
+            "path": "src/ios/NativeOffloads/MediaOffload.m",
+            "symbol": "命令入口 / 子命令处理；核查深度见本项",
+            "lines": null,
+            "kind": "源码"
+          },
+          {
+            "path": "docs/specs/ios-device-data-capabilities.md",
+            "symbol": "第 3–6 节对应能力与边界",
+            "lines": null,
+            "kind": "项目文档"
+          }
+        ],
+        "registration": "media_offload_register()"
+      },
+      {
+        "id": "browser",
+        "title": "应用内浏览器",
+        "command": "minis-browser-use",
+        "group": "app",
+        "platform": "MinisX 浏览器 / WebKit",
+        "read": "读取网页、截图与页面信息。",
+        "write": "导航、点击、输入、脚本等；Agent 另有 browser_use 工具入口。",
+        "gaps": [
+          "系统 Safari 的完整历史与 Cookie 读取。"
+        ],
+        "conditions": "作用域是 MinisX 内置浏览器。两种入口共享相关能力，具体路径见浏览器桥接实现。",
+        "depth": "注册 + 项目能力清单",
+        "refs": [
+          {
+            "path": "src/ios/NativeOffloads/BrowserUseOffload.m",
+            "symbol": "命令入口 / 子命令处理；核查深度见本项",
+            "lines": null,
+            "kind": "源码"
+          },
+          {
+            "path": "docs/specs/ios-device-data-capabilities.md",
+            "symbol": "第 3–6 节对应能力与边界",
+            "lines": null,
+            "kind": "项目文档"
+          }
+        ],
+        "registration": "browser_use_offload_register()"
+      },
+      {
+        "id": "sessions",
+        "title": "MinisX 会话",
+        "command": "minis-sessions-cli",
+        "group": "app",
+        "platform": "MinisX 会话管理",
+        "read": "列出/搜索会话、读取消息、查询状态。",
+        "write": "发起或继续会话、重试、打开会话。",
+        "gaps": [
+          "其他聊天 App 的会话或消息读取。"
+        ],
+        "conditions": "处理本应用会话；产生的新请求仍受模型配置和执行条件约束。",
+        "depth": "注册 + 项目能力清单",
+        "refs": [
+          {
+            "path": "src/ios/NativeOffloads/SessionsOffload.m",
+            "symbol": "命令入口 / 子命令处理；核查深度见本项",
+            "lines": null,
+            "kind": "源码"
+          },
+          {
+            "path": "docs/specs/ios-device-data-capabilities.md",
+            "symbol": "第 3–6 节对应能力与边界",
+            "lines": null,
+            "kind": "项目文档"
+          }
+        ],
+        "registration": "sessions_offload_register()"
+      },
+      {
+        "id": "config",
+        "title": "MinisX 配置",
+        "command": "minis-config",
+        "group": "app",
+        "platform": "MinisX 配置管理",
+        "read": "读取开放配置与配置变更记录。",
+        "write": "修改开放字段、回退配置变更。",
+        "gaps": [
+          "任意 iOS 系统设置修改。"
+        ],
+        "conditions": "写操作有应用内确认流程；受已开放字段范围约束。",
+        "depth": "注册 + 项目能力清单",
+        "refs": [
+          {
+            "path": "src/ios/NativeOffloads/ConfigOffload.m",
+            "symbol": "命令入口 / 子命令处理；核查深度见本项",
+            "lines": null,
+            "kind": "源码"
+          },
+          {
+            "path": "docs/specs/ios-device-data-capabilities.md",
+            "symbol": "第 3–6 节对应能力与边界",
+            "lines": null,
+            "kind": "项目文档"
+          }
+        ],
+        "registration": "config_offload_register()"
+      },
+      {
+        "id": "model",
+        "title": "辅助模型调用",
+        "command": "minis-model-use",
+        "group": "app",
+        "platform": "MinisX Provider / 已配置模型服务",
+        "read": "list / search：查询可调用模型。",
+        "write": "run：通过已配置模型处理输入，支持当前接口开放的参数。",
+        "gaps": [
+          "通用 multipart/form-data 语音转写端点上传。"
+        ],
+        "conditions": "模型和凭据需有效；调用可能产生网络请求和费用。当前处理器帮助说明了 JSON 输入及端点限制。",
+        "depth": "注册 + 处理器帮助入口",
+        "refs": [
+          {
+            "path": "src/ios/NativeOffloads/ModelUseOffload.m",
+            "symbol": "命令入口 / 子命令处理；核查深度见本项",
+            "lines": null,
+            "kind": "源码"
+          },
+          {
+            "path": "docs/specs/ios-device-data-capabilities.md",
+            "symbol": "第 3–6 节对应能力与边界",
+            "lines": null,
+            "kind": "项目文档"
+          },
+          {
+            "path": "src/ios/NativeOffloads/ModelUseOffload.m",
+            "symbol": "list / search / run；JSON 与 multipart 限制",
+            "lines": [
+              1,
+              101
+            ],
+            "kind": "源码"
+          }
+        ],
+        "registration": "model_use_offload_register()"
+      },
+      {
+        "id": "debug",
+        "title": "应用诊断",
+        "command": "minis-debug",
+        "group": "app",
+        "platform": "MinisX 日志 / 调试服务",
+        "read": "logs：本 App 运行日志；其他命令按构建条件开放。",
+        "write": "调试构建提供部分 RPC 操作。",
+        "gaps": [
+          "发布构建中的完整 RPC 调试能力。"
+        ],
+        "conditions": "入口在各构建注册；logs 使用本应用日志，部分 RPC 子命令仍受 DEBUG 条件控制。",
+        "depth": "注册处构建条件已核实 + 项目清单",
+        "refs": [
+          {
+            "path": "src/ios/NativeOffloads/DebugOffload.m",
+            "symbol": "命令入口 / 子命令处理；核查深度见本项",
+            "lines": null,
+            "kind": "源码"
+          },
+          {
+            "path": "docs/specs/ios-device-data-capabilities.md",
+            "symbol": "第 3–6 节对应能力与边界",
+            "lines": null,
+            "kind": "项目文档"
+          },
+          {
+            "path": "src/ios/iSH/ISHKernel.m",
+            "symbol": "bootWithRootPath: 原生处理器注册",
+            "lines": [
+              413,
+              447
+            ],
+            "kind": "源码"
+          }
+        ],
+        "registration": "debug_offload_register()"
+      }
+    ],
+    "gaps": [
+      {
+        "title": "通讯录直接读写",
+        "status": "missing",
+        "summary": "当前原生注册与项目清单未发现 apple-contacts、ContactsOffload 或 CNContactStore 读写路径。",
+        "interpretation": "项目接口缺口。可扩展性需要另行评估系统 API、授权与需求。",
+        "related": [],
+        "refs": [
+          {
+            "path": "src/ios/iSH/ISHKernel.m",
+            "symbol": "bootWithRootPath: 原生处理器注册",
+            "lines": [
+              413,
+              447
+            ],
+            "kind": "源码"
+          },
+          {
+            "path": "docs/specs/ios-device-data-capabilities.md",
+            "symbol": "第 6 节：当前未发现对应直接接口",
+            "lines": null,
+            "kind": "项目文档"
+          }
+        ]
+      },
+      {
+        "title": "短信、通话记录与第三方聊天数据库",
+        "status": "missing",
+        "summary": "当前原生工具清单缺少这些数据的直接读取入口；其他 App 私有数据库同属此项。",
+        "interpretation": "用户主动导出/分享的文件可在已授权范围内处理。直接数据库访问需另行验证。",
+        "related": [],
+        "refs": [
+          {
+            "path": "docs/specs/ios-device-data-capabilities.md",
+            "symbol": "第 6 节：当前未发现对应直接接口",
+            "lines": null,
+            "kind": "项目文档"
+          }
+        ]
+      },
+      {
+        "title": "重复日历事件创建",
+        "status": "missing",
+        "summary": "apple-calendar create 尚未接入重复规则。已有重复事件的修改/删除有 occurrence-date 与 span 路径。",
+        "interpretation": "每天/工作日重复闹钟由 apple-alarm 提供，能力清单将两种操作分别列出。",
+        "related": [
+          "calendar",
+          "alarm"
+        ],
+        "refs": [
+          {
+            "path": "src/ios/NativeOffloads/CalendarOffload.m",
+            "symbol": "create / update / delete 选项",
+            "lines": null,
+            "kind": "源码"
+          },
+          {
+            "path": "docs/specs/ios-device-data-capabilities.md",
+            "symbol": "第 6 节：周期性任务",
+            "lines": null,
+            "kind": "项目文档"
+          }
+        ]
+      },
+      {
+        "title": "提醒事项子任务与列表创建",
+        "status": "missing",
+        "summary": "独立创建列表的命令尚缺；parent-id 被当前处理器拒绝。",
+        "interpretation": "现有接口覆盖普通提醒的增删改和完成状态。",
+        "related": [
+          "reminders"
+        ],
+        "refs": [
+          {
+            "path": "docs/specs/ios-device-data-capabilities.md",
+            "symbol": "第 3 节：提醒事项",
+            "lines": null,
+            "kind": "项目文档"
+          }
+        ]
+      },
+      {
+        "title": "照片相册完整管理与原位编辑",
+        "status": "missing",
+        "summary": "相册删除、重命名、移出相册、照片原位编辑缺少对应命令。",
+        "interpretation": "已实现导入、导出、新建相册、加入相册、收藏和删除资源。",
+        "related": [
+          "photos"
+        ],
+        "refs": [
+          {
+            "path": "docs/specs/ios-device-data-capabilities.md",
+            "symbol": "第 3 节：照片与视频",
+            "lines": null,
+            "kind": "项目文档"
+          },
+          {
+            "path": "src/ios/NativeOffloads/PhotosOffload.m",
+            "symbol": "当前命令清单",
+            "lines": [
+              25,
+              39
+            ],
+            "kind": "源码"
+          }
+        ]
+      },
+      {
+        "title": "健康数据的任意修改与删除",
+        "status": "scoped",
+        "summary": "删除限于本 App 来源的受支持样本；生日/血型修改及完整运动、ECG、情绪记录创建等接口尚缺。",
+        "interpretation": "具体类型、授权和来源均需检查；类型登记与可写能力分别确认。",
+        "related": [
+          "health"
+        ],
+        "refs": [
+          {
+            "path": "docs/specs/ios-device-data-capabilities.md",
+            "symbol": "第 3 节：健康数据的特殊边界",
+            "lines": null,
+            "kind": "项目文档"
+          }
+        ]
+      },
+      {
+        "title": "其他 App 通知、Wallet 与 Safari 私人数据",
+        "status": "scoped",
+        "summary": "本地通知处理本 App；NFC 面向外部标签/卡；浏览器命令面向 MinisX 内置网页。",
+        "interpretation": "当前这些入口覆盖的对象范围明确；跨 App 数据访问未在相应入口实现。",
+        "related": [
+          "notification",
+          "nfc",
+          "browser"
+        ],
+        "refs": [
+          {
+            "path": "docs/specs/ios-device-data-capabilities.md",
+            "symbol": "第 4–6 节：通知、NFC、浏览器及缺失能力",
+            "lines": null,
+            "kind": "项目文档"
+          }
+        ]
+      },
+      {
+        "title": "直接拍照、保存麦克风原始录音、导出 TTS",
+        "status": "missing",
+        "summary": "现有 Vision 接收图片文件，Speech 输出识别文字，Speak 播放朗读；这些入口缺少对应采集/导出命令。",
+        "interpretation": "界面手动选择/拍摄图片和 Agent 可直接调用的采集接口应分别核查。",
+        "related": [
+          "vision",
+          "speech",
+          "speak"
+        ],
+        "refs": [
+          {
+            "path": "docs/specs/ios-device-data-capabilities.md",
+            "symbol": "第 5 节：数据处理与应用内能力",
+            "lines": null,
+            "kind": "项目文档"
+          }
+        ]
+      },
+      {
+        "title": "剪贴板历史与持续位置轨迹",
+        "status": "missing",
+        "summary": "剪贴板历史、图片写入剪贴板、历史位置查询与持续位置记录缺少当前直接接口。",
+        "interpretation": "已提供当前剪贴板操作和一次位置查询。",
+        "related": [
+          "clipboard",
+          "location"
+        ],
+        "refs": [
+          {
+            "path": "docs/specs/ios-device-data-capabilities.md",
+            "symbol": "第 3 节：剪贴板、位置",
+            "lines": null,
+            "kind": "项目文档"
+          }
+        ]
+      },
+      {
+        "title": "任意设备设置和完整音乐管理",
+        "status": "scoped",
+        "summary": "设备接口提供状态；音乐接口覆盖当前系统播放器及媒体库查询。重启、任意设置修改、第三方播放器控制及播放列表编辑等接口尚缺。",
+        "interpretation": "查看对应能力项的对象范围，再判断是否需要新增项目封装。",
+        "related": [
+          "device",
+          "media",
+          "open"
+        ],
+        "refs": [
+          {
+            "path": "docs/specs/ios-device-data-capabilities.md",
+            "symbol": "第 4 节：设备状态、音乐；第 5 节：URL 跳转",
+            "lines": null,
+            "kind": "项目文档"
+          }
+        ]
+      },
+      {
+        "title": "定时唤醒 Agent 并重新执行任务",
+        "status": "unverified",
+        "summary": "日历、闹钟和通知的接口已经分别核查；定期唤醒、推理并执行的完整调度路径本轮保留待核验。",
+        "interpretation": "下一步检查 Agent/Background、App Intents、任务调度及实机前后台行为。",
+        "related": [
+          "alarm",
+          "notification",
+          "calendar"
+        ],
+        "refs": [
+          {
+            "path": "docs/specs/ios-device-data-capabilities.md",
+            "symbol": "第 6 节：周期性任务的三种不同含义",
+            "lines": null,
+            "kind": "项目文档"
+          }
+        ]
+      }
+    ],
+    "relatedTools": [
+      {
+        "title": "文件读写",
+        "commands": "file_read / file_write / file_edit",
+        "note": "Agent 直接工具及 shell 文件命令，读取工作文件、附件和授权挂载目录；外部目录写入条件为 isWritable && userAllowWrite。"
+      },
+      {
+        "title": "记忆与图片读取",
+        "commands": "memory_get / memory_write / read_image",
+        "note": "Agent 直接工具；读写应用记忆或可访问图片。"
+      },
+      {
+        "title": "MCP 集成",
+        "commands": "minis-mcp-cli",
+        "note": "客体命令行通过配置连接 MCP 服务；上面的 27 组按 ISHKernel 原生注册口径统计。"
+      }
+    ]
+  },
+  "frameworks": [
+    {
+      "name": "EventKit",
+      "title": "日历与提醒事项",
+      "description": "系统管理日历事件和提醒事项；处理器使用 EKEventStore 发起查询或保存。",
+      "capabilities": [
+        "calendar",
+        "reminders"
+      ],
+      "refs": [
+        {
+          "path": "src/ios/NativeOffloads/CalendarOffload.m",
+          "symbol": "命令入口 / 子命令处理；核查深度见本项",
+          "lines": null,
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/NativeOffloads/RemindersOffload.m",
+          "symbol": "命令入口 / 子命令处理；核查深度见本项",
+          "lines": null,
+          "kind": "源码"
+        },
+        {
+          "path": "docs/specs/ios-device-data-capabilities.md",
+          "symbol": "第 2–6 节：接口与边界",
+          "lines": null,
+          "kind": "项目文档"
+        }
+      ],
+      "verification": "框架与功能对应表；具体实现核查深度见对应能力项。"
+    },
+    {
+      "name": "PhotoKit / Photos",
+      "title": "照片和相册资源",
+      "description": "按照片库授权范围访问 PHAsset 等资源；导出后得到可用于后续工具的文件。",
+      "capabilities": [
+        "photos"
+      ],
+      "refs": [
+        {
+          "path": "src/ios/NativeOffloads/PhotosOffload.m",
+          "symbol": "命令入口 / 子命令处理；核查深度见本项",
+          "lines": null,
+          "kind": "源码"
+        },
+        {
+          "path": "docs/specs/ios-device-data-capabilities.md",
+          "symbol": "第 2–6 节：接口与边界",
+          "lines": null,
+          "kind": "项目文档"
+        }
+      ],
+      "verification": "框架与功能对应表；具体实现核查深度见对应能力项。"
+    },
+    {
+      "name": "HealthKit",
+      "title": "健康数据与类型授权",
+      "description": "通过 HKHealthStore 请求指定数据类型；读写能力、来源和样本类型分别受约束。",
+      "capabilities": [
+        "health"
+      ],
+      "refs": [
+        {
+          "path": "src/ios/NativeOffloads/HealthKitOffload.m",
+          "symbol": "命令入口 / 子命令处理；核查深度见本项",
+          "lines": null,
+          "kind": "源码"
+        },
+        {
+          "path": "docs/specs/ios-device-data-capabilities.md",
+          "symbol": "第 2–6 节：接口与边界",
+          "lines": null,
+          "kind": "项目文档"
+        }
+      ],
+      "verification": "框架与功能对应表；具体实现核查深度见对应能力项。"
+    },
+    {
+      "name": "CoreLocation",
+      "title": "定位与地理编码",
+      "description": "返回坐标或地址解析结果；系统定位授权与位置可用性共同影响结果。",
+      "capabilities": [
+        "location"
+      ],
+      "refs": [
+        {
+          "path": "src/ios/NativeOffloads/LocationOffload.m",
+          "symbol": "命令入口 / 子命令处理；核查深度见本项",
+          "lines": null,
+          "kind": "源码"
+        },
+        {
+          "path": "docs/specs/ios-device-data-capabilities.md",
+          "symbol": "第 2–6 节：接口与边界",
+          "lines": null,
+          "kind": "项目文档"
+        }
+      ],
+      "verification": "框架与功能对应表；具体实现核查深度见对应能力项。"
+    },
+    {
+      "name": "MapKit / WeatherKit",
+      "title": "地图和天气服务",
+      "description": "地点、路线与天气查询经系统服务接口处理，调用可涉及网络服务。",
+      "capabilities": [
+        "maps",
+        "weather"
+      ],
+      "refs": [
+        {
+          "path": "src/ios/NativeOffloads/MapsOffload.m",
+          "symbol": "命令入口 / 子命令处理；核查深度见本项",
+          "lines": null,
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/NativeOffloads/WeatherOffload.m",
+          "symbol": "命令入口 / 子命令处理；核查深度见本项",
+          "lines": null,
+          "kind": "源码"
+        },
+        {
+          "path": "docs/specs/ios-device-data-capabilities.md",
+          "symbol": "第 2–6 节：接口与边界",
+          "lines": null,
+          "kind": "项目文档"
+        }
+      ],
+      "verification": "框架与功能对应表；具体实现核查深度见对应能力项。"
+    },
+    {
+      "name": "AlarmKit / UserNotifications",
+      "title": "闹钟与本 App 通知",
+      "description": "分别安排闹钟/倒计时和通知，管理当前 App 所创建的相应对象。",
+      "capabilities": [
+        "alarm",
+        "notification"
+      ],
+      "refs": [
+        {
+          "path": "src/ios/NativeOffloads/AlarmOffload.m",
+          "symbol": "命令入口 / 子命令处理；核查深度见本项",
+          "lines": null,
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/NativeOffloads/NotificationOffload.m",
+          "symbol": "命令入口 / 子命令处理；核查深度见本项",
+          "lines": null,
+          "kind": "源码"
+        },
+        {
+          "path": "docs/specs/ios-device-data-capabilities.md",
+          "symbol": "第 2–6 节：接口与边界",
+          "lines": null,
+          "kind": "项目文档"
+        }
+      ],
+      "verification": "框架与功能对应表；具体实现核查深度见对应能力项。"
+    },
+    {
+      "name": "HomeKit / CoreBluetooth / CoreNFC",
+      "title": "家居与外部设备",
+      "description": "通过系统授权和外设/标签协议访问具体对象，设备能力会限制可执行操作。",
+      "capabilities": [
+        "home",
+        "bluetooth",
+        "nfc"
+      ],
+      "refs": [
+        {
+          "path": "src/ios/NativeOffloads/HomeKitOffload.m",
+          "symbol": "命令入口 / 子命令处理；核查深度见本项",
+          "lines": null,
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/NativeOffloads/BluetoothOffload.m",
+          "symbol": "命令入口 / 子命令处理；核查深度见本项",
+          "lines": null,
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/NativeOffloads/NFCOffload.m",
+          "symbol": "命令入口 / 子命令处理；核查深度见本项",
+          "lines": null,
+          "kind": "源码"
+        },
+        {
+          "path": "docs/specs/ios-device-data-capabilities.md",
+          "symbol": "第 2–6 节：接口与边界",
+          "lines": null,
+          "kind": "项目文档"
+        }
+      ],
+      "verification": "框架与功能对应表；具体实现核查深度见对应能力项。"
+    },
+    {
+      "name": "Vision / NaturalLanguage",
+      "title": "给定内容的分析",
+      "description": "输入图片或文本，返回检测、识别和语言分析结果。",
+      "capabilities": [
+        "vision",
+        "nlp"
+      ],
+      "refs": [
+        {
+          "path": "src/ios/NativeOffloads/VisionOffload.m",
+          "symbol": "命令入口 / 子命令处理；核查深度见本项",
+          "lines": null,
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/NativeOffloads/NLPOffload.m",
+          "symbol": "命令入口 / 子命令处理；核查深度见本项",
+          "lines": null,
+          "kind": "源码"
+        },
+        {
+          "path": "docs/specs/ios-device-data-capabilities.md",
+          "symbol": "第 2–6 节：接口与边界",
+          "lines": null,
+          "kind": "项目文档"
+        }
+      ],
+      "verification": "框架与功能对应表；具体实现核查深度见对应能力项。"
+    },
+    {
+      "name": "Speech / AVFoundation / AVKit",
+      "title": "语音和本地音视频",
+      "description": "识别、朗读和媒体播放沿各自处理器执行；麦克风、音频会话与设备支持影响结果。",
+      "capabilities": [
+        "speech",
+        "speak",
+        "player"
+      ],
+      "refs": [
+        {
+          "path": "src/ios/NativeOffloads/SpeechOffload.m",
+          "symbol": "命令入口 / 子命令处理；核查深度见本项",
+          "lines": null,
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/NativeOffloads/SpeakOffload.m",
+          "symbol": "命令入口 / 子命令处理；核查深度见本项",
+          "lines": null,
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/NativeOffloads/PlayerOffload.m",
+          "symbol": "命令入口 / 子命令处理；核查深度见本项",
+          "lines": null,
+          "kind": "源码"
+        },
+        {
+          "path": "docs/specs/ios-device-data-capabilities.md",
+          "symbol": "第 2–6 节：接口与边界",
+          "lines": null,
+          "kind": "项目文档"
+        }
+      ],
+      "verification": "框架与功能对应表；具体实现核查深度见对应能力项。"
+    },
+    {
+      "name": "MediaPlayer / UIKit",
+      "title": "音乐、剪贴板和链接",
+      "description": "系统音乐播放器、当前剪贴板及 URL 打开接口分别封装为项目命令。",
+      "capabilities": [
+        "media",
+        "clipboard",
+        "open"
+      ],
+      "refs": [
+        {
+          "path": "src/ios/NativeOffloads/MediaOffload.m",
+          "symbol": "命令入口 / 子命令处理；核查深度见本项",
+          "lines": null,
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/NativeOffloads/ClipboardOffload.m",
+          "symbol": "命令入口 / 子命令处理；核查深度见本项",
+          "lines": null,
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/NativeOffloads/OpenOffload.m",
+          "symbol": "命令入口 / 子命令处理；核查深度见本项",
+          "lines": null,
+          "kind": "源码"
+        },
+        {
+          "path": "docs/specs/ios-device-data-capabilities.md",
+          "symbol": "第 2–6 节：接口与边界",
+          "lines": null,
+          "kind": "项目文档"
+        }
+      ],
+      "verification": "框架与功能对应表；具体实现核查深度见对应能力项。"
+    }
+  ],
+  "moduleGuides": {
+    "ish": {
+      "intro": "以“查看今天的日历事件”为例，模型选择 shell_execute，并给出 apple-calendar list --today --compact。下面只追踪该命令的执行路径，示例未在设备上运行。",
+      "steps": [
+        [
+          "接收命令与检查",
+          "executeSingleToolUse() 接收工具名和参数，进行参数预检；shell 路径按可识别命令执行应用内权限检查。通过后调用 executeCommand()。",
+          "工具参数 → 命令字符串和超时预算"
+        ],
+        [
+          "准备会话执行上下文",
+          "executeCommand() 取得 sessionId，检查 Bash 兼容性，并经 runRaw() 进入协调器。execute() 检查 isBooted，登记执行并准备静态挂载，再取得 MinisFsRouter 的 fsContext。",
+          "sessionId → 文件路由标记 fsContext"
+        ],
+        [
+          "启动独立 shell",
+          "runCommand() 读取 EnvVarStore 的环境变量，把命令写入 stdin 脚本，交给 ISHShellExecutor.executeExecutable(\"/bin/sh\", …)。每次命令拥有自己的 PID（进程编号）和管道（输入输出通道）。",
+          "脚本 + 环境变量 + fsContext → 客体进程"
+        ],
+        [
+          "按命令类型执行",
+          "普通 Linux 命令沿客体程序路径运行；已注册的 apple-calendar 进入对应原生处理器。该示例随后使用 EventKit 读取事件。",
+          "已注册命令 → 原生能力桥接"
+        ],
+        [
+          "边执行边返回输出",
+          "lineCallback 把文本行交给上层供工具块更新；PID 回调用于跟踪运行状态。完成回调汇总 stdout 与 stderr，再返回 output 和 exitCode。",
+          "增量输出 → 界面；完成结果 → 等待中的调用方"
+        ],
+        [
+          "清理输出并继续 Agent 循环",
+          "runRaw() 处理回车覆盖和终端控制符，并对超长结果保留首尾。工具层生成与原调用 ID 配对的 toolResult，主循环保存结果并让模型继续。",
+          "CommandResult → toolResult → 后续模型请求"
+        ]
+      ],
+      "details": [
+        [
+          "会话路径为什么需要路由",
+          "两个会话都可使用 /var/minis/workspace/result.txt。MinisFsRouter 按 fsContext 将其映射到各自的 Library/MinisChat/minis/<sessionId>/workspace/result.txt；attachments、offloads、browser 同样按会话路由。memory、skills、shared 等保持共享挂载。"
+        ],
+        [
+          "工作目录与文件保存",
+          "包装脚本从 cd /root 开始，每次执行使用独立 shell。命令内部的 cd 和临时环境改变属于当前进程；需要跨命令保留的内容应写入明确的会话工作目录。"
+        ],
+        [
+          "等待、超时与停止",
+          "协调器用 continuation 记录等待位置，让完成回调恢复 async 函数。未传 timeout 时协调器用 300 秒兜底；聊天入口通常传入自己的预算。超时/停止路径请求结束进程组，随后返回结果或错误。已经提交到系统的写入副作用应另行核对。"
+        ],
+        [
+          "读旧文档时如何取舍",
+          "旧概述与少量遗留注释仍描述串行队列。当前 execute() 直接登记后运行独立命令，支持同会话与跨会话并发；perSessionInflight 用于跟踪执行和停止。"
+        ]
+      ],
+      "refs": [
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel+ConcurrentTools.swift",
+          "symbol": "shell_execute 权限检查、executeCommand 回调与结果处理",
+          "lines": [
+            217,
+            388
+          ],
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/ISH/ISHExecutionCoordinator.swift",
+          "symbol": "execute(); runCommand(); stopCurrentCommand(sessionId:)",
+          "lines": null,
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel+ISHCommand.swift",
+          "symbol": "executeCommand(); runRaw()",
+          "lines": [
+            17,
+            181
+          ],
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/ISH/MinisFsRouter.swift",
+          "symbol": "context(for:); installHook(); hostPath(forGuest:sid:)",
+          "lines": null,
+          "kind": "源码"
+        }
+      ]
+    },
+    "native": {
+      "intro": "同一个日历查询在这里从命令参数变成 EventKit 查询。原生处理器运行在 App 本地，负责参数、权限、结果格式和错误转换。",
+      "steps": [
+        [
+          "启动时登记命令",
+          "ISHKernel.bootWithRootPath: 调用各组注册函数。calendar_offload_register() 用 native_offload_add_handler(\"apple-calendar\", calendar_handler) 绑定入口，并准备客体命令 stub，即 shell 可以找到的占位命令文件。",
+          "命令名 → 可调用处理器函数"
+        ],
+        [
+          "接收并解释参数",
+          "calendar_handler 接收 argc/argv 和输入输出描述符，识别 list 与 --today；NativeOffloadUtils 提供子命令、选项、日期解析等公共函数。",
+          "argv → list 操作和日期范围"
+        ],
+        [
+          "取得访问条件",
+          "cmd_list() 通过 requestCalendarAccess() 请求系统日历授权。当前处理器使用完成回调与信号量等待结果；失败时输出 authorization_denied 等错误。",
+          "系统授权结果 → 执行或错误返回"
+        ],
+        [
+          "查询系统对象",
+          "resolve_date_range() 将 --today 转成设备本地当日区间；EKEventStore 创建时间谓词，查询、排序并按条件筛选事件。",
+          "日期范围 → EKEvent 列表"
+        ],
+        [
+          "统一结果并返回",
+          "event_to_dict() 转换事件字段，noff_json_envelope() / noff_json_error() 封装结果，noff_emit_json() 写到输出描述符。退出码随处理器返回，上层再交给模型。",
+          "事件对象 → JSON + 退出码 → Agent"
+        ]
+      ],
+      "details": [
+        [
+          "三种名称对应三个层次",
+          "shell_execute 是模型可选的工具名；apple-calendar 是该工具运行的项目命令；EKEventStore 是处理器调用的苹果 API 类型。沿这三层追踪同一条请求，可以定位输入、执行和系统返回。"
+        ],
+        [
+          "两道权限各自负责什么",
+          "OffloadPermissionManager 管理应用内 bypass / askOnce / notAllowed；EventKit、Photos 等再检查系统授权。bypass 表示通过 MinisX 门禁这一层，系统授权仍独立检查。命令层的 --confirm 还需要单独满足。"
+        ],
+        [
+          "应用内门禁的实际覆盖",
+          "extractOffloadCommand() 按命令字符串的首个 token 匹配已登记清单，只有部分工具出现在可配置权限页。命令识别、并发询问和嵌套调用的完整覆盖需要专门验证；当前说明记录已读实现的范围。"
+        ],
+        [
+          "Swift 桥接为什么会再多一层",
+          "例如 WeatherKit 和 AlarmKit 的接口由 Swift helper 暴露给 Objective-C 处理器。处理器把参数交给 Bridge，Bridge 在 Task 或完成回调中返回 NSDictionary / Error，然后继续统一输出。"
+        ]
+      ],
+      "refs": [
+        {
+          "path": "src/ios/Agent/Chat/AIChatViewModel+ConcurrentTools.swift",
+          "symbol": "shell_execute 权限检查、executeCommand 回调与结果处理",
+          "lines": [
+            217,
+            388
+          ],
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/iSH/ISHKernel.m",
+          "symbol": "bootWithRootPath: 原生处理器注册",
+          "lines": [
+            413,
+            447
+          ],
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/NativeOffloads/CalendarOffload.m",
+          "symbol": "calendar_handler(); cmd_list(); event_to_dict(); calendar_offload_register()",
+          "lines": null,
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/NativeOffloads/NativeOffloadUtils.m",
+          "symbol": "JSON 封装与输出",
+          "lines": [
+            131,
+            215
+          ],
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/Agent/Offload/OffloadPermissionManager.swift",
+          "symbol": "extractOffloadCommand(); checkPermission()",
+          "lines": null,
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/NativeOffloads/AlarmOffloadBridge.swift",
+          "symbol": "requestAuthorization(); scheduleAlarm()",
+          "lines": null,
+          "kind": "源码"
+        }
+      ]
+    },
+    "os": {
+      "intro": "这里按照“处理器调用了哪个框架，以及当前暴露了哪些操作”阅读。系统框架是一组苹果提供的 API；具体对象访问范围由系统管理。",
+      "steps": [
+        [
+          "把意图转换为系统参数",
+          "日历处理器把“今天”换成开始/结束时间；照片操作换成资源 ID；健康操作换成样本类型与时间区间。",
+          "用户意图 → 处理器参数 → API 输入"
+        ],
+        [
+          "核对能力、授权和对象范围",
+          "同时检查项目是否封装了所需操作、用户给出的授权范围，以及硬件/服务/类型规则。照片可局部授权，健康读写按类型处理，本地通知针对本 App。",
+          "访问条件 → 可处理的对象集合"
+        ],
+        [
+          "等待系统返回",
+          "EventKit、Photos 等返回对象或完成回调；Swift Bridge 可用 Task 等待异步 API。天气和地图服务还可能等待联网结果。",
+          "API 调用 → 对象 / 完成结果 / Error"
+        ],
+        [
+          "由处理器把结果交回 Agent",
+          "系统对象转为 JSON 或输出文件，沿原生处理器 → 命令结果 → toolResult 返回。模型随后根据上下文决定如何答复或继续调用。",
+          "系统结果 → 工具结果 → 模型决策"
+        ]
+      ],
+      "details": [
+        [
+          "三个需要分别确认的问题",
+          "系统是否提供所需 API？项目是否把该操作封装成可调用命令？当前设备是否满足授权与运行条件？功能开发前按此顺序查证。"
+        ],
+        [
+          "数据实际存在哪里",
+          "日历、健康与照片原始数据由系统及相应服务管理；命令结果可能成为消息历史或导出文件。App 的 SQLite 保存会话/状态，系统框架通过自己的 API 管理原始对象。"
+        ],
+        [
+          "本地调用与数据流向",
+          "处理器在设备本地运行；天气/路线等可使用网络服务。工具结果还可能进入当前配置的模型请求。完整数据流向与隐私审计保留为独立验证事项。"
+        ],
+        [
+          "收到系统结果怎样判断成功",
+          "按层检查调用方是否执行、exitCode、JSON 中 ok/error，以及系统返回的对象 ID 或可查询状态。对于外设无响应写入、URL 跳转等，需要结合后续状态验证目标动作。"
+        ]
+      ],
+      "refs": [
+        {
+          "path": "docs/specs/ios-device-data-capabilities.md",
+          "symbol": "第 2、3、4、6 节",
+          "lines": null,
+          "kind": "项目文档"
+        },
+        {
+          "path": "src/ios/NativeOffloads/CalendarOffload.m",
+          "symbol": "requestCalendarAccess(); cmd_list()",
+          "lines": null,
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/NativeOffloads/WeatherOffload.m",
+          "symbol": "fetchWeatherForLatitude:longitude:completion:",
+          "lines": null,
+          "kind": "源码"
+        },
+        {
+          "path": "src/ios/NativeOffloads/AlarmOffloadBridge.swift",
+          "symbol": "AlarmManager; requestAuthorization()",
+          "lines": null,
+          "kind": "源码"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,697 @@
+{
+  "edition": "v3",
+  "baseline": "1fe22b29c7a80b386bb4635a26ef5172bcbedfd3",
+  "method": "Chromium / HTML set_content + hash navigation",
+  "passed": 135,
+  "checks": [
+    {
+      "check": "默认入口为整体架构",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "模块 ui",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "模块 agent",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "模块 providers",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "模块 config",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "模块 storage",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "模块 tools",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "模块 ish",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "模块 native",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "模块 sync",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "模块 llm",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "模块 cloud",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "模块 os",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "模块 send",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "模块 session",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "模块 context",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "模块 loop",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "模块 stream",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "模块 mcp",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "模块 mcpui",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "模块 mcpdisk",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "模块 override",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "模块 mcpsnippet",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "模块 refresh",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "模块 mcpsync",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "模块 cli",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "主流程步骤 1",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "主流程步骤 2",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "主流程步骤 3",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "主流程步骤 4",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "主流程步骤 5",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "主流程步骤 6",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "主流程步骤 7",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "主流程步骤 8",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "条件分支 tools",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "条件分支 failure",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "条件分支 stop",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "问题定位 send",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "问题定位 stream",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "问题定位 history",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "全部 27 组条目",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "27 个注册函数逐项唯一",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "21 个 apple 命令",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "分类 personal",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "分类 system",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "分类 media",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "分类 app",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "关键词搜索 照片",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "清空搜索",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "可深链展开 calendar",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "可深链展开 reminders",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "可深链展开 photos",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "可深链展开 health",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "可深链展开 clipboard",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "可深链展开 location",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "可深链展开 alarm",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "可深链展开 notification",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "可深链展开 home",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "可深链展开 bluetooth",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "可深链展开 nfc",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "可深链展开 device",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "可深链展开 maps",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "可深链展开 weather",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "可深链展开 open",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "可深链展开 speech",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "可深链展开 speak",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "可深链展开 player",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "可深链展开 ffmpeg",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "可深链展开 vision",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "可深链展开 nlp",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "可深链展开 media",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "可深链展开 browser",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "可深链展开 sessions",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "可深链展开 config",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "可深链展开 model",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "可深链展开 debug",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "11 类重点边界",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "缺口搜索 通讯录",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "跨三模块保留流程来源",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "清单保留原流程返回",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "返回工具分支",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "框架表定位照片能力",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "能力项返回 OS",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "清单进入模块后可返回条目",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "返回已展开条目",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "浏览器后退",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "浏览器前进",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "新增源码进入索引",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "所有原生清单引用有相对路径与说明",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "源码链接固定 Commit",
+      "passed": true,
+      "detail": 154
+    },
+    {
+      "check": "键盘展开能力",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "视口宽度 1440 #/architecture",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "视口宽度 1440 #/module/ish",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "视口宽度 1440 #/module/native",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "视口宽度 1440 #/module/os",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "视口宽度 1440 #/capabilities",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "视口宽度 1440 #/capabilities?tab=limits",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "视口宽度 1440 #/flow/06",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "视口宽度 1024 #/architecture",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "视口宽度 1024 #/module/ish",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "视口宽度 1024 #/module/native",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "视口宽度 1024 #/module/os",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "视口宽度 1024 #/capabilities",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "视口宽度 1024 #/capabilities?tab=limits",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "视口宽度 1024 #/flow/06",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "视口宽度 768 #/architecture",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "视口宽度 768 #/module/ish",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "视口宽度 768 #/module/native",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "视口宽度 768 #/module/os",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "视口宽度 768 #/capabilities",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "视口宽度 768 #/capabilities?tab=limits",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "视口宽度 768 #/flow/06",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "视口宽度 390 #/architecture",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "视口宽度 390 #/module/ish",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "视口宽度 390 #/module/native",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "视口宽度 390 #/module/os",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "视口宽度 390 #/capabilities",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "视口宽度 390 #/capabilities?tab=limits",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "视口宽度 390 #/flow/06",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "视口宽度 360 #/architecture",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "视口宽度 360 #/module/ish",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "视口宽度 360 #/module/native",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "视口宽度 360 #/module/os",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "视口宽度 360 #/capabilities",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "视口宽度 360 #/capabilities?tab=limits",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "视口宽度 360 #/flow/06",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "独立入口 index.html",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "独立入口 message-lifecycle.html",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "独立入口 mcp.html",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "独立入口 native-capabilities.html",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "独立入口 ish.html",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "独立入口 native.html",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "独立入口 ios-frameworks.html",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "JavaScript 运行错误为零",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "check": "页面展示无需外部资源请求",
+      "passed": true,
+      "detail": []
+    }
+  ],
+  "errors": [],
+  "networkRequests": [],
+  "unavailable": [
+    "Direct file:// navigation excluded from this test; it was blocked by administrator policy in the original generation environment (ERR_BLOCKED_BY_ADMINISTRATOR)",
+    "Safari and physical-device browser validation",
+    "iOS build, native tool execution and real permissions/data verification"
+  ],
+  "scope": "Static webpage interaction and data-structure validation only. Repository remains unchanged.",
+  "staticChecks": {
+    "javascriptSyntax": "node --check _source/app.js: passed",
+    "generation": "Python generator schema validation: passed",
+    "whitespace": "git diff --no-index --check local v2 v3 copies: passed",
+    "sourceLinks": "fixed commit and relative path/symbol structure checked; outbound access not tested"
+  }
+}
