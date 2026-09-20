@@ -110,6 +110,7 @@ Use the shared skills below when the task fits; read the linked SKILL.md before 
 | Skill | Use when |
 | --- | --- |
 | [plan-task](.agents/skills/plan-task/SKILL.md) | Clarifying a development goal, researching relevant constraints, comparing viable approaches and confirming the implementation and acceptance plan |
+| [ios-ui-design](.agents/skills/ios-ui-design/SKILL.md) | Designing or checking native iOS hierarchy, navigation, feedback, motion and accessibility using Apple guidance and explained tradeoffs |
 | [resume-task](.agents/skills/resume-task/SKILL.md) | Resuming an existing task and verifying its records against current Git and code state |
 | [review-task](.agents/skills/review-task/SKILL.md) | Preparing, performing or resolving a review against fixed code and confirmed requirements |
 
