@@ -521,6 +521,7 @@
 		RCL000119 /* BackupHistoryDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = RCL000219 /* BackupHistoryDetailView.swift */; };
 		RCL000120 /* BackupCategoryIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = RCL000220 /* BackupCategoryIcon.swift */; };
 		RCL000121 /* BackupHUD.swift in Sources */ = {isa = PBXBuildFile; fileRef = RCL000221 /* BackupHUD.swift */; };
+		CA1E0001 /* CalendarRecurrenceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CA1E0002; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -699,13 +700,13 @@
 		AA71B0212F44BEB200A28A5E /* Launch Screen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
 		AA8A568B2F6FBB7A00A3E54E /* MinisUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MinisUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		AADDA9E02F6ECCF400B66649 /* ThumbnailCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThumbnailCache.swift; sourceTree = "<group>"; };
-		AAF00F002F50A00000049557 /* FFmpeg.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FFmpeg.framework; path = ../../deps/frameworks/FFmpeg.framework; sourceTree = "<group>"; };
-		AAF10F002F50A00000049557 /* libavcodec.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libavcodec.framework; path = ../../deps/frameworks/libavcodec.framework; sourceTree = "<group>"; };
-		AAF10F042F50A00000049557 /* libavformat.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libavformat.framework; path = ../../deps/frameworks/libavformat.framework; sourceTree = "<group>"; };
-		AAF10F072F50A00000049557 /* libavutil.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libavutil.framework; path = ../../deps/frameworks/libavutil.framework; sourceTree = "<group>"; };
-		AAF10F0A2F50A00000049557 /* libavfilter.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libavfilter.framework; path = ../../deps/frameworks/libavfilter.framework; sourceTree = "<group>"; };
-		AAF10F0D2F50A00000049557 /* libswresample.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libswresample.framework; path = ../../deps/frameworks/libswresample.framework; sourceTree = "<group>"; };
-		AAF10F102F50A00000049557 /* libswscale.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libswscale.framework; path = ../../deps/frameworks/libswscale.framework; sourceTree = "<group>"; };
+		AAF00F002F50A00000049557 /* FFmpeg.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FFmpeg.framework; path = frameworks/FFmpeg.framework; sourceTree = MINIS_DEPS_ROOT; };
+		AAF10F002F50A00000049557 /* libavcodec.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libavcodec.framework; path = frameworks/libavcodec.framework; sourceTree = MINIS_DEPS_ROOT; };
+		AAF10F042F50A00000049557 /* libavformat.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libavformat.framework; path = frameworks/libavformat.framework; sourceTree = MINIS_DEPS_ROOT; };
+		AAF10F072F50A00000049557 /* libavutil.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libavutil.framework; path = frameworks/libavutil.framework; sourceTree = MINIS_DEPS_ROOT; };
+		AAF10F0A2F50A00000049557 /* libavfilter.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libavfilter.framework; path = frameworks/libavfilter.framework; sourceTree = MINIS_DEPS_ROOT; };
+		AAF10F0D2F50A00000049557 /* libswresample.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libswresample.framework; path = frameworks/libswresample.framework; sourceTree = MINIS_DEPS_ROOT; };
+		AAF10F102F50A00000049557 /* libswscale.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libswscale.framework; path = frameworks/libswscale.framework; sourceTree = MINIS_DEPS_ROOT; };
 		AC0000001 /* ProviderCustomization.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = ProviderCustomization.xcconfig; path = Configs/ProviderCustomization.xcconfig; sourceTree = "<group>"; };
 		AC0000201 /* ProviderCustomizationGenerated.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ProviderCustomizationGenerated.swift; path = Generated/ProviderCustomizationGenerated.swift; sourceTree = "<group>"; };
 		B7E2CB0D0D63E6D6FDB45568 /* VoiceActivityDetector.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VoiceActivityDetector.swift; sourceTree = "<group>"; };
@@ -1196,6 +1197,8 @@
 		RCL000219 /* BackupHistoryDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupHistoryDetailView.swift; sourceTree = "<group>"; };
 		RCL000220 /* BackupCategoryIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupCategoryIcon.swift; sourceTree = "<group>"; };
 		RCL000221 /* BackupHUD.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupHUD.swift; sourceTree = "<group>"; };
+		CA1E0002 /* CalendarRecurrenceTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CalendarTests/CalendarRecurrenceTests.m; sourceTree = SOURCE_ROOT; };
+		CA1E0003 /* MinisCalendarTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MinisCalendarTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -1256,6 +1259,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CA1E0005 = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -1428,6 +1432,7 @@
 				E5FP00030 /* FileProvider */,
 				AA8A568C2F6FBB7A00A3E54E /* MinisUITests */,
 				BB1000012F700000000000AA /* MinisTests */,
+				CA1E0002 /* CalendarRecurrenceTests.m */,
 				AA26BD0E2F2E5FA500AECF2D /* Frameworks */,
 				E51000032 /* Products */,
 				AACCC6B4300B9D590053F20D /* Recovered References */,
@@ -1476,6 +1481,7 @@
 				E5FP00010 /* MinisFileProvider.appex */,
 				AA8A568B2F6FBB7A00A3E54E /* MinisUITests.xctest */,
 				BB1000010F700000000000AA /* MinisTests.xctest */,
+				CA1E0003 /* MinisCalendarTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2434,6 +2440,17 @@
 			productReference = E5H000010 /* AgentWidgetExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
+		CA1E0007 /* MinisCalendarTests */ = {
+            isa = PBXNativeTarget;
+            buildConfigurationList = CA1E000A;
+            buildPhases = (CA1E0004, CA1E0005, CA1E0006, );
+            buildRules = ();
+            dependencies = (CA1E000B, );
+            name = MinisCalendarTests;
+            productName = MinisCalendarTests;
+            productReference = CA1E0003;
+            productType = "com.apple.product-type.bundle.unit-test";
+        };
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -2495,6 +2512,7 @@
 				E5FP00040 /* MinisFileProvider */,
 				AA8A568A2F6FBB7A00A3E54E /* MinisUITests */,
 				BB1000070F700000000000AA /* MinisTests */,
+				CA1E0007 /* MinisCalendarTests */,
 			);
 		};
 /* End PBXProject section */
@@ -2568,6 +2586,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CA1E0006 = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
@@ -3124,6 +3143,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CA1E0004 = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (CA1E0001, ); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -3152,6 +3172,7 @@
 			target = E5H000040 /* AgentWidgetExtension */;
 			targetProxy = E5H000081 /* PBXContainerItemProxy */;
 		};
+		CA1E000B = {isa = PBXTargetDependency; target = E51000040 /* Minis */; };
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
@@ -3196,7 +3217,7 @@
 					"$(inherited)",
 				);
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.openminis.MinisUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -3216,7 +3237,7 @@
 				DEVELOPMENT_TEAM = "";
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.openminis.MinisUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -3242,13 +3263,13 @@
 				);
 				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = (
-					"$(SRCROOT)/../../deps/include",
-					"$(SRCROOT)/../../deps/include/ish",
+					"$(MINIS_DEPS_ROOT)/include",
+					"$(MINIS_DEPS_ROOT)/include/ish",
 					"$(SRCROOT)/NativeOffloads",
-					"$(SRCROOT)/../../deps/frameworks/FFmpeg.framework/Headers",
+					"$(MINIS_DEPS_ROOT)/frameworks/FFmpeg.framework/Headers",
 					"$(SRCROOT)/Vendor/cppjieba/include",
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.openminis.MinisTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -3271,13 +3292,13 @@
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = (
-					"$(SRCROOT)/../../deps/include",
-					"$(SRCROOT)/../../deps/include/ish",
+					"$(MINIS_DEPS_ROOT)/include",
+					"$(MINIS_DEPS_ROOT)/include/ish",
 					"$(SRCROOT)/NativeOffloads",
-					"$(SRCROOT)/../../deps/frameworks/FFmpeg.framework/Headers",
+					"$(MINIS_DEPS_ROOT)/frameworks/FFmpeg.framework/Headers",
 					"$(SRCROOT)/Vendor/cppjieba/include",
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.openminis.MinisTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -3345,12 +3366,15 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				MINIS_DEPS_ROOT = "$(SRCROOT)/../../deps";
+				"MINIS_DEPS_ROOT[sdk=iphonesimulator*]" = "$(SRCROOT)/../../deps/simulator";
+				"ARCHS[sdk=iphonesimulator*]" = arm64;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -3408,11 +3432,14 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
+				MINIS_DEPS_ROOT = "$(SRCROOT)/../../deps";
+				"MINIS_DEPS_ROOT[sdk=iphonesimulator*]" = "$(SRCROOT)/../../deps/simulator";
+				"ARCHS[sdk=iphonesimulator*]" = arm64;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -3433,14 +3460,15 @@
 				ENABLE_PREVIEWS = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SRCROOT)/../../build/frameworks",
+					"$(MINIS_DEPS_ROOT)/frameworks",
 					"$(SRCROOT)/../../deps/frameworks",
 				);
 				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = (
-					"$(SRCROOT)/../../deps/include",
-					"$(SRCROOT)/../../deps/include/ish",
+					"$(MINIS_DEPS_ROOT)/include",
+					"$(MINIS_DEPS_ROOT)/include/ish",
 					"$(SRCROOT)/NativeOffloads",
-					"$(SRCROOT)/../../deps/frameworks/FFmpeg.framework/Headers",
+					"$(MINIS_DEPS_ROOT)/frameworks/FFmpeg.framework/Headers",
 					"$(SRCROOT)/Vendor/cppjieba/include",
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/Info.plist";
@@ -3450,12 +3478,12 @@
 				INFOPLIST_KEY_UILaunchStoryboardName = "Launch Screen";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/../../deps/libs";
+				LIBRARY_SEARCH_PATHS = "$(MINIS_DEPS_ROOT)/libs";
 				MARKETING_VERSION = 1.13;
 				OTHER_LDFLAGS = (
 					"-lish_emu",
@@ -3487,14 +3515,15 @@
 				ENABLE_PREVIEWS = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SRCROOT)/../../build/frameworks",
+					"$(MINIS_DEPS_ROOT)/frameworks",
 					"$(SRCROOT)/../../deps/frameworks",
 				);
 				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = (
-					"$(SRCROOT)/../../deps/include",
-					"$(SRCROOT)/../../deps/include/ish",
+					"$(MINIS_DEPS_ROOT)/include",
+					"$(MINIS_DEPS_ROOT)/include/ish",
 					"$(SRCROOT)/NativeOffloads",
-					"$(SRCROOT)/../../deps/frameworks/FFmpeg.framework/Headers",
+					"$(MINIS_DEPS_ROOT)/frameworks/FFmpeg.framework/Headers",
 					"$(SRCROOT)/Vendor/cppjieba/include",
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/Info.plist";
@@ -3504,12 +3533,12 @@
 				INFOPLIST_KEY_UILaunchStoryboardName = "Launch Screen";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/../../deps/libs";
+				LIBRARY_SEARCH_PATHS = "$(MINIS_DEPS_ROOT)/libs";
 				MARKETING_VERSION = 1.13;
 				OTHER_LDFLAGS = (
 					"-lish_emu",
@@ -3535,9 +3564,9 @@
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ShareExtension/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Share to Minis";
+				INFOPLIST_KEY_CFBundleDisplayName = "Share to MinisX";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -3562,9 +3591,9 @@
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ShareExtension/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Share to Minis";
+				INFOPLIST_KEY_CFBundleDisplayName = "Share to MinisX";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -3589,9 +3618,9 @@
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FileProvider/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Minis Files";
+				INFOPLIST_KEY_CFBundleDisplayName = "MinisX Files";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -3616,9 +3645,9 @@
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FileProvider/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Minis Files";
+				INFOPLIST_KEY_CFBundleDisplayName = "MinisX Files";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -3643,9 +3672,9 @@
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AgentWidget/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Agent Activity";
+				INFOPLIST_KEY_CFBundleDisplayName = "MinisX Activity";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -3670,9 +3699,9 @@
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AgentWidget/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Agent Activity";
+				INFOPLIST_KEY_CFBundleDisplayName = "MinisX Activity";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -3688,6 +3717,30 @@
 			};
 			name = Release;
 		};
+		CA1E0008 = {isa = XCBuildConfiguration; buildSettings = {
+                BUNDLE_LOADER = "$(TEST_HOST)";
+                CODE_SIGN_STYLE = Automatic;
+                DEVELOPMENT_TEAM = "";
+                GENERATE_INFOPLIST_FILE = YES;
+                HEADER_SEARCH_PATHS = ("$(SRCROOT)/NativeOffloads", );
+                IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+                PRODUCT_BUNDLE_IDENTIFIER = com.openminis.MinisCalendarTests;
+                PRODUCT_NAME = "$(TARGET_NAME)";
+                TARGETED_DEVICE_FAMILY = "1,2";
+                TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Minis.app/Minis";
+}; name = Debug; };
+		CA1E0009 = {isa = XCBuildConfiguration; buildSettings = {
+                BUNDLE_LOADER = "$(TEST_HOST)";
+                CODE_SIGN_STYLE = Automatic;
+                DEVELOPMENT_TEAM = "";
+                GENERATE_INFOPLIST_FILE = YES;
+                HEADER_SEARCH_PATHS = ("$(SRCROOT)/NativeOffloads", );
+                IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+                PRODUCT_BUNDLE_IDENTIFIER = com.openminis.MinisCalendarTests;
+                PRODUCT_NAME = "$(TARGET_NAME)";
+                TARGETED_DEVICE_FAMILY = "1,2";
+                TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Minis.app/Minis";
+}; name = Release; };
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -3754,6 +3807,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		CA1E000A = {isa = XCConfigurationList; buildConfigurations = (CA1E0008, CA1E0009, ); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */

@@ -13,6 +13,9 @@
 /// Register the apple-calendar native handler.
 void calendar_offload_register(void);
 
+/// 日历命令统一入口；原生桥接与集成测试走相同分发和校验。调用线程不能是主线程。
+int calendar_offload_handle(int argc, char **argv, int stdin_fd, int stdout_fd, int stderr_fd);
+
 /// Shared reminder subcommand handlers (used by apple-reminders offload).
 int calendar_cmd_reminders(int argc, char **argv, int stdout_fd, BOOL compact, BOOL quiet);
 int calendar_cmd_remind(int argc, char **argv, int stdout_fd, int stderr_fd, BOOL compact, BOOL quiet);

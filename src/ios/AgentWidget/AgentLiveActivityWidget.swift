@@ -16,7 +16,7 @@ struct AgentLiveActivityWidget: Widget {
                     HStack(spacing: 3) {
                         Image(systemName: "sparkles")
                             .font(.caption2)
-                        Text(context.state.soulName.isEmpty ? "Minis" : context.state.soulName)
+                        Text(context.state.soulName.isEmpty || context.state.soulName == "Minis" ? "MinisX" : context.state.soulName)
                             .font(.caption.bold())
                     }
                     .padding(.horizontal, 6)
@@ -220,7 +220,7 @@ struct AgentLockScreenView: View {
                 HStack(spacing: 3) {
                     Image(systemName: "sparkles")
                         .font(.caption2)
-                    Text(state.soulName.isEmpty ? "Minis" : state.soulName)
+                    Text(state.soulName.isEmpty || state.soulName == "Minis" ? "MinisX" : state.soulName)
                         .font(.caption.bold())
                 }
                 .padding(.horizontal, 6)

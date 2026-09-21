@@ -286,8 +286,8 @@ final class AgentLiveActivityManager {
     }
 
     static func currentSoulName() -> String {
-        let name = SoulStore.cachedMetadata.name.trimmingCharacters(in: .whitespacesAndNewlines)
-        return name.isEmpty ? "Minis" : name
+        let name = SoulStore.cachedMetadata.displayName.trimmingCharacters(in: .whitespacesAndNewlines)
+        return name.isEmpty ? "MinisX" : name
     }
 
     /// SF Symbol for the most-recently-invoked tool across all active sessions,

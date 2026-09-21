@@ -19,6 +19,7 @@ set -e
 #
 # Usage:
 #   ./build_ish.sh [clean|debug|release]
+#   MINIS_SDK=iphonesimulator ./build_ish.sh [clean|debug|release] (iOS 26.0+)
 #
 # Output:
 #   deps/libs/      - Static libraries (.a files)
@@ -28,14 +29,18 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ISH_DIR="$SCRIPT_DIR/ish"
-OUTPUT_LIBS="$SCRIPT_DIR/libs"
-OUTPUT_INCLUDE="$SCRIPT_DIR/include"
-OUTPUT_RESOURCES="$SCRIPT_DIR/resources"
+source "$SCRIPT_DIR/ios_build_target.sh"
+OUTPUT_LIBS="$MINIS_DEPS_ROOT/libs"
+OUTPUT_INCLUDE="$MINIS_DEPS_ROOT/include"
+OUTPUT_RESOURCES="$MINIS_DEPS_ROOT/resources"
+BUILD_DIR="$ISH_DIR/build-ios"
+if [ "$MINIS_SDK" = "iphonesimulator" ]; then
+    BUILD_DIR="$MINIS_DEPS_ROOT/ish-build"
+fi
 
 # Build configuration
 BUILD_TYPE="${1:-release}"
 ARCHS="arm64"
-IOS_DEPLOYMENT_TARGET="14.0"
 
 # Colors for output
 RED='\033[0;31m'
@@ -130,7 +135,7 @@ init_submodules() {
 clean_build() {
     log_info "Cleaning build artifacts..."
 
-    rm -rf "$ISH_DIR/build-ios"
+    rm -rf "$BUILD_DIR"
     rm -rf "$OUTPUT_LIBS"
     rm -rf "$OUTPUT_INCLUDE"
     rm -rf "$OUTPUT_RESOURCES"
@@ -144,18 +149,18 @@ clean_build() {
 setup_cross_compile() {
     log_info "Setting up iOS cross-compilation..."
 
-    BUILD_DIR="$ISH_DIR/build-ios"
     mkdir -p "$BUILD_DIR"
 
     # Get iOS SDK path
-    IOS_SDK=$(xcrun --sdk iphoneos --show-sdk-path)
+    IOS_SDK=$(xcrun --sdk "$MINIS_SDK" --show-sdk-path)
 
+    CC="$(xcrun --sdk "$MINIS_SDK" -f clang)"
     # Create cross-compilation file for meson
     CROSS_FILE="$BUILD_DIR/ios-cross.txt"
 
-    cat > "$CROSS_FILE" << EOF
+    cat > "$CROSS_FILE.new" << EOF
 [binaries]
-c = ['clang', '-arch', 'arm64', '-isysroot', '$IOS_SDK', '-miphoneos-version-min=$IOS_DEPLOYMENT_TARGET']
+c = ['$CC', '-target', '$MINIS_TARGET', '-isysroot', '$IOS_SDK']
 ar = 'ar'
 strip = 'strip'
 pkg-config = 'false'
@@ -176,6 +181,16 @@ sys_root = '$IOS_SDK'
 library_dirs = ['$IOS_SDK/usr/lib']
 EOF
 
+    if [ -f "$BUILD_DIR/build.ninja" ] && ! cmp -s "$CROSS_FILE.new" "$CROSS_FILE"; then
+        # Meson 缓存编译器和 SDK；变化时重建所选目标目录，避免复用旧平台对象。
+        local saved_cross
+        saved_cross="$(mktemp)"
+        cp "$CROSS_FILE.new" "$saved_cross"
+        rm -rf "$BUILD_DIR"
+        mkdir -p "$BUILD_DIR"
+        mv "$saved_cross" "$CROSS_FILE.new"
+    fi
+    mv "$CROSS_FILE.new" "$CROSS_FILE"
     log_success "Cross-compilation file created"
 }
 
@@ -185,7 +200,6 @@ EOF
 build_ish() {
     log_info "Building iSH libraries for iOS ($BUILD_TYPE)..."
 
-    BUILD_DIR="$ISH_DIR/build-ios"
     CROSS_FILE="$BUILD_DIR/ios-cross.txt"
 
     cd "$ISH_DIR"
@@ -244,8 +258,6 @@ build_ish() {
 # ============================================================================
 copy_outputs() {
     log_info "Copying output files..."
-
-    BUILD_DIR="$ISH_DIR/build-ios"
 
     # Create output directories
     mkdir -p "$OUTPUT_LIBS"

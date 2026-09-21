@@ -12,6 +12,39 @@ ordered by dependency, and skipping one produces confusing link errors later.
 
 ---
 
+## MinisX v1.13 development build
+
+This branch uses upstream v1.13 with MinisX branding, the existing icons,
+extended calendar recurrence, and the complete project Harness.
+The minimum supported iOS version is **26.0** for the app and extensions.
+The Xcode SDK may be newer. App identifiers and stored data names remain stable.
+
+For an Apple Silicon simulator build, use the same Xcode installation for
+native dependencies and the app:
+
+```sh
+export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer
+bash scripts/build_ios_simulator.sh
+```
+
+The script builds simulator-specific LAME, FFmpeg and iSH outputs under
+`deps/simulator/`, and builds both device and simulator Rclone slices from
+`deps/rclone-mobile/go.mod`. Install a compatible Go toolchain before running
+it (the Go modules may require a newer version than the root go directive).
+It also creates the ignored `ProviderCustomization.xcconfig` from the empty
+tracked example if absent. Existing local configuration is kept.
+
+Use `SIMULATOR_NAME` and `SIMULATOR_OS` to select an installed simulator, and
+`--skip-deps` only after dependencies have been built for this checkout's
+pinned iSH commit and the required SDK. Device outputs remain under `deps/`.
+The `MinisCalendarTests` scheme provides the isolated EventKit integration
+suite; its known annual week-number failures must remain visible as documented
+in [calendar recurrence](docs/specs/ios-calendar-recurrence.md).
+
+Harness entry points and workflow are in [AGENTS.md](AGENTS.md) and the
+[skill guide](docs/harness/skills-guide.md). Historical task records remain
+available under `tasks/archive/` and are excluded from default context discovery.
+
 ## Common setup
 
 Clone with submodules — the iSH and PRoot forks are submodules, and a clone
@@ -76,7 +109,7 @@ without setting this.
 | Tool | Version / notes |
 |---|---|
 | macOS | Apple Silicon strongly recommended (see the simulator note below) |
-| Xcode | With the iOS SDK; the project targets **iOS 26.2** and **Swift 6.0** |
+| Xcode | With the iOS SDK; MinisX targets **iOS 26.0+**; use the Swift compiler bundled with Xcode |
 | Homebrew packages | `brew install ninja llvm libarchive pkg-config` |
 | Python 3 + Meson | `pip3 install meson` |
 

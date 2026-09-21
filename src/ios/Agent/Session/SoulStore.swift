@@ -509,6 +509,11 @@ struct SoulMetadata: Equatable {
     /// "the fixed sparkle". Prefer `displayIcon`.
     var displayEmoji: String { "✨" }
 
+    /// 只映射旧版默认显示名，不修改磁盘身份、用户自定义名称或图标。
+    var displayName: String {
+        name.isEmpty || name == "Minis" ? "MinisX" : name
+    }
+
     static let `default` = SoulMetadata(
         name: "Minis",
         // Default emoji is intentionally empty — the UI uses the fixed
@@ -1028,13 +1033,11 @@ enum SystemPromptBuilder {
 /// any place that previously hard-coded "Minis" as a label.
 @MainActor
 struct AssistantSoulName: View {
-    @State private var name: String = SoulStore.cachedMetadata.name.isEmpty
-        ? "Minis" : SoulStore.cachedMetadata.name
+    @State private var name: String = SoulStore.cachedMetadata.displayName
     var body: some View {
         Text(name)
             .onReceive(NotificationCenter.default.publisher(for: .soulMdChanged)) { _ in
-                let n = SoulStore.cachedMetadata.name
-                name = n.isEmpty ? "Minis" : n
+                name = SoulStore.cachedMetadata.displayName
             }
     }
 }

@@ -1007,8 +1007,8 @@ struct TypingIndicator: View {
     /// the user has renamed the assistant in Soul settings. Updates via
     /// `.soulMdChanged` Notification — same wiring used by `AssistantSoulName`.
     @State private var soulName: String = {
-        let n = SoulStore.cachedMetadata.name.trimmingCharacters(in: .whitespacesAndNewlines)
-        return n.isEmpty ? "Minis" : n
+        let n = SoulStore.cachedMetadata.displayName.trimmingCharacters(in: .whitespacesAndNewlines)
+        return n.isEmpty ? "MinisX" : n
     }()
 
     var body: some View {
@@ -1025,8 +1025,8 @@ struct TypingIndicator: View {
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: .soulMdChanged)) { _ in
-            let n = SoulStore.cachedMetadata.name.trimmingCharacters(in: .whitespacesAndNewlines)
-            soulName = n.isEmpty ? "Minis" : n
+            let n = SoulStore.cachedMetadata.displayName.trimmingCharacters(in: .whitespacesAndNewlines)
+            soulName = n.isEmpty ? "MinisX" : n
         }
         .font(.system(size: 15, weight: .medium))
         .foregroundStyle(ChatColors.tertiaryText)

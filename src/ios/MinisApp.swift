@@ -657,7 +657,7 @@ struct MinisApp: App {
 
     private static let fileProviderDomain = NSFileProviderDomain(
         identifier: NSFileProviderDomainIdentifier("com.openminis.app.files"),
-        displayName: "Minis"
+        displayName: "MinisX"
     )
 
     /// Bumped when we need to force-rebuild the FileProvider domain on next launch
@@ -847,6 +847,21 @@ struct MinisApp: App {
             }
 
             if alreadyRegistered {
+                if let existing = domains.first(where: { $0.identifier == fileProviderDomain.identifier }),
+                   existing.displayName != fileProviderDomain.displayName {
+                    // 同一标识的 add 可更新显示名，无需删除域或用户文件。
+                    let renamed = NSFileProviderDomain(
+                        identifier: existing.identifier,
+                        displayName: fileProviderDomain.displayName
+                    )
+                    NSFileProviderManager.add(renamed) { error in
+                        if let error {
+                            lifecycleLog.warning("[FileProvider] rename failed: \(error.localizedDescription)")
+                        } else {
+                            lifecycleLog.info("[FileProvider] display name updated to MinisX")
+                        }
+                    }
+                }
                 // Domain exists — just signal a refresh, don't remove+re-add.
                 lifecycleLog.info("[FileProvider] domain already registered, signaling refresh")
                 NSFileProviderManager(for: fileProviderDomain)?.signalEnumerator(for: .rootContainer) { signalErr in

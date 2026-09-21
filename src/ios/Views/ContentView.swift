@@ -997,8 +997,7 @@ struct ContentView: View {
     @State private var sessionsByIdCache: [String: ChatSession] = [:]
     /// Soul name shown as the sidebar title. Sourced from SOUL.md, falls
     /// back to "Minis". Refreshed whenever SoulStore posts .soulMdChanged.
-    @State private var soulName: String = SoulStore.cachedMetadata.name.isEmpty
-        ? "Minis" : SoulStore.cachedMetadata.name
+    @State private var soulName: String = SoulStore.cachedMetadata.displayName
     /// Subtitle state shown under the "Minis" sidebar title. nil hides the
     /// row; otherwise it renders as small capsules per type or a single
     /// status string. Refreshed by a 5s timer.
@@ -1254,7 +1253,8 @@ struct ContentView: View {
     /// override where the user just chose to be.
     private static let pendingBackgroundNavigationTTL: TimeInterval = 90
 
-    var body: some View {
+    // 分段保留修饰符顺序，限制每段的类型推断规模。
+    private var navigationContent: some View {
         GeometryReader { geo in
             let wide = isIPad && geo.size.width >= compactThreshold
             Group {
@@ -1347,6 +1347,10 @@ struct ContentView: View {
                 flushPendingBackgroundNavigation()
             }
         }
+    }
+
+    private var sessionEventContent: some View {
+        navigationContent
         .onReceive(NotificationCenter.default.publisher(for: .sessionDidCreate)) { note in
             guard isWideLayout, let newId = note.object as? String else { return }
             let noteDraftId = (note.userInfo as? [String: String])?["draftId"]
@@ -1440,6 +1444,10 @@ struct ContentView: View {
                 ISHTerminalView(showCloseButton: true)
             }
         }
+    }
+
+    private var presentationContent: some View {
+        sessionEventContent
         .sheet(isPresented: $showAlarmList, onDismiss: { fetchAlarmsIfNeeded() }) {
             AlarmListView()
         }
@@ -1620,135 +1628,12 @@ struct ContentView: View {
                 .animation(.easeInOut(duration: 0.2), value: isExporting)
             }
         }
-        .task {
-            sessions = await ChatStore.shared.listSessions()
-            // Folders must load WITH the first session batch: groupedSessionIDs
-            // treats a folder_id whose folder isn't loaded as an orphan and
-            // renders the session ungrouped, so a first paint with sessions
-            // but no folders shows a flat list and the folder cards only
-            // "appear after a while" (whenever refreshSessionList next ran —
-            // the exact symptom reported from the Mac build).
-            folders = await ChatStore.shared.listFolders()
-            let shareAlreadyHandled = shareCoordinator.bufferVersion > 0
-            // A Home Screen Quick Action that fired during launch will
-            // open the right session itself via `quickActionRouter.newChatTrigger`.
-            // Skip the Launch Session logic so we don't open a second,
-            // conflicting session (the "last session" / "new chat"
-            // launchScreen branch races the shortcut and the user ends
-            // up watching one view replaced by the other).
-            // Two signals indicate a quick-action launch is in flight:
-            //   1. Router bumped newChatTrigger but ContentView hasn't
-            //      consumed it yet (race: .task runs before .onAppear).
-            //   2. QuickActionWorkflow is past .idle — router already
-            //      called start(), workflow owns the next session to
-            //      open. Even if (1) flipped because .onAppear already
-            //      ran and consumed the trigger, the workflow is still
-            //      mid-flight and the launch session would clobber it.
-            let workflowActive: Bool = {
-                if case .idle = QuickActionWorkflow.shared.state { return false }
-                return true
-            }()
-            let quickActionPending = quickActionRouter.newChatTrigger != consumedQuickActionTrigger || workflowActive
-            shareLog.info("[Share] .task: hasPendingShare=\(shareCoordinator.hasPendingShare) launchScreen=\(launchScreen) sessions=\(sessions.count) bufferVersion=\(shareCoordinator.bufferVersion) shareAlreadyHandled=\(shareAlreadyHandled) quickActionPending=\(quickActionPending) workflowActive=\(workflowActive)")
+    }
 
-            // [T-notification-tap-vs-launch-session] A notification tap's
-            // explicit target session outranks every launch-screen default.
-            // Cold launch: didReceive fired before our .onReceive subscriber
-            // existed, so the post was lost — the buffered copy is the only
-            // surviving signal. Consume it and navigate. Warm-ish overlap: the
-            // post arrived while this .task was awaiting listSessions() and
-            // .onReceive already navigated — handledRecently suppresses the
-            // launch-screen default so it can't clobber that navigation.
-            if let notificationTarget = NotificationNavigationStore.shared.takePending() {
-                shareLog.info("[Share] .task: notification tap target=\(notificationTarget.prefix(8)) — overriding launchScreen logic")
-                var tx = Transaction()
-                tx.disablesAnimations = true
-                withTransaction(tx) { openSession(notificationTarget) }
-            } else if NotificationNavigationStore.shared.handledRecently {
-                shareLog.info("[Share] .task: notification navigation just handled — skipping launchScreen logic")
-            } else if quickActionPending {
-                shareLog.info("[Share] .task: quick action pending — deferring launchScreen logic to QuickActionRouter")
-            } else if shareAlreadyHandled {
-                // onChange(hasPendingShare) already processed the share and
-                // opened a new session before .task ran. Skip normal launch
-                // screen logic so we don't clobber it with a different session.
-                shareLog.info("[Share] .task: share already handled by onChange — skipping launchScreen logic")
-            } else if shareCoordinator.hasPendingShare {
-                // onChange hasn't fired yet (e.g. onOpenURL arrived during await).
-                // Process share here and open a new session for it.
-                shareLog.info("[Share] .task: processing pending share")
-                processPendingShare()
-                shareLog.info("[Share] .task: buffer stored, bufferVersion=\(shareCoordinator.bufferVersion) buffer=\(shareCoordinator.pendingShareBuffer != nil)")
-                // [T-share-routes-to-background-session] Cold launch: nothing is
-                // on screen yet (this branch runs before any launch-screen
-                // navigation), so the "foreground session" the warm path looks
-                // for does not exist and a new session IS the right
-                // destination. It is still stamped onto the buffer, which is
-                // what stops a session restored moments later — e.g. the
-                // Launch-Session default, or a chat resuming an agent loop —
-                // from mounting first and swallowing the share.
-                let target = Self.makeNewSessionId()
-                shareCoordinator.setBufferTarget(target)
-                shareLog.info("[Share] .task: cold launch — opening new session \(target.prefix(16)) for share")
-                var tx = Transaction()
-                tx.disablesAnimations = true
-                withTransaction(tx) { openSession(target) }
-            } else if CrashReporter.shared.shouldBypassSessionRestore {
-                // [T-ios-session-crash-loop] The last two launches both died in
-                // the foreground within a minute of each other — the signature
-                // of a session that faults while loading and is then re-opened
-                // automatically on the next launch, which the user cannot
-                // escape from inside the app (they can reach neither Settings
-                // to change the launch screen nor the list to delete it).
-                //
-                // Open nothing: fall through to the session list so the app is
-                // usable again. Deliberately placed AFTER the notification-tap
-                // and share branches — those are explicit, just-expressed user
-                // intent, and a stale crash flag must not swallow them.
-                CrashReporter.shared.clearCrashLoopFlag()
-                shareLog.warning("[Share] .task: crash-loop detected — skipping session restore, landing on the session list")
-            } else {
-                // No share — normal launch screen behavior
-                switch launchScreen {
-                case 1:
-                    if let latest = sessions.first {
-                        var tx = Transaction()
-                        tx.disablesAnimations = true
-                        withTransaction(tx) { openSession(latest.id) }
-                    }
-                case 2:
-                    var tx = Transaction()
-                    tx.disablesAnimations = true
-                    withTransaction(tx) { openSession(Self.makeNewSessionId()) }
-                case 3:
-                    break
-                default:
-                    if !sessions.isEmpty,
-                       let latest = sessions.first,
-                       Date().timeIntervalSince(latest.updatedAt) > 15 * 60 {
-                        var tx = Transaction()
-                        tx.disablesAnimations = true
-                        withTransaction(tx) { openSession(Self.makeNewSessionId()) }
-                    } else if isWideLayout, let latest = sessions.first {
-                        var tx = Transaction()
-                        tx.disablesAnimations = true
-                        withTransaction(tx) { openSession(latest.id) }
-                    }
-                }
-            }
-            // iPad split launch: every launchScreen branch above has resolved
-            // by now, so if the restored selection lives inside a collapsed
-            // folder, expand that folder (accordion — closes the others) so
-            // the selected row is actually visible in the sidebar instead of
-            // hidden behind a collapsed card.
-            if isWideLayout, let sid = selectedSessionId,
-               let fid = sessions.first(where: { $0.id == sid })?.folderId,
-               collapsedFolderIds.contains(fid) {
-                toggleFolderCollapsed(fid)
-            }
-            didInitialLoad = true
-            fetchAlarmsIfNeeded()
-            await refreshRemoteDeviceSessions()
+    private var startupContent: some View {
+        presentationContent
+        .task {
+            await loadInitialSessionState()
         }
         .onReceive(NotificationCenter.default.publisher(for: .cloudSyncDidFetchChanges)) { _ in
             // [T-ios-state-publish-offmain-crash] cloud-sync fetch fires off-main;
@@ -1764,6 +1649,10 @@ struct ContentView: View {
         .onChange(of: sessions) { _ in
             rebuildSessionsByIdCache()
         }
+    }
+
+    private var navigationEventContent: some View {
+        startupContent
         .onChange(of: selectedSessionId) { newValue in
             // [T-ios-session-switch-attributegraph-race] Hosting-view race
             // mitigation: when the user switches between two sessions while
@@ -1925,6 +1814,10 @@ struct ContentView: View {
             }
             fetchAlarmsIfNeeded()
         }
+    }
+
+    private var deepLinkContent: some View {
+        navigationEventContent
         .onChange(of: shareCoordinator.hasPendingShare) { hasPending in
             if hasPending {
                 let hadRecord = SharedContainerStore.loadPendingShare() != nil
@@ -2009,6 +1902,10 @@ struct ContentView: View {
             selectedSessionId = sid
             deepLink.pendingSessionId = nil
         }
+    }
+
+    var body: some View {
+        deepLinkContent
         .onChange(of: scenePhase) { phase in
             // [T-ios-scenephase-active-sigkill] Defer ALL .active work off the
             // synchronous callback. Writing @Published (SyncCore.isAppInBackground)
@@ -2055,6 +1952,139 @@ struct ContentView: View {
                 }
             }
         }
+    }
+
+    // 启动加载独立于 View 表达式，保留原有异步顺序和任务生命周期。
+    @MainActor
+    private func loadInitialSessionState() async {
+        sessions = await ChatStore.shared.listSessions()
+        // Folders must load WITH the first session batch: groupedSessionIDs
+        // treats a folder_id whose folder isn't loaded as an orphan and
+        // renders the session ungrouped, so a first paint with sessions
+        // but no folders shows a flat list and the folder cards only
+        // "appear after a while" (whenever refreshSessionList next ran —
+        // the exact symptom reported from the Mac build).
+        folders = await ChatStore.shared.listFolders()
+        let shareAlreadyHandled = shareCoordinator.bufferVersion > 0
+        // A Home Screen Quick Action that fired during launch will
+        // open the right session itself via `quickActionRouter.newChatTrigger`.
+        // Skip the Launch Session logic so we don't open a second,
+        // conflicting session (the "last session" / "new chat"
+        // launchScreen branch races the shortcut and the user ends
+        // up watching one view replaced by the other).
+        // Two signals indicate a quick-action launch is in flight:
+        //   1. Router bumped newChatTrigger but ContentView hasn't
+        //      consumed it yet (race: .task runs before .onAppear).
+        //   2. QuickActionWorkflow is past .idle — router already
+        //      called start(), workflow owns the next session to
+        //      open. Even if (1) flipped because .onAppear already
+        //      ran and consumed the trigger, the workflow is still
+        //      mid-flight and the launch session would clobber it.
+        let workflowActive: Bool = {
+            if case .idle = QuickActionWorkflow.shared.state { return false }
+            return true
+        }()
+        let quickActionPending = quickActionRouter.newChatTrigger != consumedQuickActionTrigger || workflowActive
+        shareLog.info("[Share] .task: hasPendingShare=\(shareCoordinator.hasPendingShare) launchScreen=\(launchScreen) sessions=\(sessions.count) bufferVersion=\(shareCoordinator.bufferVersion) shareAlreadyHandled=\(shareAlreadyHandled) quickActionPending=\(quickActionPending) workflowActive=\(workflowActive)")
+
+        // [T-notification-tap-vs-launch-session] A notification tap's
+        // explicit target session outranks every launch-screen default.
+        // Cold launch: didReceive fired before our .onReceive subscriber
+        // existed, so the post was lost — the buffered copy is the only
+        // surviving signal. Consume it and navigate. Warm-ish overlap: the
+        // post arrived while this .task was awaiting listSessions() and
+        // .onReceive already navigated — handledRecently suppresses the
+        // launch-screen default so it can't clobber that navigation.
+        if let notificationTarget = NotificationNavigationStore.shared.takePending() {
+            shareLog.info("[Share] .task: notification tap target=\(notificationTarget.prefix(8)) — overriding launchScreen logic")
+            var tx = Transaction()
+            tx.disablesAnimations = true
+            withTransaction(tx) { openSession(notificationTarget) }
+        } else if NotificationNavigationStore.shared.handledRecently {
+            shareLog.info("[Share] .task: notification navigation just handled — skipping launchScreen logic")
+        } else if quickActionPending {
+            shareLog.info("[Share] .task: quick action pending — deferring launchScreen logic to QuickActionRouter")
+        } else if shareAlreadyHandled {
+            // onChange(hasPendingShare) already processed the share and
+            // opened a new session before .task ran. Skip normal launch
+            // screen logic so we don't clobber it with a different session.
+            shareLog.info("[Share] .task: share already handled by onChange — skipping launchScreen logic")
+        } else if shareCoordinator.hasPendingShare {
+            // onChange hasn't fired yet (e.g. onOpenURL arrived during await).
+            // Process share here and open a new session for it.
+            shareLog.info("[Share] .task: processing pending share")
+            processPendingShare()
+            shareLog.info("[Share] .task: buffer stored, bufferVersion=\(shareCoordinator.bufferVersion) buffer=\(shareCoordinator.pendingShareBuffer != nil)")
+            // [T-share-routes-to-background-session] Cold launch: nothing is
+            // on screen yet (this branch runs before any launch-screen
+            // navigation), so the "foreground session" the warm path looks
+            // for does not exist and a new session IS the right
+            // destination. It is still stamped onto the buffer, which is
+            // what stops a session restored moments later — e.g. the
+            // Launch-Session default, or a chat resuming an agent loop —
+            // from mounting first and swallowing the share.
+            let target = Self.makeNewSessionId()
+            shareCoordinator.setBufferTarget(target)
+            shareLog.info("[Share] .task: cold launch — opening new session \(target.prefix(16)) for share")
+            var tx = Transaction()
+            tx.disablesAnimations = true
+            withTransaction(tx) { openSession(target) }
+        } else if CrashReporter.shared.shouldBypassSessionRestore {
+            // [T-ios-session-crash-loop] The last two launches both died in
+            // the foreground within a minute of each other — the signature
+            // of a session that faults while loading and is then re-opened
+            // automatically on the next launch, which the user cannot
+            // escape from inside the app (they can reach neither Settings
+            // to change the launch screen nor the list to delete it).
+            //
+            // Open nothing: fall through to the session list so the app is
+            // usable again. Deliberately placed AFTER the notification-tap
+            // and share branches — those are explicit, just-expressed user
+            // intent, and a stale crash flag must not swallow them.
+            CrashReporter.shared.clearCrashLoopFlag()
+            shareLog.warning("[Share] .task: crash-loop detected — skipping session restore, landing on the session list")
+        } else {
+            // No share — normal launch screen behavior
+            switch launchScreen {
+            case 1:
+                if let latest = sessions.first {
+                    var tx = Transaction()
+                    tx.disablesAnimations = true
+                    withTransaction(tx) { openSession(latest.id) }
+                }
+            case 2:
+                var tx = Transaction()
+                tx.disablesAnimations = true
+                withTransaction(tx) { openSession(Self.makeNewSessionId()) }
+            case 3:
+                break
+            default:
+                if !sessions.isEmpty,
+                   let latest = sessions.first,
+                   Date().timeIntervalSince(latest.updatedAt) > 15 * 60 {
+                    var tx = Transaction()
+                    tx.disablesAnimations = true
+                    withTransaction(tx) { openSession(Self.makeNewSessionId()) }
+                } else if isWideLayout, let latest = sessions.first {
+                    var tx = Transaction()
+                    tx.disablesAnimations = true
+                    withTransaction(tx) { openSession(latest.id) }
+                }
+            }
+        }
+        // iPad split launch: every launchScreen branch above has resolved
+        // by now, so if the restored selection lives inside a collapsed
+        // folder, expand that folder (accordion — closes the others) so
+        // the selected row is actually visible in the sidebar instead of
+        // hidden behind a collapsed card.
+        if isWideLayout, let sid = selectedSessionId,
+           let fid = sessions.first(where: { $0.id == sid })?.folderId,
+           collapsedFolderIds.contains(fid) {
+            toggleFolderCollapsed(fid)
+        }
+        didInitialLoad = true
+        fetchAlarmsIfNeeded()
+        await refreshRemoteDeviceSessions()
     }
 
     // MARK: - Split Layout (iPad / wide window)
@@ -2755,8 +2785,8 @@ struct ContentView: View {
         // across the sidebar's life, so the sink is never torn down mid-transaction
         // and can't drop a .soulMdChanged notification arriving during reconstruction.
         .onReceive(NotificationCenter.default.publisher(for: .soulMdChanged)) { _ in
-            let n = SoulStore.cachedMetadata.name
-            soulName = n.isEmpty ? "Minis" : n
+            let n = SoulStore.cachedMetadata.displayName
+            soulName = n.isEmpty ? "MinisX" : n
         }
     }
 
@@ -3934,7 +3964,7 @@ struct ContentView: View {
                 .padding(.bottom, 4)
 
             VStack(spacing: 8) {
-                Text("Welcome to Minis")
+                Text("Welcome to MinisX")
                     .font(.title2.bold())
                 Text("Your first On-Device Agent is almost ready.")
                     .font(.subheadline)
@@ -5553,7 +5583,7 @@ struct ContentView: View {
                 done += 1
                 if msg.isToolResultOnly { continue }
 
-                let role = msg.role == .user ? "User" : "Minis"
+                let role = msg.role == .user ? "User" : "MinisX"
                 let time = timeFmt.string(from: msg.createdAt)
                 var parts: [String] = []
                 for part in msg.parts {
@@ -7665,7 +7695,7 @@ private struct SettingsSheet: View {
                         AboutView()
                     } label: {
                         Label {
-                            Text("About Minis")
+                            Text("About MinisX")
                         } icon: {
                             Image(systemName: "info")
                                 .font(.system(size: 9))
@@ -7896,7 +7926,7 @@ private struct SettingsSheet: View {
         components.scheme = "mailto"
         components.path = "dev@openminis.app"
         components.queryItems = [
-            URLQueryItem(name: "subject", value: "Minis Feedback"),
+            URLQueryItem(name: "subject", value: "MinisX Feedback"),
             URLQueryItem(name: "body", value: body),
         ]
         return components.url
@@ -7924,7 +7954,7 @@ private struct SettingsSheet: View {
         |-------|-------|
         | Platform | iOS |
         | OS Version | iOS \(iosVersion) |
-        | Minis Version | \(appVersion) (build \(build)) |
+        | MinisX Version | \(appVersion) (build \(build)) |
         | Device Model | \(device) |
 
         ## 🔁 Steps to Reproduce

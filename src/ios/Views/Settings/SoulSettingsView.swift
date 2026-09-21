@@ -47,7 +47,10 @@ struct SoulSettingsView: View {
 
             Section(AppLocalized("Identity")) {
                 LabeledContent(AppLocalized("Name")) {
-                    TextField("Minis", text: $name)
+                    TextField("MinisX", text: Binding(
+                        get: { name == "Minis" ? "MinisX" : name },
+                        set: { name = $0 }
+                    ))
                         .multilineTextAlignment(.trailing)
                         .textInputAutocapitalization(.words)
                         .submitLabel(.done)
@@ -222,7 +225,7 @@ struct SoulSettingsView: View {
                 Text(AppLocalized("Images must have a transparent background (PNG). Photos without transparency can't be used."))
             }
             VStack(alignment: .leading, spacing: 2) {
-                Text(name.isEmpty ? "Minis" : name)
+                Text(name.isEmpty || name == "Minis" ? "MinisX" : name)
                     .font(.title3.weight(.semibold))
                 if !style.trimmingCharacters(in: .whitespaces).isEmpty {
                     Text(style)

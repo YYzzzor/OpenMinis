@@ -5,10 +5,7 @@
 #   ios-arm64            (device)
 #   ios-arm64-simulator  (simulator)
 #
-# The simulator slice matters: libish_emu.a is device-only, which already
-# prevents building this app for the Simulator. rclone must not become a
-# SECOND reason — if the iSH constraint is ever lifted, this should not be
-# what blocks it.
+# Both slices are required by the device and simulator build workflows.
 #
 # Which backends get linked is decided by deps/rclone-mobile/backends/backends.go,
 # not here. rclone itself is a go.mod dependency (pinned version), never
@@ -19,6 +16,11 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SRC="$ROOT/deps/rclone-mobile"
 OUT="$ROOT/deps/frameworks"
 BUILD="$ROOT/deps/build/rclone"
+IOS_DEPLOYMENT_TARGET="${MINIS_IOS_DEPLOYMENT_TARGET:-26.0}"
+if ! [[ "$IOS_DEPLOYMENT_TARGET" =~ ^[0-9]+\.[0-9]+(\.[0-9]+)?$ ]]; then
+  echo "error: invalid MINIS_IOS_DEPLOYMENT_TARGET" >&2
+  exit 1
+fi
 
 command -v go >/dev/null || { echo "error: go toolchain not found" >&2; exit 1; }
 
@@ -34,8 +36,8 @@ build_slice() {
       -o "$BUILD/$tag/librclone.a" ./librclone
 }
 
-build_slice iphoneos          "-miphoneos-version-min=16.0"        device
-build_slice iphonesimulator   "-mios-simulator-version-min=16.0"   simulator
+build_slice iphoneos          "-miphoneos-version-min=$IOS_DEPLOYMENT_TARGET"        device
+build_slice iphonesimulator   "-mios-simulator-version-min=$IOS_DEPLOYMENT_TARGET"   simulator
 
 # c-archive emits librclone.h next to each .a; both slices share one header.
 for t in device simulator; do
