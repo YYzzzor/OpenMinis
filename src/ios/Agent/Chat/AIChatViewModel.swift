@@ -2554,17 +2554,12 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
         // interruption. Anything beyond that is partial streaming content that should
         // be discarded so the retry starts cleanly from the last committed state.
         //
-        // [T-ios-retry-wipes-prior-text] Use clearUncommittedStreamTail instead of a
-        // blind `removeSubrange(committedBlockCount...)`. committedBlockCount is a
-        // shared instance property; error-interrupted (non-cancel) paths don't update
-        // it, so on retry it can LAG behind the message's actual committed+persisted
-        // block count. A blind removeSubrange then wipes already-committed non-empty
-        // text/terminal-tool blocks the user had on screen (the "retry makes all prior
-        // output vanish" report; DB intact since retry only mutates the in-memory
-        // array). The shared helper drops only the uncommitted tail's partial text +
-        // streaming/running tools and ALWAYS keeps non-empty text and terminal tool
-        // results — identical to the blind trim in the normal case (tail is empty/
-        // partial text + in-flight tools), but it never removes committed output.
+        // [T-ios-retry-wipes-prior-text] runAgentLoop advances
+        // `committedBlockCount` after adding an iteration to
+        // agentHistory. A stream error intentionally leaves it unchanged, so text and
+        // thinking emitted by that failed iteration remain in the removable tail.
+        // Code that inserts a UI-only block before the prefix must shift the boundary
+        // too (see applyFallbackSwitch below).
         AppLogger(category: "RetryDiag").info("[RetryDiag] retry() pre-trim committedBlockCount=\(self.committedBlockCount) blocks=\(lastMsg.blocks.count) kinds=[\(lastMsg.blocks.map { $0.kind == .text ? "t\($0.content.isEmpty ? "0" : "\($0.content.count)")" : "tool(\($0.toolStatus.map { String(describing: $0) } ?? "nil"))" }.joined(separator: ","))]")
         Self.clearUncommittedStreamTail(lastMsg, committedBlockCount: committedBlockCount)
         // Also remove any trailing empty text blocks left by prior iterations
@@ -2600,6 +2595,11 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
 
         let existingMsgIdx = messages.count - 1
         let existingBlockCount = lastMsg.blocks.count
+        // The surviving blocks are now the committed prefix for the retry's first
+        // iteration. Keep both cursors aligned so Stop during that stream neither
+        // re-commits nor removes content that survived the retry cleanup.
+        committedBlockCount = existingBlockCount
+        prevCommittedBlockCount = existingBlockCount
         errorMessage = nil
         isProcessing = true
         isNearBottom = true
@@ -2697,11 +2697,9 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
         userDidCancel = false
 
         // Safety: trim any uncommitted blocks (should be no-op with new cancel flow).
-        // [T-ios-retry-wipes-prior-text] Same fix as retry(): the blind
-        // removeSubrange(committedBlockCount...) here wiped committed post-tool text
-        // when committedBlockCount lagged (the warning below literally predicted it).
-        // clearUncommittedStreamTail preserves non-empty text + terminal tools while
-        // still dropping the uncommitted partial/streaming tail.
+        // [T-ios-retry-wipes-prior-text] Same boundary contract as retry(): the
+        // committed prefix is durable; text, thinking and in-flight tools after it
+        // belong to the interrupted iteration.
         if committedBlockCount < lastMsg.blocks.count {
             logger.info("⏹️[StopDiag] resume() pre-trim committed=\(self.committedBlockCount) blocks=\(lastMsg.blocks.count) — preserving committed text/tools via clearUncommittedStreamTail")
             Self.clearUncommittedStreamTail(lastMsg, committedBlockCount: committedBlockCount)
@@ -2735,6 +2733,8 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
 
         let existingMsgIdx = messages.count - 1
         let existingBlockCount = lastMsg.blocks.count
+        committedBlockCount = existingBlockCount
+        prevCommittedBlockCount = existingBlockCount
         errorMessage = nil
         isProcessing = true
 
@@ -3027,14 +3027,18 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
             let isAsst = inBounds && messages[r].role == .assistant
             if inBounds, isAsst {
                 messages[r].isAwaitingModelResponse = true
+                let boundary = max(0, min(resumeBlocks ?? messages[r].blocks.count, messages[r].blocks.count))
+                committedBlockCount = boundary
+                prevCommittedBlockCount = boundary
+                effectiveResumeBlocks = boundary
             } else {
                 // [RetryDiag] resumeAt points outside the array or at a non-
                 // assistant row — an off-by-one in the caller's index math. The
                 // loop will still try to resume at r; surface it loudly.
                 AppLogger(category: "RetryDiag").warning("[RetryDiag] launchRerunAgentLoop SUSPECT resumeAt=\(r) inBounds=\(inBounds) isAssistant=\(isAsst) messagesCount=\(self.messages.count) — index may be off-by-one")
+                effectiveResumeBlocks = resumeBlocks
             }
             effectiveResumeAt = r
-            effectiveResumeBlocks = resumeBlocks
         } else {
             // Append placeholder assistant so the typing indicator can latch
             // on instantly; tell runAgentLoop to resume into it.
@@ -3043,6 +3047,8 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
             messages.append(placeholder)
             effectiveResumeAt = messages.count - 1
             effectiveResumeBlocks = 0
+            committedBlockCount = 0
+            prevCommittedBlockCount = 0
         }
 
         isProcessing = true
@@ -3799,6 +3805,7 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
         msgIdx = messages.count - 1
         committedBlockCount = 0
         self.committedBlockCount = 0
+        self.prevCommittedBlockCount = 0
         scrollToBottomSignal.send()
         logger.info("Injected \(queued.count) queued prompt(s) as new turn after tool loop, new msgIdx=\(msgIdx)")
         return true
@@ -4054,8 +4061,12 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
                 return false
             }
             let hasAnyToolUse = last.blocks.contains { $0.toolStatus != nil }
-            if !hasNonEmptyText, !hasAnyToolUse, prevCommittedBlockCount == 0 {
-                logger.info("⏹️[StopDiag] Case0 REMOVING thinking-only placeholder at idx=\(candidateIdx) blocks=\(last.blocks.count) (no text, no tool_use, prevCommitted=0)")
+            let committedPrefixEnd = min(prevCommittedBlockCount, last.blocks.count)
+            let hasCommittedModelBlock = last.blocks[..<committedPrefixEnd].contains {
+                $0.kind != .info
+            }
+            if !hasNonEmptyText, !hasAnyToolUse, !hasCommittedModelBlock {
+                logger.info("⏹️[StopDiag] Case0 REMOVING thinking-only placeholder at idx=\(candidateIdx) blocks=\(last.blocks.count) (no text, no tool_use, no committed model block)")
                 messages.remove(at: candidateIdx)
                 dumpCandidateState("cleanup-EXIT-case0")
                 return
@@ -4178,19 +4189,34 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
     var lastBadgedAssistantTurnCount: Int = -1
     // MARK: - Agent Loop
 
-    /// Clear ONLY the uncommitted streaming tail of an assistant message after a
-    /// mid-stream failure, preserving every block already committed+persisted in
-    /// an earlier round of the same loop. [T-ios-stream-retry-text-disappear]
+    /// Clear only the uncommitted streaming tail of an assistant message after a
+    /// mid-stream failure, preserving every block in the committed prefix.
+    /// [T-ios-stream-retry-text-disappear]
     ///
-    /// Blocks at index `[0, committedBlockCount)` are the committed prefix (text
-    /// and terminal tool results from prior rounds, already in the DB) and are
-    /// kept verbatim. From `committedBlockCount` onward we drop the in-flight
-    /// failed stream: text blocks (partial output that the retry will re-stream)
-    /// and tool blocks stuck in `.streaming` / `.running` (which would otherwise
-    /// stay orphaned in the UI, never reaching a terminal state). A completed
-    /// tool block in the tail (rare) is left alone so its result still shows.
+    /// `committedBlockCount` is the UI-block boundary maintained alongside agent
+    /// history. Blocks before it are kept verbatim. Text and thinking after it are
+    /// partial output that the replacement stream will regenerate, even when already
+    /// non-empty. Streaming/running tools are removed; a terminal tool in the tail is
+    /// retained because its status proves completion independently of the boundary.
+    /// Callers that insert blocks before the committed prefix must shift the boundary.
+    @MainActor
+    static func prependFallbackInfoBlock(
+        _ block: AssistantBlock,
+        to message: ChatMessage,
+        committedBlockCount: inout Int,
+        previousCommittedBlockCount: inout Int
+    ) {
+        message.blocks.insert(block, at: 0)
+        committedBlockCount += 1
+        previousCommittedBlockCount += 1
+    }
+
     @MainActor
     static func clearUncommittedStreamTail(_ message: ChatMessage, committedBlockCount: Int) {
+        // Clamp defensively: error cleanup can remove empty text blocks after the
+        // boundary was recorded, so a count beyond the current array does not prove
+        // that the cursor belongs to another message. Message-switching paths reset
+        // the cursor explicitly instead of inferring identity from the count.
         let lowerBound = max(0, min(committedBlockCount, message.blocks.count))
         guard lowerBound < message.blocks.count else { return }
         var kept = Array(message.blocks[0..<lowerBound])
@@ -4686,7 +4712,16 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
                         let instanceLabel = ProviderConfigStore.shared.instance(for: newEntry.providerInstanceId)?.label ?? newEntry.model.provider
                         let noticeText = trailLines.joined(separator: "\n") + "\n" + String(localized: "Switched to \(newEntry.model.displayName) (\(instanceLabel))")
                         let infoBlock = AssistantBlock(kind: .info, content: noticeText)
-                        messages[msgIdx].blocks.insert(infoBlock, at: 0)
+                        // The notice is UI-only but is inserted before every existing
+                        // block. Shift both absolute-index cursors so Retry or Stop
+                        // cannot mistake a committed block for failed streaming output.
+                        Self.prependFallbackInfoBlock(
+                            infoBlock,
+                            to: messages[msgIdx],
+                            committedBlockCount: &committedBlockCount,
+                            previousCommittedBlockCount: &self.prevCommittedBlockCount
+                        )
+                        self.committedBlockCount = committedBlockCount
                         fallbackReasons.removeAll()
                     } else {
                         logger.error("🔀AGENT_LOOP applyFallbackSwitch: assistant message id=\(runMsgId) no longer in messages (count=\(self.messages.count)) — skipping fallback notice")
@@ -5828,4 +5863,3 @@ enum LLMProviderError: LocalizedError {
         }
     }
 }
-

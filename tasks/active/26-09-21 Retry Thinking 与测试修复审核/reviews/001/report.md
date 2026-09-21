@@ -1,0 +1,37 @@
+# Independent review
+
+Snapshot: bfd367e01921b0050af0257b49b782ad478f12f8b059a0c6e723be5b87e34f6b
+Conclusion: nonblocking
+
+## Coverage
+Required Spec: requirements/tasks/active/26-09-21 Retry Thinking 与测试修复审核/task.md — read all sections (目标, 已确认的实现边界, 验收条件, 已执行验证, 未验证范围). Patches read: patches/base-to-worktree.patch (only change: +'@testable import Minis' in src/ios/MinisTests/ToolPreflightTests.swift), patches/unstaged.patch (identical), patches/staged.patch (empty). Snapshot code read: src/ios/MinisTests/RetryThinkingBlockTests.swift, src/ios/MinisTests/ToolPreflightTests.swift, src/ios/MinisTests/ToolLoopDetectorTests.swift, src/ios/Agent/Chat/AIChatViewModel.swift (retry ~2540-2660, resume ~2690-2730, clearUncommittedStreamTail ~4180-4210, runAgentLoop commit ~4990-5030, mid-stream catch ~4780-4910), src/ios/Agent/Chat/AIChatViewModel+Fallback.swift (~420-490), src/ios/Agent/Chat/AIChatViewModel+SSEStream.swift (~200-360, 760-870), src/ios/Agent/Chat/AIChatViewModel+ToolPreflight.swift (~195-290), src/ios/Agent/Chat/ChatModels.swift (ChatMessage/AssistantBlock/ToolBlockStatus init/kind), src/ios/Minis.xcodeproj/project.pbxproj (MinisTests PBXFileSystemSynchronizedRootGroup, membership exception only ThinkingLevelTests.swift, TEST_HOST module 'Minis'). Optional Spec selections: none (manifest spec_selections is empty).
+
+## Limitations
+Read-only harness: no build, compile, or test execution was performed; all 'tests pass'/failure claims in task.md are unverified. RetryThinkingBlockTests.swift is an untracked addition (present in snapshot/manifest, absent from Git patches), so its persistence/commit status is not confirmed. The 4 reported ToolLoopDetectorTests assertion failures were neither reproduced nor root-caused; only static scope comparison (they exercise the independent pure ToolLoopDetector in ToolLoopDetectorTests.swift, which the one-line test-import diff does not touch) supports the 'unrelated' claim. Unexecuted tests: RetryThinkingBlockTests (2), ToolPreflightTests (9), full MinisTests (192, reported 188 pass), and no end-to-end Retry against a real provider (explicitly out of scope in 未验证范围). The 13710-line manifest.json was not read in full; only artifacts, state (base 92eb0d6, branch feat/minisx-branding, exclusions), and relevant entries were inspected. Excluded/unresolved dependencies: deps/ish and deps/proot (gitlinks only, deps/proot uninitialized) per request.md; deps/lame, deps/ffmpeg and other vendored trees were not reviewed. Whether committedBlockCount can actually undercount (the lag scenario cited in AIChatViewModel.swift:2560-2565) is asserted in a comment but not proven by any test, so the runtime impact of R2 is unresolved.
+
+## R1
+- severity: minor
+- requirement: 验收条件 #1/#5: 下一次流只创建一个新的 Thinking block; RetryThinkingBlockTests 定向测试锁定未提交 Thinking 清理行为。
+- location: snapshot/src/ios/MinisTests/RetryThinkingBlockTests.swift (both test methods); production call sites snapshot/src/ios/Agent/Chat/AIChatViewModel.swift:2569/2707/4804/4886, AIChatViewModel+Fallback.swift:449, AIChatViewModel+SSEStream.swift:788-798.
+- trigger: Any regression in the real Retry plumbing — e.g. retry()/auto-retry/fallback passing a stale committedBlockCount, dropping the clearUncommittedStreamTail call, or SSEStream creating a second .thinking block on re-stream — while the helper itself stays unchanged.
+- evidence: Both tests call the static helper AIChatViewModel.clearUncommittedStreamTail directly with synthetic committedBlockCount values (0 and 2) and then manually append a fresh thinking block; they never invoke retry(), resume(), the runAgentLoop mid-stream catch, the group-fallback path, or processStreamEvents/thinkingDelta block creation. The 'next stream creates exactly one thinking block' assertion is only simulated with message.blocks.append(...).
+- verification: Read the two test bodies and all production call sites of clearUncommittedStreamTail; confirmed no test exercises retry(), auto-retry, fallback, or SSEStream, so only the helper's pure behavior is locked.
+- certainty: high (scope of the tests is directly observable; the end-to-end acceptance path is demonstrably not exercised).
+
+## R2
+- severity: minor
+- requirement: 验收条件 #2: 已提交的 Thinking、文本和终态工具结果不被误删。
+- location: snapshot/src/ios/Agent/Chat/AIChatViewModel.swift:2560-2565 (retry() rationale comment) and :4193-4208 (clearUncommittedStreamTail body); test snapshot/src/ios/MinisTests/RetryThinkingBlockTests.swift:testRetryKeepsCommittedBlocksButDropsOnlyFailedStreamingTail.
+- trigger: committedBlockCount undercounts the message's actually-committed blocks (the 'error-interrupted (non-cancel) paths don't update it; it can LAG' scenario the comment names), so committed blocks fall at index >= committedBlockCount.
+- evidence: The helper drops every tail text block unconditionally (`if block.kind == .text { continue }`) and every tail thinking block, so the retry() comment's claim that it 'ALWAYS keeps non-empty text and terminal tool results' is not true for tail blocks; only [0, committedBlockCount) is kept verbatim. The new test uses committedBlockCount=2 matching exactly the two committed blocks and asserts the committed prefix survives, i.e. it covers only the exact-count case, not the lag case that motivated the helper.
+- verification: Read helper body, the surrounding comment, and the committedBlockCount update sites (exact count set after each completed iteration at AIChatViewModel.swift:5027-5029 / 5381-5408) and the new test's inputs; no test constructs committedBlockCount < actual committed count.
+- certainty: medium (comment-vs-code mismatch is certain; whether the lag can occur and thus actually delete committed text/tools is asserted only by the comment and unresolved without runtime evidence).
+
+## R3
+- severity: info
+- requirement: 未验证范围 / 已执行验证: 完整 MinisTests 未全绿, 4 个 ToolLoopDetectorTests 断言失败需判断是否与本轮改动无关。
+- location: snapshot/src/ios/MinisTests/ToolLoopDetectorTests.swift; diff patches/base-to-worktree.patch (ToolPreflightTests.swift only).
+- trigger: Building/running the MinisTests target after the @testable import fix now compiles, letting the pre-existing ToolLoopDetectorTests execute and report 4 assertion failures.
+- evidence: The patch changes only one line (adding '@testable import Minis' to ToolPreflightTests.swift); ToolLoopDetectorTests constructs ToolLoopDetector directly and asserts on check()/record() levels with no dependency on preflight, thinking blocks, or clearUncommittedStreamTail. The round leaves the suite red and states the failures still need to be adjudicated rather than providing a diagnosis.
+- verification: Static comparison of the diff scope against ToolLoopDetectorTests' exercised symbols; no execution/reproduction of the 4 failures was possible under the read-only harness.
+- certainty: medium (logical unrelatedness is well supported; the specific failing assertions and any pre-existing root cause are unconfirmed).
