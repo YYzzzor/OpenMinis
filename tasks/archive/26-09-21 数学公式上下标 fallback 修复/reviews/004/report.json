@@ -1,0 +1,38 @@
+{
+  "conclusion": "nonblocking",
+  "coverage": "Required: requirements/tasks/active/26-09-21 数学公式上下标 fallback 修复/task.md read in full (目标与验收, 上下文与决定, 实现计划, 进展与验证, 阻塞与纠偏, 审查). Optional/related: patches/base-to-worktree.patch and patches/unstaged.patch (identical) and patches/staged.patch (empty); snapshot/src/ios/Agent/Markdown/SwiftMathRenderer.swift in full; snapshot/src/ios/MinisTests/SwiftMathRendererTests.swift in full; caller site MathAttachment.performRender in snapshot/src/ios/Views/Chat/SelectableMarkdownView.swift; project.pbxproj MinisTests target (PBXFileSystemSynchronizedRootGroup, so the untracked test file auto-compiles); manifest.json artifact list and git status.",
+  "findings": [
+    {
+      "certainty": "certain that the code path behaves as described; the practical likelihood of such input is very low.",
+      "evidence": "protectFallbackTextMarkers only rewrites '_' and '^' to U+E000/U+E001 and does not escape pre-existing U+E000-U+E003; appendFallbackCharacter maps U+E000->'_' and U+E001->'^' unconditionally, and buildAttributedString silently drops (index + 1) any U+E002/U+E003 it encounters.",
+      "id": "R1",
+      "location": "src/ios/Agent/Markdown/SwiftMathRenderer.swift: fallbackLiteralUnderscore/fallbackLiteralCaret/fallbackTextGroupStart/fallbackTextGroupEnd (U+E000-U+E003) and protectFallbackTextMarkers / buildAttributedString / appendFallbackCharacter",
+      "requirement": "目标与验收: fallback 输出不再显示 LaTeX 的 ^、_ 和脚本分组花括号; 单字符及 {...} 分组的上/下标使用较小字号并上/下移基线. Acceptance implies fallback output must faithfully reflect the formula content for arbitrary inputs.",
+      "severity": "low",
+      "trigger": "Fallback path (main SwiftMath render fails) on a formula whose own text already contains private-use code points U+E000-U+E003, e.g. a \\text{...} body or plain math containing U+E000 or U+E001.",
+      "verification": "Static trace of latexToUnicode -> buildAttributedString for input containing the PUA range; no unit test covers PUA input (all tests use ASCII/LaTeX)."
+    },
+    {
+      "certainty": "likely (behavior is deterministic from the code; only the desirability is a judgement).",
+      "evidence": "cmdPattern strips only backslash followed by ASCII letters, so '\\\\\\\\' survives to buildAttributedString; the escape branch then treats '\\\\'+'\\\\' as an escaped literal and emits a single '\\' character, whereas the base implementation emitted each backslash scalar (two '\\' characters). Either way a spurious backslash is displayed instead of a line break.",
+      "id": "R2",
+      "location": "src/ios/Agent/Markdown/SwiftMathRenderer.swift: buildAttributedString escape branch plus isFallbackEscapedLiteral (includes '\"\\\\\"'), and latexToUnicode cmdPattern (#\"\\\\[a-zA-Z]+\"#)",
+      "requirement": "目标与验收: SwiftMath 主渲染、Markdown 数学识别和其他 Markdown 内容保持不变 (no behavioral regression vs the base fallback for non-script content).",
+      "severity": "low",
+      "trigger": "Fallback on LaTeX containing a line break '\\\\\\\\' (e.g. multi-line aligned/gathered bodies) or a stray/trailing backslash that is not a letter command.",
+      "verification": "Static trace of latexToUnicode then buildAttributedString for 'x \\\\\\\\ y'; no test asserts the rendered string for '\\\\\\\\'."
+    },
+    {
+      "certainty": "certain (deterministic), though it only occurs on malformed LaTeX.",
+      "evidence": "parseScriptGroup for a non-'{', non-escape, non-text-group operand returns the next single Character verbatim; nothing distinguishes a real operand from a synthesized '(' / ')' / ')' produced by the frac/sqrt rewrites.",
+      "id": "R3",
+      "location": "src/ios/Agent/Markdown/SwiftMathRenderer.swift: parseScriptGroup single-character fallback branch (guard chars[operandStart] == \"{\" else return (String(chars[operandStart]), operandStart + 1))",
+      "requirement": "目标与验收: fallback 输出不再显示 LaTeX 的 ^、_ 和脚本分组花括号; scripts use smaller font and shifted baseline (script operands must be the real operand, not a delimiter synthesized by another conversion).",
+      "severity": "low",
+      "trigger": "Fallback input with a dangling script marker immediately before a delimiter that another conversion injected, e.g. \\\\sqrt{x^}: after sqrtPattern the string is '√(x^)', so the trailing ')' is consumed as the superscript operand.",
+      "verification": "Static trace of latexToUnicode+sqrtPattern then buildAttributedString for '\\\\sqrt{x^}'; the resulting attributed string is '√x)' with ')' carrying a positive baselineOffset. No test covers a dangling marker before a delimiter."
+    }
+  ],
+  "limitations": "No tests were executed: this is a read-only review with no Xcode/iOS Simulator, so the claimed 11/11 SwiftMathRendererTests pass, the App build pass, and git diff --check are unverified at runtime; all behavior conclusions are from static tracing. The pixel-level assertions in testFallbackRendererProducesUnclippedImageForScripts (hasContent and !touchesBorder) and the exact effect of NSAttributedString.draw(with:options:) with .usesLineFragmentOrigin plus baselineOffset could not be confirmed by rendering. Availability of the STIXTwoMath-Regular font and UIColor.label semantics in the test environment were not checked. Prior reports openminis-math-script-fallback-001/002/003 are not in this bundle, so handling of their R1-R4 items was judged only against the task.md summary; second-round R3 (draw-rect vs glyph bounds) is treated as accepted-by-agent and was re-derived statically, not empirically. KaTeXRenderer, MathRenderScheduler, MinisMarkdownParser and the broader Markdown pipeline were not exercised, so the 'other Markdown unchanged' acceptance item rests on the patch touching only the fallback functions. deps/ish and deps/proot are excluded and were not read.",
+  "snapshot_id": "2e87b355b3a7814703806f88215e56a335eacfbe24abb44d460499d5bdaa3985"
+}

@@ -110,15 +110,9 @@ enum SwiftMathRenderer {
         let key = ("F:" + cacheKey(latex: latex, displayMode: displayMode, fontSize: fontSize)) as NSString
         if let cached = cache.object(forKey: key) { return cached }
 
-        let unicode = latexToUnicode(latex)
-        guard !unicode.isEmpty else { return nil }
-
-        let textFont = UIFont.systemFont(ofSize: fontSize)
-        let mathFont = UIFont(name: "STIXTwoMath-Regular", size: fontSize) ?? textFont
-        let boldFont = UIFont.boldSystemFont(ofSize: fontSize)
-
-        let attributed = buildAttributedString(unicode, textFont: textFont, mathFont: mathFont, boldFont: boldFont)
-        guard attributed.length > 0 else { return nil }
+        guard let attributed = fallbackAttributedString(latex: latex, fontSize: fontSize) else {
+            return nil
+        }
 
         let constraintWidth: CGFloat = displayMode ? 600 : 2000
         let boundingRect = attributed.boundingRect(
@@ -131,27 +125,255 @@ enum SwiftMathRenderer {
 
         let renderer = UIGraphicsImageRenderer(size: pixelSize)
         let image = renderer.image { _ in
-            attributed.draw(in: CGRect(origin: CGPoint(x: 2, y: 1), size: boundingRect.size))
+            // baselineOffset 可能让排版边界出现负原点；按实际边界平移后再绘制，
+            // 避免上标顶部或下标底部被图片边缘裁切。
+            let drawRect = CGRect(
+                x: 2 - boundingRect.minX,
+                y: 1 - boundingRect.minY,
+                width: boundingRect.width,
+                height: boundingRect.height
+            )
+            attributed.draw(
+                with: drawRect,
+                options: [.usesLineFragmentOrigin, .usesFontLeading],
+                context: nil
+            )
         }
         let result = SwiftMathRenderResult(image: image, size: pixelSize)
         cache.setObject(result, forKey: key)
         return result
     }
 
-    private static func buildAttributedString(_ text: String, textFont: UIFont, mathFont: UIFont, boldFont: UIFont) -> NSAttributedString {
+    /// 构造 Unicode fallback 的最终排版结果。保留为模块内可见，便于测试在
+    /// SwiftMath 失败时真正使用的字号和基线属性，而不是只比较转换后的字符串。
+    static func fallbackAttributedString(latex: String, fontSize: CGFloat = 17) -> NSAttributedString? {
+        let unicode = latexToUnicode(latex)
+        guard !unicode.isEmpty else { return nil }
+
+        let textFont = UIFont.systemFont(ofSize: fontSize)
+        let mathFont = UIFont(name: "STIXTwoMath-Regular", size: fontSize) ?? textFont
+        let result = buildAttributedString(unicode, textFont: textFont, mathFont: mathFont)
+        return result.length > 0 ? result : nil
+    }
+
+    private enum ScriptPosition {
+        case superscript
+        case subscripted
+    }
+
+    private static let fallbackLiteralUnderscore: Character = "\u{E000}"
+    private static let fallbackLiteralCaret: Character = "\u{E001}"
+    private static let fallbackTextGroupStart: Character = "\u{E002}"
+    private static let fallbackTextGroupEnd: Character = "\u{E003}"
+
+    private static func buildAttributedString(_ text: String, textFont: UIFont, mathFont: UIFont) -> NSAttributedString {
         let result = NSMutableAttributedString()
         let textColor = UIColor.label
-        for ch in text.unicodeScalars {
-            let s = String(ch)
-            let font: UIFont
-            if ch.properties.isAlphabetic && !ch.properties.isMath {
-                font = textFont
-            } else {
-                font = mathFont
+        let chars = Array(text)
+        var index = 0
+
+        while index < chars.count {
+            let ch = chars[index]
+
+            // 转义后的脚本标记和花括号是普通字符，不参与 fallback 结构解析。
+            if ch == "\\", index + 1 < chars.count,
+               isFallbackEscapedLiteral(chars[index + 1]) {
+                appendFallbackCharacter(
+                    chars[index + 1],
+                    position: nil,
+                    to: result,
+                    textFont: textFont,
+                    mathFont: mathFont,
+                    textColor: textColor
+                )
+                index += 2
+                continue
             }
-            result.append(NSAttributedString(string: s, attributes: [.font: font, .foregroundColor: textColor]))
+
+            if ch == "^" || ch == "_" {
+                let position: ScriptPosition = ch == "^" ? .superscript : .subscripted
+                let parsed = parseScriptGroup(chars, startingAt: index + 1)
+                if !parsed.text.isEmpty {
+                    appendFallbackText(
+                        parsed.text,
+                        position: position,
+                        to: result,
+                        textFont: textFont,
+                        mathFont: mathFont,
+                        textColor: textColor
+                    )
+                }
+                // 即使脚本为空或标记位于末尾，也要消费语法字符，避免重新显示 ^/_。
+                index = parsed.nextIndex
+                continue
+            }
+
+            if ch == fallbackTextGroupStart || ch == fallbackTextGroupEnd {
+                index += 1
+                continue
+            }
+
+            // 非脚本分组的花括号只是 LaTeX 结构字符，不显示到 fallback 中。
+            if ch != "{" && ch != "}" {
+                appendFallbackText(
+                    String(ch),
+                    position: nil,
+                    to: result,
+                    textFont: textFont,
+                    mathFont: mathFont,
+                    textColor: textColor
+                )
+            }
+            index += 1
         }
         return result
+    }
+
+    private static func parseScriptGroup(_ chars: [Character], startingAt start: Int) -> (text: String, nextIndex: Int) {
+        var operandStart = start
+        while operandStart < chars.count, chars[operandStart].isWhitespace {
+            operandStart += 1
+        }
+        guard operandStart < chars.count else { return ("", operandStart) }
+        if chars[operandStart] == "\\", operandStart + 1 < chars.count,
+           isFallbackEscapedLiteral(chars[operandStart + 1]) {
+            return (String(chars[operandStart...operandStart + 1]), operandStart + 2)
+        }
+        if chars[operandStart] == fallbackTextGroupStart {
+            var index = operandStart + 1
+            var text = ""
+            while index < chars.count, chars[index] != fallbackTextGroupEnd {
+                text.append(chars[index])
+                index += 1
+            }
+            if index < chars.count { index += 1 }
+            return (text, index)
+        }
+        guard chars[operandStart] == "{" else {
+            return (String(chars[operandStart]), operandStart + 1)
+        }
+
+        var depth = 1
+        var index = operandStart + 1
+        var text = ""
+        while index < chars.count {
+            let ch = chars[index]
+            if ch == "\\", index + 1 < chars.count,
+               isFallbackEscapedLiteral(chars[index + 1]) {
+                text.append(ch)
+                text.append(chars[index + 1])
+                index += 2
+                continue
+            }
+            if ch == "{" {
+                depth += 1
+                if depth > 1 { text.append(ch) }
+            } else if ch == "}" {
+                depth -= 1
+                if depth == 0 { return (text, index + 1) }
+                text.append(ch)
+            } else {
+                text.append(ch)
+            }
+            index += 1
+        }
+
+        // 未闭合分组按剩余内容排版；主渲染已经失败时仍尽量给出可读结果。
+        return (text, index)
+    }
+
+    private static func appendFallbackText(
+        _ text: String,
+        position: ScriptPosition?,
+        to result: NSMutableAttributedString,
+        textFont: UIFont,
+        mathFont: UIFont,
+        textColor: UIColor
+    ) {
+        let chars = Array(text)
+        var index = 0
+        while index < chars.count {
+            let ch = chars[index]
+            if ch == "\\", index + 1 < chars.count,
+               isFallbackEscapedLiteral(chars[index + 1]) {
+                appendFallbackCharacter(
+                    chars[index + 1],
+                    position: position,
+                    to: result,
+                    textFont: textFont,
+                    mathFont: mathFont,
+                    textColor: textColor
+                )
+                index += 2
+                continue
+            }
+            if ch == "^" || ch == "_" {
+                let nested = parseScriptGroup(chars, startingAt: index + 1)
+                if !nested.text.isEmpty {
+                    appendFallbackText(
+                        nested.text,
+                        position: position,
+                        to: result,
+                        textFont: textFont,
+                        mathFont: mathFont,
+                        textColor: textColor
+                    )
+                }
+                index = nested.nextIndex
+                continue
+            }
+            if ch != "{" && ch != "}" {
+                appendFallbackCharacter(
+                    ch,
+                    position: position,
+                    to: result,
+                    textFont: textFont,
+                    mathFont: mathFont,
+                    textColor: textColor
+                )
+            }
+            index += 1
+        }
+    }
+
+    private static func appendFallbackCharacter(
+        _ character: Character,
+        position: ScriptPosition?,
+        to result: NSMutableAttributedString,
+        textFont: UIFont,
+        mathFont: UIFont,
+        textColor: UIColor
+    ) {
+        let visibleCharacter: Character
+        switch character {
+        case fallbackLiteralUnderscore:
+            visibleCharacter = "_"
+        case fallbackLiteralCaret:
+            visibleCharacter = "^"
+        default:
+            visibleCharacter = character
+        }
+
+        for scalar in visibleCharacter.unicodeScalars {
+            let baseFont = scalar.properties.isAlphabetic && !scalar.properties.isMath
+                ? textFont
+                : mathFont
+            var attributes: [NSAttributedString.Key: Any] = [
+                .font: baseFont,
+                .foregroundColor: textColor,
+            ]
+            if let position {
+                attributes[.font] = baseFont.withSize(baseFont.pointSize * 0.72)
+                attributes[.baselineOffset] = position == .superscript
+                    ? baseFont.pointSize * 0.38
+                    : -baseFont.pointSize * 0.22
+            }
+            result.append(NSAttributedString(string: String(scalar), attributes: attributes))
+        }
+    }
+
+    private static func isFallbackEscapedLiteral(_ character: Character) -> Bool {
+        character == "_" || character == "^" || character == "{" || character == "}" || character == "\\"
     }
 
     /// Convert common LaTeX to Unicode text. Not exhaustive — covers the
@@ -161,7 +383,18 @@ enum SwiftMathRenderer {
 
         // Strip \text{...} / \textbf{...} / \mathrm{...} / \operatorname{...} wrappers, keep content
         let textPattern = try! NSRegularExpression(pattern: #"\\(?:text|textbf|mathrm|operatorname|mathbf|bold)\{([^}]*)\}"#)
-        s = textPattern.stringByReplacingMatches(in: s, range: NSRange(s.startIndex..., in: s), withTemplate: "$1")
+        let textMatches = textPattern.matches(in: s, range: NSRange(s.startIndex..., in: s))
+        let mutableText = NSMutableString(string: s)
+        let sourceText = s as NSString
+        for match in textMatches.reversed() where match.numberOfRanges > 1 {
+            let content = sourceText.substring(with: match.range(at: 1))
+            let protectedContent = protectFallbackTextMarkers(content)
+            // 使用不会参与 LaTeX 花括号匹配的内部标记，使 x^\text{hi} 仍把 hi
+            // 整体视为上标，同时不干扰后续 \frac 与 \sqrt 的既有转换。
+            let grouped = "\(fallbackTextGroupStart)\(protectedContent)\(fallbackTextGroupEnd)"
+            mutableText.replaceCharacters(in: match.range, with: grouped)
+        }
+        s = mutableText as String
 
         // \frac{a}{b} → a/b
         let fracPattern = try! NSRegularExpression(pattern: #"\\(?:frac|dfrac|tfrac)\{([^}]*)\}\{([^}]*)\}"#)
@@ -206,16 +439,34 @@ enum SwiftMathRenderer {
         let cmdPattern = try! NSRegularExpression(pattern: #"\\[a-zA-Z]+"#)
         s = cmdPattern.stringByReplacingMatches(in: s, range: NSRange(s.startIndex..., in: s), withTemplate: "")
 
-        // Clean up braces and extra whitespace
-        s = s.replacingOccurrences(of: "{", with: "")
-        s = s.replacingOccurrences(of: "}", with: "")
-        s = s.replacingOccurrences(of: "^", with: "^")
-        s = s.replacingOccurrences(of: "_", with: "_")
-
         let multiSpace = try! NSRegularExpression(pattern: #" {3,}"#)
         s = multiSpace.stringByReplacingMatches(in: s, range: NSRange(s.startIndex..., in: s), withTemplate: "  ")
 
         return s.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private static func protectFallbackTextMarkers(_ text: String) -> String {
+        let chars = Array(text)
+        var result = ""
+        var index = 0
+        while index < chars.count {
+            let ch = chars[index]
+            if ch == "\\", index + 1 < chars.count {
+                result.append(ch)
+                result.append(chars[index + 1])
+                index += 2
+                continue
+            }
+            if ch == "_" {
+                result.append(fallbackLiteralUnderscore)
+            } else if ch == "^" {
+                result.append(fallbackLiteralCaret)
+            } else {
+                result.append(ch)
+            }
+            index += 1
+        }
+        return result
     }
 }
 
