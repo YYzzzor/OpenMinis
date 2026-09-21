@@ -1,0 +1,22 @@
+{
+  "Minis.app": {
+    "CFBundleDisplayName": "MinisX",
+    "CFBundleIdentifier": "com.openminis.app",
+    "MinimumOSVersion": "16.0"
+  },
+  "AgentWidgetExtension.appex": {
+    "CFBundleDisplayName": "MinisX Activity",
+    "CFBundleIdentifier": "com.openminis.app.AgentWidget",
+    "MinimumOSVersion": "16.2"
+  },
+  "MinisFileProvider.appex": {
+    "CFBundleDisplayName": "MinisX Files",
+    "CFBundleIdentifier": "com.openminis.app.FileProvider",
+    "MinimumOSVersion": "16.0"
+  },
+  "MinisShare.appex": {
+    "CFBundleDisplayName": "Share to MinisX",
+    "CFBundleIdentifier": "com.openminis.app.ShareExtension",
+    "MinimumOSVersion": "16.0"
+  }
+}

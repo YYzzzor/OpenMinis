@@ -1,0 +1,1012 @@
+{
+  "scope": "User-requested task-directory migration; metadata only, no historical task bodies",
+  "tasks": [
+    {
+      "old": "docs/tasks/active/26-09-11 实现 OpenMinis 开发 Harness",
+      "new": "tasks/active/26-09-11 实现 OpenMinis 开发 Harness",
+      "status": "blocked"
+    },
+    {
+      "old": "docs/tasks/active/26-09-11 核查 iOS 定时任务能力",
+      "new": "tasks/archive/26-09-11 核查 iOS 定时任务能力",
+      "status": "done"
+    },
+    {
+      "old": "docs/tasks/active/26-09-15 完成 iOS 首次构建",
+      "new": "tasks/archive/26-09-15 完成 iOS 首次构建",
+      "status": "done"
+    },
+    {
+      "old": "docs/tasks/active/26-09-15 添加任务规划技能与使用说明.md",
+      "new": "tasks/archive/26-09-15 添加任务规划技能与使用说明.md",
+      "status": "done"
+    },
+    {
+      "old": "docs/tasks/active/26-09-15 统一 MinisX 界面名称.md",
+      "new": "tasks/archive/26-09-15 统一 MinisX 界面名称.md",
+      "status": "done"
+    },
+    {
+      "old": "docs/tasks/active/26-09-15 设置 MinisX 默认系统版本.md",
+      "new": "tasks/archive/26-09-15 设置 MinisX 默认系统版本.md",
+      "status": "done"
+    },
+    {
+      "old": "docs/tasks/active/26-09-15 适配 iOS 27 模拟器构建",
+      "new": "tasks/archive/26-09-15 适配 iOS 27 模拟器构建",
+      "status": "done"
+    },
+    {
+      "old": "docs/tasks/active/26-09-18 审查任务规划技能",
+      "new": "tasks/archive/26-09-18 审查任务规划技能",
+      "status": "done"
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建",
+      "status": "done"
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 添加原生界面设计技能.md",
+      "new": "tasks/archive/26-09-20 添加原生界面设计技能.md",
+      "status": "done"
+    }
+  ],
+  "file_count": 119,
+  "protected_file_count": 102,
+  "original_bytes": 5706579,
+  "files": [
+    {
+      "old": "docs/tasks/active/26-09-11 实现 OpenMinis 开发 Harness/trial-001-assessment.md",
+      "new": "tasks/active/26-09-11 实现 OpenMinis 开发 Harness/trial-001-assessment.md",
+      "original_bytes": 1937,
+      "original_sha256": "2f62dfb9479a8fcb0310a58ed3a721d1381c5e497c6c187fb63135c083232aeb",
+      "current_sha256": "73c6368222360a34f1bc70ecfcb0ad64990dc70c178d5e02c8446f3a22a6107f",
+      "preserve_original_bytes": false
+    },
+    {
+      "old": "docs/tasks/active/26-09-11 实现 OpenMinis 开发 Harness/task.md",
+      "new": "tasks/active/26-09-11 实现 OpenMinis 开发 Harness/task.md",
+      "original_bytes": 11590,
+      "original_sha256": "3a25f81378a18b484e5d0c4546faf465b400271f81635059b1fa806481c8fdce",
+      "current_sha256": "7fddd926592ec35656f153af3df1ef261387070b52cec5c1ff454660d75bfbbc",
+      "preserve_original_bytes": false
+    },
+    {
+      "old": "docs/tasks/active/26-09-11 实现 OpenMinis 开发 Harness/task.checkpoint.json",
+      "new": "tasks/active/26-09-11 实现 OpenMinis 开发 Harness/task.checkpoint.json",
+      "original_bytes": 5229,
+      "original_sha256": "50e1b3a3b3a896ef3e29b9e91a59807c93e7310a653a3f8e19f48712a1fd92fb",
+      "current_sha256": "50e1b3a3b3a896ef3e29b9e91a59807c93e7310a653a3f8e19f48712a1fd92fb",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-11 核查 iOS 定时任务能力/task.md",
+      "new": "tasks/archive/26-09-11 核查 iOS 定时任务能力/task.md",
+      "original_bytes": 7552,
+      "original_sha256": "098c9c68aa26b403f9eb4c7bd7f1b0ec135b4b1309cfd2dd21a27e373a68258e",
+      "current_sha256": "c3645a127ff336f290acc325c2d9e581df5d8f50f6a7149fd606539be50ca945",
+      "preserve_original_bytes": false
+    },
+    {
+      "old": "docs/tasks/active/26-09-11 核查 iOS 定时任务能力/findings.md",
+      "new": "tasks/archive/26-09-11 核查 iOS 定时任务能力/findings.md",
+      "original_bytes": 17791,
+      "original_sha256": "227c425d3ddefda32bc5123ae7e877e2b0c2c353746885a8b0b82a7e216cabda",
+      "current_sha256": "227c425d3ddefda32bc5123ae7e877e2b0c2c353746885a8b0b82a7e216cabda",
+      "preserve_original_bytes": false
+    },
+    {
+      "old": "docs/tasks/active/26-09-11 核查 iOS 定时任务能力/task.checkpoint.json",
+      "new": "tasks/archive/26-09-11 核查 iOS 定时任务能力/task.checkpoint.json",
+      "original_bytes": 5126,
+      "original_sha256": "f4584421bb77912691c599ca734f676bcdae3ce6b936205b44493c21b0041900",
+      "current_sha256": "f4584421bb77912691c599ca734f676bcdae3ce6b936205b44493c21b0041900",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-15 完成 iOS 首次构建/verification.md",
+      "new": "tasks/archive/26-09-15 完成 iOS 首次构建/verification.md",
+      "original_bytes": 3500,
+      "original_sha256": "4ccb9f1491e3712690b4bfbda10485234a3cdc94726c487e735282b235f35329",
+      "current_sha256": "4ccb9f1491e3712690b4bfbda10485234a3cdc94726c487e735282b235f35329",
+      "preserve_original_bytes": false
+    },
+    {
+      "old": "docs/tasks/active/26-09-15 完成 iOS 首次构建/task.md",
+      "new": "tasks/archive/26-09-15 完成 iOS 首次构建/task.md",
+      "original_bytes": 4463,
+      "original_sha256": "664a66bfad4acc219b6e9809882ff2632398b8e47ca3c022da98790f34e39c2a",
+      "current_sha256": "664a66bfad4acc219b6e9809882ff2632398b8e47ca3c022da98790f34e39c2a",
+      "preserve_original_bytes": false
+    },
+    {
+      "old": "docs/tasks/active/26-09-15 完成 iOS 首次构建/task.checkpoint.json",
+      "new": "tasks/archive/26-09-15 完成 iOS 首次构建/task.checkpoint.json",
+      "original_bytes": 3095,
+      "original_sha256": "cf31a624ae39525181e4f388b6d12e617550811948b5ba71f255c819b97bc11f",
+      "current_sha256": "cf31a624ae39525181e4f388b6d12e617550811948b5ba71f255c819b97bc11f",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-15 完成 iOS 首次构建/evidence/OpenMinis-ffmpeg-build.log.gz",
+      "new": "tasks/archive/26-09-15 完成 iOS 首次构建/evidence/OpenMinis-ffmpeg-build.log.gz",
+      "original_bytes": 36220,
+      "original_sha256": "f4ef29b6acbb377f5dd45a76ad30b1904e4fed735bae8eb543d903ba6d7f082d",
+      "current_sha256": "f4ef29b6acbb377f5dd45a76ad30b1904e4fed735bae8eb543d903ba6d7f082d",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-15 完成 iOS 首次构建/evidence/OpenMinis-harness-tests.log.gz",
+      "new": "tasks/archive/26-09-15 完成 iOS 首次构建/evidence/OpenMinis-harness-tests.log.gz",
+      "original_bytes": 72,
+      "original_sha256": "c257fb3bb465208381d9492102884ec1ad753236f9998bb9ccf91355e8b8762a",
+      "current_sha256": "c257fb3bb465208381d9492102884ec1ad753236f9998bb9ccf91355e8b8762a",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-15 完成 iOS 首次构建/evidence/OpenMinis-lame-build.log.gz",
+      "new": "tasks/archive/26-09-15 完成 iOS 首次构建/evidence/OpenMinis-lame-build.log.gz",
+      "original_bytes": 4791,
+      "original_sha256": "aaa220887fcbef325aea1a615a508b264456e4f657a98a2c3a58da199e9e780c",
+      "current_sha256": "aaa220887fcbef325aea1a615a508b264456e4f657a98a2c3a58da199e9e780c",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-15 完成 iOS 首次构建/evidence/review-input-002.tar.gz",
+      "new": "tasks/archive/26-09-15 完成 iOS 首次构建/evidence/review-input-002.tar.gz",
+      "original_bytes": 70032,
+      "original_sha256": "d3ca5ac88dcc866f3897b7cb2ef5a50702029a42b5c0e6ae7031e89a215c6f45",
+      "current_sha256": "d3ca5ac88dcc866f3897b7cb2ef5a50702029a42b5c0e6ae7031e89a215c6f45",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-15 完成 iOS 首次构建/evidence/OpenMinis-ish-build.log.gz",
+      "new": "tasks/archive/26-09-15 完成 iOS 首次构建/evidence/OpenMinis-ish-build.log.gz",
+      "original_bytes": 10606,
+      "original_sha256": "60657368447fe0e709a14e6c49ed550ea7f96eb3d0e8fabfb1ad9ef44cf21869",
+      "current_sha256": "60657368447fe0e709a14e6c49ed550ea7f96eb3d0e8fabfb1ad9ef44cf21869",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-15 完成 iOS 首次构建/evidence/OpenMinis-build-check.log.gz",
+      "new": "tasks/archive/26-09-15 完成 iOS 首次构建/evidence/OpenMinis-build-check.log.gz",
+      "original_bytes": 118793,
+      "original_sha256": "e8c5c6465f0b6d165c66f860bed10124307cc299b8aac1da84f66527f501b787",
+      "current_sha256": "e8c5c6465f0b6d165c66f860bed10124307cc299b8aac1da84f66527f501b787",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-15 完成 iOS 首次构建/evidence/OpenMinis-rootfs-build.log.gz",
+      "new": "tasks/archive/26-09-15 完成 iOS 首次构建/evidence/OpenMinis-rootfs-build.log.gz",
+      "original_bytes": 1391,
+      "original_sha256": "cfa5a81c21e5d24c59d76f317f5493b6c994e2201b18c78759271491dad5fa3f",
+      "current_sha256": "cfa5a81c21e5d24c59d76f317f5493b6c994e2201b18c78759271491dad5fa3f",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-15 完成 iOS 首次构建/reviews/003/bundle-location.json",
+      "new": "tasks/archive/26-09-15 完成 iOS 首次构建/reviews/003/bundle-location.json",
+      "original_bytes": 248,
+      "original_sha256": "d912ffda4cb83f299a7a6b480cbe25cddc8772f0ed5679abed35a3097bde89e8",
+      "current_sha256": "d912ffda4cb83f299a7a6b480cbe25cddc8772f0ed5679abed35a3097bde89e8",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-15 完成 iOS 首次构建/reviews/003/report.json",
+      "new": "tasks/archive/26-09-15 完成 iOS 首次构建/reviews/003/report.json",
+      "original_bytes": 8708,
+      "original_sha256": "2ce4897d257eefb25b9e7f90cfdad91a58ae3d7a779dc4d723123de45f7bf3a4",
+      "current_sha256": "2ce4897d257eefb25b9e7f90cfdad91a58ae3d7a779dc4d723123de45f7bf3a4",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-15 完成 iOS 首次构建/reviews/003/report.md",
+      "new": "tasks/archive/26-09-15 完成 iOS 首次构建/reviews/003/report.md",
+      "original_bytes": 8507,
+      "original_sha256": "816338c8eb79b9aa1b6e96415d6de5c5a566234342ac61728bdef31dab37fac5",
+      "current_sha256": "816338c8eb79b9aa1b6e96415d6de5c5a566234342ac61728bdef31dab37fac5",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-15 完成 iOS 首次构建/reviews/003/built-bundle-identities.json",
+      "new": "tasks/archive/26-09-15 完成 iOS 首次构建/reviews/003/built-bundle-identities.json",
+      "original_bytes": 653,
+      "original_sha256": "760616b556e8334c021b0c39d27167c56b8b4d09d46a978cd8c593866a3e9e10",
+      "current_sha256": "760616b556e8334c021b0c39d27167c56b8b4d09d46a978cd8c593866a3e9e10",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-15 完成 iOS 首次构建/reviews/003/resolution.md",
+      "new": "tasks/archive/26-09-15 完成 iOS 首次构建/reviews/003/resolution.md",
+      "original_bytes": 2599,
+      "original_sha256": "86700bd6a9629461455931e93dd47498a37fe40a6142dbb42f4a65d5abbc454e",
+      "current_sha256": "86700bd6a9629461455931e93dd47498a37fe40a6142dbb42f4a65d5abbc454e",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-15 完成 iOS 首次构建/reviews/003/report.txt",
+      "new": "tasks/archive/26-09-15 完成 iOS 首次构建/reviews/003/report.txt",
+      "original_bytes": 8539,
+      "original_sha256": "17fa9516545005eb4f7d9d0c2281b604eea9f46ec763a79305f379d435534b02",
+      "current_sha256": "17fa9516545005eb4f7d9d0c2281b604eea9f46ec763a79305f379d435534b02",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-15 完成 iOS 首次构建/reviews/003/manifest.json",
+      "new": "tasks/archive/26-09-15 完成 iOS 首次构建/reviews/003/manifest.json",
+      "original_bytes": 16939,
+      "original_sha256": "33a93616ef9d0109a2bb55d97f7c9a412d28e0732837dcb228eebc25b917ad4f",
+      "current_sha256": "33a93616ef9d0109a2bb55d97f7c9a412d28e0732837dcb228eebc25b917ad4f",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-15 完成 iOS 首次构建/reviews/003/request.md",
+      "new": "tasks/archive/26-09-15 完成 iOS 首次构建/reviews/003/request.md",
+      "original_bytes": 4464,
+      "original_sha256": "463ec0993ff34e1a51745b6db5b552726566536eb5e3975f12c2466b68b0c401",
+      "current_sha256": "463ec0993ff34e1a51745b6db5b552726566536eb5e3975f12c2466b68b0c401",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-15 完成 iOS 首次构建/reviews/003/bundle.tar.gz",
+      "new": "tasks/archive/26-09-15 完成 iOS 首次构建/reviews/003/bundle.tar.gz",
+      "original_bytes": 76052,
+      "original_sha256": "fb43ec55e3954c71d6ec49d3e7713706d1234b344867d39688aa7e05ad603e62",
+      "current_sha256": "fb43ec55e3954c71d6ec49d3e7713706d1234b344867d39688aa7e05ad603e62",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-15 完成 iOS 首次构建/reviews/003/status.json",
+      "new": "tasks/archive/26-09-15 完成 iOS 首次构建/reviews/003/status.json",
+      "original_bytes": 1077,
+      "original_sha256": "fc5f474a79f28aedcddac1397ab24211807b27abd3ddce087788f73817f9d894",
+      "current_sha256": "fc5f474a79f28aedcddac1397ab24211807b27abd3ddce087788f73817f9d894",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-15 添加任务规划技能与使用说明.md",
+      "new": "tasks/archive/26-09-15 添加任务规划技能与使用说明.md",
+      "original_bytes": 5227,
+      "original_sha256": "36e5405d89101bd33f9ab7ba7e39aae47bfff9b4da68ad9369c617f107343653",
+      "current_sha256": "36e5405d89101bd33f9ab7ba7e39aae47bfff9b4da68ad9369c617f107343653",
+      "preserve_original_bytes": false
+    },
+    {
+      "old": "docs/tasks/active/26-09-15 添加任务规划技能与使用说明.checkpoint.json",
+      "new": "tasks/archive/26-09-15 添加任务规划技能与使用说明.checkpoint.json",
+      "original_bytes": 858,
+      "original_sha256": "68a20567054dfac479890cfa65a47ebc6bb35e93a234975791e54586f91fc1d6",
+      "current_sha256": "68a20567054dfac479890cfa65a47ebc6bb35e93a234975791e54586f91fc1d6",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-15 统一 MinisX 界面名称.md",
+      "new": "tasks/archive/26-09-15 统一 MinisX 界面名称.md",
+      "original_bytes": 2687,
+      "original_sha256": "0a5859aaed000aeb83e0165c671d46b5a13c42bf6c8bf372ca202eb2cfd93c41",
+      "current_sha256": "0a5859aaed000aeb83e0165c671d46b5a13c42bf6c8bf372ca202eb2cfd93c41",
+      "preserve_original_bytes": false
+    },
+    {
+      "old": "docs/tasks/active/26-09-15 统一 MinisX 界面名称.checkpoint.json",
+      "new": "tasks/archive/26-09-15 统一 MinisX 界面名称.checkpoint.json",
+      "original_bytes": 8965,
+      "original_sha256": "6d67568009109b7258df9230edbbea31920df45105101c2a40316f50f419f32c",
+      "current_sha256": "6d67568009109b7258df9230edbbea31920df45105101c2a40316f50f419f32c",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-15 设置 MinisX 默认系统版本.md",
+      "new": "tasks/archive/26-09-15 设置 MinisX 默认系统版本.md",
+      "original_bytes": 2391,
+      "original_sha256": "a58b8d78f1e1aed8f5752205414347985612162ca079c299bf92e827f8523f56",
+      "current_sha256": "a58b8d78f1e1aed8f5752205414347985612162ca079c299bf92e827f8523f56",
+      "preserve_original_bytes": false
+    },
+    {
+      "old": "docs/tasks/active/26-09-15 设置 MinisX 默认系统版本.checkpoint.json",
+      "new": "tasks/archive/26-09-15 设置 MinisX 默认系统版本.checkpoint.json",
+      "original_bytes": 836,
+      "original_sha256": "15312807f673f6f59e795e0546ca98fdbb2261c6a7331cf74eea891953a8e384",
+      "current_sha256": "15312807f673f6f59e795e0546ca98fdbb2261c6a7331cf74eea891953a8e384",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-15 适配 iOS 27 模拟器构建/verification.md",
+      "new": "tasks/archive/26-09-15 适配 iOS 27 模拟器构建/verification.md",
+      "original_bytes": 2355,
+      "original_sha256": "66220e2ac82a1a8b89ffdcee5ea4ca33d399f510964b6a160767f78ddd2093be",
+      "current_sha256": "66220e2ac82a1a8b89ffdcee5ea4ca33d399f510964b6a160767f78ddd2093be",
+      "preserve_original_bytes": false
+    },
+    {
+      "old": "docs/tasks/active/26-09-15 适配 iOS 27 模拟器构建/task.md",
+      "new": "tasks/archive/26-09-15 适配 iOS 27 模拟器构建/task.md",
+      "original_bytes": 4533,
+      "original_sha256": "148cd0fa7639541f07d0640178efd6978a9797c5e7a9e2590fe02471f3da568e",
+      "current_sha256": "148cd0fa7639541f07d0640178efd6978a9797c5e7a9e2590fe02471f3da568e",
+      "preserve_original_bytes": false
+    },
+    {
+      "old": "docs/tasks/active/26-09-15 适配 iOS 27 模拟器构建/task.checkpoint.json",
+      "new": "tasks/archive/26-09-15 适配 iOS 27 模拟器构建/task.checkpoint.json",
+      "original_bytes": 5345,
+      "original_sha256": "d2fc15f6091391a255da63689fb22db60b7cf67e5a945b0b76c95ea3dc629ee4",
+      "current_sha256": "d2fc15f6091391a255da63689fb22db60b7cf67e5a945b0b76c95ea3dc629ee4",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-15 适配 iOS 27 模拟器构建/evidence/OpenMinis-device-regression.log.gz",
+      "new": "tasks/archive/26-09-15 适配 iOS 27 模拟器构建/evidence/OpenMinis-device-regression.log.gz",
+      "original_bytes": 79527,
+      "original_sha256": "82d4a75269003aeac1a97b462d18b086dbf4d8cdfa7acb937d7567b50ea810d4",
+      "current_sha256": "82d4a75269003aeac1a97b462d18b086dbf4d8cdfa7acb937d7567b50ea810d4",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-15 适配 iOS 27 模拟器构建/evidence/OpenMinis-simulator-build.log.gz",
+      "new": "tasks/archive/26-09-15 适配 iOS 27 模拟器构建/evidence/OpenMinis-simulator-build.log.gz",
+      "original_bytes": 234262,
+      "original_sha256": "cb26586ef7237e786961f69d4a30a872f4fbcac089bf06140359d3c5b1788b6a",
+      "current_sha256": "cb26586ef7237e786961f69d4a30a872f4fbcac089bf06140359d3c5b1788b6a",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-15 适配 iOS 27 模拟器构建/evidence/OpenMinis-simulator-runtime-final.log.gz",
+      "new": "tasks/archive/26-09-15 适配 iOS 27 模拟器构建/evidence/OpenMinis-simulator-runtime-final.log.gz",
+      "original_bytes": 4123,
+      "original_sha256": "2eccab65ffb5052eecd1a398c4e864cf4706c20116cd27762ea4a7877d5160e5",
+      "current_sha256": "2eccab65ffb5052eecd1a398c4e864cf4706c20116cd27762ea4a7877d5160e5",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-15 适配 iOS 27 模拟器构建/evidence/OpenMinis-simulator-final-build.log.gz",
+      "new": "tasks/archive/26-09-15 适配 iOS 27 模拟器构建/evidence/OpenMinis-simulator-final-build.log.gz",
+      "original_bytes": 26053,
+      "original_sha256": "bd0db7dd818e6aeb0b34e10e93945a78a372b0f15dfc5c0b1206a83b580f98dd",
+      "current_sha256": "bd0db7dd818e6aeb0b34e10e93945a78a372b0f15dfc5c0b1206a83b580f98dd",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-15 适配 iOS 27 模拟器构建/evidence/OpenMinis-simulator-rebuild2.log.gz",
+      "new": "tasks/archive/26-09-15 适配 iOS 27 模拟器构建/evidence/OpenMinis-simulator-rebuild2.log.gz",
+      "original_bytes": 103014,
+      "original_sha256": "0839c636a63de503c57569f27462c61e3700f06494571905d3373221adea8a1e",
+      "current_sha256": "0839c636a63de503c57569f27462c61e3700f06494571905d3373221adea8a1e",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-15 适配 iOS 27 模拟器构建/evidence/OpenMinis-simulator-rebuild.log.gz",
+      "new": "tasks/archive/26-09-15 适配 iOS 27 模拟器构建/evidence/OpenMinis-simulator-rebuild.log.gz",
+      "original_bytes": 100204,
+      "original_sha256": "c1131927b2fda2a14e21756a69796afdfad0aa34a4db64d28a4bb3b052663733",
+      "current_sha256": "c1131927b2fda2a14e21756a69796afdfad0aa34a4db64d28a4bb3b052663733",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-15 适配 iOS 27 模拟器构建/evidence/bundle-identities.json",
+      "new": "tasks/archive/26-09-15 适配 iOS 27 模拟器构建/evidence/bundle-identities.json",
+      "original_bytes": 978,
+      "original_sha256": "326371ace4ecd22fcf2f412d95d04c1719cddb581975553d8fd4382d908df504",
+      "current_sha256": "326371ace4ecd22fcf2f412d95d04c1719cddb581975553d8fd4382d908df504",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-15 适配 iOS 27 模拟器构建/evidence/device-dependencies.json",
+      "new": "tasks/archive/26-09-15 适配 iOS 27 模拟器构建/evidence/device-dependencies.json",
+      "original_bytes": 2070,
+      "original_sha256": "e66349a8b04f9cd25a57c789a80d87f89cd649bdee1721dc5b8fbf5e6cb79fff",
+      "current_sha256": "e66349a8b04f9cd25a57c789a80d87f89cd649bdee1721dc5b8fbf5e6cb79fff",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-15 适配 iOS 27 模拟器构建/evidence/simulator-launch.png",
+      "new": "tasks/archive/26-09-15 适配 iOS 27 模拟器构建/evidence/simulator-launch.png",
+      "original_bytes": 377656,
+      "original_sha256": "72fc58e7fa9916a43684bd9907fbc804a2a970a27a14f135e940679f0c4e7f9a",
+      "current_sha256": "72fc58e7fa9916a43684bd9907fbc804a2a970a27a14f135e940679f0c4e7f9a",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-15 适配 iOS 27 模拟器构建/reviews/001/review-input.tar.gz",
+      "new": "tasks/archive/26-09-15 适配 iOS 27 模拟器构建/reviews/001/review-input.tar.gz",
+      "original_bytes": 145693,
+      "original_sha256": "de3bfef4d9eb35fb8a335de0afd6b0d1b40c611df8485b80fb1496ea41335b71",
+      "current_sha256": "de3bfef4d9eb35fb8a335de0afd6b0d1b40c611df8485b80fb1496ea41335b71",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-15 适配 iOS 27 模拟器构建/reviews/001/status.md",
+      "new": "tasks/archive/26-09-15 适配 iOS 27 模拟器构建/reviews/001/status.md",
+      "original_bytes": 361,
+      "original_sha256": "a5cab53324284da83ef2d0632a7abea811ee552c1999474f93262aac62ff7a82",
+      "current_sha256": "a5cab53324284da83ef2d0632a7abea811ee552c1999474f93262aac62ff7a82",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-15 适配 iOS 27 模拟器构建/reviews/001/manifest.json",
+      "new": "tasks/archive/26-09-15 适配 iOS 27 模拟器构建/reviews/001/manifest.json",
+      "original_bytes": 17701,
+      "original_sha256": "5dee74afc186984aac33877101a72ab52960c0c274a61ea1b4d5925efacbb6ec",
+      "current_sha256": "5dee74afc186984aac33877101a72ab52960c0c274a61ea1b4d5925efacbb6ec",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-15 适配 iOS 27 模拟器构建/reviews/001/request.md",
+      "new": "tasks/archive/26-09-15 适配 iOS 27 模拟器构建/reviews/001/request.md",
+      "original_bytes": 2749,
+      "original_sha256": "7ac31594ef00d1c48021d73a8c369fb86f2f0e86bb4619a983710f76c6913cd2",
+      "current_sha256": "7ac31594ef00d1c48021d73a8c369fb86f2f0e86bb4619a983710f76c6913cd2",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-18 审查任务规划技能/task.md",
+      "new": "tasks/archive/26-09-18 审查任务规划技能/task.md",
+      "original_bytes": 6078,
+      "original_sha256": "8a697aa2048759b57c335ec3063e7744a021acd6c1486d669f5cd55388bf69c4",
+      "current_sha256": "af0c48d696611c0bbb414068caba67d825b511a29e942612361f1136cf94821c",
+      "preserve_original_bytes": false
+    },
+    {
+      "old": "docs/tasks/active/26-09-18 审查任务规划技能/adjustments.md",
+      "new": "tasks/archive/26-09-18 审查任务规划技能/adjustments.md",
+      "original_bytes": 2349,
+      "original_sha256": "65e970e6853858200df19915c9bb5ca6d4ee76c9738ca160be756ed5756db9c8",
+      "current_sha256": "65e970e6853858200df19915c9bb5ca6d4ee76c9738ca160be756ed5756db9c8",
+      "preserve_original_bytes": false
+    },
+    {
+      "old": "docs/tasks/active/26-09-18 审查任务规划技能/task.checkpoint.json",
+      "new": "tasks/archive/26-09-18 审查任务规划技能/task.checkpoint.json",
+      "original_bytes": 833,
+      "original_sha256": "70813db076d62ea7e561378029fd88ef6d789dd9ffe27cb38c1aad584dc8490b",
+      "current_sha256": "70813db076d62ea7e561378029fd88ef6d789dd9ffe27cb38c1aad584dc8490b",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-18 审查任务规划技能/reviews/001/bundle-location.json",
+      "new": "tasks/archive/26-09-18 审查任务规划技能/reviews/001/bundle-location.json",
+      "original_bytes": 329,
+      "original_sha256": "0e146173a88c31a72c29b009d1f78dc5ef01d02cb26f2faedd856a3c48fdac19",
+      "current_sha256": "0e146173a88c31a72c29b009d1f78dc5ef01d02cb26f2faedd856a3c48fdac19",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-18 审查任务规划技能/reviews/001/report.json",
+      "new": "tasks/archive/26-09-18 审查任务规划技能/reviews/001/report.json",
+      "original_bytes": 11406,
+      "original_sha256": "6cece935a8510d379f3e157c6815839981e5d346bea727b1872d59ba501cf8a7",
+      "current_sha256": "6cece935a8510d379f3e157c6815839981e5d346bea727b1872d59ba501cf8a7",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-18 审查任务规划技能/reviews/001/report.md",
+      "new": "tasks/archive/26-09-18 审查任务规划技能/reviews/001/report.md",
+      "original_bytes": 11037,
+      "original_sha256": "db2fa67a047b5500bf3cf73e0fa07cc18ba121abe7814eb39991fefd77b47f66",
+      "current_sha256": "db2fa67a047b5500bf3cf73e0fa07cc18ba121abe7814eb39991fefd77b47f66",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-18 审查任务规划技能/reviews/001/resolution.md",
+      "new": "tasks/archive/26-09-18 审查任务规划技能/reviews/001/resolution.md",
+      "original_bytes": 5284,
+      "original_sha256": "a8a1fe0a0d1bafb216fba5cc6e9fab8276afb637806d6040a27da44a93cef16f",
+      "current_sha256": "a8a1fe0a0d1bafb216fba5cc6e9fab8276afb637806d6040a27da44a93cef16f",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-18 审查任务规划技能/reviews/001/report.txt",
+      "new": "tasks/archive/26-09-18 审查任务规划技能/reviews/001/report.txt",
+      "original_bytes": 11407,
+      "original_sha256": "d19888fb0d75973500522f784ce37261fa71e8f9c2698116f2ba6363953d72b6",
+      "current_sha256": "d19888fb0d75973500522f784ce37261fa71e8f9c2698116f2ba6363953d72b6",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-18 审查任务规划技能/reviews/001/manifest.json",
+      "new": "tasks/archive/26-09-18 审查任务规划技能/reviews/001/manifest.json",
+      "original_bytes": 9497,
+      "original_sha256": "a8c37bacaa66de1e46935624385b5a19daf7a161a0183d8ef5f42352393bf7d5",
+      "current_sha256": "a8c37bacaa66de1e46935624385b5a19daf7a161a0183d8ef5f42352393bf7d5",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-18 审查任务规划技能/reviews/001/request.md",
+      "new": "tasks/archive/26-09-18 审查任务规划技能/reviews/001/request.md",
+      "original_bytes": 2046,
+      "original_sha256": "06c78cfcb8c676b275ac48b1c8966beffbb562bba33dee6063a9581b8df50e82",
+      "current_sha256": "06c78cfcb8c676b275ac48b1c8966beffbb562bba33dee6063a9581b8df50e82",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-18 审查任务规划技能/reviews/001/status.json",
+      "new": "tasks/archive/26-09-18 审查任务规划技能/reviews/001/status.json",
+      "original_bytes": 1077,
+      "original_sha256": "1ec438247d0455ba33ed161af7816c4007f1b643963444206a98677ce3cea853",
+      "current_sha256": "1ec438247d0455ba33ed161af7816c4007f1b643963444206a98677ce3cea853",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/verification.md",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/verification.md",
+      "original_bytes": 12945,
+      "original_sha256": "f7fb7c9ba9eccf1706650548f07cdabc471f89bed3a6cbc90473f33304a018a9",
+      "current_sha256": "a9b6f86219369235f577a7d960a485f9977e9503b252c5ce1635451f745d8e40",
+      "preserve_original_bytes": false
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/task.md",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/task.md",
+      "original_bytes": 10093,
+      "original_sha256": "64fa674b6e5ac71a9c8ea3fc3a04f1641f011d9841a3d5295b4c64d0ed0fe5bf",
+      "current_sha256": "64fa674b6e5ac71a9c8ea3fc3a04f1641f011d9841a3d5295b4c64d0ed0fe5bf",
+      "preserve_original_bytes": false
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/task.checkpoint.json",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/task.checkpoint.json",
+      "original_bytes": 5341,
+      "original_sha256": "1252ffe7640499b225c120250239fefd2e68be5ba49842e9df5177ae66bd0db0",
+      "current_sha256": "1252ffe7640499b225c120250239fefd2e68be5ba49842e9df5177ae66bd0db0",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/acceptance.md",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/acceptance.md",
+      "original_bytes": 1824,
+      "original_sha256": "824e23e1c7bccca5669933e8faae331638a8041c0b1face14cd47b0aa2b525cc",
+      "current_sha256": "824e23e1c7bccca5669933e8faae331638a8041c0b1face14cd47b0aa2b525cc",
+      "preserve_original_bytes": false
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/evidence/calendar-complete-26.log.gz",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/evidence/calendar-complete-26.log.gz",
+      "original_bytes": 29582,
+      "original_sha256": "164e021cbd0b6ebb07e2fc0bf06f3f0ba890a09204a93620ee0cb095875670dc",
+      "current_sha256": "164e021cbd0b6ebb07e2fc0bf06f3f0ba890a09204a93620ee0cb095875670dc",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/evidence/cleanup-after.json",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/evidence/cleanup-after.json",
+      "original_bytes": 76255,
+      "original_sha256": "db2563cbdc09ffbbff8d3a1eff775a02b8ad9392961f8fde3aa720a531803e47",
+      "current_sha256": "db2563cbdc09ffbbff8d3a1eff775a02b8ad9392961f8fde3aa720a531803e47",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/evidence/calendar-weeks.log.gz",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/evidence/calendar-weeks.log.gz",
+      "original_bytes": 27732,
+      "original_sha256": "69e45bb4aa2a03f3439b3256d791b466d81476698a5f597a442f51e17e4fcf5e",
+      "current_sha256": "69e45bb4aa2a03f3439b3256d791b466d81476698a5f597a442f51e17e4fcf5e",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/evidence/test-artifact-inventory.json",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/evidence/test-artifact-inventory.json",
+      "original_bytes": 3273,
+      "original_sha256": "1059da6b476979db318df0ef8bbcf028370d717a0db257a9dd9b086881151b7a",
+      "current_sha256": "1059da6b476979db318df0ef8bbcf028370d717a0db257a9dd9b086881151b7a",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/evidence/calendar-accepted-26.log.gz",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/evidence/calendar-accepted-26.log.gz",
+      "original_bytes": 33547,
+      "original_sha256": "ba95e479469e1692e4c4f1e5d72d35ab6fa36c3fdf86f4ce0757d1b79c467e11",
+      "current_sha256": "ba95e479469e1692e4c4f1e5d72d35ab6fa36c3fdf86f4ce0757d1b79c467e11",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/evidence/calendar-build.log.gz",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/evidence/calendar-build.log.gz",
+      "original_bytes": 82348,
+      "original_sha256": "afcb023e8c4d864d650904ce45c3ec1276f183c3a7fbb86b8cc90039a2b4aa89",
+      "current_sha256": "afcb023e8c4d864d650904ce45c3ec1276f183c3a7fbb86b8cc90039a2b4aa89",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/evidence/calendar-cleanup-26.log.gz",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/evidence/calendar-cleanup-26.log.gz",
+      "original_bytes": 28926,
+      "original_sha256": "0200b2a6d871791fb15625d798046c0c1fd5350a8f28c1830b04fe9b1a36f521",
+      "current_sha256": "0200b2a6d871791fb15625d798046c0c1fd5350a8f28c1830b04fe9b1a36f521",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/evidence/calendar-zone-fix-26.log.gz",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/evidence/calendar-zone-fix-26.log.gz",
+      "original_bytes": 31206,
+      "original_sha256": "72b60616dcb205aaf58b99ae73c3c39cea10bdfbdcbff31c03f7820b721d0cc6",
+      "current_sha256": "72b60616dcb205aaf58b99ae73c3c39cea10bdfbdcbff31c03f7820b721d0cc6",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/evidence/calendar-final-26.log.gz",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/evidence/calendar-final-26.log.gz",
+      "original_bytes": 47364,
+      "original_sha256": "0e403b573195d1b5b923070663149a4d53eda6a67769a91c28aee9664d685e04",
+      "current_sha256": "0e403b573195d1b5b923070663149a4d53eda6a67769a91c28aee9664d685e04",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/evidence/cleanup-before.json",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/evidence/cleanup-before.json",
+      "original_bytes": 86179,
+      "original_sha256": "13337bd9bee158b71a73bee3a6bac3fe2fca2e3087ee6bd0a74c5ac95e6d5746",
+      "current_sha256": "13337bd9bee158b71a73bee3a6bac3fe2fca2e3087ee6bd0a74c5ac95e6d5746",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/evidence/calendar-cleanup-27-retry.log.gz",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/evidence/calendar-cleanup-27-retry.log.gz",
+      "original_bytes": 34729,
+      "original_sha256": "c559900c6b918d6de0efb527796f3ab92ec39318f06b4e1f893840a79eb8e5f7",
+      "current_sha256": "c559900c6b918d6de0efb527796f3ab92ec39318f06b4e1f893840a79eb8e5f7",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/evidence/calendar-complete-27.log.gz",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/evidence/calendar-complete-27.log.gz",
+      "original_bytes": 16554,
+      "original_sha256": "d10ca1ae7ad8ce3ad918e436a37be59871634c0f1e60a9677efa377f091ae8fc",
+      "current_sha256": "d10ca1ae7ad8ce3ad918e436a37be59871634c0f1e60a9677efa377f091ae8fc",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/evidence/calendar-native-week.log.gz",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/evidence/calendar-native-week.log.gz",
+      "original_bytes": 28008,
+      "original_sha256": "51445cb4fee1e7615985929b4fb75679f8ea934181d677f7b14e36f3ad1e030b",
+      "current_sha256": "51445cb4fee1e7615985929b4fb75679f8ea934181d677f7b14e36f3ad1e030b",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/evidence/calendar-persisted-week.log.gz",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/evidence/calendar-persisted-week.log.gz",
+      "original_bytes": 29727,
+      "original_sha256": "81049cfe33ae1c872d662b7dc5a864998678a61e627c85e08011f92f84d714e1",
+      "current_sha256": "81049cfe33ae1c872d662b7dc5a864998678a61e627c85e08011f92f84d714e1",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/evidence/calendar-accepted-27.log.gz",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/evidence/calendar-accepted-27.log.gz",
+      "original_bytes": 15822,
+      "original_sha256": "b872596db647e3534af6d1109f3707bd8bfc0a26639690f5104ce0ac88eb2bab",
+      "current_sha256": "b872596db647e3534af6d1109f3707bd8bfc0a26639690f5104ce0ac88eb2bab",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/evidence/calendar-cleanup-27.log.gz",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/evidence/calendar-cleanup-27.log.gz",
+      "original_bytes": 10950,
+      "original_sha256": "0749b33a20fe1681fe4badc40b6a5178e23a7c789b2f1c116d18c9f0dfa55480",
+      "current_sha256": "0749b33a20fe1681fe4badc40b6a5178e23a7c789b2f1c116d18c9f0dfa55480",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/evidence/calendar-zone-fix-27.log.gz",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/evidence/calendar-zone-fix-27.log.gz",
+      "original_bytes": 14039,
+      "original_sha256": "a236195be7d8c623dcd0bbdd97ecd7da7e3c124ee98a3e93faabd4a407572612",
+      "current_sha256": "a236195be7d8c623dcd0bbdd97ecd7da7e3c124ee98a3e93faabd4a407572612",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/evidence/calendar-final-27.log.gz",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/evidence/calendar-final-27.log.gz",
+      "original_bytes": 15364,
+      "original_sha256": "79bb25e3ad8440cb6ab5703a7ffed677e20f10bb42af7d37993bf5505906a58e",
+      "current_sha256": "79bb25e3ad8440cb6ab5703a7ffed677e20f10bb42af7d37993bf5505906a58e",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/reviews/001/bundle-location.json",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/reviews/001/bundle-location.json",
+      "original_bytes": 312,
+      "original_sha256": "c156ecd1b44f263db64900f75fd69b516aea0be54837f79d99c9577e1d9e03c3",
+      "current_sha256": "c156ecd1b44f263db64900f75fd69b516aea0be54837f79d99c9577e1d9e03c3",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/reviews/001/report.txt",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/reviews/001/report.txt",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "current_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/reviews/001/manifest.json",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/reviews/001/manifest.json",
+      "original_bytes": 660988,
+      "original_sha256": "bfc0197946f33ca68db0a77e5cda7f5bd5c248aa983eb344676bd72f1b83eb09",
+      "current_sha256": "bfc0197946f33ca68db0a77e5cda7f5bd5c248aa983eb344676bd72f1b83eb09",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/reviews/001/request.md",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/reviews/001/request.md",
+      "original_bytes": 936,
+      "original_sha256": "ab551b90ecd88364bf0659fba9a8647c280ccf48afd144f38c5d217e1b8ef506",
+      "current_sha256": "ab551b90ecd88364bf0659fba9a8647c280ccf48afd144f38c5d217e1b8ef506",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/reviews/001/status.json",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/reviews/001/status.json",
+      "original_bytes": 1887,
+      "original_sha256": "9392bdc72e4cc94b05b4d1a097500e887d16d23b9a07fd653d06fc347ebdb124",
+      "current_sha256": "9392bdc72e4cc94b05b4d1a097500e887d16d23b9a07fd653d06fc347ebdb124",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/reviews/006/bundle-location.json",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/reviews/006/bundle-location.json",
+      "original_bytes": 312,
+      "original_sha256": "7e6fe12431783158aa2b125b5bbe91f98587b4459aaf95b30e91002755ed2316",
+      "current_sha256": "7e6fe12431783158aa2b125b5bbe91f98587b4459aaf95b30e91002755ed2316",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/reviews/006/report.json",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/reviews/006/report.json",
+      "original_bytes": 7704,
+      "original_sha256": "940195d7bbe749aba1627c8f1cad467ceed4f887d33a97239689dfa7f08ee987",
+      "current_sha256": "940195d7bbe749aba1627c8f1cad467ceed4f887d33a97239689dfa7f08ee987",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/reviews/006/report.md",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/reviews/006/report.md",
+      "original_bytes": 7499,
+      "original_sha256": "aec593c125aaff77d83b1840d3e1a2c21e423ea3f437ffddfe74d406a7eeff02",
+      "current_sha256": "aec593c125aaff77d83b1840d3e1a2c21e423ea3f437ffddfe74d406a7eeff02",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/reviews/006/resolution.md",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/reviews/006/resolution.md",
+      "original_bytes": 1895,
+      "original_sha256": "a3ad7a721de0ca570c17f3d492164fdb59a1ae27c7bed0aac64fd43ebf6e0120",
+      "current_sha256": "a3ad7a721de0ca570c17f3d492164fdb59a1ae27c7bed0aac64fd43ebf6e0120",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/reviews/006/report.txt",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/reviews/006/report.txt",
+      "original_bytes": 7705,
+      "original_sha256": "88078bf05fe9927eaee666f4c7435e44756105a69bd47814f61f0da008d0bc4e",
+      "current_sha256": "88078bf05fe9927eaee666f4c7435e44756105a69bd47814f61f0da008d0bc4e",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/reviews/006/manifest.json",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/reviews/006/manifest.json",
+      "original_bytes": 674424,
+      "original_sha256": "0c4b8b09049ab133a684a957af9916d39f785007711a460dbfe15e14293ab115",
+      "current_sha256": "0c4b8b09049ab133a684a957af9916d39f785007711a460dbfe15e14293ab115",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/reviews/006/request.md",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/reviews/006/request.md",
+      "original_bytes": 1025,
+      "original_sha256": "f05a35c783ac9c86ad2ad5a28501d633e7ed7eea2f4aad5a50a5013d38a28c60",
+      "current_sha256": "f05a35c783ac9c86ad2ad5a28501d633e7ed7eea2f4aad5a50a5013d38a28c60",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/reviews/006/status.json",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/reviews/006/status.json",
+      "original_bytes": 1077,
+      "original_sha256": "b940d92c2a51e955d11b085da1d4222de1bde3b24a3e48b801c6dbfc46099ac4",
+      "current_sha256": "b940d92c2a51e955d11b085da1d4222de1bde3b24a3e48b801c6dbfc46099ac4",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/reviews/004/bundle-location.json",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/reviews/004/bundle-location.json",
+      "original_bytes": 312,
+      "original_sha256": "00d8d72aadc17b18184e03d03682d1327cb77c04d0b2d5e2388615650cb5e243",
+      "current_sha256": "00d8d72aadc17b18184e03d03682d1327cb77c04d0b2d5e2388615650cb5e243",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/reviews/004/report.json",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/reviews/004/report.json",
+      "original_bytes": 8999,
+      "original_sha256": "637e33ce59b1744fe84872f46b5459145e694c2e8f89cd3be8d7f504c1388eaa",
+      "current_sha256": "637e33ce59b1744fe84872f46b5459145e694c2e8f89cd3be8d7f504c1388eaa",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/reviews/004/report.md",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/reviews/004/report.md",
+      "original_bytes": 8774,
+      "original_sha256": "63074d8d9ab2fbe4d8e2753f05decdccf63bfc3e43ea94417848010ba7b205d5",
+      "current_sha256": "63074d8d9ab2fbe4d8e2753f05decdccf63bfc3e43ea94417848010ba7b205d5",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/reviews/004/resolution.md",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/reviews/004/resolution.md",
+      "original_bytes": 837,
+      "original_sha256": "02937731c2ac18f7d81e5765b1d0b32af577c304510dd9ea4a5f1219c6b35523",
+      "current_sha256": "02937731c2ac18f7d81e5765b1d0b32af577c304510dd9ea4a5f1219c6b35523",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/reviews/004/report.txt",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/reviews/004/report.txt",
+      "original_bytes": 9000,
+      "original_sha256": "5cacabd4d28fd91b78ddd14d316743d1b0965433212b548b967aeedfd661617c",
+      "current_sha256": "5cacabd4d28fd91b78ddd14d316743d1b0965433212b548b967aeedfd661617c",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/reviews/004/manifest.json",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/reviews/004/manifest.json",
+      "original_bytes": 667102,
+      "original_sha256": "6a1c47a040f755c4e1026cb9654bc1583e1d5eb6dbcfd483f59de73e5de16db8",
+      "current_sha256": "6a1c47a040f755c4e1026cb9654bc1583e1d5eb6dbcfd483f59de73e5de16db8",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/reviews/004/request.md",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/reviews/004/request.md",
+      "original_bytes": 1025,
+      "original_sha256": "f05a35c783ac9c86ad2ad5a28501d633e7ed7eea2f4aad5a50a5013d38a28c60",
+      "current_sha256": "f05a35c783ac9c86ad2ad5a28501d633e7ed7eea2f4aad5a50a5013d38a28c60",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/reviews/004/status.json",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/reviews/004/status.json",
+      "original_bytes": 1077,
+      "original_sha256": "f737f4b724d552f63f09a03d092c3bd6354d36480fdaf3ecd9727f251a284081",
+      "current_sha256": "f737f4b724d552f63f09a03d092c3bd6354d36480fdaf3ecd9727f251a284081",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/reviews/005/bundle-location.json",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/reviews/005/bundle-location.json",
+      "original_bytes": 312,
+      "original_sha256": "f852d080c5ac85080a5d93c498eaf41f242ec4ece66a860574bfb99a8d80d0c6",
+      "current_sha256": "f852d080c5ac85080a5d93c498eaf41f242ec4ece66a860574bfb99a8d80d0c6",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/reviews/005/report.json",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/reviews/005/report.json",
+      "original_bytes": 8317,
+      "original_sha256": "c875751e09202b841f2529a6a73cb3ec4ba8e24a9ca3e5aae6e7de9b58e0cd74",
+      "current_sha256": "c875751e09202b841f2529a6a73cb3ec4ba8e24a9ca3e5aae6e7de9b58e0cd74",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/reviews/005/report.md",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/reviews/005/report.md",
+      "original_bytes": 7924,
+      "original_sha256": "fddb2c5b5b8665628aef4ee53de99d396d45b63f6c32ccf82f0e3a5550141be0",
+      "current_sha256": "fddb2c5b5b8665628aef4ee53de99d396d45b63f6c32ccf82f0e3a5550141be0",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/reviews/005/resolution.md",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/reviews/005/resolution.md",
+      "original_bytes": 1342,
+      "original_sha256": "31ef2eefb378b94fdd8851a7af7895eda47ddce2760ce4d94d47622088dee940",
+      "current_sha256": "31ef2eefb378b94fdd8851a7af7895eda47ddce2760ce4d94d47622088dee940",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/reviews/005/report.txt",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/reviews/005/report.txt",
+      "original_bytes": 8318,
+      "original_sha256": "32130299cbe0de64c8d2a085c11b3c6bcba35d91c10eaa226adf956e542c3a83",
+      "current_sha256": "32130299cbe0de64c8d2a085c11b3c6bcba35d91c10eaa226adf956e542c3a83",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/reviews/005/manifest.json",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/reviews/005/manifest.json",
+      "original_bytes": 670763,
+      "original_sha256": "438e4ac266ac58ec77c94146cb3a369be9ecd17c188115f1fb23d5fae91a1557",
+      "current_sha256": "438e4ac266ac58ec77c94146cb3a369be9ecd17c188115f1fb23d5fae91a1557",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/reviews/005/request.md",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/reviews/005/request.md",
+      "original_bytes": 1025,
+      "original_sha256": "f05a35c783ac9c86ad2ad5a28501d633e7ed7eea2f4aad5a50a5013d38a28c60",
+      "current_sha256": "f05a35c783ac9c86ad2ad5a28501d633e7ed7eea2f4aad5a50a5013d38a28c60",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/reviews/005/status.json",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/reviews/005/status.json",
+      "original_bytes": 1077,
+      "original_sha256": "a466bbf0f26db5f0f15aae764fc1f865374076e7883754e01f212d937f18f879",
+      "current_sha256": "a466bbf0f26db5f0f15aae764fc1f865374076e7883754e01f212d937f18f879",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/reviews/002/bundle-location.json",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/reviews/002/bundle-location.json",
+      "original_bytes": 225,
+      "original_sha256": "da28f8855a4274e23e67da09e5d3d5f6b69dfd61b34775b3e05937ec9413e44c",
+      "current_sha256": "da28f8855a4274e23e67da09e5d3d5f6b69dfd61b34775b3e05937ec9413e44c",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/reviews/002/resolution.md",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/reviews/002/resolution.md",
+      "original_bytes": 1607,
+      "original_sha256": "0120dbbf0f0399770fd2fec77ce44ebf3bcf9afd64264d46ad6a1ae7ba2507f9",
+      "current_sha256": "0120dbbf0f0399770fd2fec77ce44ebf3bcf9afd64264d46ad6a1ae7ba2507f9",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/reviews/002/stderr.txt",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/reviews/002/stderr.txt",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "current_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/reviews/002/report.txt",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/reviews/002/report.txt",
+      "original_bytes": 12185,
+      "original_sha256": "d8b1141e1f3c383dfed7277e0438da18a66f57c98876966d8a9a8d5454ad74ea",
+      "current_sha256": "d8b1141e1f3c383dfed7277e0438da18a66f57c98876966d8a9a8d5454ad74ea",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/reviews/002/manifest.json",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/reviews/002/manifest.json",
+      "original_bytes": 660988,
+      "original_sha256": "bfc0197946f33ca68db0a77e5cda7f5bd5c248aa983eb344676bd72f1b83eb09",
+      "current_sha256": "bfc0197946f33ca68db0a77e5cda7f5bd5c248aa983eb344676bd72f1b83eb09",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/reviews/002/request.md",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/reviews/002/request.md",
+      "original_bytes": 936,
+      "original_sha256": "ab551b90ecd88364bf0659fba9a8647c280ccf48afd144f38c5d217e1b8ef506",
+      "current_sha256": "ab551b90ecd88364bf0659fba9a8647c280ccf48afd144f38c5d217e1b8ef506",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 支持完整日历重复创建/reviews/002/status.json",
+      "new": "tasks/archive/26-09-20 支持完整日历重复创建/reviews/002/status.json",
+      "original_bytes": 809,
+      "original_sha256": "3278196a79ea49f951a3ba3f878598757da92b99451a3747b4b3b9ac9726dfa3",
+      "current_sha256": "3278196a79ea49f951a3ba3f878598757da92b99451a3747b4b3b9ac9726dfa3",
+      "preserve_original_bytes": true
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 添加原生界面设计技能.md",
+      "new": "tasks/archive/26-09-20 添加原生界面设计技能.md",
+      "original_bytes": 6308,
+      "original_sha256": "f03808657c4b37b02458896f1cd34877161155ef1365757e9ffbcb0b3b951bc9",
+      "current_sha256": "f03808657c4b37b02458896f1cd34877161155ef1365757e9ffbcb0b3b951bc9",
+      "preserve_original_bytes": false
+    },
+    {
+      "old": "docs/tasks/active/26-09-20 添加原生界面设计技能.checkpoint.json",
+      "new": "tasks/archive/26-09-20 添加原生界面设计技能.checkpoint.json",
+      "original_bytes": 840,
+      "original_sha256": "72c1b5918f4d319d6bf5dccabd531c20569dd4c68cc37b86458dae67cbf69c1b",
+      "current_sha256": "72c1b5918f4d319d6bf5dccabd531c20569dd4c68cc37b86458dae67cbf69c1b",
+      "preserve_original_bytes": true
+    }
+  ]
+}

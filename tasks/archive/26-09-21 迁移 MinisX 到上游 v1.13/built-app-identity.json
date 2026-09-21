@@ -1,0 +1,30 @@
+[
+  {
+    "path": "build/ios-simulator/Build/Products/Debug-iphonesimulator/Minis.app",
+    "name": "MinisX",
+    "id": "com.openminis.app",
+    "version": "1.13",
+    "minimumOS": "26.0"
+  },
+  {
+    "path": "build/ios-simulator/Build/Products/Debug-iphonesimulator/Minis.app/PlugIns/MinisFileProvider.appex",
+    "name": "MinisX Files",
+    "id": "com.openminis.app.FileProvider",
+    "version": "1.13",
+    "minimumOS": "26.0"
+  },
+  {
+    "path": "build/ios-simulator/Build/Products/Debug-iphonesimulator/Minis.app/PlugIns/AgentWidgetExtension.appex",
+    "name": "MinisX Activity",
+    "id": "com.openminis.app.AgentWidget",
+    "version": "1.13",
+    "minimumOS": "26.0"
+  },
+  {
+    "path": "build/ios-simulator/Build/Products/Debug-iphonesimulator/Minis.app/PlugIns/MinisShare.appex",
+    "name": "Share to MinisX",
+    "id": "com.openminis.app.ShareExtension",
+    "version": "1.13",
+    "minimumOS": "26.0"
+  }
+]

@@ -1,0 +1,46 @@
+# Independent review
+
+Snapshot: 7e0f078320ece88aa238506129f0e82319e8f53322615e0893182bd744a21590
+Conclusion: nonblocking
+
+## Coverage
+必读（任务「Spec 阅读清单」要求，均按快照 requirements/ 全文读完）：requirements/AGENTS.md 全文（含新增 Project Skills 与 Development Harness）；requirements/docs/harness/record-formats.md 全文；requirements/docs/harness/operations.md 全文；requirements/.agents/skills/resume-task/SKILL.md 全文；requirements/.agents/skills/review-task/SKILL.md 全文；requirements/docs/tasks/active/26-09-15 添加任务规划技能与使用说明.md 全文；另读本轮任务文件 requirements/docs/tasks/active/26-09-18 审查任务规划技能/task.md 全文。可选参考小节：manifest 的 spec_selections 为空（未使用 --spec-section/--spec-reference），故无必读摘录与可选参考小节可读；本次不涉及 docs/specs，iOS API Spec 不适用。补充核对（changed artifacts 与对照材料，来自 snapshot/）：.agents/skills/plan-task/SKILL.md 全文、docs/harness/skills-guide.md 全文、docs/harness/spec-context.md 全文、docs/tasks/active/26-09-18 审查任务规划技能/task.md、patches/base-to-worktree.patch（AGENTS.md 新增 12 行、operations.md 改 1 行）、scripts/harness/review.py（prepare/run/validate_report/export）、scripts/harness/task_state.py（确认不解析 Markdown 节标题）、manifest.json 的 state.status 与文件哈希（工作区与记录自述一致）。逐项核对：新增技能与三名技能计数、AGENTS.md/operations.md 相对链接（4+2 处）与 skills-guide 的 6 处本地链接目标路径均可达；26-09-15 记录「56 行 plan-task、90 行说明」与行数一致，「12 处本地 Markdown 链接」与快照实际计数一致；用户意图（单一 plan-task、面向用户说明、不设原型阶段、沿用 Harness）与改动内容一致，未发现越出授权的改动或对 resume-task/review-task 正文的改动。
+
+## Limitations
+未执行任何测试或构建：scripts/harness/test_review.py、test_spec_context.py、test_task_state.py 属显式排除路径，operation.md「验证」中的 python3 -B -m unittest discover -s scripts/harness -p 'test_*.py' 与 git diff --check 本轮均未运行，本次审查全部为只读静态阅读。排除路径未审阅（src、deps、docs/specs、docs/harness/design.md、docs/harness/validation.md、docs/harness/proposals、notes、.github 等），其中 docs/harness/record-formats.md 引用的 proposals/005-task-naming.md 与 spec-context.md 引用的 proposals/003-spec-context.md 位于被排除目录，无法确认其存在与内容，即 record-formats.md 的必读依赖中这两处外部引用未解决。26-09-15 记录中「quick_validate.py 检查通过」所用校验器与依赖不在快照内，无法复核该格式校验结论；「用户已批准创建 plan-task 技能及入口改动」的原始批准证据（对话或提案）不在快照中，仅有实现者自述的任务记录，属未独立核实的依赖。无网络访问：无法核实 DeepSeek 2026-09-10 公告中 deepseek-flash 与 V4.1 Flash 的对应关系，也无法核实 operations.md「调用 Pi」示例里 --model deepseek-v4-pro（该行非本轮改动）是否仍为有效模型标识；skills-guide.md 中 Matt Pocock 的三个外链未访问。技能与说明的真实端到端行为未验证：26-09-15 记录自述只做了四项隔离情景的模拟试用，未有真实多轮 iOS 开发任务中的使用结果；本轮不重复应用构建，也不宣称真实 iOS 功能验证。本报告只覆盖上述静态材料，未发现问题不等于运行时正确。
+
+## R1
+- severity: low
+- requirement: plan-task SKILL.md「形成确认稿」：复杂或跨会话任务按 docs/harness/record-formats.md 写入 docs/tasks/active/ 的现有任务记录，包含适用的 Spec 阅读清单，已确认内容分别进入「目标与验收」「上下文与决定」「实现计划」；record-formats.md「任务记录」模板与「每轮审查」；spec-context.md「任务记录与交接」要求记录路径、完整标题路径、用途及必读/参考类别
+- location: snapshot/.agents/skills/plan-task/SKILL.md:48；snapshot/docs/harness/record-formats.md「任务记录」模板；requirements/docs/tasks/active/26-09-18 审查任务规划技能/task.md（节标题「确认的用户意图」「审查范围」「Spec 阅读清单」）
+- trigger: 执行者按新技能为本轮或后续任务创建/维护任务记录时，按该记录的结构照做
+- evidence: plan-task:48「已确认内容分别进入“目标与验收”“上下文与决定”“实现计划”，避免另建重复需求体系」，并称「计划待确认和已批准应明确区分」；而 record-formats.md 模板节为 恢复信息 / 目标与验收 / 上下文与决定 / Spec 阅读清单 / 实现计划 / 进展与验证 / 阻塞与纠偏 / 审查，状态枚举为「planned / active / blocked / done / cancelled」，未说明哪个状态值表示「计划待确认」。本轮同批创建的 26-09-18 task.md 实际使用「## 确认的用户意图」「## 审查范围」替代「上下文与决定」，无「实现计划」节，且 状态：active 而其「## 审查」写明「待执行」，即新技能要求的命名与待确认/已批准区分在该记录中未体现。另有格式要求缺口：record-formats.md 要求「必读：<文档路径 :: 完整标题路径（或全文）；用途与必要的依赖小节>」，但该记录「Spec 阅读清单」仅列「AGENTS.md 全文；docs/harness/record-formats.md 全文；…」六项路径，无逐项用途，也无「按需参考」行。
+- verification: 主 Agent 对照 record-formats.md 模板核对 26-09-18 task.md 的节标题与 Spec 清单字段，确认「计划待确认」应落到哪个状态值或节名，并决定是否在 record-formats.md 或 plan-task SKILL.md 补一条命名对照说明；随后用 task_state.py inspect 复读记录确认无实际解析影响（快照中 task_state.py 不解析节标题，故仅为表述一致性问题）
+- certainty: 节名不一致、缺「实现计划」节、Spec 清单缺逐项用途已由文本比对确认；是否引起实际错误记录行为或验收歧义待核实（影响限于记录可读性，不改变验收条件）
+
+## R2
+- severity: low
+- requirement: AGENTS.md「Reader Background」：Assume the reader knows basic C++ syntax but is not familiar with Modern C++, Swift, SwiftUI, or iOS development；plan-task SKILL.md「交付结果」对读者背景的复述应与之一致
+- location: snapshot/.agents/skills/plan-task/SKILL.md:8（对比 snapshot/AGENTS.md「Reader Background」节）
+- trigger: 执行者按 plan-task 撰写确认稿、解释方案与术语时，只依据技能内的读者背景描述
+- evidence: plan-task:8「用户了解基础 C++，不熟悉 Swift 和 iOS」；AGENTS.md「Assume the reader knows basic C++ syntax but is not familiar with Modern C++, Swift, SwiftUI, or iOS development.」并另列「Do not use advanced Modern C++ concepts to explain Swift unless the C++ concept is also explained.」技能复述漏掉 Modern C++ 与 SwiftUI，且未指向 AGENTS.md 对应小节，形成同一规则的两处不同表述。
+- verification: 请作者确认是否有意简化；建议该句改为引用 AGENTS.md 的 Reader Background，或补回 Modern C++/SwiftUI，再检查 plan-task 与 AGENTS.md 是否仍有重复但不同的规则表述
+- certainty: 文本差异已确认；是否实际导致对用户使用未解释的 Modern C++ 概念属可能影响，待核实
+
+## R3
+- severity: low
+- requirement: AGENTS.md「Development Harness」把 Pi 独立审查限定在行为变更、缺陷修复、跨模块重构，并规定「Delegation is not mandatory for every task」；review-task SKILL.md 明示「不为普通问答和纯排版启动流程」；plan-task 描述把适用范围限定为「新功能、目标不清的修复或有实质取舍的改动」
+- location: snapshot/.agents/skills/plan-task/SKILL.md:56 与 snapshot/AGENTS.md「Project Skills」节第一段（及 snapshot/docs/harness/skills-guide.md:9 表格行）
+- trigger: 小型或纯文档类任务经 plan-task 形成计划并实施后，执行者据交接段判定是否需要 Pi 独立审查与完整验收
+- evidence: plan-task:56「实施、测试、Pi 独立审查和最终验收沿用现有 Harness 与 review-task。」未附适用范围限定；AGENTS.md 新增段「For new development, use plan-task to settle material goals, choices and acceptance before implementation.」同样未列出小任务、纯文档或已有批准情形的例外，而 plan-task 正文与 skills-guide.md 另有「已有计划或任务记录…只讨论新出现的实质问题」「已有批准计划直接沿用」「只改一处已明确的文案…无需完整规划」等例外表述。
+- verification: 确认真实意图：Pi 审查是按任务类别（行为变更/缺陷修复/跨模块重构）决定，还是计划流程的一环；如需保持现有边界，建议在 plan-task:56 与 AGENTS.md 新段补「按 Harness 适用范围」限定语，再读一遍三处表述确认无歧义
+- certainty: 「沿用现有 Harness」可解释为不覆盖既有边界，故仅属措辞未限定的歧义；实际是否造成过度流程化待核实
+
+## R4
+- severity: low
+- requirement: 26-09-15 任务验收项「行为案例的实际结果及限制如实记录」；AGENTS.md「Changes and Validation」记录不可用校验并如实说明；operations.md「格式校验与模拟测试不证明模型行为正确」
+- location: requirements/docs/tasks/active/26-09-15 添加任务规划技能与使用说明.md「进展与验证」「审查」节；snapshot/docs/harness/skills-guide.md:90
+- trigger: 后续任务据 26-09-15 的 [x] 验收结论，认定新技能与使用说明已在真实使用中有效
+- evidence: 26-09-15 记录：「独立子 Agent check_plan_skill 只读取技能，使用给定案例事实模拟下一条回复与动作；未读取真实源码、联网、修改文件或运行应用」「以上是格式检查和隔离情景试用，尚未证明新技能在真实多轮 iOS 开发中的端到端效果；后续以实际任务验证」。本轮 26-09-18 记录亦写明「不重复应用构建或宣称真实 iOS 功能验证」。即技能加载、按技能执行、skills-guide 对用户承诺的行为（如「Agent 会读取已有目标、决定…」）均无真实任务证据。
+- verification: 在下一个真实小型开发任务中执行 plan-task，记录是否加载技能、确认稿是否出现、是否按 record-formats 写入计划与 Spec 清单，并把观察结果写回 26-09-15 或新任务记录的「进展与验证」；在此之前不要把该技能视为已端到端验证
+- certainty: 未做真实任务验证已由记录自述确认；影响程度（是否需要立即补验）待主 Agent 结合验收条件判断

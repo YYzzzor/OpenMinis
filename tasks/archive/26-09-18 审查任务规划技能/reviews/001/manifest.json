@@ -1,0 +1,220 @@
+{
+  "artifacts": {
+    "patches/base-to-worktree.patch": {
+      "executable": false,
+      "sha256": "5ff75cb49556ee67f25a3ae08d3858827fe07de05665d17fd22087fe82d4f40a"
+    },
+    "patches/staged.patch": {
+      "executable": false,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "patches/unstaged.patch": {
+      "executable": false,
+      "sha256": "5ff75cb49556ee67f25a3ae08d3858827fe07de05665d17fd22087fe82d4f40a"
+    },
+    "request.md": "06c78cfcb8c676b275ac48b1c8966beffbb562bba33dee6063a9581b8df50e82",
+    "requirements/.agents/skills/resume-task/SKILL.md": {
+      "executable": false,
+      "sha256": "90fea16994b00ded44b811e5d2473073d3bfce46c37b60481ee8b11914ce98cb"
+    },
+    "requirements/.agents/skills/review-task/SKILL.md": {
+      "executable": false,
+      "sha256": "bd911bd98879f54868478d2f8ba3cb49a9c6716b22a12731d1eaad65b6803472"
+    },
+    "requirements/AGENTS.md": {
+      "executable": false,
+      "sha256": "8c38d472ccdd82f6ea949e3760b69449da151feb0e950bdab7a2de2bd5f098a9"
+    },
+    "requirements/docs/harness/operations.md": {
+      "executable": false,
+      "sha256": "f9cb29cbb5658cb43d04884165331b6aafbd9226bf2724a998a44662bf2967db"
+    },
+    "requirements/docs/harness/record-formats.md": {
+      "executable": false,
+      "sha256": "f6c0b6c6a002285ce21eaa921e9ac32c4d9c8c51e7b4b52c833d821377e60a85"
+    },
+    "requirements/docs/tasks/active/26-09-15 添加任务规划技能与使用说明.md": {
+      "executable": false,
+      "sha256": "82437375644775d6794a319a9e5892ff23db317be0cbf7d9a25f10c2816a2371"
+    },
+    "requirements/docs/tasks/active/26-09-18 审查任务规划技能/task.md": {
+      "executable": false,
+      "sha256": "935655cf25f19be99d0b61529104c15103d4f0a1c79a138b30acd167caacac13"
+    },
+    "snapshot/.agents/skills/plan-task/SKILL.md": {
+      "executable": false,
+      "sha256": "31f941eb6d1d8c5aed6c704ffc20241c89f30622a33bbbc0aed00c2529c6f342"
+    },
+    "snapshot/.agents/skills/resume-task/SKILL.md": {
+      "executable": false,
+      "sha256": "90fea16994b00ded44b811e5d2473073d3bfce46c37b60481ee8b11914ce98cb"
+    },
+    "snapshot/.agents/skills/review-task/SKILL.md": {
+      "executable": false,
+      "sha256": "bd911bd98879f54868478d2f8ba3cb49a9c6716b22a12731d1eaad65b6803472"
+    },
+    "snapshot/AGENTS.md": {
+      "executable": false,
+      "sha256": "8c38d472ccdd82f6ea949e3760b69449da151feb0e950bdab7a2de2bd5f098a9"
+    },
+    "snapshot/docs/harness/operations.md": {
+      "executable": false,
+      "sha256": "f9cb29cbb5658cb43d04884165331b6aafbd9226bf2724a998a44662bf2967db"
+    },
+    "snapshot/docs/harness/record-formats.md": {
+      "executable": false,
+      "sha256": "f6c0b6c6a002285ce21eaa921e9ac32c4d9c8c51e7b4b52c833d821377e60a85"
+    },
+    "snapshot/docs/harness/skills-guide.md": {
+      "executable": false,
+      "sha256": "7d5d3edf0fd1a27c1a9a800f848f6e96445e4f178350bd0acc108777cca4d964"
+    },
+    "snapshot/docs/harness/spec-context.md": {
+      "executable": false,
+      "sha256": "4e3102cfe1ebf99a54eeb78d32332cb53b387813542d3be59891ac7628f5574c"
+    },
+    "snapshot/docs/tasks/active/26-09-15 添加任务规划技能与使用说明.md": {
+      "executable": false,
+      "sha256": "82437375644775d6794a319a9e5892ff23db317be0cbf7d9a25f10c2816a2371"
+    },
+    "snapshot/docs/tasks/active/26-09-18 审查任务规划技能/task.md": {
+      "executable": false,
+      "sha256": "935655cf25f19be99d0b61529104c15103d4f0a1c79a138b30acd167caacac13"
+    },
+    "snapshot/scripts/harness/review.py": {
+      "executable": false,
+      "sha256": "81d563dc5ff04c4aadcb80033b0e74b8b4d68fe5fa143a1a29cea4a983bdd57d"
+    },
+    "snapshot/scripts/harness/spec_context.py": {
+      "executable": false,
+      "sha256": "54bde54d0b183dc631f29691223f2df1da17257461dde33edef3089a539f49ba"
+    },
+    "snapshot/scripts/harness/task_state.py": {
+      "executable": false,
+      "sha256": "a78239ff425266323858b1751fedf12d33c24fbd3304ef1e3caa335d2010f600"
+    }
+  },
+  "repo": "/Users/huyuanzhao/Coding/Projects/OpenMinis",
+  "schema": 1,
+  "snapshot_id": "7e0f078320ece88aa238506129f0e82319e8f53322615e0893182bd744a21590",
+  "spec_selections": [],
+  "state": {
+    "base": "3c0eb138c2b4e2de743ca8a4a36a3a5dc88b5472",
+    "branch": "feat/minisx-branding",
+    "excluded_gitlinks": {
+      "deps/ish": {
+        "index_commit": "de124dd66124a15239cea1465164f74980ada245",
+        "status": "",
+        "worktree": "de124dd66124a15239cea1465164f74980ada245"
+      },
+      "deps/proot": {
+        "index_commit": "8cf13e997cdc9472997aae19df8050c073c9a86c",
+        "worktree": "uninitialized"
+      }
+    },
+    "exclusions": [
+      ".github",
+      ".gitignore",
+      ".gitmodules",
+      "BUILDING.md",
+      "CONTRIBUTING.md",
+      "LICENSE",
+      "README.md",
+      "THIRD_PARTY_LICENSES.md",
+      "assets",
+      "deps",
+      "docs/harness/design.md",
+      "docs/harness/evidence",
+      "docs/harness/proposals",
+      "docs/harness/validation.md",
+      "docs/specs",
+      "docs/tasks/active/26-09-11 实现 OpenMinis 开发 Harness",
+      "docs/tasks/active/26-09-11 核查 iOS 定时任务能力",
+      "docs/tasks/active/26-09-15 完成 iOS 首次构建",
+      "docs/tasks/active/26-09-15 统一 MinisX 界面名称.md",
+      "docs/tasks/active/26-09-15 设置 MinisX 默认系统版本.md",
+      "docs/tasks/active/26-09-15 适配 iOS 27 模拟器构建",
+      "notes",
+      "scripts/build_ios_simulator.sh",
+      "scripts/gen_debug_skill.sh",
+      "scripts/gen_debug_skill_android.sh",
+      "scripts/harness/test_review.py",
+      "scripts/harness/test_spec_context.py",
+      "scripts/harness/test_task_state.py",
+      "scripts/install_alpine.sh",
+      "scripts/optimize_rootfs.sh",
+      "scripts/prepare_android_sandbox.sh",
+      "scripts/prepare_rootfs.sh",
+      "scripts/symbolicate_hang.py",
+      "scripts/update_models_dev.sh",
+      "src"
+    ],
+    "files": {
+      ".agents/skills/plan-task/SKILL.md": {
+        "executable": false,
+        "sha256": "31f941eb6d1d8c5aed6c704ffc20241c89f30622a33bbbc0aed00c2529c6f342"
+      },
+      ".agents/skills/resume-task/SKILL.md": {
+        "executable": false,
+        "sha256": "90fea16994b00ded44b811e5d2473073d3bfce46c37b60481ee8b11914ce98cb"
+      },
+      ".agents/skills/review-task/SKILL.md": {
+        "executable": false,
+        "sha256": "bd911bd98879f54868478d2f8ba3cb49a9c6716b22a12731d1eaad65b6803472"
+      },
+      "AGENTS.md": {
+        "executable": false,
+        "sha256": "8c38d472ccdd82f6ea949e3760b69449da151feb0e950bdab7a2de2bd5f098a9"
+      },
+      "docs/harness/operations.md": {
+        "executable": false,
+        "sha256": "f9cb29cbb5658cb43d04884165331b6aafbd9226bf2724a998a44662bf2967db"
+      },
+      "docs/harness/record-formats.md": {
+        "executable": false,
+        "sha256": "f6c0b6c6a002285ce21eaa921e9ac32c4d9c8c51e7b4b52c833d821377e60a85"
+      },
+      "docs/harness/skills-guide.md": {
+        "executable": false,
+        "sha256": "7d5d3edf0fd1a27c1a9a800f848f6e96445e4f178350bd0acc108777cca4d964"
+      },
+      "docs/harness/spec-context.md": {
+        "executable": false,
+        "sha256": "4e3102cfe1ebf99a54eeb78d32332cb53b387813542d3be59891ac7628f5574c"
+      },
+      "docs/tasks/active/26-09-15 添加任务规划技能与使用说明.md": {
+        "executable": false,
+        "sha256": "82437375644775d6794a319a9e5892ff23db317be0cbf7d9a25f10c2816a2371"
+      },
+      "docs/tasks/active/26-09-18 审查任务规划技能/task.md": {
+        "executable": false,
+        "sha256": "935655cf25f19be99d0b61529104c15103d4f0a1c79a138b30acd167caacac13"
+      },
+      "scripts/harness/review.py": {
+        "executable": false,
+        "sha256": "81d563dc5ff04c4aadcb80033b0e74b8b4d68fe5fa143a1a29cea4a983bdd57d"
+      },
+      "scripts/harness/spec_context.py": {
+        "executable": false,
+        "sha256": "54bde54d0b183dc631f29691223f2df1da17257461dde33edef3089a539f49ba"
+      },
+      "scripts/harness/task_state.py": {
+        "executable": false,
+        "sha256": "a78239ff425266323858b1751fedf12d33c24fbd3304ef1e3caa335d2010f600"
+      }
+    },
+    "head": "3c0eb138c2b4e2de743ca8a4a36a3a5dc88b5472",
+    "index_sha256": "ac8c5554f18c6e6d9db61a01324348f01e0a81c7051e1328cc5bb4cfc32c0c8f",
+    "requirements": {
+      ".agents/skills/resume-task/SKILL.md": "90fea16994b00ded44b811e5d2473073d3bfce46c37b60481ee8b11914ce98cb",
+      ".agents/skills/review-task/SKILL.md": "bd911bd98879f54868478d2f8ba3cb49a9c6716b22a12731d1eaad65b6803472",
+      "AGENTS.md": "8c38d472ccdd82f6ea949e3760b69449da151feb0e950bdab7a2de2bd5f098a9",
+      "docs/harness/operations.md": "f9cb29cbb5658cb43d04884165331b6aafbd9226bf2724a998a44662bf2967db",
+      "docs/harness/record-formats.md": "f6c0b6c6a002285ce21eaa921e9ac32c4d9c8c51e7b4b52c833d821377e60a85",
+      "docs/tasks/active/26-09-15 添加任务规划技能与使用说明.md": "82437375644775d6794a319a9e5892ff23db317be0cbf7d9a25f10c2816a2371",
+      "docs/tasks/active/26-09-18 审查任务规划技能/task.md": "935655cf25f19be99d0b61529104c15103d4f0a1c79a138b30acd167caacac13"
+    },
+    "status": " M AGENTS.md\u0000 M docs/harness/operations.md\u0000?? .agents/skills/plan-task/SKILL.md\u0000?? docs/harness/skills-guide.md\u0000?? docs/tasks/active/26-09-15 添加任务规划技能与使用说明.md\u0000?? docs/tasks/active/26-09-18 审查任务规划技能/task.md\u0000"
+  },
+  "task": "docs/tasks/active/26-09-18 审查任务规划技能/task.md"
+}

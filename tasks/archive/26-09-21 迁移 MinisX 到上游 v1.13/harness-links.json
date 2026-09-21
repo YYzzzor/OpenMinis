@@ -1,0 +1,297 @@
+{
+  "scanned_markdown_files": 41,
+  "existing_links": [
+    {
+      "source": "AGENTS.md",
+      "line": 112,
+      "target": ".agents/skills/plan-task/SKILL.md",
+      "exists": true
+    },
+    {
+      "source": "AGENTS.md",
+      "line": 113,
+      "target": ".agents/skills/ios-ui-design/SKILL.md",
+      "exists": true
+    },
+    {
+      "source": "AGENTS.md",
+      "line": 114,
+      "target": ".agents/skills/resume-task/SKILL.md",
+      "exists": true
+    },
+    {
+      "source": "AGENTS.md",
+      "line": 115,
+      "target": ".agents/skills/review-task/SKILL.md",
+      "exists": true
+    },
+    {
+      "source": "AGENTS.md",
+      "line": 117,
+      "target": "docs/harness/skills-guide.md",
+      "exists": true
+    },
+    {
+      "source": ".agents/skills/ios-ui-design/SKILL.md",
+      "line": 25,
+      "target": "references/apple-design.md",
+      "exists": true
+    },
+    {
+      "source": "docs/harness/operations.md",
+      "line": 3,
+      "target": "skills-guide.md",
+      "exists": true
+    },
+    {
+      "source": "docs/harness/operations.md",
+      "line": 42,
+      "target": "spec-context.md",
+      "exists": true
+    },
+    {
+      "source": "docs/harness/skills-guide.md",
+      "line": 9,
+      "target": "../../.agents/skills/plan-task/SKILL.md",
+      "exists": true
+    },
+    {
+      "source": "docs/harness/skills-guide.md",
+      "line": 10,
+      "target": "../../.agents/skills/ios-ui-design/SKILL.md",
+      "exists": true
+    },
+    {
+      "source": "docs/harness/skills-guide.md",
+      "line": 11,
+      "target": "../../.agents/skills/resume-task/SKILL.md",
+      "exists": true
+    },
+    {
+      "source": "docs/harness/skills-guide.md",
+      "line": 12,
+      "target": "../../.agents/skills/review-task/SKILL.md",
+      "exists": true
+    },
+    {
+      "source": "docs/harness/skills-guide.md",
+      "line": 92,
+      "target": "../../.agents/skills/ios-ui-design/references/apple-design.md",
+      "exists": true
+    },
+    {
+      "source": "docs/harness/skills-guide.md",
+      "line": 113,
+      "target": "record-formats.md",
+      "exists": true
+    },
+    {
+      "source": "docs/harness/skills-guide.md",
+      "line": 113,
+      "target": "operations.md",
+      "exists": true
+    },
+    {
+      "source": "docs/harness/skills-guide.md",
+      "line": 115,
+      "target": "../../AGENTS.md",
+      "exists": true
+    },
+    {
+      "source": "docs/harness/validation.md",
+      "line": 26,
+      "target": "evidence/pi-smoke-001/report.md",
+      "exists": true
+    },
+    {
+      "source": "docs/harness/validation.md",
+      "line": 33,
+      "target": "evidence/pi-harness-001/resolution.md",
+      "exists": true
+    },
+    {
+      "source": "docs/harness/validation.md",
+      "line": 56,
+      "target": "evidence/pi-harness-002/resolution.md",
+      "exists": true
+    },
+    {
+      "source": "docs/harness/validation.md",
+      "line": 66,
+      "target": "evidence/pi-harness-003/resolution.md",
+      "exists": true
+    },
+    {
+      "source": "docs/harness/validation.md",
+      "line": 72,
+      "target": "evidence/pi-recovery-001/assessment.md",
+      "exists": true
+    },
+    {
+      "source": "docs/harness/validation.md",
+      "line": 78,
+      "target": "evidence/codex-recovery-001/assessment.md",
+      "exists": true
+    },
+    {
+      "source": "docs/harness/validation.md",
+      "line": 84,
+      "target": "evidence/recovery-drift-001/assessment.md",
+      "exists": true
+    },
+    {
+      "source": "docs/harness/validation.md",
+      "line": 90,
+      "target": "evidence/pi-skill-review-001/resolution.md",
+      "exists": true
+    },
+    {
+      "source": "docs/harness/validation.md",
+      "line": 96,
+      "target": "evidence/rule-approval-001/assessment.md",
+      "exists": true
+    },
+    {
+      "source": "docs/harness/record-formats.md",
+      "line": 7,
+      "target": "proposals/005-task-naming.md",
+      "exists": true
+    },
+    {
+      "source": "docs/harness/record-formats.md",
+      "line": 62,
+      "target": "spec-context.md",
+      "exists": true
+    },
+    {
+      "source": "docs/harness/design.md",
+      "line": 33,
+      "target": "record-formats.md",
+      "exists": true
+    },
+    {
+      "source": "docs/harness/design.md",
+      "line": 33,
+      "target": "../../tasks/active/26-09-11 实现 OpenMinis 开发 Harness/task.md",
+      "exists": true
+    },
+    {
+      "source": "docs/harness/design.md",
+      "line": 39,
+      "target": "spec-context.md",
+      "exists": true
+    },
+    {
+      "source": "docs/harness/design.md",
+      "line": 87,
+      "target": "proposals/004-review-judgment.md",
+      "exists": true
+    },
+    {
+      "source": "docs/harness/design.md",
+      "line": 105,
+      "target": "proposals/002-instruction-scope.md",
+      "exists": true
+    },
+    {
+      "source": "docs/harness/design.md",
+      "line": 115,
+      "target": "validation.md",
+      "exists": true
+    },
+    {
+      "source": "docs/harness/spec-context.md",
+      "line": 3,
+      "target": "proposals/003-spec-context.md",
+      "exists": true
+    },
+    {
+      "source": "docs/harness/proposals/002-instruction-scope.md",
+      "line": 27,
+      "target": "../design.md",
+      "exists": true
+    },
+    {
+      "source": "docs/harness/proposals/006-task-layout-and-archive.md",
+      "line": 20,
+      "target": "../../../tasks/archive/26-09-20 独立任务目录与按需归档/task.md",
+      "exists": true
+    },
+    {
+      "source": "docs/harness/evidence/pi-harness-003/resolution.md",
+      "line": 3,
+      "target": "pi-review.md",
+      "exists": true
+    },
+    {
+      "source": "docs/harness/evidence/pi-harness-003/resolution.md",
+      "line": 6,
+      "target": "bundle.tar.gz",
+      "exists": true
+    },
+    {
+      "source": "docs/harness/evidence/pi-harness-002/resolution.md",
+      "line": 3,
+      "target": "pi-review.md",
+      "exists": true
+    },
+    {
+      "source": "docs/harness/evidence/pi-harness-002/resolution.md",
+      "line": 5,
+      "target": "bundle.tar.gz",
+      "exists": true
+    },
+    {
+      "source": "docs/harness/evidence/pi-harness-001/resolution.md",
+      "line": 4,
+      "target": "pi-review.md",
+      "exists": true
+    },
+    {
+      "source": "docs/harness/evidence/pi-harness-001/resolution.md",
+      "line": 6,
+      "target": "bundle.tar.gz",
+      "exists": true
+    }
+  ],
+  "archive_targets_metadata_only": [
+    {
+      "source": "docs/harness/proposals/006-task-layout-and-archive.md",
+      "line": 20,
+      "target": "../../../tasks/archive/26-09-20 独立任务目录与按需归档/task.md",
+      "exists": true
+    }
+  ],
+  "missing": [
+    {
+      "source": "docs/harness/evidence/pi-harness-003/request.md",
+      "line": 56,
+      "target": "proposals/003-spec-context.md",
+      "exists": false
+    },
+    {
+      "source": "docs/harness/evidence/pi-harness-003/request.md",
+      "line": 82,
+      "target": "proposals/003-spec-context.md",
+      "exists": false
+    },
+    {
+      "source": "docs/harness/evidence/pi-harness-002/request.md",
+      "line": 53,
+      "target": "proposals/003-spec-context.md",
+      "exists": false
+    },
+    {
+      "source": "docs/harness/evidence/pi-harness-002/request.md",
+      "line": 79,
+      "target": "proposals/003-spec-context.md",
+      "exists": false
+    },
+    {
+      "source": "docs/harness/evidence/pi-harness-001/pi-review.md",
+      "line": 68,
+      "target": "proposals/003-spec-context.md",
+      "exists": false
+    }
+  ]
+}

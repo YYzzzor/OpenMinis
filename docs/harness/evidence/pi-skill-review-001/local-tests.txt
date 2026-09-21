@@ -1,0 +1,7 @@
+test_retry_server_error (test_classifier.ClassifierTests.test_retry_server_error) ... ok
+test_success (test_classifier.ClassifierTests.test_success) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.000s
+
+OK

@@ -146,3 +146,26 @@ deps/lame-3.100/**/.deps/
 # not a vendored binary — same treatment as the iOS Rclone.xcframework it is
 # built alongside (deps/build_rclone_ios.sh).
 src/android/app/libs/rclone.aar
+
+# Native iOS Simulator dependencies and isolated source/build trees
+deps/simulator/
+
+# Python bytecode caches
+__pycache__/
+*.py[cod]
+
+# Machine-local provider customization (copy the tracked example)
+src/ios/Configs/ProviderCustomization.xcconfig
+
+# Local Harness checkpoints and generated build/review evidence
+# Keep authored task descriptions, verification notes and review reports visible.
+tasks/**/*.checkpoint.json
+tasks/**/evidence/
+tasks/**/*.tar.gz
+tasks/**/bundle-location.json
+
+# Compatibility for legacy task data restored from an older checkout
+docs/tasks/**/*.checkpoint.json
+docs/tasks/**/evidence/
+docs/tasks/**/*.tar.gz
+docs/tasks/**/bundle-location.json

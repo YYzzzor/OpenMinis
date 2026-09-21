@@ -1,0 +1,358 @@
+[
+  {
+    "log": "calendar-26.4-r1.log",
+    "sha256": "8e608da2a2912da317e5723c80ddc892bedfd11b515576e8f1f357c7c1e5c95c",
+    "passed": 30,
+    "failed": 4,
+    "tests": [
+      [
+        "testBiweeklyMultipleWeekdays",
+        "passed",
+        "0.318 seconds"
+      ],
+      [
+        "testCombinedFilters",
+        "passed",
+        "0.108 seconds"
+      ],
+      [
+        "testDaysOfYearAndLeapYear",
+        "passed",
+        "0.093 seconds"
+      ],
+      [
+        "testDefaultTimeZoneCompatibility",
+        "passed",
+        "0.108 seconds"
+      ],
+      [
+        "testEndConditionsAndExactBoundary",
+        "passed",
+        "0.198 seconds"
+      ],
+      [
+        "testEndConditionsForEveryFrequency",
+        "passed",
+        "0.381 seconds"
+      ],
+      [
+        "testEveryWeekdayAndMultipleWeekdays",
+        "passed",
+        "0.067 seconds"
+      ],
+      [
+        "testInvalidDatesAndTimeZonesDoNotSave",
+        "passed",
+        "0.037 seconds"
+      ],
+      [
+        "testInvalidRulesDoNotSave",
+        "passed",
+        "0.107 seconds"
+      ],
+      [
+        "testMixedAndMalformedUpstreamOptionsDoNotSave",
+        "passed",
+        "0.050 seconds"
+      ],
+      [
+        "testMonthDaysAndMissing31st",
+        "passed",
+        "0.069 seconds"
+      ],
+      [
+        "testMonthlyOrdinalWeekdays",
+        "passed",
+        "0.065 seconds"
+      ],
+      [
+        "testMonthsOfYear",
+        "passed",
+        "0.043 seconds"
+      ],
+      [
+        "testNativeWeekNumberReference",
+        "failed",
+        "0.104 seconds"
+      ],
+      [
+        "testNonCreateRejectsRecurrenceOptions",
+        "passed",
+        "0.031 seconds"
+      ],
+      [
+        "testOtherOptionLikeTextValuesAreLiteral",
+        "passed",
+        "1.450 seconds"
+      ],
+      [
+        "testPositiveWeeksOfYear",
+        "failed",
+        "0.046 seconds"
+      ],
+      [
+        "testReminderEntrypointsRejectCalendarRecurrenceWithoutMutation",
+        "passed",
+        "0.855 seconds"
+      ],
+      [
+        "testReminderRecurrenceOptionLikeTextRemainsLiteral",
+        "passed",
+        "0.518 seconds"
+      ],
+      [
+        "testSelectorLikeNotesAreLiteral",
+        "passed",
+        "0.046 seconds"
+      ],
+      [
+        "testSetPositionsAcrossSelectors",
+        "failed",
+        "0.155 seconds"
+      ],
+      [
+        "testSimpleFrequenciesAndIntervals",
+        "passed",
+        "0.101 seconds"
+      ],
+      [
+        "testSingleEventRegression",
+        "passed",
+        "0.066 seconds"
+      ],
+      [
+        "testTimeZoneAndDaylightSaving",
+        "passed",
+        "0.044 seconds"
+      ],
+      [
+        "testTimeZoneOptionLikeValuesAreLiteral",
+        "passed",
+        "0.149 seconds"
+      ],
+      [
+        "testUnknownCalendarDoesNotFallBack",
+        "passed",
+        "0.040 seconds"
+      ],
+      [
+        "testUntilFamiliesKeepTheirBoundarySemantics",
+        "passed",
+        "0.131 seconds"
+      ],
+      [
+        "testUpstreamFrequencyAliases",
+        "passed",
+        "0.159 seconds"
+      ],
+      [
+        "testUpstreamReminderRecurrenceCreateUpdateAndClear",
+        "passed",
+        "0.462 seconds"
+      ],
+      [
+        "testUpstreamWeekdayAliasesAndListReadback",
+        "passed",
+        "0.067 seconds"
+      ],
+      [
+        "testWeeksOfYear",
+        "failed",
+        "0.051 seconds"
+      ],
+      [
+        "testYearlyBoundarySelectors",
+        "passed",
+        "0.087 seconds"
+      ],
+      [
+        "testYearlyOrdinalWeekdays",
+        "passed",
+        "0.076 seconds"
+      ],
+      [
+        "testYearWeekWarningSurvivesCreateAndList",
+        "passed",
+        "0.052 seconds"
+      ]
+    ]
+  },
+  {
+    "log": "calendar-27.0-r1.log",
+    "sha256": "c86a1619807ad1c1775a49e46dc8aeba68a31f8c177d754f3aaa60f7ae0e0388",
+    "passed": 30,
+    "failed": 4,
+    "tests": [
+      [
+        "testBiweeklyMultipleWeekdays",
+        "passed",
+        "0.764 seconds"
+      ],
+      [
+        "testCombinedFilters",
+        "passed",
+        "0.282 seconds"
+      ],
+      [
+        "testDaysOfYearAndLeapYear",
+        "passed",
+        "0.092 seconds"
+      ],
+      [
+        "testDefaultTimeZoneCompatibility",
+        "passed",
+        "0.073 seconds"
+      ],
+      [
+        "testEndConditionsAndExactBoundary",
+        "passed",
+        "0.232 seconds"
+      ],
+      [
+        "testEndConditionsForEveryFrequency",
+        "passed",
+        "0.541 seconds"
+      ],
+      [
+        "testEveryWeekdayAndMultipleWeekdays",
+        "passed",
+        "0.224 seconds"
+      ],
+      [
+        "testInvalidDatesAndTimeZonesDoNotSave",
+        "passed",
+        "0.044 seconds"
+      ],
+      [
+        "testInvalidRulesDoNotSave",
+        "passed",
+        "0.132 seconds"
+      ],
+      [
+        "testMixedAndMalformedUpstreamOptionsDoNotSave",
+        "passed",
+        "0.058 seconds"
+      ],
+      [
+        "testMonthDaysAndMissing31st",
+        "passed",
+        "0.076 seconds"
+      ],
+      [
+        "testMonthlyOrdinalWeekdays",
+        "passed",
+        "0.073 seconds"
+      ],
+      [
+        "testMonthsOfYear",
+        "passed",
+        "0.047 seconds"
+      ],
+      [
+        "testNativeWeekNumberReference",
+        "failed",
+        "0.110 seconds"
+      ],
+      [
+        "testNonCreateRejectsRecurrenceOptions",
+        "passed",
+        "0.036 seconds"
+      ],
+      [
+        "testOtherOptionLikeTextValuesAreLiteral",
+        "passed",
+        "1.858 seconds"
+      ],
+      [
+        "testPositiveWeeksOfYear",
+        "failed",
+        "0.052 seconds"
+      ],
+      [
+        "testReminderEntrypointsRejectCalendarRecurrenceWithoutMutation",
+        "passed",
+        "0.953 seconds"
+      ],
+      [
+        "testReminderRecurrenceOptionLikeTextRemainsLiteral",
+        "passed",
+        "0.577 seconds"
+      ],
+      [
+        "testSelectorLikeNotesAreLiteral",
+        "passed",
+        "0.052 seconds"
+      ],
+      [
+        "testSetPositionsAcrossSelectors",
+        "failed",
+        "0.168 seconds"
+      ],
+      [
+        "testSimpleFrequenciesAndIntervals",
+        "passed",
+        "0.124 seconds"
+      ],
+      [
+        "testSingleEventRegression",
+        "passed",
+        "0.061 seconds"
+      ],
+      [
+        "testTimeZoneAndDaylightSaving",
+        "passed",
+        "0.057 seconds"
+      ],
+      [
+        "testTimeZoneOptionLikeValuesAreLiteral",
+        "passed",
+        "0.159 seconds"
+      ],
+      [
+        "testUnknownCalendarDoesNotFallBack",
+        "passed",
+        "0.032 seconds"
+      ],
+      [
+        "testUntilFamiliesKeepTheirBoundarySemantics",
+        "passed",
+        "0.098 seconds"
+      ],
+      [
+        "testUpstreamFrequencyAliases",
+        "passed",
+        "0.140 seconds"
+      ],
+      [
+        "testUpstreamReminderRecurrenceCreateUpdateAndClear",
+        "passed",
+        "0.472 seconds"
+      ],
+      [
+        "testUpstreamWeekdayAliasesAndListReadback",
+        "passed",
+        "0.071 seconds"
+      ],
+      [
+        "testWeeksOfYear",
+        "failed",
+        "0.054 seconds"
+      ],
+      [
+        "testYearlyBoundarySelectors",
+        "passed",
+        "0.095 seconds"
+      ],
+      [
+        "testYearlyOrdinalWeekdays",
+        "passed",
+        "0.070 seconds"
+      ],
+      [
+        "testYearWeekWarningSurvivesCreateAndList",
+        "passed",
+        "0.050 seconds"
+      ]
+    ]
+  }
+]

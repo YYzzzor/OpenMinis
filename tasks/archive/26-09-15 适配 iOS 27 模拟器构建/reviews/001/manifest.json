@@ -1,0 +1,228 @@
+{
+  "artifacts": {
+    "patches/base-to-worktree.patch": {
+      "executable": false,
+      "sha256": "6cf0b6068faa481f3b7818cb8f8b2748120ea7807175bf669e67f20634b8ac3d"
+    },
+    "patches/staged.patch": {
+      "executable": false,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "patches/unstaged.patch": {
+      "executable": false,
+      "sha256": "6cf0b6068faa481f3b7818cb8f8b2748120ea7807175bf669e67f20634b8ac3d"
+    },
+    "request.md": "7ac31594ef00d1c48021d73a8c369fb86f2f0e86bb4619a983710f76c6913cd2",
+    "requirements/docs/tasks/active/26-09-15 适配 iOS 27 模拟器构建/task.md": {
+      "executable": false,
+      "sha256": "699b6810c72c0898d35f30932a00efb579d87f49140d1a49a6446ffd5a6b69c6"
+    },
+    "snapshot/.gitignore": {
+      "executable": false,
+      "sha256": "3613407b2e42848e36214d01945df5973ed73b0865f06af48e81eeaa50a61b9c"
+    },
+    "snapshot/BUILDING.md": {
+      "executable": false,
+      "sha256": "5a71485ac565e92cc2d76b57783c6e3be4da0b882926522218079ecef4097233"
+    },
+    "snapshot/deps/build_ffmpeg.sh": {
+      "executable": true,
+      "sha256": "198fba2d5628b0b85aa0d4d80191dde8d591f134595bb7c746a2350aa5dbdef5"
+    },
+    "snapshot/deps/build_ish.sh": {
+      "executable": true,
+      "sha256": "adccc018da892111a30b431bb5473cd936505d53dd8f49f3b2c6d84088aa8f94"
+    },
+    "snapshot/deps/build_lame.sh": {
+      "executable": true,
+      "sha256": "9aece03487bc6f8fac34ccff12f848fc0e2b0bd736afef07bb6ca8ca2eb1d40f"
+    },
+    "snapshot/deps/ios_build_target.sh": {
+      "executable": false,
+      "sha256": "fd884b94db832a322a84c1c97a5b6fceecbe5993200c757f8b4bc2cdde3edbd6"
+    },
+    "snapshot/deps/prepare_alpine_rootfs.sh": {
+      "executable": true,
+      "sha256": "692a89345b28aca4c953573ba40e09d78bb91aec13e762abb8dac31bf639db1b"
+    },
+    "snapshot/docs/tasks/active/26-09-15 适配 iOS 27 模拟器构建/task.md": {
+      "executable": false,
+      "sha256": "699b6810c72c0898d35f30932a00efb579d87f49140d1a49a6446ffd5a6b69c6"
+    },
+    "snapshot/docs/tasks/active/26-09-15 适配 iOS 27 模拟器构建/verification.md": {
+      "executable": false,
+      "sha256": "66220e2ac82a1a8b89ffdcee5ea4ca33d399f510964b6a160767f78ddd2093be"
+    },
+    "snapshot/scripts/build_ios_simulator.sh": {
+      "executable": false,
+      "sha256": "c83e168e8c6ca6b7db0e4a98ebfbf8262bd2827a47bb6745e16d9c1f5cfb34d6"
+    },
+    "snapshot/src/ios/Minis.xcodeproj/project.pbxproj": {
+      "executable": false,
+      "sha256": "ca0eaf4bbe2abcaf3672477ba227df8eb4b1f125826c443bf924a1027aec11f1"
+    },
+    "snapshot/src/ios/Views/ContentView.swift": {
+      "executable": false,
+      "sha256": "02aa1c8f42a0d3e6ffa8d1326271a8d3cd8c5208db85a9939a60e4fec03607fd"
+    }
+  },
+  "repo": "/Users/huyuanzhao/Coding/Projects/OpenMinis",
+  "schema": 1,
+  "snapshot_id": "f1c88216d16c38f2b86a9676d134db6faa976971fefd35f7697662736f716d3b",
+  "spec_selections": [],
+  "state": {
+    "base": "141b9f212abc91250debc667bc6b0bf415dff890",
+    "branch": "feat/minisx-branding",
+    "excluded_gitlinks": {
+      "deps/ish": {
+        "index_commit": "de124dd66124a15239cea1465164f74980ada245",
+        "status": "?? build-ios/.ninja_deps\u0000?? build-ios/.ninja_log\u0000?? build-ios/build.ninja\u0000?? build-ios/compile_commands.json\u0000?? build-ios/cpu-offsets.h\u0000?? build-ios/ios-cross.txt\u0000?? build-ios/libfakefs.a\u0000?? build-ios/libfakefs.a.p/fs_fake-db.c.o\u0000?? build-ios/libfakefs.a.p/fs_fake-migrate.c.o\u0000?? build-ios/libfakefs.a.p/fs_fake-rebuild.c.o\u0000?? build-ios/libish.a\u0000?? build-ios/libish.a.p/fs_adhoc.c.o\u0000?? build-ios/libish.a.p/fs_dev.c.o\u0000?? build-ios/libish.a.p/fs_dir.c.o\u0000?? build-ios/libish.a.p/fs_dyndev.c.o\u0000?? build-ios/libish.a.p/fs_fake.c.o\u0000?? build-ios/libish.a.p/fs_fd.c.o\u0000?? build-ios/libish.a.p/fs_generic.c.o\u0000?? build-ios/libish.a.p/fs_inode.c.o\u0000?? build-ios/libish.a.p/fs_lock.c.o\u0000?? build-ios/libish.a.p/fs_mem.c.o\u0000?? build-ios/libish.a.p/fs_mount.c.o\u0000?? build-ios/libish.a.p/fs_path.c.o\u0000?? build-ios/libish.a.p/fs_pipe.c.o\u0000?? build-ios/libish.a.p/fs_poll.c.o\u0000?? build-ios/libish.a.p/fs_proc.c.o\u0000?? build-ios/libish.a.p/fs_proc_entry.c.o\u0000?? build-ios/libish.a.p/fs_proc_ish.c.o\u0000?? build-ios/libish.a.p/fs_proc_net.c.o\u0000?? build-ios/libish.a.p/fs_proc_pid.c.o\u0000?? build-ios/libish.a.p/fs_proc_root.c.o\u0000?? build-ios/libish.a.p/fs_pty.c.o\u0000?? build-ios/libish.a.p/fs_real.c.o\u0000?? build-ios/libish.a.p/fs_sock.c.o\u0000?? build-ios/libish.a.p/fs_sockrestart.c.o\u0000?? build-ios/libish.a.p/fs_stat.c.o\u0000?? build-ios/libish.a.p/fs_tmp.c.o\u0000?? build-ios/libish.a.p/fs_tty-real.c.o\u0000?? build-ios/libish.a.p/fs_tty.c.o\u0000?? build-ios/libish.a.p/kernel_arch_arm64_calls.c.o\u0000?? build-ios/libish.a.p/kernel_calls.c.o\u0000?? build-ios/libish.a.p/kernel_epoll.c.o\u0000?? build-ios/libish.a.p/kernel_errno.c.o\u0000?? build-ios/libish.a.p/kernel_eventfd.c.o\u0000?? build-ios/libish.a.p/kernel_exec.c.o\u0000?? build-ios/libish.a.p/kernel_exit.c.o\u0000?? build-ios/libish.a.p/kernel_fork.c.o\u0000?? build-ios/libish.a.p/kernel_fs.c.o\u0000?? build-ios/libish.a.p/kernel_fs_info.c.o\u0000?? build-ios/libish.a.p/kernel_futex.c.o\u0000?? build-ios/libish.a.p/kernel_getset.c.o\u0000?? build-ios/libish.a.p/kernel_group.c.o\u0000?? build-ios/libish.a.p/kernel_init.c.o\u0000?? build-ios/libish.a.p/kernel_inotify.c.o\u0000?? build-ios/libish.a.p/kernel_ipc.c.o\u0000?? build-ios/libish.a.p/kernel_log.c.o\u0000?? build-ios/libish.a.p/kernel_memory.c.o\u0000?? build-ios/libish.a.p/kernel_misc.c.o\u0000?? build-ios/libish.a.p/kernel_mmap.c.o\u0000?? build-ios/libish.a.p/kernel_native_offload.c.o\u0000?? build-ios/libish.a.p/kernel_pidfd.c.o\u0000?? build-ios/libish.a.p/kernel_poll.c.o\u0000?? build-ios/libish.a.p/kernel_ptrace.c.o\u0000?? build-ios/libish.a.p/kernel_random.c.o\u0000?? build-ios/libish.a.p/kernel_resource.c.o\u0000?? build-ios/libish.a.p/kernel_signal.c.o\u0000?? build-ios/libish.a.p/kernel_task.c.o\u0000?? build-ios/libish.a.p/kernel_time.c.o\u0000?? build-ios/libish.a.p/kernel_tls.c.o\u0000?? build-ios/libish.a.p/kernel_uname.c.o\u0000?? build-ios/libish.a.p/kernel_user.c.o\u0000?? build-ios/libish.a.p/kernel_vdso.c.o\u0000?? build-ios/libish.a.p/platform_darwin.c.o\u0000?? build-ios/libish.a.p/util_fchdir.c.o\u0000?? build-ios/libish.a.p/util_fifo.c.o\u0000?? build-ios/libish.a.p/util_signpost.c.o\u0000?? build-ios/libish.a.p/util_sync.c.o\u0000?? build-ios/libish.a.p/util_timer.c.o\u0000?? build-ios/libish_emu.a\u0000?? build-ios/libish_emu.a.p/asbestos_asbestos.c.o\u0000?? build-ios/libish_emu.a.p/asbestos_guest-arm64_crypto_helpers.c.o\u0000?? build-ios/libish_emu.a.p/asbestos_guest-arm64_gadgets-aarch64_bits.S.o\u0000?? build-ios/libish_emu.a.p/asbestos_guest-arm64_gadgets-aarch64_control.S.o\u0000?? build-ios/libish_emu.a.p/asbestos_guest-arm64_gadgets-aarch64_crypto.S.o\u0000?? build-ios/libish_emu.a.p/asbestos_guest-arm64_gadgets-aarch64_entry.S.o\u0000?? build-ios/libish_emu.a.p/asbestos_guest-arm64_gadgets-aarch64_math.S.o\u0000?? build-ios/libish_emu.a.p/asbestos_guest-arm64_gadgets-aarch64_memory.S.o\u0000?? build-ios/libish_emu.a.p/asbestos_guest-arm64_gen.c.o\u0000?? build-ios/libish_emu.a.p/asbestos_helpers.c.o\u0000?? build-ios/libish_emu.a.p/emu_arch_arm64_fpu.c.o\u0000?? build-ios/libish_emu.a.p/emu_tlb.c.o\u0000?? build-ios/libish_emu.a.p/kernel_native_offload_prebuilt.c.o\u0000?? build-ios/libish_emu.a.p/kernel_native_offload_sym.c.o\u0000?? build-ios/libish_emu.a.p/kernel_native_offload_sym_builtins.c.o\u0000?? build-ios/meson-info/intro-benchmarks.json\u0000?? build-ios/meson-info/intro-buildoptions.json\u0000?? build-ios/meson-info/intro-buildsystem_files.json\u0000?? build-ios/meson-info/intro-compilers.json\u0000?? build-ios/meson-info/intro-dependencies.json\u0000?? build-ios/meson-info/intro-install_plan.json\u0000?? build-ios/meson-info/intro-installed.json\u0000?? build-ios/meson-info/intro-machines.json\u0000?? build-ios/meson-info/intro-projectinfo.json\u0000?? build-ios/meson-info/intro-targets.json\u0000?? build-ios/meson-info/intro-tests.json\u0000?? build-ios/meson-info/meson-info.json\u0000?? build-ios/meson-logs/meson-log.txt\u0000?? build-ios/meson-logs/meson-setup.txt\u0000?? build-ios/meson-private/build.dat\u0000?? build-ios/meson-private/cleantrees.dat\u0000?? build-ios/meson-private/cmd_line.txt\u0000?? build-ios/meson-private/coredata.dat\u0000?? build-ios/meson-private/install.dat\u0000?? build-ios/meson-private/meson.lock\u0000?? build-ios/meson-private/meson_benchmark_setup.dat\u0000?? build-ios/meson-private/meson_test_setup.dat\u0000?? build-ios/meson-private/sanity_check_for_c.c\u0000?? build-ios/meson-private/sanity_check_for_c.exe\u0000?? build-ios/meson-private/sanity_check_for_c_cross.exe\u0000?? build-ios/vdso/arm64/libvdso.so.elf\u0000",
+        "worktree": "de124dd66124a15239cea1465164f74980ada245"
+      },
+      "deps/proot": {
+        "index_commit": "8cf13e997cdc9472997aae19df8050c073c9a86c",
+        "worktree": "uninitialized"
+      }
+    },
+    "exclusions": [
+      ".agents",
+      ".github",
+      ".gitmodules",
+      "AGENTS.md",
+      "CONTRIBUTING.md",
+      "LICENSE",
+      "README.md",
+      "THIRD_PARTY_LICENSES.md",
+      "assets",
+      "deps/ISH_INTEGRATION.md",
+      "deps/build_proot.sh",
+      "deps/ffmpeg-patch",
+      "deps/ish",
+      "deps/lame-3.100",
+      "deps/proot",
+      "deps/talloc",
+      "docs/harness",
+      "docs/specs",
+      "docs/tasks/active/26-09-11 实现 OpenMinis 开发 Harness",
+      "docs/tasks/active/26-09-11 核查 iOS 定时任务能力",
+      "docs/tasks/active/26-09-15 完成 iOS 首次构建",
+      "docs/tasks/active/26-09-15 适配 iOS 27 模拟器构建/evidence",
+      "docs/tasks/active/26-09-15 适配 iOS 27 模拟器构建/task.checkpoint.json",
+      "notes",
+      "scripts/gen_debug_skill.sh",
+      "scripts/gen_debug_skill_android.sh",
+      "scripts/harness",
+      "scripts/install_alpine.sh",
+      "scripts/optimize_rootfs.sh",
+      "scripts/prepare_android_sandbox.sh",
+      "scripts/prepare_rootfs.sh",
+      "scripts/symbolicate_hang.py",
+      "scripts/update_models_dev.sh",
+      "src/android",
+      "src/ios/Agent",
+      "src/ios/AgentWidget",
+      "src/ios/AppDelegate.swift",
+      "src/ios/Assets.xcassets",
+      "src/ios/Configs",
+      "src/ios/Debug",
+      "src/ios/Diagnostics",
+      "src/ios/FileProvider",
+      "src/ios/ISHCommandExecutionExample.swift",
+      "src/ios/Info.plist",
+      "src/ios/Launch Screen.storyboard",
+      "src/ios/Localizable.xcstrings",
+      "src/ios/Minis.entitlements",
+      "src/ios/Minis.xcodeproj/project.xcworkspace",
+      "src/ios/Minis.xcodeproj/xcshareddata",
+      "src/ios/MinisApp-Bridging-Header.h",
+      "src/ios/MinisApp.swift",
+      "src/ios/MinisTests",
+      "src/ios/MinisUITests",
+      "src/ios/NativeOffloads",
+      "src/ios/Preview Content",
+      "src/ios/PrivacyInfo.xcprivacy",
+      "src/ios/Providers",
+      "src/ios/Resources",
+      "src/ios/ShareExtension",
+      "src/ios/Shared",
+      "src/ios/Vendor",
+      "src/ios/Views/Alarms",
+      "src/ios/Views/Backup",
+      "src/ios/Views/Chat",
+      "src/ios/Views/MCP",
+      "src/ios/Views/Providers",
+      "src/ios/Views/Rootfs",
+      "src/ios/Views/Settings",
+      "src/ios/Views/Skills",
+      "src/ios/Views/Sync",
+      "src/ios/WebApp",
+      "src/ios/de.lproj",
+      "src/ios/default_mount",
+      "src/ios/en.lproj",
+      "src/ios/fr.lproj",
+      "src/ios/iSH",
+      "src/ios/ja.lproj",
+      "src/ios/ko.lproj",
+      "src/ios/zh-Hans.lproj",
+      "src/ios/zh-Hant.lproj",
+      "src/shared"
+    ],
+    "files": {
+      ".gitignore": {
+        "executable": false,
+        "sha256": "3613407b2e42848e36214d01945df5973ed73b0865f06af48e81eeaa50a61b9c"
+      },
+      "BUILDING.md": {
+        "executable": false,
+        "sha256": "5a71485ac565e92cc2d76b57783c6e3be4da0b882926522218079ecef4097233"
+      },
+      "deps/build_ffmpeg.sh": {
+        "executable": true,
+        "sha256": "198fba2d5628b0b85aa0d4d80191dde8d591f134595bb7c746a2350aa5dbdef5"
+      },
+      "deps/build_ish.sh": {
+        "executable": true,
+        "sha256": "adccc018da892111a30b431bb5473cd936505d53dd8f49f3b2c6d84088aa8f94"
+      },
+      "deps/build_lame.sh": {
+        "executable": true,
+        "sha256": "9aece03487bc6f8fac34ccff12f848fc0e2b0bd736afef07bb6ca8ca2eb1d40f"
+      },
+      "deps/ios_build_target.sh": {
+        "executable": false,
+        "sha256": "fd884b94db832a322a84c1c97a5b6fceecbe5993200c757f8b4bc2cdde3edbd6"
+      },
+      "deps/prepare_alpine_rootfs.sh": {
+        "executable": true,
+        "sha256": "692a89345b28aca4c953573ba40e09d78bb91aec13e762abb8dac31bf639db1b"
+      },
+      "docs/tasks/active/26-09-15 适配 iOS 27 模拟器构建/task.md": {
+        "executable": false,
+        "sha256": "699b6810c72c0898d35f30932a00efb579d87f49140d1a49a6446ffd5a6b69c6"
+      },
+      "docs/tasks/active/26-09-15 适配 iOS 27 模拟器构建/verification.md": {
+        "executable": false,
+        "sha256": "66220e2ac82a1a8b89ffdcee5ea4ca33d399f510964b6a160767f78ddd2093be"
+      },
+      "scripts/build_ios_simulator.sh": {
+        "executable": false,
+        "sha256": "c83e168e8c6ca6b7db0e4a98ebfbf8262bd2827a47bb6745e16d9c1f5cfb34d6"
+      },
+      "src/ios/Minis.xcodeproj/project.pbxproj": {
+        "executable": false,
+        "sha256": "ca0eaf4bbe2abcaf3672477ba227df8eb4b1f125826c443bf924a1027aec11f1"
+      },
+      "src/ios/Views/ContentView.swift": {
+        "executable": false,
+        "sha256": "02aa1c8f42a0d3e6ffa8d1326271a8d3cd8c5208db85a9939a60e4fec03607fd"
+      }
+    },
+    "head": "141b9f212abc91250debc667bc6b0bf415dff890",
+    "index_sha256": "e65e7d94609d719779964127538f56b4702a4914a3e714ecd8f6da94507c5609",
+    "requirements": {
+      "docs/tasks/active/26-09-15 适配 iOS 27 模拟器构建/task.md": "699b6810c72c0898d35f30932a00efb579d87f49140d1a49a6446ffd5a6b69c6"
+    },
+    "status": " M .gitignore\u0000 M BUILDING.md\u0000 M deps/build_ffmpeg.sh\u0000 M deps/build_ish.sh\u0000 M deps/build_lame.sh\u0000 M deps/ish\u0000 M src/ios/Info.plist\u0000 M src/ios/Minis.xcodeproj/project.pbxproj\u0000 M src/ios/Views/ContentView.swift\u0000 M src/ios/Views/Settings/AboutView.swift\u0000 M src/ios/Views/Settings/MemoryManagementView.swift\u0000?? deps/ios_build_target.sh\u0000?? docs/tasks/active/26-09-15 完成 iOS 首次构建/evidence/OpenMinis-build-check.log.gz\u0000?? docs/tasks/active/26-09-15 完成 iOS 首次构建/evidence/OpenMinis-ffmpeg-build.log.gz\u0000?? docs/tasks/active/26-09-15 完成 iOS 首次构建/evidence/OpenMinis-harness-tests.log.gz\u0000?? docs/tasks/active/26-09-15 完成 iOS 首次构建/evidence/OpenMinis-ish-build.log.gz\u0000?? docs/tasks/active/26-09-15 完成 iOS 首次构建/evidence/OpenMinis-lame-build.log.gz\u0000?? docs/tasks/active/26-09-15 完成 iOS 首次构建/evidence/OpenMinis-rootfs-build.log.gz\u0000?? docs/tasks/active/26-09-15 完成 iOS 首次构建/evidence/review-input-002.tar.gz\u0000?? docs/tasks/active/26-09-15 完成 iOS 首次构建/reviews/003/built-bundle-identities.json\u0000?? docs/tasks/active/26-09-15 完成 iOS 首次构建/reviews/003/bundle-location.json\u0000?? docs/tasks/active/26-09-15 完成 iOS 首次构建/reviews/003/bundle.tar.gz\u0000?? docs/tasks/active/26-09-15 完成 iOS 首次构建/reviews/003/manifest.json\u0000?? docs/tasks/active/26-09-15 完成 iOS 首次构建/reviews/003/report.json\u0000?? docs/tasks/active/26-09-15 完成 iOS 首次构建/reviews/003/report.md\u0000?? docs/tasks/active/26-09-15 完成 iOS 首次构建/reviews/003/report.txt\u0000?? docs/tasks/active/26-09-15 完成 iOS 首次构建/reviews/003/request.md\u0000?? docs/tasks/active/26-09-15 完成 iOS 首次构建/reviews/003/resolution.md\u0000?? docs/tasks/active/26-09-15 完成 iOS 首次构建/reviews/003/status.json\u0000?? docs/tasks/active/26-09-15 完成 iOS 首次构建/task.checkpoint.json\u0000?? docs/tasks/active/26-09-15 完成 iOS 首次构建/task.md\u0000?? docs/tasks/active/26-09-15 完成 iOS 首次构建/verification.md\u0000?? docs/tasks/active/26-09-15 适配 iOS 27 模拟器构建/evidence/OpenMinis-device-regression.log.gz\u0000?? docs/tasks/active/26-09-15 适配 iOS 27 模拟器构建/evidence/OpenMinis-simulator-build.log.gz\u0000?? docs/tasks/active/26-09-15 适配 iOS 27 模拟器构建/evidence/OpenMinis-simulator-final-build.log.gz\u0000?? docs/tasks/active/26-09-15 适配 iOS 27 模拟器构建/evidence/OpenMinis-simulator-rebuild.log.gz\u0000?? docs/tasks/active/26-09-15 适配 iOS 27 模拟器构建/evidence/OpenMinis-simulator-rebuild2.log.gz\u0000?? docs/tasks/active/26-09-15 适配 iOS 27 模拟器构建/evidence/OpenMinis-simulator-runtime-final.log.gz\u0000?? docs/tasks/active/26-09-15 适配 iOS 27 模拟器构建/evidence/bundle-identities.json\u0000?? docs/tasks/active/26-09-15 适配 iOS 27 模拟器构建/evidence/device-dependencies.json\u0000?? docs/tasks/active/26-09-15 适配 iOS 27 模拟器构建/evidence/simulator-launch.png\u0000?? docs/tasks/active/26-09-15 适配 iOS 27 模拟器构建/task.checkpoint.json\u0000?? docs/tasks/active/26-09-15 适配 iOS 27 模拟器构建/task.md\u0000?? docs/tasks/active/26-09-15 适配 iOS 27 模拟器构建/verification.md\u0000?? scripts/build_ios_simulator.sh\u0000?? scripts/harness/__pycache__/review.cpython-314.pyc\u0000?? scripts/harness/__pycache__/spec_context.cpython-314.pyc\u0000?? src/ios/Configs/ProviderCustomization.xcconfig\u0000"
+  },
+  "task": "docs/tasks/active/26-09-15 适配 iOS 27 模拟器构建/task.md"
+}

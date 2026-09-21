@@ -1,0 +1,19 @@
+# Independent review
+
+Snapshot: 16cd6d9672657764a1c798f5918d611db592f5d3ddd7ac395dbb4f7a9178fb7c
+Conclusion: blocking
+
+## Coverage
+Reviewed requirements/task.md, snapshot/task.md, snapshot/classify.py, and patches/base-to-worktree.patch, patches/staged.patch, and patches/unstaged.patch. Static inspection of the worktree classify.py implementation against the stated intent.
+
+## Limitations
+No tests were executed because the snapshot contains no test files or runnable test suite; verification is by static inspection only. Runtime behavior of classify() was not exercised. Excluded paths and submodule Git state were out of scope. staged.patch was empty; base-to-worktree.patch and unstaged.patch both contained the same change.
+
+## R1
+- severity: blocking
+- requirement: Cancellation must return 'cancelled' only when cancel is true. Otherwise return 'done'.
+- location: snapshot/classify.py:2 (worktree classify.py)
+- trigger: Calling classify(True) returns 'done' instead of 'cancelled', and classify(False) returns 'cancelled' instead of 'done'.
+- evidence: snapshot/classify.py contains: def classify(cancel): return "done" if cancel else "cancelled". patches/base-to-worktree.patch shows the change from 'return "cancelled" if cancel else "done"' to 'return "done" if cancel else "cancelled"'.
+- verification: Static inspection confirms the ternary branches are inverted relative to the requirement: the 'done' and 'cancelled' return values are swapped for true and false inputs. The patch shows the previous version matched the requirement and the worktree version reverses it, confirming a regression.
+- certainty: high

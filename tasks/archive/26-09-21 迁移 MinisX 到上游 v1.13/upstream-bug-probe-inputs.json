@@ -1,0 +1,50 @@
+{
+  "upstream_base": "7414c0d6e8ec52e51d158f622e4379654872e7b5",
+  "new_source_sha256": {
+    "src/ios/Agent/Markdown/SwiftMathRenderer.swift": "dd695b943d61059eacab0761c3000a2fc0e67ec9efc70b8d9bdc481de4988de1",
+    "src/ios/Agent/Chat/AIChatViewModel.swift": "5023d0239e14a0fb3c99f1757b13402cc9c0cd65ffd4e86ac39f6f4a7b47d593"
+  },
+  "math_samples": [
+    [
+      "basic",
+      "x_i^2"
+    ],
+    [
+      "grouped",
+      "a_{ij}^{10}"
+    ],
+    [
+      "escaped",
+      "x\\_label \\^ caret"
+    ],
+    [
+      "text literal",
+      "\\text{snake_case a^b}"
+    ],
+    [
+      "whitespace",
+      "x^ 2+y_ 1"
+    ],
+    [
+      "command operand",
+      "x^\\text{hi}_{a\\_b\\{c\\}}"
+    ],
+    [
+      "fraction",
+      "\\frac{\\text{a}}{\\text{b}}"
+    ],
+    [
+      "sqrt",
+      "\\sqrt{\\text{a}+1}"
+    ],
+    [
+      "empty trailing",
+      "x^{}y_"
+    ],
+    [
+      "nested mixed",
+      "x^{a_b+c}"
+    ]
+  ],
+  "scope": "Pure source extraction probes with minimal model stubs, not full app runtime"
+}

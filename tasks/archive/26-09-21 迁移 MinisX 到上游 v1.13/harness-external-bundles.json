@@ -1,0 +1,123 @@
+[
+  {
+    "source": "tasks/active/26-09-21 Retry Thinking 与测试修复审核/reviews/001/bundle-location.json",
+    "locations": [
+      {
+        "field": "bundle",
+        "path": "/Users/huyuanzhao/.codex/.chatgpt-projects/g-p-6aa8f27e863c8191be6cf501db847b1a/review-bundles/openminis-retry-thinking-003",
+        "exists": true,
+        "has_manifest": true
+      }
+    ]
+  },
+  {
+    "source": "tasks/active/26-09-21 Retry Thinking 与测试修复审核/reviews/002/bundle-location.json",
+    "locations": [
+      {
+        "field": "bundle",
+        "path": "/Users/huyuanzhao/.codex/.chatgpt-projects/g-p-6aa8f27e863c8191be6cf501db847b1a/review-bundles/openminis-retry-thinking-011",
+        "exists": true,
+        "has_manifest": true
+      }
+    ]
+  },
+  {
+    "source": "tasks/archive/26-09-20 独立任务目录与按需归档/reviews/001/bundle-location.json",
+    "locations": [
+      {
+        "field": "bundle",
+        "path": "/Users/huyuanzhao/Documents/Codex/2026-09-20/github-plugin-github-openai-curated-remote/work/harness-task-layout/review-001",
+        "exists": true,
+        "has_manifest": true
+      }
+    ]
+  },
+  {
+    "source": "tasks/archive/26-09-15 完成 iOS 首次构建/reviews/003/bundle-location.json",
+    "locations": [
+      {
+        "field": "bundle",
+        "path": "/private/tmp/OpenMinis-build-review-003",
+        "exists": true,
+        "has_manifest": false
+      }
+    ]
+  },
+  {
+    "source": "tasks/archive/26-09-21 数学公式上下标 fallback 修复/reviews/004/bundle-location.json",
+    "locations": [
+      {
+        "field": "bundle",
+        "path": "/Users/huyuanzhao/.codex/.chatgpt-projects/g-p-6aa8f27e863c8191be6cf501db847b1a/review-bundles/openminis-math-script-fallback-004",
+        "exists": true,
+        "has_manifest": true
+      }
+    ]
+  },
+  {
+    "source": "tasks/archive/26-09-20 支持完整日历重复创建/reviews/001/bundle-location.json",
+    "locations": [
+      {
+        "field": "bundle",
+        "path": "/Users/huyuanzhao/Documents/Codex/2026-09-20/github-plugin-github-openai-curated-remote/work/review-001",
+        "exists": true,
+        "has_manifest": true
+      }
+    ]
+  },
+  {
+    "source": "tasks/archive/26-09-20 支持完整日历重复创建/reviews/006/bundle-location.json",
+    "locations": [
+      {
+        "field": "bundle",
+        "path": "/Users/huyuanzhao/Documents/Codex/2026-09-20/github-plugin-github-openai-curated-remote/work/review-006",
+        "exists": true,
+        "has_manifest": true
+      }
+    ]
+  },
+  {
+    "source": "tasks/archive/26-09-20 支持完整日历重复创建/reviews/004/bundle-location.json",
+    "locations": [
+      {
+        "field": "bundle",
+        "path": "/Users/huyuanzhao/Documents/Codex/2026-09-20/github-plugin-github-openai-curated-remote/work/review-004",
+        "exists": true,
+        "has_manifest": true
+      }
+    ]
+  },
+  {
+    "source": "tasks/archive/26-09-20 支持完整日历重复创建/reviews/005/bundle-location.json",
+    "locations": [
+      {
+        "field": "bundle",
+        "path": "/Users/huyuanzhao/Documents/Codex/2026-09-20/github-plugin-github-openai-curated-remote/work/review-005",
+        "exists": true,
+        "has_manifest": true
+      }
+    ]
+  },
+  {
+    "source": "tasks/archive/26-09-20 支持完整日历重复创建/reviews/002/bundle-location.json",
+    "locations": [
+      {
+        "field": "bundle",
+        "path": "/Users/huyuanzhao/Documents/Codex/2026-09-20/github-plugin-github-openai-curated-remote/work/review-002",
+        "exists": true,
+        "has_manifest": true
+      }
+    ]
+  },
+  {
+    "source": "tasks/archive/26-09-18 审查任务规划技能/reviews/001/bundle-location.json",
+    "locations": [
+      {
+        "field": "bundle",
+        "path": "/Users/huyuanzhao/.codex/.chatgpt-projects/g-p-6aa8f27e863c8191be6cf501db847b1a/outputs/reviews/plan-task-2026-09-18/001",
+        "exists": true,
+        "has_manifest": true
+      }
+    ]
+  }
+]

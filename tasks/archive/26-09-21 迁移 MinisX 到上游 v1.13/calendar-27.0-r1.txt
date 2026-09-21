@@ -1,0 +1,369 @@
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -project src/ios/Minis.xcodeproj -scheme MinisCalendarTests -configuration Debug -destination "platform=iOS Simulator,id=FEB53464-BDF7-4193-893B-D06D0414DBBD,arch=arm64" -derivedDataPath build/ios-simulator -clonedSourcePackagesDirPath build/SourcePackages -disableAutomaticPackageResolution -parallel-testing-enabled NO -resultBundlePath ../../migration-evidence/calendar-27.0-r1.xcresult test-without-building
+
+Resolve Package Graph
+
+
+Resolved source packages:
+  swift-http-structured-headers: https://github.com/apple/swift-http-structured-headers.git @ 1.7.0
+  swift-service-lifecycle: https://github.com/swift-server/swift-service-lifecycle @ 2.12.0
+  swift-nio-http2: https://github.com/apple/swift-nio-http2.git @ 1.46.0
+  SwiftMath: https://github.com/mgriebling/SwiftMath @ 1.7.3
+  swift-collections: https://github.com/apple/swift-collections @ 1.6.0
+  swift-nio-ssl: https://github.com/apple/swift-nio-ssl.git @ 2.37.5
+  cmark-gfm: https://github.com/swiftlang/swift-cmark @ 0.9.0
+  swift-numerics: https://github.com/apple/swift-numerics.git @ 1.1.1
+  SwiftAnthropic: https://github.com/jamesrochabrun/SwiftAnthropic @ 2.2.0
+  swift-configuration: https://github.com/apple/swift-configuration.git @ 1.2.0
+  swift-async-algorithms: https://github.com/apple/swift-async-algorithms.git @ 1.1.5
+  swift-http-types: https://github.com/apple/swift-http-types.git @ 1.8.0
+  async-http-client: https://github.com/swift-server/async-http-client.git @ 1.36.1
+  swift-certificates: https://github.com/apple/swift-certificates.git @ 1.20.0
+  swift-nio: https://github.com/apple/swift-nio.git @ 2.103.0
+  swift-system: https://github.com/apple/swift-system @ 1.8.1
+  RealTimeCutVADLibrary: https://github.com/helloooideeeeea/RealTimeCutVADLibrary.git @ 1.0.14
+  swift-crypto: https://github.com/apple/swift-crypto.git @ 4.5.2
+  swift-algorithms: https://github.com/apple/swift-algorithms.git @ 1.2.1
+  swift-atomics: https://github.com/apple/swift-atomics.git @ 1.3.1
+  swift-nio-extras: https://github.com/apple/swift-nio-extras.git @ 1.35.1
+  swift-distributed-tracing: https://github.com/apple/swift-distributed-tracing.git @ 1.5.0
+  swift-nio-transport-services: https://github.com/apple/swift-nio-transport-services.git @ 1.28.0
+  swift-asn1: https://github.com/apple/swift-asn1.git @ 1.7.3
+  swift-log: https://github.com/apple/swift-log.git @ 1.15.1
+  swift-service-context: https://github.com/apple/swift-service-context.git @ 1.3.0
+
+Writing result bundle at path:
+	/Users/huyuanzhao/.codex/.chatgpt-projects/g-p-6aa8f27e863c8191be6cf501db847b1a/migration-evidence/calendar-27.0-r1.xcresult
+
+[DebugServer] Listening on http://0.0.0.0:8321
+2026-09-22 00:22:52.991347+0800 Minis[30768:6194106] [TextContainerGuard] [INFO] installed (threshold=2)
+2026-09-22 00:22:52.991683+0800 Minis[30768:6194106] [AttributeQueryRecorder] [INFO] installed concrete=0x1c04c5c08 mutable=0x1c04c31a0 base=0x10b6fa158 cap=10
+2026-09-22 00:22:53.142324+0800 Minis[30768:6194106] [LiveActivity] [INFO] [LiveActivity][cleanup src=MinisApp.init] enabled=true currentActivity.id=nil systemActivities.count=0 systemIds=[]
+2026-09-22 00:22:53.170516+0800 Minis[30768:6194106] [LiveActivity] [INFO] [LiveActivity][cleanup src=MinisApp.init] nothing to clean: systemActivities is empty
+2026-09-22 00:22:53.652299+0800 Minis[30768:6194106] [AppDelegate] [INFO] didFinishLaunching (scene-based; shortcut routing happens in SceneDelegate)
+2026-09-22 00:22:54.094683+0800 Minis[30768:6194106] [AppDelegate] [INFO] scene willConnectTo (no shortcut)
+2026-09-22 00:22:54.099233+0800 Minis[30768:6194106] [Lifecycle] [INFO] [Lifecycle] → Inactive (remaining: unlimited)
+2026-09-22 00:22:54.502268+0800 Minis[30768:6194657] [ProviderConfigDB] [INFO] [v3] schema up-to-date at version 2
+2026-09-22 00:22:54.502467+0800 Minis[30768:6194657] [ProviderConfigDB] [INFO] [v3] ProviderConfigDB opened at /Users/huyuanzhao/Library/Developer/CoreSimulator/Devices/FEB53464-BDF7-4193-893B-D06D0414DBBD/data/Containers/Data/Application/45C0E73D-4FEF-4635-B602-342692A82482/Library/MinisChat/provider-config.db
+2026-09-22 00:22:55.471367+0800 Minis[30768:6194106] [ProviderConfigStore] [INFO] [ModelList] refreshAllModelsIfNeeded: SKIP — no enabled instances
+2026-09-22 00:22:55.471622+0800 Minis[30768:6194106] [Share] [INFO] [Share] onAppear — checking for pending share
+2026-09-22 00:22:55.471696+0800 Minis[30768:6194106] [Share] [INFO] [Share] checkForPendingShare called
+2026-09-22 00:22:55.485495+0800 Minis[30768:6194106] [Share] [INFO] [Share] No pending share found
+2026-09-22 00:22:55.503080+0800 Minis[30768:6194106] [BackgroundKeepAlive] [INFO] [BackgroundKeepAlive] Setup: enabled=false, locationTracking=false
+2026-09-22 00:22:55.504030+0800 Minis[30768:6194106] [BackgroundKeepAlive] [INFO] [BKA] unconditional orphan-session retract on setup
+2026-09-22 00:22:55.504591+0800 Minis[30768:6194106] [BackgroundKeepAlive] [INFO] [BKA][LocationLA] retracted orphaned CLBackgroundActivitySession (caller=setup)
+2026-09-22 00:22:55.505519+0800 Minis[30768:6194106] [LiveActivity] [INFO] [LiveActivity][cleanup src=BKA.setup] enabled=true currentActivity.id=nil systemActivities.count=0 systemIds=[]
+2026-09-22 00:22:55.505620+0800 Minis[30768:6194106] [LiveActivity] [INFO] [LiveActivity][cleanup src=BKA.setup] nothing to clean: systemActivities is empty
+2026-09-22 00:22:55.524144+0800 Minis[30768:6194106] NetworkMonitor: start() called, isStarted=0
+2026-09-22 00:22:55.524360+0800 Minis[30768:6194106] [Network] [INFO] [Network] Monitor started — writing initial DNS config
+2026-09-22 00:22:55.524543+0800 Minis[30768:6194106] NetworkMonitor: about to refreshDns + dump proxy
+2026-09-22 00:22:55.533193+0800 Minis[30768:6194106] ISHKernel: [DNS] Cannot refresh DNS — dnsHostPath not set yet
+2026-09-22 00:22:55.544522+0800 Minis[30768:6194106] [Network] [INFO] [Proxy] dump (monitor-start) http=1:127.0.0.1:7890 https=1:127.0.0.1:7890 socks=1:127.0.0.1:7890 pac=0:- exceptions=["*jd.com,*zhihu.com,*zhimg.com,*360buyimg.com,localhost,*.local,127.*,10.*,172.16.*,172.17.*,172.18.*,172.19.*,172.2*,172.30.*,172.31.*,192.168.*"]
+2026-09-22 00:22:55.546824+0800 Minis[30768:6194106] [Network] [INFO] [Proxy] dump (monitor-start) extra keys: ["ProxyAutoDiscoveryEnable": 0, "__SCOPED__": {
+    en0 =     {
+        ExceptionsList =         (
+            "*jd.com,*zhihu.com,*zhimg.com,*360buyimg.com,localhost,*.local,127.*,10.*,172.16.*,172.17.*,172.18.*,172.19.*,172.2*,172.30.*,172.31.*,192.168.*"
+        );
+        HTTPEnable = 1;
+        HTTPPort = 7890;
+        HTTPProxy = "127.0.0.1";
+        HTTPSEnable = 1;
+        HTTPSPort = 7890;
+        HTTPSProxy = "127.0.0.1";
+        ProxyAutoConfigEnable = 0;
+        ProxyAutoDiscoveryEnable = 0;
+        SOCKSEnable = 1;
+        SOCKSPort = 7890;
+        SOCKSProxy = "127.0.0.1";
+    };
+}]
+2026-09-22 00:22:55.557837+0800 Minis[30768:6194106] [Network] [INFO] [Proxy] dump (monitor-start) CFNetworkCopyProxiesForURL(api.anthropic.com)=[["kCFProxyPortNumberKey": 7890, "kCFProxyHostNameKey": 127.0.0.1, "kCFProxyTypeKey": kCFProxyTypeHTTPS], ["kCFProxyHostNameKey": 127.0.0.1, "kCFProxyTypeKey": kCFProxyTypeSOCKS, "kCFProxyPortNumberKey": 7890]]
+2026-09-22 00:22:55.581916+0800 Minis[30768:6194106] [Lifecycle] [INFO] [FPSyncTrace] app-updated old=1.13(1) exec=2026-09-21T16:05:30Z new=1.13(1) exec=2026-09-21T16:22:00Z mac=false
+2026-09-22 00:22:55.598762+0800 Minis[30768:6194515] [Network] [INFO] [Network] Path update — status: satisfied, interfaces: ["wifi"]
+2026-09-22 00:22:55.599058+0800 Minis[30768:6194515] [Network] [INFO] [Network] Interface change detected — refreshing DNS
+2026-09-22 00:22:55.599934+0800 Minis[30768:6194515] ISHKernel: [DNS] Cannot refresh DNS — dnsHostPath not set yet
+2026-09-22 00:22:55.600228+0800 Minis[30768:6194515] [Network] [INFO] [Proxy] dump (interface-change) http=1:127.0.0.1:7890 https=1:127.0.0.1:7890 socks=1:127.0.0.1:7890 pac=0:- exceptions=["*jd.com,*zhihu.com,*zhimg.com,*360buyimg.com,localhost,*.local,127.*,10.*,172.16.*,172.17.*,172.18.*,172.19.*,172.2*,172.30.*,172.31.*,192.168.*"]
+2026-09-22 00:22:55.600413+0800 Minis[30768:6194515] [Network] [INFO] [Proxy] dump (interface-change) extra keys: ["ProxyAutoDiscoveryEnable": 0, "__SCOPED__": {
+    en0 =     {
+        ExceptionsList =         (
+            "*jd.com,*zhihu.com,*zhimg.com,*360buyimg.com,localhost,*.local,127.*,10.*,172.16.*,172.17.*,172.18.*,172.19.*,172.2*,172.30.*,172.31.*,192.168.*"
+        );
+        HTTPEnable = 1;
+        HTTPPort = 7890;
+        HTTPProxy = "127.0.0.1";
+        HTTPSEnable = 1;
+        HTTPSPort = 7890;
+        HTTPSProxy = "127.0.0.1";
+        ProxyAutoConfigEnable = 0;
+        ProxyAutoDiscoveryEnable = 0;
+        SOCKSEnable = 1;
+        SOCKSPort = 7890;
+        SOCKSProxy = "127.0.0.1";
+    };
+}]
+2026-09-22 00:22:55.601093+0800 Minis[30768:6194515] [Network] [INFO] [Proxy] dump (interface-change) CFNetworkCopyProxiesForURL(api.anthropic.com)=[["kCFProxyHostNameKey": 127.0.0.1, "kCFProxyTypeKey": kCFProxyTypeHTTPS, "kCFProxyPortNumberKey": 7890], ["kCFProxyPortNumberKey": 7890, "kCFProxyTypeKey": kCFProxyTypeSOCKS, "kCFProxyHostNameKey": 127.0.0.1]]
+2026-09-22 00:22:55.632370+0800 Minis[30768:6194106] [Lifecycle] [INFO] [FPSyncTrace] appGroup=group.com.openminis.app container=/Users/huyuanzhao/Library/Developer/CoreSimulator/Devices/FEB53464-BDF7-4193-893B-D06D0414DBBD/data/Containers/Shared/AppGroup/04121016-BD5B-4120-8599-C51AF231311B resolved=/Users/huyuanzhao/Library/Developer/CoreSimulator/Devices/FEB53464-BDF7-4193-893B-D06D0414DBBD/data/Containers/Shared/AppGroup/04121016-BD5B-4120-8599-C51AF231311B
+2026-09-22 00:22:55.632756+0800 Minis[30768:6194106] [Lifecycle] [INFO] [FPSyncTrace] providerRoot=/Users/huyuanzhao/Library/Developer/CoreSimulator/Devices/FEB53464-BDF7-4193-893B-D06D0414DBBD/data/Containers/Shared/AppGroup/04121016-BD5B-4120-8599-C51AF231311B/MinisFileProvider resolved=/Users/huyuanzhao/Library/Developer/CoreSimulator/Devices/FEB53464-BDF7-4193-893B-D06D0414DBBD/data/Containers/Shared/AppGroup/04121016-BD5B-4120-8599-C51AF231311B/MinisFileProvider
+2026-09-22 00:22:55.633122+0800 Minis[30768:6194106] [Lifecycle] [INFO] [FPSyncTrace] root=shared path=/Users/huyuanzhao/Library/Developer/CoreSimulator/Devices/FEB53464-BDF7-4193-893B-D06D0414DBBD/data/Containers/Shared/AppGroup/04121016-BD5B-4120-8599-C51AF231311B/MinisFileProvider/shared exists=true childCount=0
+2026-09-22 00:22:55.633975+0800 Minis[30768:6194106] [Lifecycle] [INFO] [FPSyncTrace] root=skills path=/Users/huyuanzhao/Library/Developer/CoreSimulator/Devices/FEB53464-BDF7-4193-893B-D06D0414DBBD/data/Containers/Shared/AppGroup/04121016-BD5B-4120-8599-C51AF231311B/MinisFileProvider/skills exists=true childCount=0
+2026-09-22 00:22:55.634150+0800 Minis[30768:6194106] [Lifecycle] [INFO] [FPSyncTrace] root=memory path=/Users/huyuanzhao/Library/Developer/CoreSimulator/Devices/FEB53464-BDF7-4193-893B-D06D0414DBBD/data/Containers/Shared/AppGroup/04121016-BD5B-4120-8599-C51AF231311B/MinisFileProvider/memory exists=true childCount=1
+2026-09-22 00:22:55.635026+0800 Minis[30768:6194106] [FPWatcher] [INFO] [FPSyncTrace] root=shared path=/Users/huyuanzhao/Library/Developer/CoreSimulator/Devices/FEB53464-BDF7-4193-893B-D06D0414DBBD/data/Containers/Shared/AppGroup/04121016-BD5B-4120-8599-C51AF231311B/MinisFileProvider/shared watchesAttached=1 topLevelChildren=0
+2026-09-22 00:22:55.635322+0800 Minis[30768:6194106] [FPWatcher] [INFO] [FPSyncTrace] root=skills path=/Users/huyuanzhao/Library/Developer/CoreSimulator/Devices/FEB53464-BDF7-4193-893B-D06D0414DBBD/data/Containers/Shared/AppGroup/04121016-BD5B-4120-8599-C51AF231311B/MinisFileProvider/skills watchesAttached=1 topLevelChildren=0
+2026-09-22 00:22:55.635714+0800 Minis[30768:6194106] [FPWatcher] [INFO] [FPSyncTrace] root=memory path=/Users/huyuanzhao/Library/Developer/CoreSimulator/Devices/FEB53464-BDF7-4193-893B-D06D0414DBBD/data/Containers/Shared/AppGroup/04121016-BD5B-4120-8599-C51AF231311B/MinisFileProvider/memory watchesAttached=1 topLevelChildren=1
+2026-09-22 00:22:55.635823+0800 Minis[30768:6194106] [FPWatcher] [INFO] started — watching 3 directories
+2026-09-22 00:22:55.636228+0800 Minis[30768:6194515] [Lifecycle] [INFO] [FileProvider] domain already registered, signaling refresh
+2026-09-22 00:22:55.644977+0800 Minis[30768:6194106] [MountedFolders] [INFO] activateAll: 0 entries to resolve
+2026-09-22 00:22:55.645185+0800 Minis[30768:6194106] [MountedFolders] [INFO] pushExternalMountSnapshot: 0 active / 0 total
+2026-09-22 00:22:55.653831+0800 Minis[30768:6194106] [RowHeight] [INFO] [SCROLL] idle -> idle
+2026-09-22 00:22:55.666628+0800 Minis[30768:6194655] [iCloud] [INFO] [ChatStore.listSessions] ENTER queue='com.apple.root.user-initiated-qos.cooperative' isMain=false thread=<NSThread: 0x10794d000>{number = 3, name = (null)}
+2026-09-22 00:22:55.667223+0800 Minis[30768:6194655] [iCloud] [INFO] [ChatStore.listSessions] EXIT queue='com.apple.root.user-initiated-qos.cooperative'
+2026-09-22 00:22:56.321050+0800 Minis[30768:6194106] [API] cannot add handler to 0 from 0 - dropping
+2026-09-22 00:22:57.710254+0800 Minis[30768:6194106] [KaTeXRenderer] [INFO] WKWebView attached to window
+2026-09-22 00:22:57.724870+0800 Minis[30768:6194106] [AIChatVM] [DEBUG] [KeepScreen] noop reason=start sessions=0 enabled=false bg=false held=false
+2026-09-22 00:22:57.737820+0800 Minis[30768:6194106] [QuickAction] [INFO] registerShortcutItems installed=3
+2026-09-22 00:22:57.750285+0800 Minis[30768:6194106] [ProviderConfigStore] [INFO] [ThinkingRules] cache primed: 0 instance(s) with custom rules
+2026-09-22 00:22:57.751564+0800 Minis[30768:6194106] [XPCErrors] non-launching port is incompatible with service identifier "com.apple.PointerUI.pointeruid.default-service"
+2026-09-22 00:22:57.753763+0800 Minis[30768:6194657] [HangDetector] started thresholdMs=2000
+2026-09-22 00:22:57.755967+0800 Minis[30768:6194106] [BackgroundKeepAlive] [DEBUG] [BackgroundKeepAlive] Reevaluate: sessions=0 enabled=false isActive=false shouldBeActive=false ids=[]
+2026-09-22 00:22:57.770741+0800 Minis[30768:6194106] [BackgroundKeepAlive] [INFO] [BKA][Evaluate] caller=bgSpeakToggle isActive=false bgSpeak=false bg=false sessions=0 suspended=0 playing=false stopDebounce=nil → decision=NOOP(already stopped) reason=isActive=false
+2026-09-22 00:22:57.771007+0800 Minis[30768:6194106] [SyncCore] [DEBUG] [SyncCore] v2 disabled (flag off) — staying on v1
+2026-09-22 00:22:57.771001+0800 Minis[30768:6194788] [ISHCoordinator] [INFO] MOUNT-DIAG apply-entry snapshotCount=0 booted=false staticInit=0 currentLinuxPaths=[]
+2026-09-22 00:22:57.771294+0800 Minis[30768:6194788] [ISHCoordinator] [INFO] MOUNT external: kernel not booted, will apply snapshot on next performMount
+2026-09-22 00:22:57.885520+0800 Minis[30768:6194106] [API] cannot add handler to 0 from 0 - dropping
+2026-09-22 00:22:57.889699+0800 Minis[30768:6194106] [AIChatVM] [DEBUG] [KeepScreen] noop reason=defaults sessions=0 enabled=false bg=false held=false
+2026-09-22 00:22:57.916787+0800 Minis[30768:6194106] [AIChatVM] [DEBUG] [KeepScreen] noop reason=defaults sessions=0 enabled=false bg=false held=false
+2026-09-22 00:22:57.971518+0800 Minis[30768:6194106] [AIChatVM] [DEBUG] [KeepScreen] noop reason=tracker sessions=0 enabled=false bg=false held=false
+2026-09-22 00:22:57.973095+0800 Minis[30768:6194106] [Share] [INFO] [Share] .task: hasPendingShare=false launchScreen=0 sessions=0 bufferVersion=0 shareAlreadyHandled=false quickActionPending=false workflowActive=false
+2026-09-22 00:22:57.973794+0800 Minis[30768:6194106] [BackgroundKeepAlive] [INFO] [BackgroundKeepAlive] Authorization changed: 0
+2026-09-22 00:22:57.974128+0800 Minis[30768:6194756] [iCloud] [INFO] [iCloud] listSyncDevices: returning 0 devices
+2026-09-22 00:22:57.975494+0800 Minis[30768:6194756] [iCloud] [INFO] [iCloud] listSyncDevices=0 diag: zone=EMPTY(syncNotInitialized) uploadPolicy=[chatSessions=true sessionFiles=true skills=true providers=true envVars=true memory=true] dirtyQueue=0{empty}
+2026-09-22 00:22:58.081825+0800 Minis[30768:6194106] [SwiftUI] Publishing changes from within view updates is not allowed, this will cause undefined behavior.
+2026-09-22 00:22:58.082104+0800 Minis[30768:6194106] [SwiftUI] Publishing changes from within view updates is not allowed, this will cause undefined behavior.
+2026-09-22 00:22:58.082349+0800 Minis[30768:6194106] [AIChatVM] [DEBUG] [KeepScreen] noop reason=defaults sessions=0 enabled=false bg=false held=false
+2026-09-22 00:22:58.403147+0800 Minis[30768:6194106] [AIChatVM] [DEBUG] [KeepScreen] noop reason=defaults sessions=0 enabled=false bg=false held=false
+2026-09-22 00:22:58.403713+0800 Minis[30768:6194106] [AIChatVM] [DEBUG] [KeepScreen] noop reason=defaults sessions=0 enabled=false bg=false held=false
+2026-09-22 00:22:58.784597+0800 Minis[30768:6194837] [MemMonitor] 📈 footprint=57.0MB (Δ+0.0MB) | sys free=2480/16384MB (15%) | pressure=normal
+2026-09-22 00:22:59.814449+0800 Minis[30768:6194837] [MemMonitor] 📈 footprint=69.6MB (Δ+12.6MB) | sys free=2525/16384MB (15%) | pressure=normal
+2026-09-22 00:23:00.505756+0800 Minis[30768:6194837] [HangDetector] ⚠️ MAIN HANG 2026ms (activity=0x80) buffered=1
+  #0 SwiftUI + 0x970824 $s7SwiftUI20ContainerCoordinator33_DB4085A53F7E00BD5F11F3B74D2A8BAELLCMU
+  #1 libobjc.A.dylib + 0x198bc _ZL33realizeClassMaybeSwiftMaybeRelockP10objc_classR12locker_mixinIN9lockdebug10lock_mixinI16objc_lock_base_tEEEb
+  #2 libobjc.A.dylib + 0xa038 _ZL17realizeAllClassesv
+  #3 libobjc.A.dylib + 0xd090 objc_copyClassList
+  #4 XCTestCore + 0x19f40 +[XCTestCase(RuntimeUtilities) _allSubclasses]
+  #5 XCTestCore + 0x1a054 +[XCTestCase(RuntimeUtilities) allSubclasses]
+  #6 XCTestCore + 0x37238 +[XCTestSuite suitesForBundlesIncludingEmptySuites:]
+  #7 XCTestCore + 0x3a44c -[XCTestSuite _initWithTestConfiguration:]
+2026-09-22 00:23:00.511044+0800 Minis[30768:6194837] [HangDetector] runloop activity trail (newest→oldest, mach_continuous_time deltas): Exit(-2111ms) BeforeSources(-2364ms) BeforeTimers(-2364ms) Entry(-2364ms) Exit(-2364ms) BeforeSources(-2587ms) BeforeTimers(-2587ms) Entry(-2587ms) BeforeSources(-2715ms) BeforeTimers(-2715ms)
+2026-09-22 00:23:00.688861+0800 Minis[30768:6194106] [RemoteSync] [INFO] [RemoteSync] refreshRemoteDeviceSessions: 0 total devices, 0 remote (self=D5E805EF-AA83-4ED8-AB95-6AF6F606438B)
+2026-09-22 00:23:00.689066+0800 Minis[30768:6194106] [RemoteSync] [INFO] [RemoteSync] Final result: 0 devices with sessions
+2026-09-22 00:23:00.697136+0800 Minis[30768:6194106] [Voice] [INFO] [Voice] [capsule-calc] capsule[y784…828 x342…386] rects=0 passes=1 → lift=0 by=none
+    (no protected rects)
+2026-09-22 00:23:00.697608+0800 Minis[30768:6194106] [Process] WebContent process (0x12d0e40c0) took 3.386586 seconds to launch
+2026-09-22 00:23:00.744092+0800 Minis[30768:6194106] [Process] GPU process (0x12d154200) took 3.172915 seconds to launch
+Test Suite 'All tests' started at 2026-09-22 00:23:00.765.
+Test Suite 'MinisCalendarTests.xctest' started at 2026-09-22 00:23:00.770.
+Test Suite 'CalendarRecurrenceTests' started at 2026-09-22 00:23:00.770.
+Test Case '-[CalendarRecurrenceTests testBiweeklyMultipleWeekdays]' started.
+2026-09-22 00:23:00.931273+0800 Minis[30768:6194837] [MemMonitor] 📈 footprint=79.8MB (Δ+10.2MB) | sys free=2325/16384MB (14%) | pressure=normal
+2026-09-22 00:23:01.291165+0800 Minis[30768:6194106] [ProviderConfigStore] [INFO] [CompositeKeyMigrate] init: entries=0 localUuid→ckPairs=0 danglingGroupRefs(before)=0 lmapSize(persisted)=0
+2026-09-22 00:23:01.293012+0800 Minis[30768:6194106] [ProviderConfigStore] [INFO] [CompositeKeyMigrate] init: normalizeReferences no-op (no uuid refs matched lmap; 0 dangling refs need a cloud entry record to normalize)
+2026-09-22 00:23:01.293281+0800 Minis[30768:6194106] [ProviderConfigStore] [INFO] [GroupLoad] init: loaded authoritative config from V3 DB — groups=0 entries=0 groupMembers(json=0→db=0) prunedDuplicates=0
+2026-09-22 00:23:01.499469+0800 Minis[30768:6194106] [Lifecycle] [INFO] [Lifecycle] → Active (remaining: unlimited)
+2026-09-22 00:23:01.515986+0800 Minis[30768:6194106] [BrowserResourceMonitor] [INFO] [BrowserToolDiag] lifecycle=didBecomeActive inflight_browser_actions=0 app_state=active app_mem=80MB app_avail_mem=0MB app_cpu=32.5% thermal=nominal low_power=false
+Test Case '-[CalendarRecurrenceTests testBiweeklyMultipleWeekdays]' passed (0.764 seconds).
+Test Case '-[CalendarRecurrenceTests testCombinedFilters]' started.
+2026-09-22 00:23:01.562102+0800 Minis[30768:6194106] [BackgroundKeepAlive] [INFO] [BKA][Lifecycle] → Active | isActive=false bg=false sessions=0 shellRunning=false bgTask=false bgTaskRemaining=unlimited silentAudioPlaying=false suspendCount=0 bgSpeak=false stopDebounceTimer=nil
+2026-09-22 00:23:01.563602+0800 Minis[30768:6194106] [BackgroundKeepAlive] [INFO] [BKA][LocationLA] retracted orphaned CLBackgroundActivitySession (caller=didBecomeActive)
+2026-09-22 00:23:01.681297+0800 Minis[30768:6194106] [CrashReporter] [INFO] CrashReporter initialized, signal handlers + MetricKit subscriber registered
+2026-09-22 00:23:01.684193+0800 Minis[30768:6194672] [ChatStore] [INFO] [ChatStore.interruptedSessionIds] scanned 0 sessions → 0 interrupted
+2026-09-22 00:23:01.687490+0800 Minis[30768:6194106] [cfprefsd] WebContent[0] Couldn't open /var/run/com.apple.security.cryptexd/mnt/com.apple.iPhoneOS.SimulatorRuntime-v24.1.434.0.3IRr0j/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 27.0.simruntime/Contents/Resources/RuntimeRoot/System/Library/ExtensionKit/Extensions/WebContentExtension.appex/Library/Managed Preferences/mobile/com.apple.Accessibility.plist due to No such file or directory
+2026-09-22 00:23:01.687585+0800 Minis[30768:6194106] [cfprefsd] WebContent[0] Couldn't open /var/run/com.apple.security.cryptexd/mnt/com.apple.iPhoneOS.SimulatorRuntime-v24.1.434.0.3IRr0j/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 27.0.simruntime/Contents/Resources/RuntimeRoot/System/Library/ExtensionKit/Extensions/WebContentExtension.appex/Library/Managed Preferences/com.apple.Accessibility.plist due to No such file or directory
+2026-09-22 00:23:01.687642+0800 Minis[30768:6194106] [cfprefsd] WebContent[0] Couldn't open /var/run/com.apple.security.cryptexd/mnt/com.apple.iPhoneOS.SimulatorRuntime-v24.1.434.0.3IRr0j/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 27.0.simruntime/Contents/Resources/RuntimeRoot/System/Library/ExtensionKit/Extensions/WebContentExtension.appex/Library/Managed Preferences/mobile/.GlobalPreferences.plist due to No such file or directory
+2026-09-22 00:23:01.688203+0800 Minis[30768:6194106] [cfprefsd] WebContent[0] Couldn't open /Users/huyuanzhao/Library/Developer/CoreSimulator/Devices/FEB53464-BDF7-4193-893B-D06D0414DBBD/data/Library/Preferences/ByHost/com.apple.Accessibility..plist due to No such file or directory
+2026-09-22 00:23:01.688287+0800 Minis[30768:6194106] [cfprefsd] WebContent[0] Couldn't open /Users/huyuanzhao/Library/Developer/CoreSimulator/Devices/FEB53464-BDF7-4193-893B-D06D0414DBBD/data/Library/Preferences/ByHost/.GlobalPreferences..plist due to No such file or directory
+2026-09-22 00:23:01.688326+0800 Minis[30768:6194106] [cfprefsd] WebContent[0] Couldn't open /var/run/com.apple.security.cryptexd/mnt/com.apple.iPhoneOS.SimulatorRuntime-v24.1.434.0.3IRr0j/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 27.0.simruntime/Contents/Resources/RuntimeRoot/System/Library/ExtensionKit/Extensions/WebContentExtension.appex/Library/Managed Preferences/mobile/com.apple.WebKit.WebContent.plist due to No such file or directory
+2026-09-22 00:23:01.689892+0800 Minis[30768:6194106] [cfprefsd] WebContent[0] Couldn't open /var/run/com.apple.security.cryptexd/mnt/com.apple.iPhoneOS.SimulatorRuntime-v24.1.434.0.3IRr0j/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 27.0.simruntime/Contents/Resources/RuntimeRoot/System/Library/ExtensionKit/Extensions/WebContentExtension.appex/Library/Managed Preferences/com.apple.WebKit.WebContent.plist due to No such file or directory
+2026-09-22 00:23:01.689970+0800 Minis[30768:6194106] [cfprefsd] WebContent[0] Couldn't open /Users/huyuanzhao/Library/Developer/CoreSimulator/Devices/FEB53464-BDF7-4193-893B-D06D0414DBBD/data/Library/Preferences/com.apple.WebKit.WebContent.plist due to No such file or directory
+2026-09-22 00:23:01.690111+0800 Minis[30768:6194106] [cfprefsd] WebContent[0] Couldn't open /Users/huyuanzhao/Library/Developer/CoreSimulator/Devices/FEB53464-BDF7-4193-893B-D06D0414DBBD/data/Library/Preferences/com.apple.WebKit.WebContent.plist due to No such file or directory
+2026-09-22 00:23:01.690203+0800 Minis[30768:6194106] [cfprefsd] WebContent[0] Couldn't open /Users/huyuanzhao/Library/Developer/CoreSimulator/Devices/FEB53464-BDF7-4193-893B-D06D0414DBBD/data/Library/Preferences/ByHost/com.apple.WebKit.WebContent..plist due to No such file or directory
+2026-09-22 00:23:01.691292+0800 Minis[30768:6194106] [SessionBadgeStore] [INFO] [BadgeRepair] summary examined=0 repaired=0 maxShift=0.0h tailDatesAvailable=0
+2026-09-22 00:23:01.691470+0800 Minis[30768:6194106] [SessionBadgeStore] [INFO] [BadgeReconcile] trigger=launch-or-foreground interrupted=0 tailDatesAvailable=0 firstStamp=0 keptStamp=0 fromTailDate=0 fallbackNow=0 clearedNoLongerInterrupted=0 changed=false
+2026-09-22 00:23:01.691549+0800 Minis[30768:6194106] ISHKernel: [DNS] Cannot refresh DNS — dnsHostPath not set yet
+[DebugServer] foreground transition — rebuilding listener on :8321
+[DebugServer] Listening on http://0.0.0.0:8321
+2026-09-22 00:23:01.717194+0800 Minis[30768:6194106] [LiveActivity] [INFO] [LiveActivity][cleanup src=scenePhase.active] enabled=true currentActivity.id=nil systemActivities.count=0 systemIds=[]
+2026-09-22 00:23:01.717393+0800 Minis[30768:6194106] [LiveActivity] [INFO] [LiveActivity][cleanup src=scenePhase.active] nothing to clean: systemActivities is empty
+2026-09-22 00:23:01.728488+0800 Minis[30768:6194106] [logging-persist] cannot open file at line 53009 of [8fa8248e30]
+2026-09-22 00:23:01.728624+0800 Minis[30768:6194106] [logging-persist] os_unix.c:53009: (2) open(/Users/huyuanzhao/Library/Developer/CoreSimulator/Devices/FEB53464-BDF7-4193-893B-D06D0414DBBD/data/Containers/Data/Application/45C0E73D-4FEF-4635-B602-342692A82482/Documents/alpine-rootfs/meta.db) - No such file or directory
+2026-09-22 00:23:01.728987+0800 Minis[30768:6194106] [logging-persist] cannot open file at line 53009 of [8fa8248e30]
+2026-09-22 00:23:01.729041+0800 Minis[30768:6194106] [logging-persist] os_unix.c:53009: (2) open(/Users/huyuanzhao/Library/Developer/CoreSimulator/Devices/FEB53464-BDF7-4193-893B-D06D0414DBBD/data/Containers/Data/Application/45C0E73D-4FEF-4635-B602-342692A82482/Documents/alpine-rootfs/meta.db) - No such file or directory
+2026-09-22 00:23:01.729376+0800 Minis[30768:6194106] [logging-persist] cannot open file at line 53009 of [8fa8248e30]
+2026-09-22 00:23:01.729433+0800 Minis[30768:6194106] [logging-persist] os_unix.c:53009: (2) open(/Users/huyuanzhao/Library/Developer/CoreSimulator/Devices/FEB53464-BDF7-4193-893B-D06D0414DBBD/data/Containers/Data/Application/45C0E73D-4FEF-4635-B602-342692A82482/Documents/alpine-rootfs/meta.db) - No such file or directory
+2026-09-22 00:23:01.729753+0800 Minis[30768:6194106] [logging-persist] cannot open file at line 53009 of [8fa8248e30]
+2026-09-22 00:23:01.729830+0800 Minis[30768:6194106] [logging-persist] os_unix.c:53009: (2) open(/Users/huyuanzhao/Library/Developer/CoreSimulator/Devices/FEB53464-BDF7-4193-893B-D06D0414DBBD/data/Containers/Data/Application/45C0E73D-4FEF-4635-B602-342692A82482/Documents/alpine-rootfs/meta.db) - No such file or directory
+2026-09-22 00:23:01.730302+0800 Minis[30768:6194106] [logging-persist] cannot open file at line 53009 of [8fa8248e30]
+2026-09-22 00:23:01.730365+0800 Minis[30768:6194106] [logging-persist] os_unix.c:53009: (2) open(/Users/huyuanzhao/Library/Developer/CoreSimulator/Devices/FEB53464-BDF7-4193-893B-D06D0414DBBD/data/Containers/Data/Application/45C0E73D-4FEF-4635-B602-342692A82482/Documents/alpine-rootfs/meta.db) - No such file or directory
+2026-09-22 00:23:01.730690+0800 Minis[30768:6194106] [logging-persist] cannot open file at line 53009 of [8fa8248e30]
+2026-09-22 00:23:01.730769+0800 Minis[30768:6194106] [logging-persist] os_unix.c:53009: (2) open(/Users/huyuanzhao/Library/Developer/CoreSimulator/Devices/FEB53464-BDF7-4193-893B-D06D0414DBBD/data/Containers/Data/Application/45C0E73D-4FEF-4635-B602-342692A82482/Documents/alpine-rootfs/meta.db) - No such file or directory
+2026-09-22 00:23:01.732731+0800 Minis[30768:6194106] [AIChatVM] [DEBUG] [KeepScreen] noop reason=defaults sessions=0 enabled=false bg=false held=false
+2026-09-22 00:23:01.751152+0800 Minis[30768:6194788] [iCloud] [INFO] [iCloudTrace] markDirty SKIP type=Skill id=skill-creator op=upsert reason=zoneEmpty(syncNotInitialized)
+2026-09-22 00:23:01.754588+0800 Minis[30768:6194106] [Lifecycle] [INFO] [Lifecycle] → Inactive (remaining: unlimited)
+2026-09-22 00:23:01.760769+0800 Minis[30768:6194106] [BrowserResourceMonitor] [INFO] [BrowserToolDiag] lifecycle=willResignActive inflight_browser_actions=0 app_state=active app_mem=80MB app_avail_mem=0MB app_cpu=64.6% thermal=nominal low_power=false
+2026-09-22 00:23:01.765807+0800 Minis[30768:6194106] [BackgroundKeepAlive] [INFO] [BKA][Lifecycle] → Inactive | isActive=false bg=false sessions=0 shellRunning=false bgTask=false bgTaskRemaining=unlimited silentAudioPlaying=false suspendCount=0 bgSpeak=false stopDebounceTimer=nil
+2026-09-22 00:23:01.744847+0800 Minis[30768:6194655] [FPWatcher] [INFO] [FPSyncTrace] reconcile rootKey=skills depth=0 added=1 removed=0
+Test Case '-[CalendarRecurrenceTests testCombinedFilters]' passed (0.282 seconds).
+Test Case '-[CalendarRecurrenceTests testDaysOfYearAndLeapYear]' started.
+Test Case '-[CalendarRecurrenceTests testDaysOfYearAndLeapYear]' passed (0.092 seconds).
+Test Case '-[CalendarRecurrenceTests testDefaultTimeZoneCompatibility]' started.
+Test Case '-[CalendarRecurrenceTests testDefaultTimeZoneCompatibility]' passed (0.073 seconds).
+Test Case '-[CalendarRecurrenceTests testEndConditionsAndExactBoundary]' started.
+2026-09-22 00:23:02.041257+0800 Minis[30768:6194921] [FPWatcher] [DEBUG] [FPSyncTrace] signalled id=skills
+2026-09-22 00:23:02.046766+0800 Minis[30768:6194921] [FPWatcher] [DEBUG] [FPSyncTrace] signalled id=NSFileProviderWorkingSetContainerItemIdentifier
+Test Case '-[CalendarRecurrenceTests testEndConditionsAndExactBoundary]' passed (0.232 seconds).
+Test Case '-[CalendarRecurrenceTests testEndConditionsForEveryFrequency]' started.
+2026-09-22 00:23:02.459650+0800 Minis[30768:6194657] [User Defaults] Could not resolve UID for user "mobile".
+Test Case '-[CalendarRecurrenceTests testEndConditionsForEveryFrequency]' passed (0.541 seconds).
+Test Case '-[CalendarRecurrenceTests testEveryWeekdayAndMultipleWeekdays]' started.
+2026-09-22 00:23:02.785988+0800 Minis[30768:6194954] [ResourceLoadStatistics] WebContent[30791] Unable to hide query parameters from script (missing data)
+Test Case '-[CalendarRecurrenceTests testEveryWeekdayAndMultipleWeekdays]' passed (0.224 seconds).
+Test Case '-[CalendarRecurrenceTests testInvalidDatesAndTimeZonesDoNotSave]' started.
+Test Case '-[CalendarRecurrenceTests testInvalidDatesAndTimeZonesDoNotSave]' passed (0.044 seconds).
+Test Case '-[CalendarRecurrenceTests testInvalidRulesDoNotSave]' started.
+Test Case '-[CalendarRecurrenceTests testInvalidRulesDoNotSave]' passed (0.132 seconds).
+Test Case '-[CalendarRecurrenceTests testMixedAndMalformedUpstreamOptionsDoNotSave]' started.
+Test Case '-[CalendarRecurrenceTests testMixedAndMalformedUpstreamOptionsDoNotSave]' passed (0.058 seconds).
+Test Case '-[CalendarRecurrenceTests testMonthDaysAndMissing31st]' started.
+Test Case '-[CalendarRecurrenceTests testMonthDaysAndMissing31st]' passed (0.076 seconds).
+Test Case '-[CalendarRecurrenceTests testMonthlyOrdinalWeekdays]' started.
+Test Case '-[CalendarRecurrenceTests testMonthlyOrdinalWeekdays]' passed (0.073 seconds).
+Test Case '-[CalendarRecurrenceTests testMonthsOfYear]' started.
+Test Case '-[CalendarRecurrenceTests testMonthsOfYear]' passed (0.047 seconds).
+Test Case '-[CalendarRecurrenceTests testNativeWeekNumberReference]' started.
+/Users/huyuanzhao/.codex/.chatgpt-projects/g-p-6aa8f27e863c8191be6cf501db847b1a/worktrees/OpenMinis-v1.13/src/ios/CalendarTests/CalendarRecurrenceTests.m:440: error: -[CalendarRecurrenceTests testNativeWeekNumberReference] : ((dates) equal to (expected)) failed: ("(
+    "2027-01-13 09:00:00 +0000"
+)") is not equal to ("(
+    "2027-01-13 09:00:00 +0000",
+    "2027-12-22 09:00:00 +0000",
+    "2028-01-12 09:00:00 +0000",
+    "2028-12-20 09:00:00 +0000"
+)") - Direct EventKit control: the native week-number expansion must work before accepting full recurrence support.
+Test Case '-[CalendarRecurrenceTests testNativeWeekNumberReference]' failed (0.110 seconds).
+Test Case '-[CalendarRecurrenceTests testNonCreateRejectsRecurrenceOptions]' started.
+Test Case '-[CalendarRecurrenceTests testNonCreateRejectsRecurrenceOptions]' passed (0.036 seconds).
+Test Case '-[CalendarRecurrenceTests testOtherOptionLikeTextValuesAreLiteral]' started.
+Test Case '-[CalendarRecurrenceTests testOtherOptionLikeTextValuesAreLiteral]' passed (1.858 seconds).
+Test Case '-[CalendarRecurrenceTests testPositiveWeeksOfYear]' started.
+/Users/huyuanzhao/.codex/.chatgpt-projects/g-p-6aa8f27e863c8191be6cf501db847b1a/worktrees/OpenMinis-v1.13/src/ios/CalendarTests/CalendarRecurrenceTests.m:176: error: -[CalendarRecurrenceTests testPositiveWeeksOfYear] : ((dates) equal to (expected)) failed: ("(
+    "2027-01-13"
+)") is not equal to ("(
+    "2027-01-13",
+    "2028-01-12",
+    "2029-01-10"
+)") - Rule (
+    "--recurrence",
+    yearly,
+    "--recurrence-weeks-of-year",
+    2,
+    "--recurrence-days-of-week",
+    WE,
+    "--recurrence-count",
+    3
+)
+Test Case '-[CalendarRecurrenceTests testPositiveWeeksOfYear]' failed (0.052 seconds).
+Test Case '-[CalendarRecurrenceTests testReminderEntrypointsRejectCalendarRecurrenceWithoutMutation]' started.
+2026-09-22 00:23:06.442793+0800 Minis[30768:6194106] [read] REMListsDataView: Requested to fetch non-existent list {objectID: 🍙~<x-apple-reminderkit://REMCDList/688695CA-C623-4DDE-838C-0E09586E0156>}
+Test Case '-[CalendarRecurrenceTests testReminderEntrypointsRejectCalendarRecurrenceWithoutMutation]' passed (0.953 seconds).
+Test Case '-[CalendarRecurrenceTests testReminderRecurrenceOptionLikeTextRemainsLiteral]' started.
+2026-09-22 00:23:07.020221+0800 Minis[30768:6194106] [read] REMListsDataView: Requested to fetch non-existent list {objectID: 🏙~<x-apple-reminderkit://REMCDList/B5AE7303-520E-48C8-8F17-FAF89BCAD208>}
+Test Case '-[CalendarRecurrenceTests testReminderRecurrenceOptionLikeTextRemainsLiteral]' passed (0.577 seconds).
+Test Case '-[CalendarRecurrenceTests testSelectorLikeNotesAreLiteral]' started.
+Test Case '-[CalendarRecurrenceTests testSelectorLikeNotesAreLiteral]' passed (0.052 seconds).
+Test Case '-[CalendarRecurrenceTests testSetPositionsAcrossSelectors]' started.
+/Users/huyuanzhao/.codex/.chatgpt-projects/g-p-6aa8f27e863c8191be6cf501db847b1a/worktrees/OpenMinis-v1.13/src/ios/CalendarTests/CalendarRecurrenceTests.m:176: error: -[CalendarRecurrenceTests testSetPositionsAcrossSelectors] : ((dates) equal to (expected)) failed: ("(
+    "2027-12-22"
+)") is not equal to ("(
+    "2027-12-22",
+    "2028-12-20"
+)") - Rule (
+    "--recurrence",
+    yearly,
+    "--recurrence-weeks-of-year",
+    "2,-2",
+    "--recurrence-days-of-week",
+    WE,
+    "--recurrence-set-positions",
+    "-1",
+    "--recurrence-count",
+    2
+)
+Test Case '-[CalendarRecurrenceTests testSetPositionsAcrossSelectors]' failed (0.168 seconds).
+Test Case '-[CalendarRecurrenceTests testSimpleFrequenciesAndIntervals]' started.
+Test Case '-[CalendarRecurrenceTests testSimpleFrequenciesAndIntervals]' passed (0.124 seconds).
+Test Case '-[CalendarRecurrenceTests testSingleEventRegression]' started.
+Test Case '-[CalendarRecurrenceTests testSingleEventRegression]' passed (0.061 seconds).
+Test Case '-[CalendarRecurrenceTests testTimeZoneAndDaylightSaving]' started.
+Test Case '-[CalendarRecurrenceTests testTimeZoneAndDaylightSaving]' passed (0.057 seconds).
+Test Case '-[CalendarRecurrenceTests testTimeZoneOptionLikeValuesAreLiteral]' started.
+Test Case '-[CalendarRecurrenceTests testTimeZoneOptionLikeValuesAreLiteral]' passed (0.159 seconds).
+Test Case '-[CalendarRecurrenceTests testUnknownCalendarDoesNotFallBack]' started.
+Test Case '-[CalendarRecurrenceTests testUnknownCalendarDoesNotFallBack]' passed (0.032 seconds).
+Test Case '-[CalendarRecurrenceTests testUntilFamiliesKeepTheirBoundarySemantics]' started.
+Test Case '-[CalendarRecurrenceTests testUntilFamiliesKeepTheirBoundarySemantics]' passed (0.098 seconds).
+Test Case '-[CalendarRecurrenceTests testUpstreamFrequencyAliases]' started.
+Test Case '-[CalendarRecurrenceTests testUpstreamFrequencyAliases]' passed (0.140 seconds).
+Test Case '-[CalendarRecurrenceTests testUpstreamReminderRecurrenceCreateUpdateAndClear]' started.
+2026-09-22 00:23:08.386460+0800 Minis[30768:6194106] [read] REMListsDataView: Requested to fetch non-existent list {objectID: 🌊~<x-apple-reminderkit://REMCDList/B48518B9-7768-4A16-B037-3260B3F6F6B1>}
+Test Case '-[CalendarRecurrenceTests testUpstreamReminderRecurrenceCreateUpdateAndClear]' passed (0.472 seconds).
+Test Case '-[CalendarRecurrenceTests testUpstreamWeekdayAliasesAndListReadback]' started.
+Test Case '-[CalendarRecurrenceTests testUpstreamWeekdayAliasesAndListReadback]' passed (0.071 seconds).
+Test Case '-[CalendarRecurrenceTests testWeeksOfYear]' started.
+/Users/huyuanzhao/.codex/.chatgpt-projects/g-p-6aa8f27e863c8191be6cf501db847b1a/worktrees/OpenMinis-v1.13/src/ios/CalendarTests/CalendarRecurrenceTests.m:176: error: -[CalendarRecurrenceTests testWeeksOfYear] : ((dates) equal to (expected)) failed: ("(
+    "2027-01-13"
+)") is not equal to ("(
+    "2027-01-13",
+    "2027-12-22",
+    "2028-01-12",
+    "2028-12-20"
+)") - Rule (
+    "--recurrence",
+    yearly,
+    "--recurrence-weeks-of-year",
+    "2,-2",
+    "--recurrence-days-of-week",
+    WE,
+    "--recurrence-count",
+    4
+)
+Test Case '-[CalendarRecurrenceTests testWeeksOfYear]' failed (0.054 seconds).
+Test Case '-[CalendarRecurrenceTests testYearlyBoundarySelectors]' started.
+Test Case '-[CalendarRecurrenceTests testYearlyBoundarySelectors]' passed (0.095 seconds).
+Test Case '-[CalendarRecurrenceTests testYearlyOrdinalWeekdays]' started.
+Test Case '-[CalendarRecurrenceTests testYearlyOrdinalWeekdays]' passed (0.070 seconds).
+Test Case '-[CalendarRecurrenceTests testYearWeekWarningSurvivesCreateAndList]' started.
+Test Case '-[CalendarRecurrenceTests testYearWeekWarningSurvivesCreateAndList]' passed (0.050 seconds).
+Test Suite 'CalendarRecurrenceTests' failed at 2026-09-22 00:23:08.728.
+	 Executed 34 tests, with 4 failures (0 unexpected) in 7.926 (7.958) seconds
+Test Suite 'MinisCalendarTests.xctest' failed at 2026-09-22 00:23:08.731.
+	 Executed 34 tests, with 4 failures (0 unexpected) in 7.926 (7.961) seconds
+Test Suite 'All tests' failed at 2026-09-22 00:23:08.731.
+	 Executed 34 tests, with 4 failures (0 unexpected) in 7.926 (7.966) seconds
+2026-09-22 00:23:08.751774+0800 Minis[30768:6194106] [AIChatVM] [DEBUG] [KeepScreen] noop reason=defaults sessions=0 enabled=false bg=false held=false
+2026-09-22 00:23:09.082 xcodebuild[30743:6193350]  IDETestOperationsObserverDebug: Failure collecting diagnostics from simulator: Process exited with error 72:
+ xcrun: error: unable to find utility "simctl", not a developer tool or in PATH
+
+2026-09-22 00:23:09.092 xcodebuild[30743:6193336] [MT] IDETestOperationsObserverDebug: 31.846 elapsed -- Testing started completed.
+2026-09-22 00:23:09.092 xcodebuild[30743:6193336] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-09-22 00:23:09.092 xcodebuild[30743:6193336] [MT] IDETestOperationsObserverDebug: 31.846 sec, +31.846 sec -- end
+
+Test session results, code coverage, and logs:
+	/Users/huyuanzhao/.codex/.chatgpt-projects/g-p-6aa8f27e863c8191be6cf501db847b1a/migration-evidence/calendar-27.0-r1.xcresult
+
+Failing tests:
+	-[CalendarRecurrenceTests testNativeWeekNumberReference]
+	-[CalendarRecurrenceTests testPositiveWeeksOfYear]
+	-[CalendarRecurrenceTests testSetPositionsAcrossSelectors]
+	-[CalendarRecurrenceTests testWeeksOfYear]
+
+** TEST EXECUTE FAILED **
+
+Testing started

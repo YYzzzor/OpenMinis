@@ -1,0 +1,3 @@
+# Archived task records remain versioned; omit them from default ripgrep discovery.
+/tasks/archive/
+/docs/tasks/archive/
