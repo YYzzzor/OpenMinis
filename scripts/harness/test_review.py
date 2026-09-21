@@ -6,6 +6,7 @@ from pathlib import Path
 import subprocess
 import tempfile
 import unittest
+from unittest.mock import patch
 
 import review
 
@@ -35,6 +36,114 @@ class ReviewTests(unittest.TestCase):
 
     def prepare(self):
         return review.prepare(self.repo, 'HEAD', 'task.md', self.bundle)
+
+
+    def task_file(self, name, content):
+        path = self.repo / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(content)
+        return path
+
+    def test_default_does_not_read_or_export_unselected_task_records(self):
+        names = ['tasks/archive/old/task.md', 'tasks/active/other/task.md',
+                 'docs/tasks/active/legacy/task.md']
+        for name in names:
+            self.task_file(name, 'PRIVATE TASK BASE\n')
+        self.git('add', '.')
+        self.git('commit', '-qm', 'task records')
+        for name in names:
+            self.task_file(name, 'PRIVATE TASK STAGED\n')
+        self.git('add', '.')
+        for name in names:
+            self.task_file(name, 'PRIVATE TASK UNSTAGED\n')
+        original = Path.read_bytes
+
+        def guarded(path):
+            if path.is_relative_to(self.repo.resolve()) and review.task_record(path.relative_to(self.repo.resolve()).as_posix()):
+                self.fail('Unselected task content was read: ' + str(path))
+            return original(path)
+
+        with patch.object(Path, 'read_bytes', guarded):
+            self.prepare()
+            manifest = review.verify(self.bundle, self.repo)
+        self.assertEqual(manifest['state']['task_record_policy'], 'selected-only')
+        for name in names:
+            self.assertNotIn(name, manifest['state']['files'])
+            self.assertFalse((self.bundle / 'snapshot' / name).exists())
+        for path in (self.bundle / 'patches').iterdir():
+            self.assertNotIn('PRIVATE TASK', path.read_text())
+        self.task_file(names[0], 'different archive content')
+        self.git('add', names[0])
+        review.verify(self.bundle, self.repo)
+
+    def test_archiving_does_not_leak_deleted_task_bodies_into_patches(self):
+        old = self.task_file('docs/tasks/active/old/task.md', 'PRIVATE LEGACY BODY\n')
+        active = self.task_file('tasks/active/done/task.md', 'PRIVATE ACTIVE BODY\n')
+        self.git('add', '.')
+        self.git('commit', '-qm', 'before archive')
+        old.unlink()
+        active.unlink()
+        self.task_file('tasks/archive/done/task.md', 'PRIVATE ACTIVE BODY\n')
+        self.git('add', '.')
+        self.prepare()
+        for path in (self.bundle / 'patches').iterdir():
+            self.assertNotIn('PRIVATE', path.read_text())
+
+    def test_selected_active_task_only_includes_explicit_requirements(self):
+        task = 'tasks/active/current/task.md'
+        self.task_file(task, 'Read sibling evidence.md only if requested.')
+        self.task_file('tasks/active/current/evidence.md', 'Do not auto-load.')
+        review.prepare(self.repo, 'HEAD', task, self.bundle)
+        self.assertTrue((self.bundle / 'requirements' / task).exists())
+        self.assertTrue((self.bundle / 'snapshot' / task).exists())
+        self.assertFalse((self.bundle / 'snapshot/tasks/active/current/evidence.md').exists())
+        self.git('add', task)
+        with self.assertRaisesRegex(review.ReviewError, 'stale'):
+            review.verify(self.bundle, self.repo)
+
+    def test_archived_requirement_requires_opt_in_and_only_selected_file_is_read(self):
+        archived = 'tasks/archive/old/task.md'
+        self.task_file(archived, '# Archived\n## Scope\nKnown history.\n')
+        self.task_file('tasks/archive/old/evidence.md', 'Unselected evidence.')
+        for kwargs in ({'task': archived}, {'task': 'task.md', 'specs': [archived]},
+                       {'task': 'task.md', 'spec_sections': [archived + '::Archived > Scope']},
+                       {'task': 'task.md', 'spec_references': [archived + '::Archived > Scope']}):
+            with self.subTest(kwargs=kwargs):
+                with self.assertRaisesRegex(review.ReviewError, '--include-archive'):
+                    review.prepare(self.repo, 'HEAD', output=self.bundle, **kwargs)
+                self.assertFalse(self.bundle.exists())
+        review.prepare(self.repo, 'HEAD', archived, self.bundle, include_archive=True)
+        review.verify(self.bundle, self.repo)
+        self.assertTrue((self.bundle / 'requirements' / archived).exists())
+        self.assertFalse((self.bundle / 'snapshot/tasks/archive/old/evidence.md').exists())
+        self.task_file(archived, 'Changed selected archive requirement.')
+        with self.assertRaisesRegex(review.ReviewError, 'stale'):
+            review.verify(self.bundle, self.repo)
+        with self.assertRaisesRegex(review.ReviewError, 'nonignored'):
+            review.prepare(self.repo, 'HEAD', archived, self.root / 'excluded',
+                           exclusions=['tasks/archive'], include_archive=True)
+
+    def test_legacy_bundle_without_policy_keeps_original_archive_binding(self):
+        archived = 'tasks/archive/old/task.md'
+        self.task_file(archived, 'Legacy archive content.')
+        self.git('add', '.')
+        self.git('commit', '-qm', 'legacy records')
+        self.prepare()
+        # 构造旧 schema fixture：历史快照曾包含整个记录树，不重写其绑定策略。
+        manifest = json.loads((self.bundle / 'manifest.json').read_text())
+        manifest['state'] = review.state(self.repo.resolve(), 'HEAD', ['task.md'])
+        destination = self.bundle / 'snapshot' / archived
+        destination.parent.mkdir(parents=True)
+        destination.write_bytes((self.repo / archived).read_bytes())
+        manifest['artifacts'] = review.artifact_hashes(self.bundle)
+        manifest.pop('snapshot_id')
+        manifest['snapshot_id'] = review.digest(review.encoded(manifest))
+        review.atomic_json(self.bundle / 'manifest.json', manifest)
+        review.verify(self.bundle, self.repo)
+        self.task_file(archived, 'Legacy binding must still notice this change.')
+        with self.assertRaisesRegex(review.ReviewError, 'stale'):
+            review.verify(self.bundle, self.repo)
+        review.verify(self.bundle)
 
     def test_section_requirements_embed_only_required_context_and_bind_full_sources(self):
         self.write('spec.md', '# Spec\nGlobal condition.\n## A\nRequired behavior.\n## B\nOptional behavior.\n')
@@ -187,6 +296,17 @@ class ReviewTests(unittest.TestCase):
         self.prepare()
         self.assertFalse((self.bundle / 'snapshot/code.py').exists())
         self.assertIn('deleted file', (self.bundle / 'patches/base-to-worktree.patch').read_text())
+
+
+    def test_unselected_archive_index_conflict_still_blocks_review(self):
+        name = 'tasks/archive/conflict/task.md'
+        blob = self.git('hash-object', 'code.py')
+        entries = ''.join('100644 ' + blob + ' ' + str(stage) + '\t' + name + '\n' for stage in (1, 2, 3))
+        subprocess.run(['git', '-C', str(self.repo), 'update-index', '--index-info'],
+                       input=entries.encode(), check=True)
+        with self.assertRaisesRegex(review.ReviewError, 'Resolve index conflicts'):
+            self.prepare()
+        self.assertFalse(self.bundle.exists())
 
     def test_reject_symlink_and_unfinished_operation(self):
         (self.repo / 'link').symlink_to('code.py')

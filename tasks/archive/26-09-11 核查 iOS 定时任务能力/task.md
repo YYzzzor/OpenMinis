@@ -61,7 +61,7 @@
 
 ## Harness 试用关联
 
-父任务：[实现 OpenMinis 开发 Harness](<../26-09-11 实现 OpenMinis 开发 Harness/task.md>)。
+父任务：[实现 OpenMinis 开发 Harness](<../../active/26-09-11 实现 OpenMinis 开发 Harness/task.md>)。
 此前双方正常恢复和隔离案例已初步通过；本次用真实代码分析观察是否能正确续接、控制范围并给出可核实结果，不因本次分析没有代码开发就声称真实开发验收全部完成。
 
 ### 本次调查进展

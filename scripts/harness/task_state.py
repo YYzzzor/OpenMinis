@@ -27,7 +27,20 @@ def atomic_json(path, value):
             os.unlink(name)
 
 
-def state(root, excluded):
+ARCHIVE_ROOTS = ('tasks/archive', 'docs/tasks/archive')
+
+
+def within(name, scopes):
+    return any(name == scope or name.startswith(scope + '/') for scope in scopes)
+
+
+def state(root, excluded, archive_scope=()):
+    archive_scope = tuple(archive_scope)
+    if any(Path(name).is_absolute() or '..' in Path(name).parts or
+           name in ARCHIVE_ROOTS or not within(name, ARCHIVE_ROOTS) for name in archive_scope):
+        raise ValueError('Archive scope must name a specific archived task, not the archive root')
+    scope = ['--', '.', *[':(literal,exclude)' + name for name in (excluded, *ARCHIVE_ROOTS)]]
+    selected_scope = ['--', *[':(literal)' + name for name in archive_scope], ':(literal,exclude)' + excluded]
     paths = git(root, 'ls-files', '-z', '--cached', '--others', '--exclude-standard').split(b'\0')
     hashes = {}
     for raw in sorted(set(paths)):
@@ -35,7 +48,7 @@ def state(root, excluded):
             continue
         name = os.fsdecode(raw)
         p = root / name
-        if name == excluded:
+        if name == excluded or (within(name, ARCHIVE_ROOTS) and not within(name, archive_scope)):
             continue
         if p.is_symlink():
             data, kind = os.fsencode(os.readlink(p)), 'symlink'
@@ -51,13 +64,21 @@ def state(root, excluded):
             p = root / p
         if p.exists():
             operations.append(name)
-    status = git(root, 'status', '--porcelain=v1', '-z', '--untracked-files=all', '--', '.', ':(exclude)' + excluded).decode('utf-8', 'surrogateescape')
+    status_args = ('status', '--porcelain=v1', '-z', '--untracked-files=all')
+    # 暂存区只需绑定 blob 标识与模式；禁用重命名检测，避免读取已归档的旧正文。
+    index_args = ('diff', '--cached', '--raw', '--no-abbrev', '--no-renames', '--no-ext-diff', '--no-textconv', '-z')
+    status = git(root, *status_args, *scope)
+    index = git(root, *index_args, *scope)
+    if archive_scope:
+        status += git(root, *status_args, *selected_scope)
+        index += git(root, *index_args, *selected_scope)
+    status = status.decode('utf-8', 'surrogateescape')
     return dict(head=git(root, 'rev-parse', 'HEAD').decode().strip(),
                 branch=git(root, 'rev-parse', '--abbrev-ref', 'HEAD').decode().strip(),
                 status=status, operations=operations,
                 files=hashlib.sha256(json.dumps(hashes, sort_keys=True, ensure_ascii=True).encode()).hexdigest(),
                 file_count=len(hashes),
-                index=hashlib.sha256(git(root, 'diff', '--cached', '--binary', '--', '.', ':(exclude)' + excluded)).hexdigest(),
+                index=hashlib.sha256(index).hexdigest(),
                 submodules=git(root, 'submodule', 'status', '--recursive').decode())
 
 
@@ -65,12 +86,18 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('action', choices=['inspect', 'checkpoint'])
     parser.add_argument('task', type=Path)
+    parser.add_argument('--include-archive', action='store_true', help='For an archived task, include only that task directory or single-file record')
     args = parser.parse_args()
     task = args.task.resolve(strict=True)
     root = Path(git(task.parent, 'rev-parse', '--show-toplevel').decode().strip())
     checkpoint = task.with_suffix('.checkpoint.json')
     excluded = checkpoint.relative_to(root).as_posix()
-    current = state(root, excluded)
+    task_name = task.relative_to(root).as_posix()
+    is_archived = within(task_name, ARCHIVE_ROOTS)
+    if not args.include_archive and is_archived:
+        parser.error('Archived tasks need explicit --include-archive; archive is not read by default')
+    archive_scope = [task.parent.relative_to(root).as_posix() if task.name == 'task.md' else task_name] if is_archived else []
+    current = state(root, excluded, archive_scope)
     if args.action == 'checkpoint':
         atomic_json(checkpoint, dict(task=task.relative_to(root).as_posix(), state=current))
         print('Checkpoint saved:', checkpoint)

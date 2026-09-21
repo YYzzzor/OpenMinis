@@ -1,6 +1,6 @@
 # 首个真实任务试用评估：iOS 定时任务能力调查
 
-日期：2026-09-11。交付：[findings.md](<../26-09-11 核查 iOS 定时任务能力/findings.md>)，文件 SHA256：`227c425d3ddefda32bc5123ae7e877e2b0c2c353746885a8b0b82a7e216cabda`。
+日期：2026-09-11。交付：[findings.md](<../../archive/26-09-11 核查 iOS 定时任务能力/findings.md>)，文件 SHA256：`227c425d3ddefda32bc5123ae7e877e2b0c2c353746885a8b0b82a7e216cabda`。
 
 ## 主 Agent 核查
 

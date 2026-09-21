@@ -9,7 +9,7 @@ description: 对照确认的任务意图审查固定版本代码，或准备和�
 
 ## 准备
 
-主 Agent 先检查改动和可用测试，记录未验证范围。使用项目 `scripts/harness/review.py --help` 与 docs/harness/operations.md 了解适配入口。固定代码、Git 状态、任务和相关规范；仅 HEAD 或分支名不足以代表 dirty 工作区。指定 provider/model。超时、失败或残缺报告保持未完成。
+主 Agent 先检查改动和可用测试，记录未验证范围。使用项目 `scripts/harness/review.py --help` 与 docs/harness/operations.md 了解适配入口。固定代码、Git 状态、任务和相关规范；仅 HEAD 或分支名不足以代表 dirty 工作区。任务记录默认只使用本轮明确指定的 --task/--spec/小节来源文件，不递归带入其它任务或附件；tasks/ 与兼容的旧 docs/tasks/ 不进入泛代码快照和补丁。归档记录只有明确需要时使用 --include-archive 配合具体文件选择，不能把整座归档库作为默认上下文。指定 provider/model。超时、失败或残缺报告保持未完成。
 
 ## 独立审查
 

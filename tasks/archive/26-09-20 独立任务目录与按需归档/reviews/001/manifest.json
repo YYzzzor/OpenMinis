@@ -1,0 +1,278 @@
+{
+  "artifacts": {
+    "patches/base-to-worktree.patch": {
+      "executable": false,
+      "sha256": "b4be5fe6192f21e41538f69c74c07933bf0814675daf41408ec3824ffcb81320"
+    },
+    "patches/staged.patch": {
+      "executable": false,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "patches/unstaged.patch": {
+      "executable": false,
+      "sha256": "b4be5fe6192f21e41538f69c74c07933bf0814675daf41408ec3824ffcb81320"
+    },
+    "request.md": "2921605a86c06c870317a8d9ca233a78ed8593e1c9968aff92fd62d208ded6d9",
+    "requirements/docs/harness/operations.md": {
+      "executable": false,
+      "sha256": "97c455b96a1665d8d21bfd2f7c0117e1b45cd2f0e56838d0c91a4b8751686ae6"
+    },
+    "requirements/docs/harness/proposals/006-task-layout-and-archive.md": {
+      "executable": false,
+      "sha256": "86407c80e4f266cc71dea16b032eab41e0e0ba86fdd2d877fca2bfe211b3a738"
+    },
+    "requirements/docs/harness/record-formats.md": {
+      "executable": false,
+      "sha256": "a11e296f5e11c34422ca712d6afc501982056f2e6619c90c30ebea06b126911e"
+    },
+    "requirements/tasks/README.md": {
+      "executable": false,
+      "sha256": "cbc4dcb6b3df313029d915238c4b1aed1ee0db962e7382201c232f53ac169c0d"
+    },
+    "requirements/tasks/active/26-09-20 独立任务目录与按需归档/task.md": {
+      "executable": false,
+      "sha256": "8b48c408e1009a6efff2c17a4f966ab257c5b2af2beff36ebec5aebe08c96970"
+    },
+    "requirements/tasks/active/26-09-20 独立任务目录与按需归档/verification.md": {
+      "executable": false,
+      "sha256": "2a4314c855831b59b531cf852709a4053af2275529e9cbe8931252a43f217b62"
+    },
+    "snapshot/.agents/skills/plan-task/SKILL.md": {
+      "executable": false,
+      "sha256": "d0d4a6ae7ac4d58241dc35e3b1cba49af691a1bad5f36e8a74a29b6f7f2c5480"
+    },
+    "snapshot/.agents/skills/resume-task/SKILL.md": {
+      "executable": false,
+      "sha256": "7d5fd0ff49ee8a8e3d67d28e627c6accfadea382c1c90744e4d0f6930de5da15"
+    },
+    "snapshot/.agents/skills/review-task/SKILL.md": {
+      "executable": false,
+      "sha256": "c8d53fe2c4a08e5c01922d5685ab1fd0816c953e3363b72bb66072fa143bc250"
+    },
+    "snapshot/.gitignore": {
+      "executable": false,
+      "sha256": "f6e838270210fdffdfb63e41917a6af2f89dfdfdabc50571d6de514b1eecc59b"
+    },
+    "snapshot/.ignore": {
+      "executable": false,
+      "sha256": "70026d9a65ce1392e97d634eb29a328888864432e9cf55cac742c3ec2a88b290"
+    },
+    "snapshot/AGENTS.md": {
+      "executable": false,
+      "sha256": "85eb8bd9b89835048b13326f549d9ff1662ea96a077eb79e9ef21e353df21c7c"
+    },
+    "snapshot/docs/harness/design.md": {
+      "executable": false,
+      "sha256": "c66b524dbf967baad5e6027283431d3940e9a34afc21db1ce957e8453ad070df"
+    },
+    "snapshot/docs/harness/operations.md": {
+      "executable": false,
+      "sha256": "97c455b96a1665d8d21bfd2f7c0117e1b45cd2f0e56838d0c91a4b8751686ae6"
+    },
+    "snapshot/docs/harness/proposals/006-task-layout-and-archive.md": {
+      "executable": false,
+      "sha256": "86407c80e4f266cc71dea16b032eab41e0e0ba86fdd2d877fca2bfe211b3a738"
+    },
+    "snapshot/docs/harness/record-formats.md": {
+      "executable": false,
+      "sha256": "a11e296f5e11c34422ca712d6afc501982056f2e6619c90c30ebea06b126911e"
+    },
+    "snapshot/docs/harness/skills-guide.md": {
+      "executable": false,
+      "sha256": "2c87ebe6023345460d0bb552882f93cf457d0e7a98001af228b536da5093d90c"
+    },
+    "snapshot/docs/harness/spec-context.md": {
+      "executable": false,
+      "sha256": "4e3102cfe1ebf99a54eeb78d32332cb53b387813542d3be59891ac7628f5574c"
+    },
+    "snapshot/scripts/harness/review.py": {
+      "executable": false,
+      "sha256": "9fbbcb92e5a47a1e8f8abf4252d61a6af77f373470f46d03d7c7d9393b293078"
+    },
+    "snapshot/scripts/harness/spec_context.py": {
+      "executable": false,
+      "sha256": "54bde54d0b183dc631f29691223f2df1da17257461dde33edef3089a539f49ba"
+    },
+    "snapshot/scripts/harness/task_state.py": {
+      "executable": false,
+      "sha256": "e6b27950311fcb119dc414fc5376b1ea6a6fa2c79dda6a4eb052a800abd79c48"
+    },
+    "snapshot/scripts/harness/test_review.py": {
+      "executable": false,
+      "sha256": "00a0b41ccc08cde8380092f63ed17419773caf84c999896774a17980d174bc96"
+    },
+    "snapshot/scripts/harness/test_spec_context.py": {
+      "executable": false,
+      "sha256": "a5297e2b30518168c3e1dcdd719c2c0d41a04ca9b000d3a42ee09ff9ef1a61e9"
+    },
+    "snapshot/scripts/harness/test_task_state.py": {
+      "executable": false,
+      "sha256": "2fc110d1bb44945b3e6acfbdad4cba72aa90a938af213b57f8edce93cc3a1f79"
+    },
+    "snapshot/tasks/README.md": {
+      "executable": false,
+      "sha256": "cbc4dcb6b3df313029d915238c4b1aed1ee0db962e7382201c232f53ac169c0d"
+    },
+    "snapshot/tasks/active/26-09-20 独立任务目录与按需归档/task.md": {
+      "executable": false,
+      "sha256": "8b48c408e1009a6efff2c17a4f966ab257c5b2af2beff36ebec5aebe08c96970"
+    },
+    "snapshot/tasks/active/26-09-20 独立任务目录与按需归档/verification.md": {
+      "executable": false,
+      "sha256": "2a4314c855831b59b531cf852709a4053af2275529e9cbe8931252a43f217b62"
+    }
+  },
+  "repo": "/Users/huyuanzhao/Coding/Projects/OpenMinis",
+  "schema": 1,
+  "snapshot_id": "2908c1d5012c7bb5ae14bbef4a0e4692dc37849567b4c706aec8f6f5a4d59e4d",
+  "spec_selections": [],
+  "state": {
+    "base": "0f1ba5fd31ab95e879013985c0fc2baeb6933c0a",
+    "branch": "feat/minisx-branding",
+    "excluded_gitlinks": {
+      "deps/ish": {
+        "index_commit": "de124dd66124a15239cea1465164f74980ada245",
+        "status": "",
+        "worktree": "de124dd66124a15239cea1465164f74980ada245"
+      },
+      "deps/proot": {
+        "index_commit": "8cf13e997cdc9472997aae19df8050c073c9a86c",
+        "worktree": "uninitialized"
+      }
+    },
+    "exclusions": [
+      ".DS_Store",
+      ".agents/skills/ios-ui-design",
+      ".github",
+      ".gitmodules",
+      "BUILDING.md",
+      "CONTRIBUTING.md",
+      "LICENSE",
+      "README.md",
+      "THIRD_PARTY_LICENSES.md",
+      "assets",
+      "build",
+      "deps",
+      "docs/.DS_Store",
+      "docs/architecture",
+      "docs/harness/evidence",
+      "docs/harness/proposals/001-bootstrap.md",
+      "docs/harness/proposals/002-instruction-scope.md",
+      "docs/harness/proposals/003-spec-context.md",
+      "docs/harness/proposals/004-review-judgment.md",
+      "docs/harness/proposals/005-task-naming.md",
+      "docs/harness/validation.md",
+      "docs/specs",
+      "notes",
+      "scripts/build_ios_simulator.sh",
+      "scripts/gen_debug_skill.sh",
+      "scripts/gen_debug_skill_android.sh",
+      "scripts/install_alpine.sh",
+      "scripts/optimize_rootfs.sh",
+      "scripts/prepare_android_sandbox.sh",
+      "scripts/prepare_rootfs.sh",
+      "scripts/symbolicate_hang.py",
+      "scripts/update_models_dev.sh",
+      "src"
+    ],
+    "files": {
+      ".agents/skills/plan-task/SKILL.md": {
+        "executable": false,
+        "sha256": "d0d4a6ae7ac4d58241dc35e3b1cba49af691a1bad5f36e8a74a29b6f7f2c5480"
+      },
+      ".agents/skills/resume-task/SKILL.md": {
+        "executable": false,
+        "sha256": "7d5fd0ff49ee8a8e3d67d28e627c6accfadea382c1c90744e4d0f6930de5da15"
+      },
+      ".agents/skills/review-task/SKILL.md": {
+        "executable": false,
+        "sha256": "c8d53fe2c4a08e5c01922d5685ab1fd0816c953e3363b72bb66072fa143bc250"
+      },
+      ".gitignore": {
+        "executable": false,
+        "sha256": "f6e838270210fdffdfb63e41917a6af2f89dfdfdabc50571d6de514b1eecc59b"
+      },
+      ".ignore": {
+        "executable": false,
+        "sha256": "70026d9a65ce1392e97d634eb29a328888864432e9cf55cac742c3ec2a88b290"
+      },
+      "AGENTS.md": {
+        "executable": false,
+        "sha256": "85eb8bd9b89835048b13326f549d9ff1662ea96a077eb79e9ef21e353df21c7c"
+      },
+      "docs/harness/design.md": {
+        "executable": false,
+        "sha256": "c66b524dbf967baad5e6027283431d3940e9a34afc21db1ce957e8453ad070df"
+      },
+      "docs/harness/operations.md": {
+        "executable": false,
+        "sha256": "97c455b96a1665d8d21bfd2f7c0117e1b45cd2f0e56838d0c91a4b8751686ae6"
+      },
+      "docs/harness/proposals/006-task-layout-and-archive.md": {
+        "executable": false,
+        "sha256": "86407c80e4f266cc71dea16b032eab41e0e0ba86fdd2d877fca2bfe211b3a738"
+      },
+      "docs/harness/record-formats.md": {
+        "executable": false,
+        "sha256": "a11e296f5e11c34422ca712d6afc501982056f2e6619c90c30ebea06b126911e"
+      },
+      "docs/harness/skills-guide.md": {
+        "executable": false,
+        "sha256": "2c87ebe6023345460d0bb552882f93cf457d0e7a98001af228b536da5093d90c"
+      },
+      "docs/harness/spec-context.md": {
+        "executable": false,
+        "sha256": "4e3102cfe1ebf99a54eeb78d32332cb53b387813542d3be59891ac7628f5574c"
+      },
+      "scripts/harness/review.py": {
+        "executable": false,
+        "sha256": "9fbbcb92e5a47a1e8f8abf4252d61a6af77f373470f46d03d7c7d9393b293078"
+      },
+      "scripts/harness/spec_context.py": {
+        "executable": false,
+        "sha256": "54bde54d0b183dc631f29691223f2df1da17257461dde33edef3089a539f49ba"
+      },
+      "scripts/harness/task_state.py": {
+        "executable": false,
+        "sha256": "e6b27950311fcb119dc414fc5376b1ea6a6fa2c79dda6a4eb052a800abd79c48"
+      },
+      "scripts/harness/test_review.py": {
+        "executable": false,
+        "sha256": "00a0b41ccc08cde8380092f63ed17419773caf84c999896774a17980d174bc96"
+      },
+      "scripts/harness/test_spec_context.py": {
+        "executable": false,
+        "sha256": "a5297e2b30518168c3e1dcdd719c2c0d41a04ca9b000d3a42ee09ff9ef1a61e9"
+      },
+      "scripts/harness/test_task_state.py": {
+        "executable": false,
+        "sha256": "2fc110d1bb44945b3e6acfbdad4cba72aa90a938af213b57f8edce93cc3a1f79"
+      },
+      "tasks/README.md": {
+        "executable": false,
+        "sha256": "cbc4dcb6b3df313029d915238c4b1aed1ee0db962e7382201c232f53ac169c0d"
+      },
+      "tasks/active/26-09-20 独立任务目录与按需归档/task.md": {
+        "executable": false,
+        "sha256": "8b48c408e1009a6efff2c17a4f966ab257c5b2af2beff36ebec5aebe08c96970"
+      },
+      "tasks/active/26-09-20 独立任务目录与按需归档/verification.md": {
+        "executable": false,
+        "sha256": "2a4314c855831b59b531cf852709a4053af2275529e9cbe8931252a43f217b62"
+      }
+    },
+    "head": "0f1ba5fd31ab95e879013985c0fc2baeb6933c0a",
+    "index_sha256": "906f981a5d3eca25ba8aaf54a78979451f4e8139282d4fb1b4aeef1745e95e5f",
+    "requirements": {
+      "docs/harness/operations.md": "97c455b96a1665d8d21bfd2f7c0117e1b45cd2f0e56838d0c91a4b8751686ae6",
+      "docs/harness/proposals/006-task-layout-and-archive.md": "86407c80e4f266cc71dea16b032eab41e0e0ba86fdd2d877fca2bfe211b3a738",
+      "docs/harness/record-formats.md": "a11e296f5e11c34422ca712d6afc501982056f2e6619c90c30ebea06b126911e",
+      "tasks/README.md": "cbc4dcb6b3df313029d915238c4b1aed1ee0db962e7382201c232f53ac169c0d",
+      "tasks/active/26-09-20 独立任务目录与按需归档/task.md": "8b48c408e1009a6efff2c17a4f966ab257c5b2af2beff36ebec5aebe08c96970",
+      "tasks/active/26-09-20 独立任务目录与按需归档/verification.md": "2a4314c855831b59b531cf852709a4053af2275529e9cbe8931252a43f217b62"
+    },
+    "status": " M .agents/skills/plan-task/SKILL.md\u0000 M .agents/skills/resume-task/SKILL.md\u0000 M .agents/skills/review-task/SKILL.md\u0000 M .gitignore\u0000 M AGENTS.md\u0000 M docs/harness/design.md\u0000 M docs/harness/operations.md\u0000 M docs/harness/record-formats.md\u0000 M docs/harness/skills-guide.md\u0000 M docs/specs/ios-device-data-capabilities.md\u0000 M scripts/harness/review.py\u0000 M scripts/harness/task_state.py\u0000 M scripts/harness/test_review.py\u0000 M scripts/harness/test_task_state.py\u0000 M src/ios/Agent/Chat/AIChatViewModel.swift\u0000 M src/ios/Minis.xcodeproj/project.pbxproj\u0000 M src/ios/NativeOffloads/CalendarOffload.h\u0000 M src/ios/NativeOffloads/CalendarOffload.m\u0000?? .ignore\u0000?? docs/harness/proposals/006-task-layout-and-archive.md\u0000?? docs/specs/ios-calendar-recurrence.md\u0000?? src/ios/CalendarTests/CalendarRecurrenceTests.m\u0000?? src/ios/Minis.xcodeproj/xcshareddata/xcschemes/MinisCalendarTests.xcscheme\u0000?? tasks/README.md\u0000?? tasks/active/26-09-20 独立任务目录与按需归档/task.md\u0000?? tasks/active/26-09-20 独立任务目录与按需归档/verification.md\u0000",
+    "task_record_policy": "selected-only"
+  },
+  "task": "tasks/active/26-09-20 独立任务目录与按需归档/task.md"
+}

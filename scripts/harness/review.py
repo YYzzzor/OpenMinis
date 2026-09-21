@@ -55,7 +55,14 @@ def excluded(name, exclusions):
     return any(name == item or name.startswith(item + "/") for item in exclusions)
 
 
-def state(repo, base, requirements, exclusions=()):
+TASK_ROOTS = ('tasks', 'docs/tasks')
+
+
+def task_record(name):
+    return excluded(name, TASK_ROOTS)
+
+
+def state(repo, base, requirements, exclusions=(), task_record_policy=None):
     if git(repo, 'rev-parse', '--show-toplevel').decode().strip() != str(repo):
         raise ReviewError('--repo must name the repository root')
     for marker in ('MERGE_HEAD', 'CHERRY_PICK_HEAD', 'REVERT_HEAD', 'rebase-merge', 'rebase-apply', 'sequencer'):
@@ -64,7 +71,20 @@ def state(repo, base, requirements, exclusions=()):
             p = repo / p
         if p.exists():
             raise ReviewError('Unfinished Git operation: ' + marker)
+    # 旧 bundle 未声明策略时保持原有全仓绑定，不能重新解释历史快照。
+    if task_record_policy not in (None, 'selected-only'):
+        raise ReviewError('Unsupported task record policy: ' + str(task_record_policy))
+    selected_only = task_record_policy == 'selected-only'
+    selected_records = [name for name in requirements if task_record(name)]
     index = git(repo, 'ls-files', '--stage', '-z')
+    # 冲突是仓库级未完成操作；先检查元数据，不能因归档隔离漏掉冲突。
+    for entry in index.split(b'\0'):
+        if entry and entry.split(b'\t', 1)[0].split()[2] != b'0':
+            raise ReviewError('Resolve index conflicts before review')
+    if selected_only:
+        index = b''.join(entry + b'\0' for entry in index.split(b'\0') if entry and
+                         (not task_record(os.fsdecode(entry.split(b'\t', 1)[1])) or
+                          os.fsdecode(entry.split(b'\t', 1)[1]) in selected_records))
     gitlinks = {}
     for entry in index.split(b'\0'):
         if not entry:
@@ -87,13 +107,15 @@ def state(repo, base, requirements, exclusions=()):
         if not entry:
             continue
         meta, raw_name = entry.split(b'\t', 1)
+        if selected_only and task_record(os.fsdecode(raw_name)):
+            continue
         if meta.startswith((b'160000 ', b'120000 ')) and not excluded(os.fsdecode(raw_name), exclusions):
             raise ReviewError('Base submodule/symlink requires explicit --exclude: ' + os.fsdecode(raw_name))
     names = git(repo, 'ls-files', '--cached', '--others', '--exclude-standard', '-z').split(b'\0')
     files = {}
     for raw in sorted(set(names) - {b''}):
         name = os.fsdecode(raw)
-        if excluded(name, exclusions):
+        if excluded(name, exclusions) or (selected_only and task_record(name) and name not in selected_records):
             continue
         path = relative(repo, name)
         if not path.exists():
@@ -107,11 +129,21 @@ def state(repo, base, requirements, exclusions=()):
         if name not in files:
             raise ReviewError('Requirements must be tracked or nonignored files: ' + name)
         reqs[name] = digest(path.read_bytes())
-    return {'base': baseline, 'head': git(repo, 'rev-parse', 'HEAD').decode().strip(),
+    status_args = ('status', '--porcelain=v1', '-z', '--untracked-files=all')
+    if selected_only:
+        status = git(repo, *status_args, '--', '.', *[':(literal,exclude)' + name for name in TASK_ROOTS])
+        if selected_records:
+            status += git(repo, *status_args, '--', *[':(literal)' + name for name in selected_records])
+    else:
+        status = git(repo, *status_args)
+    result = {'base': baseline, 'head': git(repo, 'rev-parse', 'HEAD').decode().strip(),
             'branch': git(repo, 'rev-parse', '--abbrev-ref', 'HEAD').decode().strip(),
-            'status': git(repo, 'status', '--porcelain=v1', '-z', '--untracked-files=all').decode(errors='surrogateescape'),
+            'status': status.decode(errors='surrogateescape'),
             'index_sha256': digest(index), 'files': files, 'requirements': reqs,
             'exclusions': list(exclusions), 'excluded_gitlinks': gitlinks}
+    if selected_only:
+        result['task_record_policy'] = task_record_policy
+    return result
 
 
 def artifact_hashes(folder):
@@ -127,7 +159,7 @@ def artifact_hashes(folder):
     return result
 
 
-def prepare(repo, base, task, output, specs=(), exclusions=(), spec_sections=(), spec_references=()):
+def prepare(repo, base, task, output, specs=(), exclusions=(), spec_sections=(), spec_references=(), include_archive=False):
     repo, output = Path(repo).resolve(), Path(output).resolve()
     if output.is_relative_to(repo):
         raise ReviewError('Store review bundles outside the repository to avoid self-inclusion')
@@ -142,7 +174,11 @@ def prepare(repo, base, task, output, specs=(), exclusions=(), spec_sections=(),
             name, heading = spec_context.selector(value)
             selections.append({'mode': mode, 'source': name, 'heading_path': heading})
     requirements = list(dict.fromkeys([task, *specs, *[s['source'] for s in selections]]))
-    before = state(repo, base, requirements, exclusions)
+    if not include_archive:
+        if any(excluded(str(Path(name)), ['tasks/archive', 'docs/tasks/archive']) for name in requirements):
+            raise ReviewError('Archived requirements need explicit --include-archive; archive is not read by default')
+    policy = 'selected-only'
+    before = state(repo, base, requirements, exclusions, policy)
     output.parent.mkdir(parents=True, exist_ok=True)
     temp = Path(tempfile.mkdtemp(prefix='.review-', dir=output.parent))
     try:
@@ -159,8 +195,8 @@ def prepare(repo, base, task, output, specs=(), exclusions=(), spec_sections=(),
         for name, args in {'base-to-worktree.patch': ('diff', before['base']),
                            'staged.patch': ('diff', '--cached'),
                            'unstaged.patch': ('diff',)}.items():
-            (patches / name).write_bytes(git(repo, *args, '--binary', '--no-ext-diff', '--no-textconv', '--', '.', *[':(literal,exclude)' + x for x in exclusions]))
-        after = state(repo, before['base'], requirements, exclusions)
+            (patches / name).write_bytes(git(repo, *args, '--binary', '--no-ext-diff', '--no-textconv', '--', '.', *[':(literal,exclude)' + x for x in [*exclusions, *TASK_ROOTS]]))
+        after = state(repo, before['base'], requirements, exclusions, policy)
         if before != after:
             raise ReviewError('Repository changed during snapshot; prepare again')
         for name, info in before['files'].items():
@@ -178,6 +214,8 @@ def prepare(repo, base, task, output, specs=(), exclusions=(), spec_sections=(),
                    'and running processes are excluded. Untracked additions are in snapshot and manifest, not Git patches.\n\n'
                    'Task: requirements/' + task + '\n\nRequirements:\n' +
                    ''.join('- requirements/' + x + '\n' for x in dict.fromkeys([task, *specs])) +
+                   '\nTask records under tasks/ and docs/tasks/ are excluded from generic code patches and snapshots. '
+                   'Only explicitly selected requirement files are retained; attachments and neighboring records are not loaded.\n'
                    '\nExplicitly excluded paths (including their internal behavior):\n' +
                    ''.join('- ' + x + '\n' for x in exclusions) +
                    '\nExcluded submodules record Git state only; their files are not reviewed.\n')
@@ -227,7 +265,7 @@ def verify(bundle, repo=None):
             if name not in ('report.txt', 'report.json', 'report.md') or digest((bundle / name).read_bytes()) != expected:
                 raise ReviewError('Report integrity mismatch')
     if repo is not None:
-        current = state(Path(repo).resolve(), manifest['state']['base'], list(manifest['state']['requirements']), manifest['state']['exclusions'])
+        current = state(Path(repo).resolve(), manifest['state']['base'], list(manifest['state']['requirements']), manifest['state']['exclusions'], manifest['state'].get('task_record_policy'))
         if current != manifest['state']:
             raise ReviewError('Review inputs are stale: Git state, code or requirements changed')
     return manifest
@@ -341,6 +379,7 @@ def main():
     prep.add_argument('--spec-section', action='append', default=[], help='Required excerpt: path::Full heading > Subheading')
     prep.add_argument('--spec-reference', action='append', default=[], help='Optional reference: path::Full heading > Subheading')
     prep.add_argument('--exclude', action='append', default=[], help='Exclude a relative file or directory; recorded as an unreviewed limitation')
+    prep.add_argument('--include-archive', action='store_true', help='Allow explicitly selected archived requirements; does not load the whole archive')
     check = sub.add_parser('check')
     check.add_argument('bundle')
     check.add_argument('--repo', help='Also check freshness against this repository')
@@ -357,7 +396,7 @@ def main():
     args = parser.parse_args()
     try:
         if args.action == 'prepare':
-            print(prepare(args.repo, args.base, args.task, args.output, args.spec, args.exclude, args.spec_section, args.spec_reference))
+            print(prepare(args.repo, args.base, args.task, args.output, args.spec, args.exclude, args.spec_section, args.spec_reference, args.include_archive))
         elif args.action == 'check':
             print(verify(args.bundle, args.repo)['snapshot_id'])
         elif args.action == 'export':

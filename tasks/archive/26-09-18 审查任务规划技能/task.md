@@ -39,7 +39,7 @@
 - docs/harness/operations.md :: 全文；用途：核对恢复、审查调用与证据导出约定。
 - .agents/skills/resume-task/SKILL.md :: 全文；用途：核对已有批准和恢复行为。
 - .agents/skills/review-task/SKILL.md :: 全文；用途：核对审查职责、意见处理和验收。
-- docs/tasks/active/26-09-15 添加任务规划技能与使用说明.md :: 全文；用途：核对创建范围与已有验证的实际限制。
+- tasks/archive/26-09-15 添加任务规划技能与使用说明.md :: 全文；用途：核对创建范围与已有验证的实际限制。
 
 主 Agent 报告后补读：docs/harness/proposals/003-spec-context.md、005-task-naming.md 全文；用途：核实被 Pi 排除的历史约定依据。补读不改变原快照范围。
 本次不修改应用代码，iOS API Spec 不适用。相关 Harness 脚本保留在快照中供必要时核对；应用、依赖和无关历史材料排除在审查范围外。

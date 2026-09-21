@@ -35,12 +35,12 @@
 - 使用自带 skill-creator；共享格式与工具适配分离。
 - 其他项目的科学计算案例不作为本项目领域要求。
 - 用户要求先提交原有工作，已完成；之后又明确要求为 Mac 拉取准备 Harness 提交，本批保存已获授权。
-- 用户批准按 GPT-6 Astra 指导完成六项文档调整：教学触发、自主执行、CodeGraph 回退、验证停止条件、委派标准、分支范围。见 [提案 002](../../../harness/proposals/002-instruction-scope.md)，已实施；不扩展 DeepSeek 外发授权。
-- 用户批准 Spec「索引常驻、正文按需、默认按小节」设计；见 [提案 003](../../../harness/proposals/003-spec-context.md)。必读/参考区分并随委派与审查传递，完整原文仍固定版本。三份上游 Spec 正文不变。
+- 用户批准按 GPT-6 Astra 指导完成六项文档调整：教学触发、自主执行、CodeGraph 回退、验证停止条件、委派标准、分支范围。见 [提案 002](../../../docs/harness/proposals/002-instruction-scope.md)，已实施；不扩展 DeepSeek 外发授权。
+- 用户批准 Spec「索引常驻、正文按需、默认按小节」设计；见 [提案 003](../../../docs/harness/proposals/003-spec-context.md)。必读/参考区分并随委派与审查传递，完整原文仍固定版本。三份上游 Spec 正文不变。
 
-- 用户明确批准 Pi 结论需核实、不能直接决定验收；[提案 004](../../../harness/proposals/004-review-judgment.md)已实施，同步 AGENTS.md、review-task skill 与设计/记录约定。主 Agent 的不采纳同样需有依据。
+- 用户明确批准 Pi 结论需核实、不能直接决定验收；[提案 004](../../../docs/harness/proposals/004-review-judgment.md)已实施，同步 AGENTS.md、review-task skill 与设计/记录约定。主 Agent 的不采纳同样需有依据。
 
-- 用户指定任务命名为 `YY-mm-dd Name`；当前目录由 `2026-09-11-harness` 更名为 `26-09-11 实现 OpenMinis 开发 Harness`，历史报告与快照保留原路径。见 [提案 005](../../../harness/proposals/005-task-naming.md)。
+- 用户指定任务命名为 `YY-mm-dd Name`；当前目录由 `2026-09-11-harness` 更名为 `26-09-11 实现 OpenMinis 开发 Harness`，历史报告与快照保留原路径。见 [提案 005](../../../docs/harness/proposals/005-task-naming.md)。
 
 ## Spec 阅读清单
 
@@ -72,34 +72,34 @@
 - Pi 0.85.1，已配置 DeepSeek/deepseek-v4-pro；真实小样例审查成功，未泄露凭据。
 - 基础机制阶段曾通过 20 项测试；两项技能格式检查及独立恢复前向验证通过。
 - OpenMinis 实际仓库快照准备成功，显式排除 deps/ish 与 deps/proot，未将其内部代码纳入审查。
-- 详见 [验证记录](../../../harness/validation.md) 和 [操作说明](../../../harness/operations.md)。
+- 详见 [验证记录](../../../docs/harness/validation.md) 和 [操作说明](../../../docs/harness/operations.md)。
 - 提案 002 为纯文档调整；提案 003 增加小节提取及审查输入脚本。该阶段 27 项测试通过，实际文档提取通过；上游 Spec 正文不变。更新检查点后核实与工作区一致，旧审查快照不覆盖此次改动。
 
-- 首轮 Pi 报告有 5 项非阻断意见，主 Agent 已逐项处理；该阶段 29 项测试通过，原问题已获第二轮独立复审。见 [处理记录](../../../harness/evidence/pi-harness-001/resolution.md)。
+- 首轮 Pi 报告有 5 项非阻断意见，主 Agent 已逐项处理；该阶段 29 项测试通过，原问题已获第二轮独立复审。见 [处理记录](../../../docs/harness/evidence/pi-harness-001/resolution.md)。
 
-- 第二轮新增意见经主 Agent 判断：N1 用已有 --spec 完成交接，N2 已复现修复，N3 改为能力探测。当前 30 项测试通过，两个小改动的最终针对性复核已完成。见 [第二轮处理记录](../../../harness/evidence/pi-harness-002/resolution.md)。用户说明模型为 DeepSeek-V4.1-flash，Pi 自报别名 deepseek-flash。
+- 第二轮新增意见经主 Agent 判断：N1 用已有 --spec 完成交接，N2 已复现修复，N3 改为能力探测。当前 30 项测试通过，两个小改动的最终针对性复核已完成。见 [第二轮处理记录](../../../docs/harness/evidence/pi-harness-002/resolution.md)。用户说明模型为 DeepSeek-V4.1-flash，Pi 自报别名 deepseek-flash。
 
-- 最终复核：主 Agent 验证新快照绑定并结合此前运行证据，关闭 N1/N2/N3。实现审查闭环完成，整体试用验收未完成。见 [最终处理记录](../../../harness/evidence/pi-harness-003/resolution.md)。
+- 最终复核：主 Agent 验证新快照绑定并结合此前运行证据，关闭 N1/N2/N3。实现审查闭环完成，整体试用验收未完成。见 [最终处理记录](../../../docs/harness/evidence/pi-harness-003/resolution.md)。
 
-- Pi 正常新会话恢复初步通过：用户返回报告，主 Agent 独立核验旧检查点 match；Pi 自报自动发现两项 skill 并实际读取 resume-task，review-task 执行未验证。见 [评估记录](../../../harness/evidence/pi-recovery-001/assessment.md)。Codex 真正的新对话恢复为用户新增必验项，现已完成下述正常只读演练。
+- Pi 正常新会话恢复初步通过：用户返回报告，主 Agent 独立核验旧检查点 match；Pi 自报自动发现两项 skill 并实际读取 resume-task，review-task 执行未验证。见 [评估记录](../../../docs/harness/evidence/pi-recovery-001/assessment.md)。Codex 真正的新对话恢复为用户新增必验项，现已完成下述正常只读演练。
 
-- Codex 正常新对话只读恢复初步通过：目标、进展与边界识别正确；主 Agent 独立核验旧检查点 match。见 [评估记录](../../../harness/evidence/codex-recovery-001/assessment.md)。双方恢复后实际续接与异常场景尚未验证，整体验收仍开放。
+- Codex 正常新对话只读恢复初步通过：目标、进展与边界识别正确；主 Agent 独立核验旧检查点 match。见 [评估记录](../../../docs/harness/evidence/codex-recovery-001/assessment.md)。双方恢复后实际续接与异常场景尚未验证，整体验收仍开放。
 
-- 隔离恢复续接案例通过：独立执行者识别 changed，保留正确实现和未跟踪笔记，运行 2 项测试并纠正任务；提案未生效、任务未关闭。主 Agent 核验仅任务与检查点变化，最终 match。见 [评估记录](../../../harness/evidence/recovery-drift-001/assessment.md)。这不是 Pi 客户端异常恢复测试，也不替代真实应用任务试用。
+- 隔离恢复续接案例通过：独立执行者识别 changed，保留正确实现和未跟踪笔记，运行 2 项测试并纠正任务；提案未生效、任务未关闭。主 Agent 核验仅任务与检查点变化，最终 match。见 [评估记录](../../../docs/harness/evidence/recovery-drift-001/assessment.md)。这不是 Pi 客户端异常恢复测试，也不替代真实应用任务试用。
 
-- Pi review-task 实际执行验证材料已准备：`/tmp/openminis-pi-skill-review-uvjx3_0g/review`，快照 `bbf4d90126da137d09d7d84a62e690dd60cafb26ef27b00d0faf3ef6296ded67`。报告已返回，显式独立审查初步通过；模型版本未在本轮报告确认，范围外建议不采纳。见 [准备记录](../../../harness/evidence/pi-skill-review-001/preparation.md)。
+- Pi review-task 实际执行验证材料已准备：`/tmp/openminis-pi-skill-review-uvjx3_0g/review`，快照 `bbf4d90126da137d09d7d84a62e690dd60cafb26ef27b00d0faf3ef6296ded67`。报告已返回，显式独立审查初步通过；模型版本未在本轮报告确认，范围外建议不采纳。见 [准备记录](../../../docs/harness/evidence/pi-skill-review-001/preparation.md)。
 
-- Pi review-task 执行结果见 [处理记录](../../../harness/evidence/pi-skill-review-001/resolution.md)：主 Agent 穷举 400 个有效输入确认 R1，R2 部分接受、R3 范围外不采纳。样例不修复，不扩大本轮审查。
+- Pi review-task 执行结果见 [处理记录](../../../docs/harness/evidence/pi-skill-review-001/resolution.md)：主 Agent 穷举 400 个有效输入确认 R1，R2 部分接受、R3 范围外不采纳。样例不修复，不扩大本轮审查。
 
-- 主动纠偏与审批两阶段隔离演练通过：批准前仅纠正任务并提出具体方案；模拟批准后精确替换指定指导，未扩展范围，未关闭缺失集成验证的任务。主 Agent 独立文件核对与最终 inspect 通过。见 [评估记录](../../../harness/evidence/rule-approval-001/assessment.md)。
+- 主动纠偏与审批两阶段隔离演练通过：批准前仅纠正任务并提出具体方案；模拟批准后精确替换指定指导，未扩展范围，未关闭缺失集成验证的任务。主 Agent 独立文件核对与最终 inspect 通过。见 [评估记录](../../../docs/harness/evidence/rule-approval-001/assessment.md)。
 
 - 首个真实分析试用完成：findings.md 关键判断与抽查代码/Apple 官方文档一致，保留真机限制；未强制 Pi 审查、未修改应用或共享规则。见 [试用评估](trial-001-assessment.md)。
 
 ## 参考入口
 
-- [设计](../../../harness/design.md)
-- [记录格式](../../../harness/record-formats.md)
-- [规则提案](../../../harness/proposals/001-bootstrap.md)
+- [设计](../../../docs/harness/design.md)
+- [记录格式](../../../docs/harness/record-formats.md)
+- [规则提案](../../../docs/harness/proposals/001-bootstrap.md)
 
 ## 阻塞与审批
 

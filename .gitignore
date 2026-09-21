@@ -145,6 +145,12 @@ src/ios/Configs/ProviderCustomization.xcconfig
 
 # Local Harness checkpoints and generated build/review evidence
 # Keep authored task descriptions, verification notes and review reports visible.
+tasks/**/*.checkpoint.json
+tasks/**/evidence/
+tasks/**/*.tar.gz
+tasks/**/bundle-location.json
+
+# Compatibility for legacy task data restored from an older checkout
 docs/tasks/**/*.checkpoint.json
 docs/tasks/**/evidence/
 docs/tasks/**/*.tar.gz
