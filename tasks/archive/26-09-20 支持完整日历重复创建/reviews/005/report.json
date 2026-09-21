@@ -1,0 +1,48 @@
+{
+  "conclusion": "nonblocking",
+  "coverage": "Required Spec sections read in full: docs/tasks/active/26-09-20 支持完整日历重复创建/task.md; docs/tasks/active/26-09-20 支持完整日历重复创建/verification.md; docs/specs/ios-calendar-recurrence.md. Required subsections read: docs/specs/ios-device-data-capabilities.md §1 (文档定位与核查基线), §2 (Agent 接口与苹果系统 API 的关系), §3 (个人数据读写, incl. 周期性任务的三种不同含义), §4 (授权/缺失能力 where it links the recurrence entry); docs/specs/ios-sandbox-ish-summary.md §4 (Native Offload System, incl. 4.1-4.3). Related code also read for evidence: snapshot/src/ios/NativeOffloads/CalendarOffload.h, CalendarOffload.m (create/recurrence/list paths), NativeOffloadUtils.m (noff_find_arg/noff_parse_date), snapshot/src/ios/CalendarTests/CalendarRecurrenceTests.m, MinisCalendarTests.xcscheme, the project.pbxproj and AIChatViewModel.swift diffs in patches/base-to-worktree.patch, and AGENTS.md diff.",
+  "findings": [
+    {
+      "certainty": "confirmed from repository evidence (documented, not independently reproduced)",
+      "evidence": "verification.md records iOS 26.4 and 27.0 each 20/24 pass with all 4 failures involving weeksOfTheYear, that a direct EKRecurrenceRule control reproduces it, and that the assertion is intentionally kept un-skipped. task.md keeps status:blocked and the [ ] acceptance item open. The implementation only returns a generic warning via recurrence_warnings() when weeksOfTheYear is non-empty; it does not make the rule expand.",
+      "id": "R1",
+      "location": "snapshot/src/ios/CalendarTests/CalendarRecurrenceTests.m testWeeksOfYear, testPositiveWeeksOfYear, testSetPositionsAcrossSelectors, testNativeWeekNumberReference; snapshot/src/ios/NativeOffloads/CalendarOffload.m recurrence_warnings(); verification.md §年度周次未通过项.",
+      "requirement": "task.md 目标与验收: [ ] 每个参数均经过实际原生命令创建、EventKit 保存和回读、展开日期验证; ios-calendar-recurrence.md 当前验收限制: 全部公开参数已接入，但\"所有接口均可用\"的验收尚未通过 (weeksOfTheYear 只查到首次发生).",
+      "severity": "medium",
+      "trigger": "apple-calendar create --title ... --start 2027-01-13T09:00:00Z --end 2027-01-13T10:00:00Z --time-zone Etc/UTC --recurrence yearly --recurrence-weeks-of-year 2,-2 --recurrence-days-of-week WE --recurrence-count 4 (and the direct-EventKit control).",
+      "verification": "Not independently reproduced (no simulator/Xcode). Assessed from verification.md logs plus code inspection of the warning path and the retained failing assertions."
+    },
+    {
+      "certainty": "confirmed by code reading",
+      "evidence": "noff_find_arg scans every argv token from index 1 and matches any exact \"--calendar\", so it returns \"--location\" as the calendar name; the new no-default-fallback branch then emits invalid_args \"Calendar not found\" and the event is not saved, even though the caller never passed --calendar. The same free-text collision class remains for --title/--notes/--location/--alarm values; only --time-zone received the position-aware parser and the test testTimeZoneOptionLikeValuesAreLiteral covers only the --time-zone literal.",
+      "id": "R2",
+      "location": "snapshot/src/ios/NativeOffloads/CalendarOffload.m calendar_cmd_create: `NSString *calName = noff_find_arg(argc, argv, \"--calendar\");` (~line 881) and calendar_option_has_value() positional scan in the same function; snapshot/src/ios/NativeOffloads/NativeOffloadUtils.m noff_find_arg().",
+      "requirement": "task.md 本轮授权后的复核 / 004 R2 fix intent: option values equal to an option literal must not be mis-read (only --time-zone was hardened); ios-calendar-recurrence.md: 指定 --calendar 后若找不到该日历会返回 invalid_args，不再静默写入默认日历.",
+      "severity": "low",
+      "trigger": "apple-calendar create --title T --start 2027-01-01T09:00:00Z --end 2027-01-01T10:00:00Z --notes --calendar --location L (notes value is the literal \"--calendar\" followed by another argument).",
+      "verification": "Static tracing of noff_find_arg bounds (i < argc-1) and calendar_cmd_create error path; not executed at runtime."
+    },
+    {
+      "certainty": "confirmed by code reading",
+      "evidence": "The token fails calendar_option_has_value(), fails hasPrefix:@\"--recurrence\", and is skipped; \"weekly\" is also skipped, so options is empty, parse_recurrence returns YES with rule=nil, and create saves an ordinary non-recurring event with exit 0. testInvalidRulesDoNotSave only exercises \"--recurrence-typo\", which preserves the prefix and is rejected. The spec text promises misspelled recurrence options return invalid_args and are not saved.",
+      "id": "R3",
+      "location": "snapshot/src/ios/NativeOffloads/CalendarOffload.m parse_recurrence(): `if (![key hasPrefix:@\"--recurrence\"]) continue;` and the duplicate/missing/unknown check that only runs after that prefix gate.",
+      "requirement": "ios-calendar-recurrence.md: 参数超范围、缺值、重复选项、拼错的 recurrence 选项及系统会忽略的频率/参数组合返回 invalid_args，不保存事件.",
+      "severity": "low",
+      "trigger": "apple-calendar create --title T --start 2027-01-01T09:00:00Z --end 2027-01-01T10:00:00Z --reccurence weekly (or --recurrenc weekly), i.e. a typo that drops the final \"e\" and therefore no longer has the \"--recurrence\" prefix.",
+      "verification": "Static tracing of the parse_recurrence scan loop and create flow; not executed at runtime."
+    },
+    {
+      "certainty": "confirmed from documented test record",
+      "evidence": "verification.md states 当前共有 25 个测试方法，未重新运行整套 25 项, and that the two-platform 20-pass/4-fail result predates the time-zone parsing fix. Because that fix rewrote the argument-boundary scan consumed by all create invocations, the previously green create tests are historical evidence for the pre-fix build only, leaving the post-fix regression surface only partially covered by the 5 targeted tests.",
+      "id": "R4",
+      "location": "snapshot/src/ios/CalendarOffload parsing change (time-zone position loop shared by every create call) and verification.md §004 审查后时区解析修复验证.",
+      "requirement": "task.md 本轮授权后的复核: 以 5 项针对性时区回归验证本次变化；不重写此前两平台 24 项完整测试的历史结果; verification.md §004 审查后时区解析修复验证.",
+      "severity": "low",
+      "trigger": "Re-running the other ~20 create-path tests (testSimpleFrequenciesAndIntervals, testInvalidRulesDoNotSave, testEndConditionsForEveryFrequency, testUnknownCalendarDoesNotFallBack, testSelectorLikeNotesAreLiteral, etc.) against the post-fix build.",
+      "verification": "Not executed. Assessed from verification.md's explicit record that the full suite was not re-run on the changed build."
+    }
+  ],
+  "limitations": "No test was executed: the review tools are read-only file tools and no Xcode/simulator/device is available in this environment, so the 25 XCTest cases, the two-platform 24-case regression, the xcodebuild reproduce commands and the EventKit weeksOfTheYear reproduction are all unexecuted here. Runtime behavior of EventKit (BYWEEKNO expansion, time-zone/DST handling, simulator calendar permission) could not be independently reproduced; all runtime claims rest on verification.md logs. Required Spec dependencies were only partially resolvable: reviews/001, reviews/002 and reviews/004 (report/resolution) are referenced by task.md and verification.md but are not present in this snapshot's requirements/ tree, so R2's prior wording and the 004 resolution could not be read. Excluded paths deps/ish and deps/proot were not reviewed, and no real iPhone, iCloud/Exchange/CalDAV calendar or AI end-to-end session exists in evidence. The manifest did not contain a top-level snapshot_id field; the value returned is the snapshot_id recorded in status.json for this review run (manifest head is 0f1ba5fd31ab95e879013985c0fc2baeb6933c0a).",
+  "snapshot_id": "02bf7fd1074c4a2ee3d3547f90976f8bb82d1e1dc738f6bfc7bc805d07a4af3c"
+}

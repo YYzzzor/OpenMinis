@@ -465,6 +465,7 @@
 		F1W00101 /* PrintHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1W00100 /* PrintHelper.swift */; };
 		F1W0E101 /* WebLoadError.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1W0E100 /* WebLoadError.swift */; };
 		FDD896F80E0A14A7B60B12EF /* VoiceLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E23EA0E199D6D50EBC76F2 /* VoiceLog.swift */; };
+		CA1E0001 /* CalendarRecurrenceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CA1E0002; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1076,6 +1077,8 @@
 		F1W00100 /* PrintHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintHelper.swift; sourceTree = "<group>"; };
 		F1W0E100 /* WebLoadError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebLoadError.swift; sourceTree = "<group>"; };
 		F2941B643B8A2F048A2B154E /* VoiceProviderFactory.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VoiceProviderFactory.swift; sourceTree = "<group>"; };
+		CA1E0002 /* CalendarRecurrenceTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CalendarTests/CalendarRecurrenceTests.m; sourceTree = SOURCE_ROOT; };
+		CA1E0003 /* MinisCalendarTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MinisCalendarTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -1132,6 +1135,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CA1E0005 = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -1267,6 +1271,7 @@
 				E5FP00030 /* FileProvider */,
 				AA8A568C2F6FBB7A00A3E54E /* MinisUITests */,
 				BB1000012F700000000000AA /* MinisTests */,
+                CA1E0002 /* CalendarRecurrenceTests.m */,
 				AA26BD0E2F2E5FA500AECF2D /* Frameworks */,
 				E51000032 /* Products */,
 				AACCC6B4300B9D590053F20D /* Recovered References */,
@@ -1315,6 +1320,7 @@
 				E5FP00010 /* MinisFileProvider.appex */,
 				AA8A568B2F6FBB7A00A3E54E /* MinisUITests.xctest */,
 				BB1000010F700000000000AA /* MinisTests.xctest */,
+                CA1E0003 /* MinisCalendarTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2245,6 +2251,17 @@
 			productReference = E5H000010 /* AgentWidgetExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
+		CA1E0007 /* MinisCalendarTests */ = {
+            isa = PBXNativeTarget;
+            buildConfigurationList = CA1E000A;
+            buildPhases = (CA1E0004, CA1E0005, CA1E0006, );
+            buildRules = ();
+            dependencies = (CA1E000B, );
+            name = MinisCalendarTests;
+            productName = MinisCalendarTests;
+            productReference = CA1E0003;
+            productType = "com.apple.product-type.bundle.unit-test";
+        };
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -2305,6 +2322,7 @@
 				E5FP00040 /* MinisFileProvider */,
 				AA8A568A2F6FBB7A00A3E54E /* MinisUITests */,
 				BB1000070F700000000000AA /* MinisTests */,
+                CA1E0007 /* MinisCalendarTests */,
 			);
 		};
 /* End PBXProject section */
@@ -2377,6 +2395,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CA1E0006 = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
@@ -2864,6 +2883,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CA1E0004 = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (CA1E0001, ); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -2887,6 +2907,7 @@
 			target = E5H000040 /* AgentWidgetExtension */;
 			targetProxy = E5H000081 /* PBXContainerItemProxy */;
 		};
+		CA1E000B = {isa = PBXTargetDependency; target = E51000040 /* Minis */; };
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
@@ -3427,6 +3448,30 @@
 			};
 			name = Release;
 		};
+		CA1E0008 = {isa = XCBuildConfiguration; buildSettings = {
+                BUNDLE_LOADER = "$(TEST_HOST)";
+                CODE_SIGN_STYLE = Automatic;
+                DEVELOPMENT_TEAM = "";
+                GENERATE_INFOPLIST_FILE = YES;
+                HEADER_SEARCH_PATHS = ("$(SRCROOT)/NativeOffloads", );
+                IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+                PRODUCT_BUNDLE_IDENTIFIER = com.openminis.MinisCalendarTests;
+                PRODUCT_NAME = "$(TARGET_NAME)";
+                TARGETED_DEVICE_FAMILY = "1,2";
+                TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Minis.app/Minis";
+}; name = Debug; };
+		CA1E0009 = {isa = XCBuildConfiguration; buildSettings = {
+                BUNDLE_LOADER = "$(TEST_HOST)";
+                CODE_SIGN_STYLE = Automatic;
+                DEVELOPMENT_TEAM = "";
+                GENERATE_INFOPLIST_FILE = YES;
+                HEADER_SEARCH_PATHS = ("$(SRCROOT)/NativeOffloads", );
+                IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+                PRODUCT_BUNDLE_IDENTIFIER = com.openminis.MinisCalendarTests;
+                PRODUCT_NAME = "$(TARGET_NAME)";
+                TARGETED_DEVICE_FAMILY = "1,2";
+                TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Minis.app/Minis";
+}; name = Release; };
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -3493,6 +3538,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		CA1E000A = {isa = XCConfigurationList; buildConfigurations = (CA1E0008, CA1E0009, ); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */

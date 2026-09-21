@@ -10,6 +10,7 @@
 #import <EventKit/EventKit.h>
 #import <UIKit/UIKit.h>
 #import "NativeOffloadUtils.h"
+#import "CalendarOffload.h"
 #include "kernel/native_offload.h"
 #include <unistd.h>
 
@@ -58,6 +59,30 @@ static NSString *const HELP_TEXT =
      "  --location <loc>     Event location\n"
      "  --notes <text>       Event notes\n"
      "  --alarm <minutes>    Alarm minutes before event\n"
+     "\n"
+     "  --time-zone <IANA>  Event time zone (recurring default: device local)\n"
+     "                       Use explicit offsets in --start/--end when selecting a zone.\n"
+     "\n"
+     "RECURRENCE OPTIONS (create only; one native EventKit rule):\n"
+     "  --recurrence <daily|weekly|monthly|yearly>\n"
+     "  --recurrence-interval <N>       Positive interval (default: 1; weekly + 2 = biweekly)\n"
+     "  --recurrence-days-of-week <list>  MO,TU,WE,TH,FR,SA,SU; weekly/monthly/yearly\n"
+     "                       Monthly/yearly also accept 2TU,-1FR (ordinal +/-1..53).\n"
+     "  --recurrence-days-of-month <list>  +/-1..31, no 0; monthly only\n"
+     "  --recurrence-months-of-year <list> 1..12; yearly only\n"
+     "  --recurrence-weeks-of-year <list>  +/-1..53, no 0; yearly only\n"
+     "                       WARNING: future expansion failed on tested iOS simulators;\n"
+     "                       check returned warnings and verify future dates with list.\n"
+     "  --recurrence-days-of-year <list>   +/-1..366, no 0; yearly only\n"
+     "  --recurrence-set-positions <list>  +/-1..366, no 0; requires a date selector\n"
+     "                       Lists are comma-separated; negative values count backwards.\n"
+     "                       Set positions filter matching dates within each period.\n"
+     "  --recurrence-count <N>          Stop after N occurrences, including the first\n"
+     "  --recurrence-until <date>       Inclusive YYYY-MM-DD in event zone, or ISO 8601\n"
+     "                       datetime with offset. Count/until are mutually exclusive.\n"
+     "                       Omit both to repeat forever. Start must match the pattern.\n"
+     "                       Invalid frequency/selector combinations are rejected.\n"
+     "                       Week start/calendar identifier are managed by EventKit.\n"
      "\n"
      "REMIND OPTIONS:\n"
      "  --title <title>      Reminder title (required)\n"
@@ -108,6 +133,7 @@ static NSString *const HELP_TEXT =
      "  apple-calendar freebusy --start 2026-02-24T09:00 --end 2026-02-24T18:00\n"
      "  apple-calendar create --title \"Meeting\" --start 2026-02-25T14:00 --end 2026-02-25T15:00\n"
      "  apple-calendar remind --title \"Buy groceries\" --due 2026-02-25T18:00\n"
+     "  apple-calendar create --title \"Biweekly meeting\" --start 2027-01-01T09:00:00+08:00 --end 2027-01-01T10:00:00+08:00 --time-zone Asia/Shanghai --recurrence weekly --recurrence-interval 2 --recurrence-count 10\n"
      "  apple-calendar calendars\n";
 
 // Shared EKEventStore (thread-safe, single instance is recommended)
@@ -226,6 +252,259 @@ static void resolve_date_range(int argc, char **argv, NSDate **start, NSDate **e
     *end = endStr ? noff_parse_date(endStr) : [NSDate date];
 }
 
+// EventKit 对不适用的字段会静默忽略；在保存前拒绝这些输入，防止规则被降级。
+static BOOL recurrence_integer(NSString *text, NSInteger minimum, NSInteger maximum,
+                               BOOL allowZero, NSInteger *value) {
+    if (!text.length) return NO;
+    NSScanner *scanner = [NSScanner scannerWithString:text];
+    scanner.charactersToBeSkipped = nil;
+    long long parsed = 0;
+    if (![scanner scanLongLong:&parsed] || !scanner.isAtEnd ||
+        parsed < minimum || parsed > maximum || (!allowZero && parsed == 0)) return NO;
+    // scanLongLong 会将溢出截成 LLONG_MAX/MIN；往返比较同时拒绝小数和溢出。
+    NSString *canonical = [NSString stringWithFormat:@"%lld", parsed];
+    NSString *unsignedText = [text hasPrefix:@"+"] ? [text substringFromIndex:1] : text;
+    if (![canonical isEqualToString:unsignedText]) return NO;
+    *value = (NSInteger)parsed;
+    return YES;
+}
+
+static NSArray<NSNumber *> *recurrence_numbers(NSString *text, NSInteger minimum,
+                                               NSInteger maximum, NSString **error) {
+    if (!text) return nil;
+    NSMutableOrderedSet *result = [NSMutableOrderedSet orderedSet];
+    for (NSString *part in [text componentsSeparatedByString:@","]) {
+        NSInteger value;
+        if (!recurrence_integer(part, minimum, maximum, NO, &value)) {
+            *error = [NSString stringWithFormat:@"Expected comma-separated integers in %ld...%ld, excluding 0: %@",
+                      (long)minimum, (long)maximum, text];
+            return nil;
+        }
+        [result addObject:@(value)];
+    }
+    return result.array;
+}
+
+static BOOL calendar_option_has_value(NSString *key) {
+    return [@[@"--title", @"--start", @"--end", @"--calendar", @"--location", @"--notes",
+              @"--alarm", @"--time-zone", @"--id", @"--occurrence-date", @"--span",
+              @"--days", @"--limit", @"--due", @"--list", @"--priority"] containsObject:key];
+}
+
+// 只在选项位置匹配；字符串取值可以合法包含另一个选项的名称。
+static int calendar_option_index(int argc, char **argv, const char *name) {
+    for (int i = 1; i < argc; i++) {
+        if (strcmp(argv[i], name) == 0) return i;
+        NSString *key = [NSString stringWithUTF8String:argv[i]];
+        if (calendar_option_has_value(key) || [key hasPrefix:@"--recurrence"]) i++;
+    }
+    return -1;
+}
+
+static NSString *calendar_option_value(int argc, char **argv, const char *name) {
+    int index = calendar_option_index(argc, argv, name);
+    return index >= 0 && index + 1 < argc ? [NSString stringWithUTF8String:argv[index + 1]] : nil;
+}
+
+static NSDate *recurrence_end_datetime(NSString *text) {
+    // Foundation 会容忍非法日期和尾随字符；先校验完整格式与日期组件，禁止自动修正。
+    NSString *pattern = @"^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]{1,9})?(?:Z|[+-](?:[01][0-9]|2[0-3]):[0-5][0-9])$";
+    NSRange match = [text rangeOfString:pattern options:NSRegularExpressionSearch];
+    if (match.location != 0 || match.length != text.length) return nil;
+    NSString *wallTime = [text substringToIndex:19];
+    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+    formatter.locale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
+    formatter.calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+    formatter.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
+    formatter.dateFormat = @"yyyy-MM-dd'T'HH:mm:ss";
+    formatter.lenient = NO;
+    NSDate *componentsDate = [formatter dateFromString:wallTime];
+    if (!componentsDate || ![[formatter stringFromDate:componentsDate] isEqualToString:wallTime]) return nil;
+    NSISO8601DateFormatter *iso = [[NSISO8601DateFormatter alloc] init];
+    iso.formatOptions = NSISO8601DateFormatWithInternetDateTime;
+    if ([text containsString:@"."]) iso.formatOptions |= NSISO8601DateFormatWithFractionalSeconds;
+    return [iso dateFromString:text];
+}
+
+static BOOL parse_recurrence(int argc, char **argv, NSDate *start, NSTimeZone *timeZone,
+                             EKRecurrenceRule **rule, NSString **error) {
+    *rule = nil;
+    NSArray *names = @[@"--recurrence", @"--recurrence-interval", @"--recurrence-days-of-week",
+                      @"--recurrence-days-of-month", @"--recurrence-months-of-year",
+                      @"--recurrence-weeks-of-year", @"--recurrence-days-of-year",
+                      @"--recurrence-set-positions", @"--recurrence-count", @"--recurrence-until"];
+    NSMutableDictionary<NSString *, NSString *> *options = [NSMutableDictionary dictionary];
+    for (int i = 2; i < argc; i++) {
+        NSString *key = [NSString stringWithUTF8String:argv[i]];
+        if (calendar_option_has_value(key)) { i++; continue; }
+        if (![key hasPrefix:@"--recurrence"]) {
+            if ([@[@"--compact", @"--quiet", @"-q"] containsObject:key]) continue;
+            *error = [NSString stringWithFormat:@"Unknown create option: %@. See --help.", key];
+            return NO;
+        }
+        if (![names containsObject:key] || options[key] || i + 1 >= argc ||
+            !strlen(argv[i + 1]) || strncmp(argv[i + 1], "--", 2) == 0) {
+            *error = [NSString stringWithFormat:@"Unknown, duplicated, or missing value for %@. See --help.", key];
+            return NO;
+        }
+        options[key] = [NSString stringWithUTF8String:argv[++i]];
+    }
+    if (!options.count) return YES;
+    NSArray *frequencies = @[@"daily", @"weekly", @"monthly", @"yearly"];
+    NSString *frequencyName = [options[@"--recurrence"] lowercaseString];
+    NSUInteger index = frequencyName ? [frequencies indexOfObject:frequencyName] : NSNotFound;
+    if (index == NSNotFound) {
+        *error = @"Recurrence options require --recurrence daily|weekly|monthly|yearly.";
+        return NO;
+    }
+    EKRecurrenceFrequency frequency = (EKRecurrenceFrequency)index;
+    NSInteger interval = 1;
+    if (options[@"--recurrence-interval"] &&
+        !recurrence_integer(options[@"--recurrence-interval"], 1, NSIntegerMax, NO, &interval)) {
+        *error = @"--recurrence-interval must be a positive integer.";
+        return NO;
+    }
+    NSDictionary *requiredFrequency = @{@"--recurrence-days-of-month": @"monthly",
+                                        @"--recurrence-months-of-year": @"yearly",
+                                        @"--recurrence-weeks-of-year": @"yearly",
+                                        @"--recurrence-days-of-year": @"yearly"};
+    for (NSString *key in requiredFrequency) {
+        if (options[key] && ![frequencyName isEqualToString:requiredFrequency[key]]) {
+            *error = [NSString stringWithFormat:@"%@ requires --recurrence %@ (EventKit otherwise ignores it).",
+                      key, requiredFrequency[key]];
+            return NO;
+        }
+    }
+    NSMutableArray<EKRecurrenceDayOfWeek *> *weekdays = nil;
+    if (options[@"--recurrence-days-of-week"]) {
+        if (frequency == EKRecurrenceFrequencyDaily) {
+            *error = @"--recurrence-days-of-week is only valid for weekly, monthly, or yearly recurrence.";
+            return NO;
+        }
+        weekdays = [NSMutableArray array];
+        NSArray *dayNames = @[@"SU", @"MO", @"TU", @"WE", @"TH", @"FR", @"SA"];
+        for (NSString *raw in [options[@"--recurrence-days-of-week"] componentsSeparatedByString:@","]) {
+            NSString *token = raw.uppercaseString;
+            NSString *suffix = token.length >= 2 ? [token substringFromIndex:token.length - 2] : @"";
+            NSUInteger day = [dayNames indexOfObject:suffix];
+            NSInteger ordinal = 0;
+            BOOL hasOrdinal = token.length > 2;
+            if (day == NSNotFound || (hasOrdinal &&
+                !recurrence_integer([token substringToIndex:token.length - 2], -53, 53, NO, &ordinal)) ||
+                (hasOrdinal && frequency == EKRecurrenceFrequencyWeekly)) {
+                *error = @"Weekdays use MO,TU,WE,TH,FR,SA,SU; monthly/yearly also accept ordinals -53...-1 or 1...53, e.g. 2TU,-1FR.";
+                return NO;
+            }
+            [weekdays addObject:hasOrdinal ? [EKRecurrenceDayOfWeek dayOfWeek:(EKWeekday)(day + 1) weekNumber:ordinal]
+                                          : [EKRecurrenceDayOfWeek dayOfWeek:(EKWeekday)(day + 1)]];
+        }
+    }
+    NSArray *monthDays = recurrence_numbers(options[@"--recurrence-days-of-month"], -31, 31, error);
+    if (*error) return NO;
+    NSArray *months = recurrence_numbers(options[@"--recurrence-months-of-year"], 1, 12, error);
+    if (*error) return NO;
+    NSArray *weeks = recurrence_numbers(options[@"--recurrence-weeks-of-year"], -53, 53, error);
+    if (*error) return NO;
+    NSArray *yearDays = recurrence_numbers(options[@"--recurrence-days-of-year"], -366, 366, error);
+    if (*error) return NO;
+    NSArray *positions = recurrence_numbers(options[@"--recurrence-set-positions"], -366, 366, error);
+    if (*error) return NO;
+    BOOL complex = weekdays || monthDays || months || weeks || yearDays;
+    if (positions && !complex) {
+        *error = @"--recurrence-set-positions requires at least one recurrence date selector.";
+        return NO;
+    }
+    EKRecurrenceEnd *end = nil;
+    if (options[@"--recurrence-count"] && options[@"--recurrence-until"]) {
+        *error = @"Use either --recurrence-count or --recurrence-until, not both.";
+        return NO;
+    }
+    if (options[@"--recurrence-count"]) {
+        NSInteger count;
+        if (!recurrence_integer(options[@"--recurrence-count"], 1, NSIntegerMax, NO, &count)) {
+            *error = @"--recurrence-count must be a positive integer, including the first occurrence.";
+            return NO;
+        }
+        end = [EKRecurrenceEnd recurrenceEndWithOccurrenceCount:(NSUInteger)count];
+    }
+    if (options[@"--recurrence-until"]) {
+        NSString *text = options[@"--recurrence-until"];
+        NSDate *until = nil;
+        NSDateFormatter *dateOnly = [[NSDateFormatter alloc] init];
+        dateOnly.locale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
+        dateOnly.calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+        dateOnly.timeZone = timeZone;
+        dateOnly.dateFormat = @"yyyy-MM-dd";
+        dateOnly.lenient = NO;
+        if (text.length == 10) {
+            until = [dateOnly dateFromString:text];
+            if (until && ![[dateOnly stringFromDate:until] isEqualToString:text]) until = nil;
+            if (until) {
+                // 仅日期表示包含当日；按日历加一天，不能在夏令时切换日固定加 86400 秒。
+                NSCalendar *calendar = dateOnly.calendar;
+                calendar.timeZone = timeZone;
+                until = [[calendar dateByAddingUnit:NSCalendarUnitDay value:1 toDate:until options:0]
+                         dateByAddingTimeInterval:-1];
+            }
+        } else {
+            until = recurrence_end_datetime(text);
+        }
+        if (!until || [until compare:start] == NSOrderedAscending) {
+            *error = @"--recurrence-until must be YYYY-MM-DD or an ISO 8601 datetime with timezone, on/after the first start.";
+            return NO;
+        }
+        end = [EKRecurrenceEnd recurrenceEndWithEndDate:until];
+    }
+    @try {
+        *rule = complex ? [[EKRecurrenceRule alloc] initRecurrenceWithFrequency:frequency interval:interval
+                         daysOfTheWeek:weekdays daysOfTheMonth:monthDays monthsOfTheYear:months
+                         weeksOfTheYear:weeks daysOfTheYear:yearDays setPositions:positions end:end]
+                        : [[EKRecurrenceRule alloc] initRecurrenceWithFrequency:frequency interval:interval end:end];
+    } @catch (NSException *exception) {
+        *error = [NSString stringWithFormat:@"Invalid EventKit recurrence: %@", exception.reason];
+        return NO;
+    }
+    if (!*rule) {
+        *error = @"EventKit could not create this recurrence rule.";
+        return NO;
+    }
+    return YES;
+}
+
+static NSArray *recurrence_to_array(EKEvent *event) {
+    NSMutableArray *result = [NSMutableArray array];
+    NSArray *frequencies = @[@"daily", @"weekly", @"monthly", @"yearly"];
+    NSArray *names = @[@"SU", @"MO", @"TU", @"WE", @"TH", @"FR", @"SA"];
+    for (EKRecurrenceRule *rule in event.recurrenceRules) {
+        NSMutableArray *days = [NSMutableArray array];
+        for (EKRecurrenceDayOfWeek *day in rule.daysOfTheWeek) {
+            NSString *name = names[day.dayOfTheWeek - 1];
+            [days addObject:day.weekNumber ? [NSString stringWithFormat:@"%ld%@", (long)day.weekNumber, name] : name];
+        }
+        EKRecurrenceEnd *end = rule.recurrenceEnd;
+        NSDictionary *ending = !end ? @{@"type": @"never"}
+            : end.endDate ? @{@"type": @"until", @"date": noff_format_date(end.endDate)}
+            : @{@"type": @"count", @"count": @(end.occurrenceCount)};
+        [result addObject:@{@"frequency": frequencies[rule.frequency], @"interval": @(rule.interval),
+                           @"days_of_week": days, @"days_of_month": rule.daysOfTheMonth ?: @[],
+                           @"months_of_year": rule.monthsOfTheYear ?: @[], @"weeks_of_year": rule.weeksOfTheYear ?: @[],
+                           @"days_of_year": rule.daysOfTheYear ?: @[], @"set_positions": rule.setPositions ?: @[],
+                           @"end": ending, @"calendar_identifier": rule.calendarIdentifier ?: @"",
+                           @"first_day_of_week": @(rule.firstDayOfTheWeek)}];
+    }
+    return result;
+}
+
+static NSArray<NSString *> *recurrence_warnings(EKEvent *event) {
+    for (EKRecurrenceRule *rule in event.recurrenceRules) {
+        if (rule.weeksOfTheYear.count) {
+            // iOS 26.4/27 模拟器的直接 EventKit 对照也无法展开 BYWEEKNO；真机尚未验证。
+            return @[@"EventKit saved the yearly week-number rule, but iOS 26.4/27 simulator tests did not expand future occurrences, including direct EventKit controls. Physical-device behavior is unverified. Do not report recurrence as verified without checking future dates with list."];
+        }
+    }
+    return @[];
+}
+
 static NSDictionary *event_to_dict(EKEvent *event) {
     NSMutableDictionary *d = [NSMutableDictionary dictionary];
     d[@"id"] = event.eventIdentifier ?: @"";
@@ -234,6 +513,9 @@ static NSDictionary *event_to_dict(EKEvent *event) {
     // occurrence. `occurrence_date` (the start of THIS instance) is what disambiguates a
     // single occurrence so update/delete can target it instead of the series master.
     d[@"is_recurring"] = @(event.hasRecurrenceRules);
+    d[@"recurrence_rules"] = recurrence_to_array(event);
+    if (recurrence_warnings(event).count) d[@"warnings"] = recurrence_warnings(event);
+    d[@"time_zone"] = event.timeZone.name ?: [NSNull null];
     d[@"occurrence_date"] = event.startDate ? noff_format_date(event.startDate) : [NSNull null];
     d[@"start"] = event.startDate ? noff_format_date(event.startDate) : [NSNull null];
     d[@"end"] = event.endDate ? noff_format_date(event.endDate) : [NSNull null];
@@ -530,18 +812,10 @@ static int cmd_calendars(int argc, char **argv, int stdout_fd, BOOL compact, BOO
     return NOFF_EXIT_SUCCESS;
 }
 
-static int cmd_create(int argc, char **argv, int stdout_fd, int stderr_fd, BOOL compact, BOOL quiet) {
-    NSString *authErr = nil;
-    if (!requestCalendarAccess(&authErr)) {
-        NSDictionary *err = noff_json_error(TOOL_NAME, @"create",
-                                             NOFF_ERR_AUTHORIZATION_DENIED, authErr);
-        noff_emit_json(stdout_fd, err, compact, quiet);
-        return NOFF_EXIT_AUTH_DENIED;
-    }
-
-    NSString *title = noff_find_arg(argc, argv, "--title");
-    NSString *startStr = noff_find_arg(argc, argv, "--start");
-    NSString *endStr = noff_find_arg(argc, argv, "--end");
+static int calendar_cmd_create(int argc, char **argv, int stdout_fd, int stderr_fd, BOOL compact, BOOL quiet) {
+    NSString *title = calendar_option_value(argc, argv, "--title");
+    NSString *startStr = calendar_option_value(argc, argv, "--start");
+    NSString *endStr = calendar_option_value(argc, argv, "--end");
 
     if (!title || !startStr || !endStr) {
         noff_emit_help(stderr_fd, HELP_TEXT);
@@ -563,25 +837,67 @@ static int cmd_create(int argc, char **argv, int stdout_fd, int stderr_fd, BOOL 
         return NOFF_EXIT_INVALID_ARGS;
     }
 
+    // 按选项位置消费取值，避免备注、标题中的 --time-zone 被误当作时区选项。
+    NSString *zoneName = nil;
+    BOOL zonePresent = NO;
+    BOOL invalidZoneOption = NO;
+    for (int i = 2; i < argc; i++) {
+        NSString *key = [NSString stringWithUTF8String:argv[i]];
+        if ([key isEqualToString:@"--time-zone"]) {
+            if (zonePresent || i + 1 >= argc || !strlen(argv[i + 1]) ||
+                strncmp(argv[i + 1], "--", 2) == 0) invalidZoneOption = YES;
+            else zoneName = [NSString stringWithUTF8String:argv[i + 1]];
+            zonePresent = YES;
+        }
+        if (calendar_option_has_value(key) || [key hasPrefix:@"--recurrence"]) i++;
+    }
+    NSTimeZone *zone = zoneName ? [NSTimeZone timeZoneWithName:zoneName] : [NSTimeZone localTimeZone];
+    NSString *recurrenceError = nil;
+    EKRecurrenceRule *recurrence = nil;
+    if ([endDate compare:startDate] != NSOrderedDescending) {
+        recurrenceError = @"--end must be later than --start.";
+    } else if (!zone || invalidZoneOption) {
+        recurrenceError = @"--time-zone must name an IANA time zone, e.g. Asia/Shanghai.";
+    } else {
+        parse_recurrence(argc, argv, startDate, zone, &recurrence, &recurrenceError);
+    }
+    if (recurrenceError) {
+        noff_emit_json(stdout_fd, noff_json_error(TOOL_NAME, @"create", NOFF_ERR_INVALID_ARGS,
+                                                 recurrenceError), compact, quiet);
+        return NOFF_EXIT_INVALID_ARGS;
+    }
+
+    NSString *authErr = nil;
+    if (!requestCalendarAccess(&authErr)) {
+        NSDictionary *err = noff_json_error(TOOL_NAME, @"create",
+                                             NOFF_ERR_AUTHORIZATION_DENIED, authErr);
+        noff_emit_json(stdout_fd, err, compact, quiet);
+        return NOFF_EXIT_AUTH_DENIED;
+    }
+
     EKEvent *event = [EKEvent eventWithEventStore:eventStore()];
     event.title = title;
     event.startDate = startDate;
     event.endDate = endDate;
+    // 普通单次事件保留原 EventKit 默认时区行为；重复系列绑定时区，跨夏令时保持当地钟点。
+    if (recurrence || zoneName) event.timeZone = zone;
+    if (recurrence) [event addRecurrenceRule:recurrence];
 
-    NSString *location = noff_find_arg(argc, argv, "--location");
+    NSString *location = calendar_option_value(argc, argv, "--location");
     if (location) event.location = location;
 
-    NSString *notes = noff_find_arg(argc, argv, "--notes");
+    NSString *notes = calendar_option_value(argc, argv, "--notes");
     if (notes) event.notes = notes;
 
-    NSString *alarmStr = noff_find_arg(argc, argv, "--alarm");
+    NSString *alarmStr = calendar_option_value(argc, argv, "--alarm");
     if (alarmStr) {
         EKAlarm *alarm = [EKAlarm alarmWithRelativeOffset:-[alarmStr doubleValue] * 60];
         [event addAlarm:alarm];
     }
 
-    // Find calendar by name if specified
-    NSString *calName = noff_find_arg(argc, argv, "--calendar");
+    // 外部刚创建的日历可能尚未触发缓存更新；刷新来源后再选择，找不到时不能写到默认日历。
+    [eventStore() refreshSourcesIfNecessary];
+    NSString *calName = calendar_option_value(argc, argv, "--calendar");
     if (calName) {
         for (EKCalendar *cal in [eventStore() calendarsForEntityType:EKEntityTypeEvent]) {
             if ([cal.title localizedCaseInsensitiveContainsString:calName]) {
@@ -589,8 +905,12 @@ static int cmd_create(int argc, char **argv, int stdout_fd, int stderr_fd, BOOL 
                 break;
             }
         }
-    }
-    if (!event.calendar) {
+        if (!event.calendar) {
+            noff_emit_json(stdout_fd, noff_json_error(TOOL_NAME, @"create", NOFF_ERR_INVALID_ARGS,
+                [NSString stringWithFormat:@"Calendar not found: %@. List calendars and retry.", calName]), compact, quiet);
+            return NOFF_EXIT_INVALID_ARGS;
+        }
+    } else {
         event.calendar = [eventStore() defaultCalendarForNewEvents];
     }
 
@@ -604,13 +924,17 @@ static int cmd_create(int argc, char **argv, int stdout_fd, int stderr_fd, BOOL 
         return NOFF_EXIT_ERROR;
     }
 
-    NSDictionary *data = @{
+    NSMutableDictionary *data = [@{
         @"id": event.eventIdentifier ?: @"",
         @"title": title,
         @"start": noff_format_date(startDate),
         @"end": noff_format_date(endDate),
         @"calendar": event.calendar.title ?: @"",
-    };
+        @"is_recurring": @(event.hasRecurrenceRules),
+        @"recurrence_rules": recurrence_to_array(event),
+        @"time_zone": event.timeZone.name ?: [NSNull null],
+    } mutableCopy];
+    if (recurrence_warnings(event).count) data[@"warnings"] = recurrence_warnings(event);
     noff_emit_json(stdout_fd, noff_json_envelope(TOOL_NAME, @"create", data), compact, quiet);
     return NOFF_EXIT_SUCCESS;
 }
@@ -1128,15 +1452,15 @@ int calendar_cmd_delete_reminder(int argc, char **argv, int stdout_fd, BOOL comp
     return NOFF_EXIT_SUCCESS;
 }
 
-static int calendar_handler(int argc, char **argv,
+int calendar_offload_handle(int argc, char **argv,
                              int stdin_fd, int stdout_fd, int stderr_fd) {
-    if (noff_has_flag(argc, argv, "--help") || noff_has_flag(argc, argv, "-h")) {
+    if ((calendar_option_index(argc, argv, "--help") >= 0) || (calendar_option_index(argc, argv, "-h") >= 0)) {
         noff_emit_help(stderr_fd, HELP_TEXT);
         return NOFF_EXIT_SUCCESS;
     }
 
-    BOOL compact = noff_has_flag(argc, argv, "--compact");
-    BOOL quiet = noff_has_flag(argc, argv, "-q") || noff_has_flag(argc, argv, "--quiet");
+    BOOL compact = (calendar_option_index(argc, argv, "--compact") >= 0);
+    BOOL quiet = (calendar_option_index(argc, argv, "-q") >= 0) || (calendar_option_index(argc, argv, "--quiet") >= 0);
 
     NSString *subcmd = noff_get_subcommand(argc, argv);
     if (!subcmd) {
@@ -1148,11 +1472,22 @@ static int calendar_handler(int argc, char **argv,
         return NOFF_EXIT_INVALID_ARGS;
     }
 
+    if (![subcmd isEqualToString:@"create"]) {
+        for (int i = 2; i < argc; i++) {
+            if (calendar_option_has_value([NSString stringWithUTF8String:argv[i]])) { i++; continue; }
+            if (strncmp(argv[i], "--recurrence", 12) == 0) {
+                noff_emit_json(stdout_fd, noff_json_error(TOOL_NAME, subcmd, NOFF_ERR_INVALID_ARGS,
+                    @"Recurrence options are supported by create only."), compact, quiet);
+                return NOFF_EXIT_INVALID_ARGS;
+            }
+        }
+    }
+
     if ([subcmd isEqualToString:@"list"])              return cmd_list(argc, argv, stdout_fd, compact, quiet);
     if ([subcmd isEqualToString:@"reminders"])         return calendar_cmd_reminders(argc, argv, stdout_fd, compact, quiet);
     if ([subcmd isEqualToString:@"freebusy"])          return cmd_freebusy(argc, argv, stdout_fd, compact, quiet);
     if ([subcmd isEqualToString:@"calendars"])         return cmd_calendars(argc, argv, stdout_fd, compact, quiet);
-    if ([subcmd isEqualToString:@"create"])            return cmd_create(argc, argv, stdout_fd, stderr_fd, compact, quiet);
+    if ([subcmd isEqualToString:@"create"])            return calendar_cmd_create(argc, argv, stdout_fd, stderr_fd, compact, quiet);
     if ([subcmd isEqualToString:@"update"])            return cmd_update(argc, argv, stdout_fd, stderr_fd, compact, quiet);
     if ([subcmd isEqualToString:@"delete"])            return cmd_delete(argc, argv, stdout_fd, compact, quiet);
     if ([subcmd isEqualToString:@"remind"])            return calendar_cmd_remind(argc, argv, stdout_fd, stderr_fd, compact, quiet);
@@ -1169,7 +1504,7 @@ static int calendar_handler(int argc, char **argv,
 }
 
 void calendar_offload_register(void) {
-    int err = native_offload_add_handler("apple-calendar", calendar_handler);
+    int err = native_offload_add_handler("apple-calendar", calendar_offload_handle);
     if (err == 0) {
         noff_ensure_guest_stub("/usr/local/bin/apple-calendar");
         NSLog(@"NativeOffloads: apple-calendar handler registered");

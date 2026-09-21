@@ -4,9 +4,9 @@
 
 本文面向项目使用者与开发 Agent，说明当前 iOS 实现提供哪些接口、可以读取或写入哪些数据，以及能力边界。它是现有实现的说明，不是待开发功能承诺，也不新增开发或审批规则。
 
-- 核查日期：2026-09-18。
+- 核查日期：2026-09-18；日历重复创建条目于 2026-09-20 随实现更新，验证单独记录。
 - 仓库分支：`feat/minisx-branding`。
-- 源码基线：`3c0eb138c2b4e2de743ca8a4a36a3a5dc88b5472`；核查时工作区已有文档与技能变更，本文涉及的应用源码未修改。
+- 原始核查源码基线：`3c0eb138c2b4e2de743ca8a4a36a3a5dc88b5472`。2026-09-20 日历条目依据 `0f1ba5f` 上尚未提交的本次实现更新；其余条目保留原核查结果。
 - 项目最低系统版本：iOS 26.0。
 - 验证程度：核对注册入口、命令分发及关键实现；没有访问真实手机数据，没有逐项实机测试。
 - “已实现”表示代码中存在对应处理路径，不代表当前设备已授权、系统支持所有数据类型，或操作必然成功。后续源码变化可能使本清单过时。
@@ -42,7 +42,7 @@ Agent 通常通过 `shell_execute` 执行项目封装的 `apple-*` 命令；iSH 
 
 | 类别与项目接口 | 读取能力 | 写入或修改能力 | 当前边界与源码 |
 | --- | --- | --- | --- |
-| 日历 `apple-calendar` | 日历列表、事件、忙闲时间 | `create` / `update` / `delete`；标题、起止时间、地点、备注、提前提醒等 | 创建时没有重复规则参数；已有重复事件的修改、删除支持 `--occurrence-date`、`--span this\|future\|all`。[CalendarOffload](../../src/ios/NativeOffloads/CalendarOffload.m) |
+| 日历 `apple-calendar` | 日历列表、事件、忙闲时间 | `create` / `update` / `delete`；标题、起止时间、地点、备注、提前提醒等 | 创建已接入 EventKit 完整重复规则与结束条件；年度周次为已知限制，本次暂缓，详见[重复日程接口](ios-calendar-recurrence.md)；已有重复事件的修改、删除支持 `--occurrence-date`、`--span this\|future\|all`。[CalendarOffload](../../src/ios/NativeOffloads/CalendarOffload.m) |
 | 提醒事项 `apple-reminders` | `list` 查询提醒事项及状态等 | `create` / `update` / `delete`；`complete` 标记完成、`complete --undo` 恢复未完成；截止时间、列表选择、优先级、备注等 | 没有创建提醒事项列表的独立命令；传入 `--parent-id` 会报不支持，不能创建子任务。[RemindersOffload](../../src/ios/NativeOffloads/RemindersOffload.m)，实际委托给 CalendarOffload |
 | 照片与视频 `apple-photos` | `list` / `near` / `albums` / `album` / `stats` / `export`；查询时间、位置、收藏等信息，导出资源 | `import` / `save` 导入；`create-album`、`add-to-album`；`favorite`；`delete` | 受照片授权范围限制；删除需传资源 ID 和 `--confirm`。没有相册删除、重命名、移出相册或照片原位编辑命令。[PhotosOffload](../../src/ios/NativeOffloads/PhotosOffload.m) |
 | 健康 `apple-healthkit` | 步数、心率、睡眠、运动、体重、血氧、血糖、营养等记录；多种类型和日期范围查询 | `log` 写入支持类型的数量或分类样本；`log-blood-pressure` 写血压；`delete` 删除受支持样本 | 部分类型只读或受系统写入限制；删除限定本 App 来源。详细边界见下文。[HealthKitOffload](../../src/ios/NativeOffloads/HealthKitOffload.m) |
@@ -115,7 +115,7 @@ Agent 通常通过 `shell_execute` 执行项目封装的 `apple-*` 命令；iSH 
 
 | 用户目标 | 本次核查结论 |
 | --- | --- |
-| 在日历里创建每周/每两周重复的事件 | `apple-calendar create` 尚未接入重复规则 |
+| 在日历里创建每周/每两周重复的事件 | `apple-calendar create` 已接入原生重复规则；支持每两周及完整复杂筛选，验证范围见[重复日程接口](ios-calendar-recurrence.md) |
 | 设置每天/工作日重复的闹钟 | `apple-alarm` 已有对应实现 |
 | 让 Agent 在未来定期醒来，重新读取数据、推理并执行操作 | 不能由日历、闹钟或本地通知能力推断；还需单独核查任务调度和 iOS 运行条件，本文未验证该能力 |
 
