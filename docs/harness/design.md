@@ -30,7 +30,7 @@
 - `.agents/skills/`：共享恢复、审查等技能，实施时按需创建。
 - `scripts/harness/`：快照、调用和验证等确定性操作，实施时创建。
 
-任务标题和文件名／目录名使用 `YY-mm-dd Name`，日期为创建日期；归档时保留原名。任务格式见 [record-formats.md](record-formats.md)。实施状态见 [实施任务](<../../tasks/active/26-09-11 实现 OpenMinis 开发 Harness/task.md>)。
+任务标题和文件名／目录名使用 `YY-mm-dd Name`，日期为创建日期；归档时保留原名。任务格式见 [record-formats.md](record-formats.md)。实施状态见 [实施任务](<../../tasks/archive/26-09-11 实现 OpenMinis 开发 Harness/task.md>)。
 
 ## Spec 上下文
 
