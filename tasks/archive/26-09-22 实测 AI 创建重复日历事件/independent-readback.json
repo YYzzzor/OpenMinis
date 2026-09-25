@@ -1,0 +1,172 @@
+{
+  "app": {
+    "app": "MinisApp",
+    "build": "1",
+    "device": "iPhone 18 Pro · 3E38",
+    "version": "1.13"
+  },
+  "command": "apple-calendar list (independent fresh query)",
+  "range": {
+    "start": "2026-09-01T00:00:00+08:00",
+    "end": "2027-01-01T00:00:00+08:00"
+  },
+  "events": [
+    {
+      "id": "6A92A7DA-3E53-4443-B9F1-4C904D17DD36:097C1004-4D6A-4BBE-B310-AECEABE3F116",
+      "start": "2026-09-30T15:00:00+08:00",
+      "url": null,
+      "calendar": "日历",
+      "is_recurring": true,
+      "occurrence_date": "2026-09-30T15:00:00+08:00",
+      "title": "MinisX 测试：每月最后一个工作日 0922",
+      "location": null,
+      "is_all_day": false,
+      "notes": null,
+      "recurrence_rules": [
+        {
+          "end": {
+            "type": "count",
+            "count": 3
+          },
+          "frequency": "monthly",
+          "days_of_week": [
+            "MO",
+            "TU",
+            "WE",
+            "TH",
+            "FR"
+          ],
+          "weeks_of_year": [],
+          "calendar_identifier": "gregorian",
+          "months_of_year": [],
+          "first_day_of_week": 2,
+          "days_of_year": [],
+          "days_of_month": [],
+          "set_positions": [
+            -1
+          ],
+          "interval": 1
+        }
+      ],
+      "end": "2026-09-30T15:30:00+08:00",
+      "recurrence": {
+        "days_of_week": [
+          "mon",
+          "tue",
+          "wed",
+          "thu",
+          "fri"
+        ],
+        "interval": 1,
+        "count": 3,
+        "frequency": "monthly"
+      },
+      "time_zone": "Asia/Shanghai"
+    },
+    {
+      "id": "6A92A7DA-3E53-4443-B9F1-4C904D17DD36:097C1004-4D6A-4BBE-B310-AECEABE3F116",
+      "start": "2026-10-30T15:00:00+08:00",
+      "url": null,
+      "calendar": "日历",
+      "is_recurring": true,
+      "occurrence_date": "2026-10-30T15:00:00+08:00",
+      "title": "MinisX 测试：每月最后一个工作日 0922",
+      "location": null,
+      "is_all_day": false,
+      "notes": null,
+      "recurrence_rules": [
+        {
+          "end": {
+            "type": "count",
+            "count": 3
+          },
+          "frequency": "monthly",
+          "days_of_week": [
+            "MO",
+            "TU",
+            "WE",
+            "TH",
+            "FR"
+          ],
+          "weeks_of_year": [],
+          "calendar_identifier": "gregorian",
+          "months_of_year": [],
+          "first_day_of_week": 2,
+          "days_of_year": [],
+          "days_of_month": [],
+          "set_positions": [
+            -1
+          ],
+          "interval": 1
+        }
+      ],
+      "end": "2026-10-30T15:30:00+08:00",
+      "recurrence": {
+        "days_of_week": [
+          "mon",
+          "tue",
+          "wed",
+          "thu",
+          "fri"
+        ],
+        "interval": 1,
+        "count": 3,
+        "frequency": "monthly"
+      },
+      "time_zone": "Asia/Shanghai"
+    },
+    {
+      "id": "6A92A7DA-3E53-4443-B9F1-4C904D17DD36:097C1004-4D6A-4BBE-B310-AECEABE3F116",
+      "start": "2026-11-30T15:00:00+08:00",
+      "url": null,
+      "calendar": "日历",
+      "is_recurring": true,
+      "occurrence_date": "2026-11-30T15:00:00+08:00",
+      "title": "MinisX 测试：每月最后一个工作日 0922",
+      "location": null,
+      "is_all_day": false,
+      "notes": null,
+      "recurrence_rules": [
+        {
+          "end": {
+            "type": "count",
+            "count": 3
+          },
+          "frequency": "monthly",
+          "days_of_week": [
+            "MO",
+            "TU",
+            "WE",
+            "TH",
+            "FR"
+          ],
+          "weeks_of_year": [],
+          "calendar_identifier": "gregorian",
+          "months_of_year": [],
+          "first_day_of_week": 2,
+          "days_of_year": [],
+          "days_of_month": [],
+          "set_positions": [
+            -1
+          ],
+          "interval": 1
+        }
+      ],
+      "end": "2026-11-30T15:30:00+08:00",
+      "recurrence": {
+        "days_of_week": [
+          "mon",
+          "tue",
+          "wed",
+          "thu",
+          "fri"
+        ],
+        "interval": 1,
+        "count": 3,
+        "frequency": "monthly"
+      },
+      "time_zone": "Asia/Shanghai"
+    }
+  ],
+  "query_truncated": false
+}

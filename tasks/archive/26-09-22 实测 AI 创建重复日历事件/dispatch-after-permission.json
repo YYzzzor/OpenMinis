@@ -1,0 +1,19 @@
+{
+  "_meta": {
+    "app": "MinisApp",
+    "build": "1",
+    "device": "iPhone 18 Pro · 3E38",
+    "version": "1.13"
+  },
+  "id": 1,
+  "jsonrpc": "2.0",
+  "result": {
+    "isNewSession": false,
+    "modelName": "DeepSeek Flash",
+    "prompt": "系统日历完全访问权限现在已允许，请继续原测试：先按标题确认不存在，避免重复创建，再创建原生重复系列并核查9、10、11月共3次，12月无第4次。本轮不要使用 memory_write 或更改长期记忆。",
+    "responseText": null,
+    "sessionId": "C1B2506F-3209-4B2F-A852-35E12C17F01C",
+    "status": "Running",
+    "userMessageId": "60775A39-28A7-467E-8423-8ADFCEFEB142"
+  }
+}

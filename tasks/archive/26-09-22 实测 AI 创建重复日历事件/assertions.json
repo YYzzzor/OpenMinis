@@ -1,0 +1,16 @@
+{
+  "result": "passed",
+  "date": "2026-09-22T01:03:13.222172+08:00",
+  "checks": [
+    "three expected dates",
+    "same series identifier",
+    "native recurring events",
+    "monthly weekdays with last-position selector",
+    "count end=3",
+    "Asia/Shanghai 15:00–15:30",
+    "no December occurrence",
+    "no alarms or attendees",
+    "query not truncated"
+  ],
+  "events_kept_for_user": true
+}
