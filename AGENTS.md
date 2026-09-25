@@ -13,6 +13,17 @@ This file defines how to analyze, comment on, and modify code in this repository
 - Ask when missing information would materially change the goal, scope or acceptance criteria, or when new authorization is required. If one step is blocked, continue useful work that does not depend on it.
 - Implementing an already approved plan does not require repeated rule approval. New or materially changed rules affecting future tasks still require the review described under Development Harness. Existing tool and environment permission boundaries continue to apply.
 
+## Codex Model Delegation
+
+- The project default division of work is GPT-6-Astra (`gpt-6-astra`) for planning, complex problems, integration, code review and final acceptance, with GPT-6-Luna (`gpt-6-luna`) at `max` reasoning effort for clearly scoped implementation subtasks (user decision: 2026-09-23).
+- Within an authorized task, the main agent may assign suitable implementation subtasks to Luna Max without asking the user to launch or approve each subagent. Explicitly select both the model and reasoning effort; do not rely on the subagent inheriting the main task's settings.
+- Follow the Development Harness delegation rules below. The main agent may handle small edits and work requiring continuous shared context directly when delegation would add more overhead than benefit.
+- This policy does not switch the active main task's model. If it differs from Astra, report that limitation rather than claiming the work is being performed by Astra. If Luna Max is unavailable, report the limitation and continue suitable work with the main agent; do not silently substitute another subagent model.
+- Luna Max performs author self-checks and relevant validation before handing work back. Its handoff identifies changed files, validation results and evidence locations, known concerns and unverified scope.
+- The main agent checks the actual diff and relevant code against confirmed requirements, including integration effects, edge cases and whether test assertions cover the intended behavior. Inspect original validation evidence and verify that it applies to the final code; do not rely only on the implementation agent's summary. Scale review depth to the change's impact and follow Changes and Validation below to avoid unnecessary repeated checks.
+- The main agent retains responsibility for integration and final acceptance. Existing Harness validation and independent Pi review requirements still apply: verify Pi findings, arrange fixes and relevant revalidation or re-review, and record their disposition. Neither a subagent's completion report nor Pi's conclusion is final acceptance.
+- These defaults apply to this project. A more specific user instruction for the current task takes precedence.
+
 ## Reader Background
 
 The detailed teaching guidance in Reader Background, Explanation Style and Swift Topics That Need Explanation applies when the user requests code explanation, analysis or learning. For implementation, review and progress reports, explain only what is needed to assess the work; do not teach every language feature encountered.
