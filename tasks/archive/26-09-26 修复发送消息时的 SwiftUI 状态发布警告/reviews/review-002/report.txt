@@ -1,0 +1,18 @@
+{
+  "snapshot_id": "bb6e27447ddb5f8efdd47de02dc5437cab9a04eb72d8360970f010f6c5a41c2c",
+  "conclusion": "nonblocking",
+  "coverage": "Required: tasks/active/26-09-26 修复发送消息时的 SwiftUI 状态发布警告/task.md (full); docs/specs/debug-server-api.md — Connection, Protocol, Methods (debug.search, debug.inspect; also debug.viewTree, debug.highlight, debug.agentTrace, debug.ls, debug.readFile, debug.appInfo, debug.screenshot, debug.llmRequests). Optional Spec: Provider Management Methods, Model Group Management Methods, Chat Automation Methods through chat.retry (partial). Code: snapshot/src/ios/Views/Chat/ChatInputBar.swift (PastableTextView, updateUIView, Coordinator delegate methods), snapshot/src/ios/Views/Chat/AIChatView.swift (inputBar construction, handleCaretChange, performSend, swipe-send selection gating), snapshot/src/ios/Agent/Chat/AIChatViewModel.swift (inputText/inputCaret @Published), snapshot/src/ios/Agent/Chat/AIChatViewModel+MentionMenu.swift (updateMentionMenuState/selectMention), snapshot/src/ios/MinisTests/PastableTextViewSelectionTests.swift (full), patches/unstaged.patch (full; staged.patch empty).",
+  "limitations": "Unexecuted: I did not build or run the XCTest target or the app. PastableTextViewSelectionTests.swift is an untracked addition and its membership in the Minis test target could not be verified because src/ios/Minis.xcodeproj/project.pbxproj is excluded from review scope; the tests also exercise the Coordinator in isolation (they never set textView.delegate nor invoke updateUIView), so the real UIKit delegate wiring and the isUpdatingView toggle are covered only by the task's manual device claims, not by the tests themselves. Unresolved required Spec dependency: the task's Spec 阅读清单 requires debug.inputText, but that method is not defined anywhere in the provided debug-server-api.md snapshot. Unread Spec sections: Log Methods, Browser Debug Methods, Error Codes, and Quick Start were not read in full. The iOS deployment target / Xcode 27 / SDK 27 / explicit DEVELOPER_DIR acceptance items are build/project concerns and were not independently verified.",
+  "findings": [
+    {
+      "id": "R1",
+      "severity": "nonblocking",
+      "requirement": "同流程前后对照：输入、发送、流式更新与列表无警告及重复/丢失/回退 (no illegal synchronous SwiftUI state publication during the send flow)",
+      "location": "snapshot/src/ios/Views/Chat/ChatInputBar.swift — Coordinator.scrollViewDidScroll/publishAtBottom (~lines 1754-1757) versus updateUIView's isUpdatingView guard (~lines 1497-1499)",
+      "trigger": "Inside updateUIView, tv.text = text and (in the overflow branch) tv.layoutIfNeeded() can change the UITextView scroll content/offset; if UIKit delivers scrollViewDidScroll synchronously while isUpdatingView == true, publishAtBottom writes parent.isAtScrollBottom synchronously during the view update.",
+      "evidence": "The patch only guards textViewDidChangeSelection with isUpdatingView. publishAtBottom writes the SwiftUI binding parent.isAtScrollBottom synchronously and has no isUpdatingView guard. The captured LLDB stack in the task proves only the textViewDidChangeSelection → inputCaret path; the scroll path was not part of the captured evidence.",
+      "verification": "Static inspection only; the app was not executed during this review. The task reports 0 target warnings in the send interval, but the startup-phase same-text warnings were left unverified and the composer-overflow/paste-while-updating path (which calls layoutIfNeeded inside updateUIView) was not specifically exercised.",
+      "certainty": "low"
+    }
+  ]
+}

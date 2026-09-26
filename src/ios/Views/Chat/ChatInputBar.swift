@@ -1493,6 +1493,11 @@ struct PastableTextView: UIViewRepresentable {
     }
 
     func updateUIView(_ tv: PastableUITextView, context: Context) {
+        let coordinator = context.coordinator
+        coordinator.parent = self
+        coordinator.isUpdatingView = true
+        defer { coordinator.isUpdatingView = false }
+
         // [T-ipad-composer-resize] Track the growth cap as the user drags. The
         // invalidate is required: `maxHeight` feeds `intrinsicContentSize` and
         // `isScrollEnabled`, neither of which UIKit re-derives on its own, so
@@ -1708,7 +1713,9 @@ struct PastableTextView: UIViewRepresentable {
         var parent: PastableTextView
         /// Guard flag to prevent focus feedback loop between UIKit delegate → SwiftUI → updateUIView
         var isSyncingFocus = false
-        /// [T-ios-composer-residual-text-33549] When `updateUIView` clears
+        // UIKit 在设置 text / selectedRange 时会同步通知选区变化；这期间不能回写 SwiftUI。
+        var isUpdatingView = false
+        private var selectionUpdateScheduled = false
 
         init(_ parent: PastableTextView) {
             self.parent = parent
@@ -1842,7 +1849,22 @@ struct PastableTextView: UIViewRepresentable {
         }
 
         func textViewDidChangeSelection(_ textView: UITextView) {
-            parent.hasSelection = textView.selectedRange.length > 0
+            if isUpdatingView {
+                guard !selectionUpdateScheduled else { return }
+                selectionUpdateScheduled = true
+                // 仅跨过当前视图更新边界。合并同步回调，并在执行时读取最新选区，
+                // 避免发送清空或提及插入产生的旧光标位置覆盖后续输入。
+                DispatchQueue.main.async { [weak self, weak textView] in
+                    guard let self, let textView, self.selectionUpdateScheduled else { return }
+                    self.selectionUpdateScheduled = false
+                    self.textViewDidChangeSelection(textView)
+                }
+                return
+            }
+            // 真正的用户选区事件保持即时；若已同步最新状态，取消排队的重复回写。
+            selectionUpdateScheduled = false
+            let hasSelection = textView.selectedRange.length > 0
+            if parent.hasSelection != hasSelection { parent.hasSelection = hasSelection }
             parent.onCaretChange?(textView.selectedRange.location)
         }
     }
