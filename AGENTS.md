@@ -89,6 +89,10 @@ When explaining code at the user's request, explain the actual effect of relevan
 - Do not mix Android implementation details into an iOS explanation unless the execution path genuinely crosses platforms or a comparison is explicitly useful.
 - Do not target `Vendor`, resource files, or generated files for comments unless the user explicitly asks for them.
 
+## UI Preview Collaboration
+
+- For UI adjustments, prefer Xcode Canvas previews of the production component with centrally located, clearly commented parameters the maintainer can edit to compare results. Preserve the maintainer's edits and apply confirmed values to the shared production implementation. Follow [ios-ui-design: Canvas collaboration](.agents/skills/ios-ui-design/SKILL.md#优先用-canvas-协作调整-ui) for the workflow and validation boundaries; use simulator or device checks for behavior previews cannot adequately verify. This is a preference, not a mandatory preview stage for every UI task.
+
 ## Using CodeGraph
 
 - Prefer CodeGraph for structural questions such as symbol definitions, callers, callees, execution paths, and change impact when it is available and its index applies to the current code. If unavailable or insufficient, continue with direct source reading and searches.
