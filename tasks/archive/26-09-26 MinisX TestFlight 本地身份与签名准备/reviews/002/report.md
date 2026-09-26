@@ -1,0 +1,10 @@
+# Independent review
+
+Snapshot: 846a9ed554625dae991a2823d611390d735a55c3262f89cdbe7b75c3de2b913c
+Conclusion: no_findings
+
+## Coverage
+Read required task.md in full (requirements/tasks/active/26-09-26 MinisX TestFlight 本地身份与签名准备/task.md). Read optional spec selection requirements/docs/specs/ios-device-data-capabilities.md, section 6. 授权、缺失能力与容易混淆的范围 (ancestor introduction lines 1-2 and selected subtree lines 98-122). Inspected the full patches/base-to-worktree.patch and snapshot evidence: src/ios/Info.plist; Minis.entitlements; ShareExtension/FileProvider/AgentWidget entitlements and Info.plists; Minis.xcodeproj/project.pbxproj target and build-configuration sections; and the identity-touching Swift files CloudSyncEngine.swift, ICloudBackupManager.swift, ICloudSharedZoneTransport.swift, DebugJSONRPC.swift, MinisApp.swift, FileProviderExtension.swift, AppGroupChangeWatcher.swift, FPSyncTraceLog.swift, SharedContainerStore.swift, SharedFolderVisibility.swift, AudioTogglePlaybackIntent.swift, FileBrowserView.swift, MountDetailView.swift, SharedFoldersSettingsView.swift.
+
+## Limitations
+Review is source-only and read-only; no build, test, or runtime execution was performed, so the task-recorded simulator build (bash scripts/build_ios_simulator.sh --skip-deps exit 0 / BUILD SUCCEEDED), the 155-item deduplicated warning list, and the four build artifacts were not independently reproduced (evidence/validation.md and the build log are outside this snapshot and were not loaded). Apple Developer-side resources (team 42486W5YRY membership, App Group group.com.yyzzzor.minisx, iCloud container iCloud.com.yyzzzor.minisx, App Store Connect app records, and provisioning profiles) cannot be verified from source, and no Release archive/signing or device install was performed. deps/ish and deps/proot are excluded by policy and were not reviewed (Git state only). Only the selected task.md was loaded from task records; neighboring task records and attachments were not. No old-branch baseline comparison was performed beyond the provided patch.
