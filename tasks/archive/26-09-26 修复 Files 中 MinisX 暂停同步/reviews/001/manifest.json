@@ -1,0 +1,268 @@
+{
+  "artifacts": {
+    "patches/base-to-worktree.patch": {
+      "executable": false,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "patches/staged.patch": {
+      "executable": false,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "patches/unstaged.patch": {
+      "executable": false,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "request.md": "b94a498ff3197fc298a4a30ae5c4c4e5d79d0067ec0e4bff84261102649bd966",
+    "requirements/tasks/active/26-09-26 修复 Files 中 MinisX 暂停同步/diagnosis.md": {
+      "executable": false,
+      "sha256": "86b4ee7fd65af9fd16b2c0169c5c2a1d1022e0f67d241ca4b5a3fe54fa3f1fe4"
+    },
+    "requirements/tasks/active/26-09-26 修复 Files 中 MinisX 暂停同步/diagnostic-evidence.md": {
+      "executable": false,
+      "sha256": "262f45ea0d1f35f0f90a10c43eb53b5fc6fad77896f9a020aee90c0388418571"
+    },
+    "requirements/tasks/active/26-09-26 修复 Files 中 MinisX 暂停同步/task.md": {
+      "executable": false,
+      "sha256": "9cb3c85e28940a25f6422a916de4ebcd182f1c37ab039a04914b791d09f78c42"
+    },
+    "snapshot/.agents/skills/review-task/SKILL.md": {
+      "executable": false,
+      "sha256": "30f041c617a06d264a1a87e55b66e1bf7a6cfa82a4d6f6323d7752d813c438d4"
+    },
+    "snapshot/AGENTS.md": {
+      "executable": false,
+      "sha256": "c674ee42b935655d8896cf0d3bfb4be430f779c0dac915c042f11c400ddba4d9"
+    },
+    "snapshot/src/ios/FileProvider/AppGroupChangeWatcher.swift": {
+      "executable": false,
+      "sha256": "9cdeb42d8730df0176ca7cc94c84e0d32895671bb2156970ef0f3f6acadd0815"
+    },
+    "snapshot/src/ios/FileProvider/FPSyncTraceLog.swift": {
+      "executable": false,
+      "sha256": "1c1f3807e8c971482bd5c39bf399be2a5222c04c8a2e51f92a0cf715ae6bc49a"
+    },
+    "snapshot/src/ios/FileProvider/FileProvider.entitlements": {
+      "executable": false,
+      "sha256": "be435b5a48d7923f53a38dc8d69eec88be94ab28f55574f0c8c46fe64a090c5f"
+    },
+    "snapshot/src/ios/FileProvider/FileProviderEnumerator.swift": {
+      "executable": false,
+      "sha256": "d0f6e231bfc45efa567436bff58c584b8216dff18edc572c69b02898f8dd718e"
+    },
+    "snapshot/src/ios/FileProvider/FileProviderExtension.swift": {
+      "executable": false,
+      "sha256": "c9ee34b7223bfaff867027a3709322ab16e527029c2df22095a336cc1febf52a"
+    },
+    "snapshot/src/ios/FileProvider/FileProviderItem.swift": {
+      "executable": false,
+      "sha256": "f03d931a8a257e32429151c703fd8ea7468cc522fe40b8c25dbdf1e601fb2c9b"
+    },
+    "snapshot/src/ios/FileProvider/Info.plist": {
+      "executable": false,
+      "sha256": "8218e03cf6dec072a54affb339fb39c0d1b7ceadf42b200d56d9f6deecee4f44"
+    },
+    "snapshot/src/ios/MinisApp.swift": {
+      "executable": false,
+      "sha256": "06341b3c668b6dba42aebc8cc4aa7c0e28e77c26e803b5a56b17c765f316bec6"
+    },
+    "snapshot/src/ios/Views/Settings/SharedFolderVisibility.swift": {
+      "executable": false,
+      "sha256": "86a8f81d3fa006e801fd6a0f881824e0dde4ab47d47c4a0eb3793d87f98061d5"
+    },
+    "snapshot/tasks/active/26-09-26 修复 Files 中 MinisX 暂停同步/diagnosis.md": {
+      "executable": false,
+      "sha256": "86b4ee7fd65af9fd16b2c0169c5c2a1d1022e0f67d241ca4b5a3fe54fa3f1fe4"
+    },
+    "snapshot/tasks/active/26-09-26 修复 Files 中 MinisX 暂停同步/diagnostic-evidence.md": {
+      "executable": false,
+      "sha256": "262f45ea0d1f35f0f90a10c43eb53b5fc6fad77896f9a020aee90c0388418571"
+    },
+    "snapshot/tasks/active/26-09-26 修复 Files 中 MinisX 暂停同步/task.md": {
+      "executable": false,
+      "sha256": "9cb3c85e28940a25f6422a916de4ebcd182f1c37ab039a04914b791d09f78c42"
+    }
+  },
+  "repo": "/Users/huyuanzhao/Coding/Projects/OpenMinis",
+  "schema": 1,
+  "snapshot_id": "5fa4f1b94828a2e647ac3cd958753284bf3d34f3313198c477f3fa039079b57a",
+  "spec_selections": [],
+  "state": {
+    "base": "ad545c948fe8e8a9ce57861f1944385234f9e6e7",
+    "branch": "main",
+    "excluded_gitlinks": {
+      "deps/ish": {
+        "index_commit": "3f6384c70eefd1a370f121d3492a5f21f7767df9",
+        "status": "",
+        "worktree": "3f6384c70eefd1a370f121d3492a5f21f7767df9"
+      },
+      "deps/proot": {
+        "index_commit": "8cf13e997cdc9472997aae19df8050c073c9a86c",
+        "worktree": "uninitialized"
+      }
+    },
+    "exclusions": [
+      ".DS_Store",
+      ".agents/skills/ios-ui-design",
+      ".agents/skills/plan-task",
+      ".agents/skills/resume-task",
+      ".github",
+      ".gitignore",
+      ".gitmodules",
+      ".ignore",
+      "BUILDING.md",
+      "CONTRIBUTING.md",
+      "LICENSE",
+      "README.md",
+      "THIRD_PARTY_LICENSES.md",
+      "assets",
+      "build",
+      "deps",
+      "docs",
+      "scripts",
+      "src/android",
+      "src/ios/Agent",
+      "src/ios/AgentWidget",
+      "src/ios/AppDelegate.swift",
+      "src/ios/Assets.xcassets",
+      "src/ios/CalendarTests",
+      "src/ios/Configs",
+      "src/ios/Debug",
+      "src/ios/Diagnostics",
+      "src/ios/Generated",
+      "src/ios/ISHCommandExecutionExample.swift",
+      "src/ios/Info.plist",
+      "src/ios/Launch Screen.storyboard",
+      "src/ios/Localizable.xcstrings",
+      "src/ios/Minis.entitlements",
+      "src/ios/Minis.xcodeproj",
+      "src/ios/MinisApp-Bridging-Header.h",
+      "src/ios/MinisTests",
+      "src/ios/MinisUITests",
+      "src/ios/NativeOffloads",
+      "src/ios/Preview Content",
+      "src/ios/PrivacyInfo.xcprivacy",
+      "src/ios/Providers",
+      "src/ios/Resources",
+      "src/ios/ShareExtension",
+      "src/ios/Shared",
+      "src/ios/Vendor",
+      "src/ios/Views/Alarms",
+      "src/ios/Views/Backup",
+      "src/ios/Views/Chat",
+      "src/ios/Views/ContentView.swift",
+      "src/ios/Views/MCP",
+      "src/ios/Views/Providers",
+      "src/ios/Views/Rootfs",
+      "src/ios/Views/Settings/AboutView.swift",
+      "src/ios/Views/Settings/AppLockOverlay.swift",
+      "src/ios/Views/Settings/BackupAndRestoreView.swift",
+      "src/ios/Views/Settings/BackupCategoryIcon.swift",
+      "src/ios/Views/Settings/BackupDestinationDetailView.swift",
+      "src/ios/Views/Settings/BackupDestinationPicker.swift",
+      "src/ios/Views/Settings/BackupHUD.swift",
+      "src/ios/Views/Settings/BackupHistoryDetailView.swift",
+      "src/ios/Views/Settings/BackupRestoreView.swift",
+      "src/ios/Views/Settings/BackupSettingsView.swift",
+      "src/ios/Views/Settings/BackupSkippedFilesView.swift",
+      "src/ios/Views/Settings/CloudSyncSettingsView.swift",
+      "src/ios/Views/Settings/ConfigAuditView.swift",
+      "src/ios/Views/Settings/EnhancedBackgroundSettingsView.swift",
+      "src/ios/Views/Settings/EnvironmentVariablesView.swift",
+      "src/ios/Views/Settings/FaceIDProtectionSettingsView.swift",
+      "src/ios/Views/Settings/LogManagementView.swift",
+      "src/ios/Views/Settings/MemoryManagementView.swift",
+      "src/ios/Views/Settings/MountDetailView.swift",
+      "src/ios/Views/Settings/MountedFolderCoordinator.swift",
+      "src/ios/Views/Settings/MountedFoldersManager.swift",
+      "src/ios/Views/Settings/MountedFoldersSettingsView.swift",
+      "src/ios/Views/Settings/OffloadPermissionSettingsView.swift",
+      "src/ios/Views/Settings/RcloneAddServerView.swift",
+      "src/ios/Views/Settings/SharedFoldersSettingsView.swift",
+      "src/ios/Views/Settings/SoulSettingsView.swift",
+      "src/ios/Views/Settings/StorageManagementView.swift",
+      "src/ios/Views/Skills",
+      "src/ios/Views/Sync",
+      "src/ios/WebApp",
+      "src/ios/de.lproj",
+      "src/ios/default_mount",
+      "src/ios/en.lproj",
+      "src/ios/es.lproj",
+      "src/ios/fr.lproj",
+      "src/ios/iSH",
+      "src/ios/ja.lproj",
+      "src/ios/ko.lproj",
+      "src/ios/ru.lproj",
+      "src/ios/zh-Hans.lproj",
+      "src/ios/zh-Hant.lproj",
+      "src/shared"
+    ],
+    "files": {
+      ".agents/skills/review-task/SKILL.md": {
+        "executable": false,
+        "sha256": "30f041c617a06d264a1a87e55b66e1bf7a6cfa82a4d6f6323d7752d813c438d4"
+      },
+      "AGENTS.md": {
+        "executable": false,
+        "sha256": "c674ee42b935655d8896cf0d3bfb4be430f779c0dac915c042f11c400ddba4d9"
+      },
+      "src/ios/FileProvider/AppGroupChangeWatcher.swift": {
+        "executable": false,
+        "sha256": "9cdeb42d8730df0176ca7cc94c84e0d32895671bb2156970ef0f3f6acadd0815"
+      },
+      "src/ios/FileProvider/FPSyncTraceLog.swift": {
+        "executable": false,
+        "sha256": "1c1f3807e8c971482bd5c39bf399be2a5222c04c8a2e51f92a0cf715ae6bc49a"
+      },
+      "src/ios/FileProvider/FileProvider.entitlements": {
+        "executable": false,
+        "sha256": "be435b5a48d7923f53a38dc8d69eec88be94ab28f55574f0c8c46fe64a090c5f"
+      },
+      "src/ios/FileProvider/FileProviderEnumerator.swift": {
+        "executable": false,
+        "sha256": "d0f6e231bfc45efa567436bff58c584b8216dff18edc572c69b02898f8dd718e"
+      },
+      "src/ios/FileProvider/FileProviderExtension.swift": {
+        "executable": false,
+        "sha256": "c9ee34b7223bfaff867027a3709322ab16e527029c2df22095a336cc1febf52a"
+      },
+      "src/ios/FileProvider/FileProviderItem.swift": {
+        "executable": false,
+        "sha256": "f03d931a8a257e32429151c703fd8ea7468cc522fe40b8c25dbdf1e601fb2c9b"
+      },
+      "src/ios/FileProvider/Info.plist": {
+        "executable": false,
+        "sha256": "8218e03cf6dec072a54affb339fb39c0d1b7ceadf42b200d56d9f6deecee4f44"
+      },
+      "src/ios/MinisApp.swift": {
+        "executable": false,
+        "sha256": "06341b3c668b6dba42aebc8cc4aa7c0e28e77c26e803b5a56b17c765f316bec6"
+      },
+      "src/ios/Views/Settings/SharedFolderVisibility.swift": {
+        "executable": false,
+        "sha256": "86a8f81d3fa006e801fd6a0f881824e0dde4ab47d47c4a0eb3793d87f98061d5"
+      },
+      "tasks/active/26-09-26 修复 Files 中 MinisX 暂停同步/diagnosis.md": {
+        "executable": false,
+        "sha256": "86b4ee7fd65af9fd16b2c0169c5c2a1d1022e0f67d241ca4b5a3fe54fa3f1fe4"
+      },
+      "tasks/active/26-09-26 修复 Files 中 MinisX 暂停同步/diagnostic-evidence.md": {
+        "executable": false,
+        "sha256": "262f45ea0d1f35f0f90a10c43eb53b5fc6fad77896f9a020aee90c0388418571"
+      },
+      "tasks/active/26-09-26 修复 Files 中 MinisX 暂停同步/task.md": {
+        "executable": false,
+        "sha256": "9cb3c85e28940a25f6422a916de4ebcd182f1c37ab039a04914b791d09f78c42"
+      }
+    },
+    "head": "ad545c948fe8e8a9ce57861f1944385234f9e6e7",
+    "index_sha256": "3c33b394ba0360828e77f73bf6c120b20f3e06dcdb9e8a197586cafc2e2f85c9",
+    "requirements": {
+      "tasks/active/26-09-26 修复 Files 中 MinisX 暂停同步/diagnosis.md": "86b4ee7fd65af9fd16b2c0169c5c2a1d1022e0f67d241ca4b5a3fe54fa3f1fe4",
+      "tasks/active/26-09-26 修复 Files 中 MinisX 暂停同步/diagnostic-evidence.md": "262f45ea0d1f35f0f90a10c43eb53b5fc6fad77896f9a020aee90c0388418571",
+      "tasks/active/26-09-26 修复 Files 中 MinisX 暂停同步/task.md": "9cb3c85e28940a25f6422a916de4ebcd182f1c37ab039a04914b791d09f78c42"
+    },
+    "status": " M BUILDING.md\u0000 M src/ios/Minis.xcodeproj/project.pbxproj\u0000 M src/ios/Views/Chat/ChatInputBar.swift\u0000?? src/ios/MinisTests/PastableTextViewSelectionTests.swift\u0000?? tasks/active/26-09-26 修复 Files 中 MinisX 暂停同步/diagnosis.md\u0000?? tasks/active/26-09-26 修复 Files 中 MinisX 暂停同步/diagnostic-evidence.md\u0000?? tasks/active/26-09-26 修复 Files 中 MinisX 暂停同步/task.md\u0000",
+    "task_record_policy": "selected-only"
+  },
+  "task": "tasks/active/26-09-26 修复 Files 中 MinisX 暂停同步/task.md"
+}

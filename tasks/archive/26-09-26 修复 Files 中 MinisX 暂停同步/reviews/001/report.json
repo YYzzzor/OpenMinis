@@ -1,0 +1,38 @@
+{
+  "conclusion": "nonblocking",
+  "coverage": "Read all three required Spec files in full: requirements/tasks/active/26-09-26 修复 Files 中 MinisX 暂停同步/task.md, diagnosis.md, diagnostic-evidence.md. Read the retained snapshot FileProvider sources: FileProviderExtension.swift, FileProviderItem.swift, FileProviderEnumerator.swift, AppGroupChangeWatcher.swift, FPSyncTraceLog.swift, FileProvider/Info.plist, FileProvider/FileProvider.entitlements, MinisApp.swift (full), Views/Settings/SharedFolderVisibility.swift. Optional Spec sections named in task.md (docs/specs/ios-sandbox-ish-summary.md :: iOS Sandbox Environment: iSH Virtualization Summary > 3. Mount System; Apple Xcode 27 FileProvider public headers for capabilities/replicated extension/domain/manager contracts) are not present in the snapshot and were not read.",
+  "findings": [
+    {
+      "certainty": "high",
+      "evidence": "diagnosis.md cites fp-retry-stream.log 重点1262–1638行 as the key evidence for the staging/dataless host-proxy path, but diagnostic-evidence.md quotes only lines 1368, 1405, 1601, and 1632. None of the quoted lines mention FPDaemonConnection, staging, or dataless; they only show create-item(propagated) success/failure with cannotSetMetadata→EPERM. The full log is absent from the snapshot (manifest lists no work/*.log artifacts).",
+      "id": "R1",
+      "location": "diagnosis.md 本轮确证 item 2 and 证据索引; diagnostic-evidence.md fp-retry-stream.log excerpt",
+      "requirement": "task.md 本轮独立审查问题 — 审查 diagnosis.md 的证据支持程度",
+      "severity": "medium",
+      "trigger": "A reader attempts to independently confirm the central claim that the failing work happens in the system-managed CloudStorage copy zone (staging/dataless directory creation via FPDaemonConnection host proxy), rather than in the extension's App Group createItem callback.",
+      "verification": "Read both requirement files and the manifest; confirmed the excerpt begins at line 1368 and that the retained text lacks the lines that would substantiate the copy-zone staging/dataless location claim."
+    },
+    {
+      "certainty": "high",
+      "evidence": "The dump shows the domain root (.root) as cap:r-------- m:rwxel — the same read-only + 'l' locked marker as memory/skills — yet the reconciliation lists root as successfully materialized (<fs:✅ root> <-> <fp:✅ .root>). memory and skills share cap:r-------- m:rwxel and are the failing jobs. diagnosis.md hedges that locked is not proven to be the sole root cause, but it does not reconcile why the read-only/locked root succeeds while the read-only/locked memory and skills subdirectories fail.",
+      "id": "R2",
+      "location": "diagnostic-evidence.md iOS27 原始系统dump: snapshot fp entries and reconciliation entries",
+      "requirement": "diagnosis.md 本轮确证 item 4 — 根因候选必须解释所有观察到的条目",
+      "severity": "medium",
+      "trigger": "Evaluating the hypothesis that read-only directories are marked locked and then fail metadata materialization.",
+      "verification": "Compared the snapshot fp and reconciliation entries in diagnostic-evidence.md; root, memory, and skills all carry r-------- and the 'l' flag, while only memory/skills appear with 🛑 create-item errors."
+    },
+    {
+      "certainty": "medium",
+      "evidence": "Experiment 1 changed NSFileProviderItem.fileSystemFlags (POSIX/display flags: userExecutable/userWritable), a different flag domain from the failing FPFSSetMetadataFlags VFS bitmask (8119226119/8085606151). The observed unchanged requested mode m:rwxl plus identical EPERM supports only the narrower conclusion that this patch does not change the failing metadata request; the text should state that scope explicitly. Experiment 2's supporting observation that memory 仍走 dataless 创建/元数据路径 is not visible in the retained fp-namespace-retry.log excerpt (lines 15, 23, 29, 55 show only create-item success/failure).",
+      "id": "R3",
+      "location": "diagnosis.md 已否定的最小补丁 and 第二项已否定的有界试验",
+      "requirement": "task.md 本轮独立审查问题 — 两个无效试验是否得出过强结论",
+      "severity": "low",
+      "trigger": "Review of whether '补丁无效' and '第二项试验也无效' overstate what the experiments demonstrated.",
+      "verification": "Read baseline FileProviderItem.swift (no fileSystemFlags override) and both quoted log excerpts; the retained evidence shows identical error masks across the two experiments but does not show the dataless path for experiment 2."
+    }
+  ],
+  "limitations": "Read-only review: no tests were executed and no build/install was performed by the reviewer. The raw evidence referenced by diagnosis.md (outputs/*.png, work/fp-before-dump.txt, work/fp-retry-stream.log, work/fp-namespace-retry.log, work/build-*.log, work/final-integrity.json, and the rejected/experiment patch files) is not included in the snapshot, so only the excerpts quoted in diagnostic-evidence.md could be evaluated; omitted log lines such as fp-retry-stream.log 1262-1367 could not be inspected. Optional Spec dependencies (docs/specs/ios-sandbox-ish-summary.md and Apple public SDK headers) are excluded/external and were not read. Runtime acceptance items (paused-banner removal, full enumeration/refresh, shared read/write recovery, real-device and same-source SDK comparison) remain unverified, consistent with the task's own open status; no fix is claimed.",
+  "snapshot_id": "5fa4f1b94828a2e647ac3cd958753284bf3d34f3313198c477f3fa039079b57a"
+}
