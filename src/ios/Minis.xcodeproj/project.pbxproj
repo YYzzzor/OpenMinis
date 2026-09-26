@@ -90,6 +90,7 @@
 		BKP000143 /* BackupTransferStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = BKP000243 /* BackupTransferStatus.swift */; };
 		BKP000144 /* BackupSkippedFilesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BKP000244 /* BackupSkippedFilesView.swift */; };
 		C0B1AF9A75C90C3C178A8804 /* VoiceTextSanitizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7656F4130247E4002A3AC0C /* VoiceTextSanitizer.swift */; };
+		CA1E0001 /* CalendarTests/CalendarRecurrenceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CA1E0002 /* CalendarTests/CalendarRecurrenceTests.m */; };
 		E51000001 /* MinisApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E51000011 /* MinisApp.swift */; };
 		E51000002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E51000012 /* ContentView.swift */; };
 		E51000003 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E51000013 /* Assets.xcassets */; };
@@ -521,10 +522,16 @@
 		RCL000119 /* BackupHistoryDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = RCL000219 /* BackupHistoryDetailView.swift */; };
 		RCL000120 /* BackupCategoryIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = RCL000220 /* BackupCategoryIcon.swift */; };
 		RCL000121 /* BackupHUD.swift in Sources */ = {isa = PBXBuildFile; fileRef = RCL000221 /* BackupHUD.swift */; };
-		CA1E0001 /* CalendarRecurrenceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CA1E0002; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		4ABFBC5430678EA2009A513D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E51000060 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E51000040;
+			remoteInfo = Minis;
+		};
 		AA8A56912F6FBB7A00A3E54E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E51000060 /* Project object */;
@@ -740,6 +747,8 @@
 		BKP000242 /* BackupZipWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupZipWriter.swift; sourceTree = "<group>"; };
 		BKP000243 /* BackupTransferStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupTransferStatus.swift; sourceTree = "<group>"; };
 		BKP000244 /* BackupSkippedFilesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupSkippedFilesView.swift; sourceTree = "<group>"; };
+		CA1E0002 /* CalendarTests/CalendarRecurrenceTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CalendarTests/CalendarRecurrenceTests.m; sourceTree = SOURCE_ROOT; };
+		CA1E0003 /* MinisCalendarTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MinisCalendarTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D7656F4130247E4002A3AC0C /* VoiceTextSanitizer.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VoiceTextSanitizer.swift; sourceTree = "<group>"; };
 		DE154CF628D8699BD99CF9CB /* AudioSessionCoordinator.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AudioSessionCoordinator.swift; sourceTree = "<group>"; };
 		E51000010 /* Minis.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Minis.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1197,8 +1206,6 @@
 		RCL000219 /* BackupHistoryDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupHistoryDetailView.swift; sourceTree = "<group>"; };
 		RCL000220 /* BackupCategoryIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupCategoryIcon.swift; sourceTree = "<group>"; };
 		RCL000221 /* BackupHUD.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupHUD.swift; sourceTree = "<group>"; };
-		CA1E0002 /* CalendarRecurrenceTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CalendarTests/CalendarRecurrenceTests.m; sourceTree = SOURCE_ROOT; };
-		CA1E0003 /* MinisCalendarTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MinisCalendarTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -1241,6 +1248,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CA1E0005 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E51000020 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1265,7 +1279,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		CA1E0005 = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -1438,7 +1451,7 @@
 				E5FP00030 /* FileProvider */,
 				AA8A568C2F6FBB7A00A3E54E /* MinisUITests */,
 				BB1000012F700000000000AA /* MinisTests */,
-				CA1E0002 /* CalendarRecurrenceTests.m */,
+				CA1E0002 /* CalendarTests/CalendarRecurrenceTests.m */,
 				AA26BD0E2F2E5FA500AECF2D /* Frameworks */,
 				E51000032 /* Products */,
 				AACCC6B4300B9D590053F20D /* Recovered References */,
@@ -2362,6 +2375,24 @@
 			productReference = BB1000010F700000000000AA /* MinisTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		CA1E0007 /* MinisCalendarTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CA1E000A /* Build configuration list for PBXNativeTarget "MinisCalendarTests" */;
+			buildPhases = (
+				CA1E0004 /* Sources */,
+				CA1E0005 /* Frameworks */,
+				CA1E0006 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CA1E000B /* PBXTargetDependency */,
+			);
+			name = MinisCalendarTests;
+			productName = MinisCalendarTests;
+			productReference = CA1E0003 /* MinisCalendarTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		E51000040 /* Minis */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = E51000050 /* Build configuration list for PBXNativeTarget "Minis" */;
@@ -2446,17 +2477,6 @@
 			productReference = E5H000010 /* AgentWidgetExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
-		CA1E0007 /* MinisCalendarTests */ = {
-            isa = PBXNativeTarget;
-            buildConfigurationList = CA1E000A;
-            buildPhases = (CA1E0004, CA1E0005, CA1E0006, );
-            buildRules = ();
-            dependencies = (CA1E000B, );
-            name = MinisCalendarTests;
-            productName = MinisCalendarTests;
-            productReference = CA1E0003;
-            productType = "com.apple.product-type.bundle.unit-test";
-        };
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -2541,6 +2561,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CA1E0006 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E51000042 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -2592,7 +2619,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		CA1E0006 = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
@@ -2679,6 +2705,14 @@
 				E5KIMI0A2 /* KimiOAuthRefreshCoordinator.swift in Sources */,
 				E5KIMI0B2 /* KimiDeviceFlow.swift in Sources */,
 				E5OARC003 /* LLMError.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CA1E0004 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CA1E0001 /* CalendarTests/CalendarRecurrenceTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3149,7 +3183,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		CA1E0004 = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (CA1E0001, ); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -3162,6 +3195,11 @@
 			isa = PBXTargetDependency;
 			target = E51000040 /* Minis */;
 			targetProxy = BB1000B10F700000000000AA /* PBXContainerItemProxy */;
+		};
+		CA1E000B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E51000040 /* Minis */;
+			targetProxy = 4ABFBC5430678EA2009A513D /* PBXContainerItemProxy */;
 		};
 		E5E000080 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -3178,7 +3216,6 @@
 			target = E5H000040 /* AgentWidgetExtension */;
 			targetProxy = E5H000081 /* PBXContainerItemProxy */;
 		};
-		CA1E000B = {isa = PBXTargetDependency; target = E51000040 /* Minis */; };
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
@@ -3317,11 +3354,44 @@
 			};
 			name = Release;
 		};
+		CA1E0008 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/NativeOffloads";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.openminis.MinisCalendarTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Minis.app/Minis";
+			};
+			name = Debug;
+		};
+		CA1E0009 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/NativeOffloads";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.openminis.MinisCalendarTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Minis.app/Minis";
+			};
+			name = Release;
+		};
 		E51000070 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = AC0000001 /* ProviderCustomization.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				"ARCHS[sdk=iphonesimulator*]" = arm64;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -3374,13 +3444,12 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MINIS_DEPS_ROOT = "$(SRCROOT)/../../deps";
+				"MINIS_DEPS_ROOT[sdk=iphonesimulator*]" = "$(SRCROOT)/../../deps/simulator";
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
-				MINIS_DEPS_ROOT = "$(SRCROOT)/../../deps";
-				"MINIS_DEPS_ROOT[sdk=iphonesimulator*]" = "$(SRCROOT)/../../deps/simulator";
-				"ARCHS[sdk=iphonesimulator*]" = arm64;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -3391,6 +3460,7 @@
 			baseConfigurationReference = AC0000001 /* ProviderCustomization.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				"ARCHS[sdk=iphonesimulator*]" = arm64;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -3440,12 +3510,11 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MINIS_DEPS_ROOT = "$(SRCROOT)/../../deps";
+				"MINIS_DEPS_ROOT[sdk=iphonesimulator*]" = "$(SRCROOT)/../../deps/simulator";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
-				MINIS_DEPS_ROOT = "$(SRCROOT)/../../deps";
-				"MINIS_DEPS_ROOT[sdk=iphonesimulator*]" = "$(SRCROOT)/../../deps/simulator";
-				"ARCHS[sdk=iphonesimulator*]" = arm64;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -3462,7 +3531,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Preview Content\"";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 42486W5YRY;
 				ENABLE_PREVIEWS = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SRCROOT)/../../build/frameworks",
@@ -3478,7 +3547,31 @@
 					"$(SRCROOT)/Vendor/cppjieba/include",
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/Info.plist";
-				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "VM requires network access for SLIRP networking";
+				INFOPLIST_KEY_CFBundleDisplayName = MinisX;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
+				INFOPLIST_KEY_NFCReaderUsageDescription = "MinisX uses NFC so the AI agent can read and write NFC tags on your behalf.";
+				INFOPLIST_KEY_NSAppleMusicUsageDescription = "MinisX uses media library access so the AI agent can search your music library and control playback on your behalf.";
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "MinisX uses Bluetooth so the AI agent can scan for, connect to, and communicate with nearby BLE devices on your behalf.";
+				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "MinisX uses Bluetooth so the AI agent can scan for, connect to, and communicate with nearby BLE devices on your behalf.";
+				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "MinisX uses calendar access so the AI agent can query your schedule, check availability, and create events on your behalf.";
+				INFOPLIST_KEY_NSCalendarsUsageDescription = "MinisX uses calendar access so the AI agent can query your schedule, check availability, and create events on your behalf.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "MinisX needs camera access to take photos for AI conversations.";
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "MinisX uses Face ID to protect locked chat sessions so only you can view their contents.";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "MinisX uses HealthKit access so the AI agent can read your health data such as steps, heart rate, sleep, and workouts on your behalf.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "MinisX uses HealthKit write access so the AI agent can log health data such as steps, weight, and water intake on your behalf.";
+				INFOPLIST_KEY_NSHomeKitUsageDescription = "MinisX uses HomeKit access so the AI agent can query and control your smart home accessories on your behalf.";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "MinisX uses local network access for the debug server and to let the AI agent communicate with locally-hosted services.";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "MinisX uses background location to keep agent tasks running when the app is in the background. Location data is only used to record session connection history.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "MinisX uses your location to record where agent sessions are started for your session history.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "MinisX needs microphone access for voice-to-text input in chat.";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "MinisX needs permission to save videos and images to your photo library.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "MinisX needs photo library access to attach images to AI conversations.";
+				INFOPLIST_KEY_NSRemindersFullAccessUsageDescription = "MinisX uses reminders access so the AI agent can query and create reminders on your behalf.";
+				INFOPLIST_KEY_NSRemindersUsageDescription = "MinisX uses reminders access so the AI agent can query and create reminders on your behalf.";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "MinisX uses speech recognition to convert your voice into text messages.";
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
+				INFOPLIST_KEY_NSSupportsLiveActivitiesFrequentUpdates = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = "Launch Screen";
@@ -3497,7 +3590,7 @@
 					"-lfakefs",
 				);
 				OTHER_SWIFT_FLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = com.openminis.app;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yyzzzor.minisx;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/MinisApp-Bridging-Header.h";
@@ -3517,7 +3610,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Preview Content\"";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 42486W5YRY;
 				ENABLE_PREVIEWS = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SRCROOT)/../../build/frameworks",
@@ -3533,7 +3626,31 @@
 					"$(SRCROOT)/Vendor/cppjieba/include",
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/Info.plist";
-				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "VM requires network access for SLIRP networking";
+				INFOPLIST_KEY_CFBundleDisplayName = MinisX;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
+				INFOPLIST_KEY_NFCReaderUsageDescription = "MinisX uses NFC so the AI agent can read and write NFC tags on your behalf.";
+				INFOPLIST_KEY_NSAppleMusicUsageDescription = "MinisX uses media library access so the AI agent can search your music library and control playback on your behalf.";
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "MinisX uses Bluetooth so the AI agent can scan for, connect to, and communicate with nearby BLE devices on your behalf.";
+				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "MinisX uses Bluetooth so the AI agent can scan for, connect to, and communicate with nearby BLE devices on your behalf.";
+				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "MinisX uses calendar access so the AI agent can query your schedule, check availability, and create events on your behalf.";
+				INFOPLIST_KEY_NSCalendarsUsageDescription = "MinisX uses calendar access so the AI agent can query your schedule, check availability, and create events on your behalf.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "MinisX needs camera access to take photos for AI conversations.";
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "MinisX uses Face ID to protect locked chat sessions so only you can view their contents.";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "MinisX uses HealthKit access so the AI agent can read your health data such as steps, heart rate, sleep, and workouts on your behalf.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "MinisX uses HealthKit write access so the AI agent can log health data such as steps, weight, and water intake on your behalf.";
+				INFOPLIST_KEY_NSHomeKitUsageDescription = "MinisX uses HomeKit access so the AI agent can query and control your smart home accessories on your behalf.";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "MinisX uses local network access for the debug server and to let the AI agent communicate with locally-hosted services.";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "MinisX uses background location to keep agent tasks running when the app is in the background. Location data is only used to record session connection history.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "MinisX uses your location to record where agent sessions are started for your session history.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "MinisX needs microphone access for voice-to-text input in chat.";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "MinisX needs permission to save videos and images to your photo library.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "MinisX needs photo library access to attach images to AI conversations.";
+				INFOPLIST_KEY_NSRemindersFullAccessUsageDescription = "MinisX uses reminders access so the AI agent can query and create reminders on your behalf.";
+				INFOPLIST_KEY_NSRemindersUsageDescription = "MinisX uses reminders access so the AI agent can query and create reminders on your behalf.";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "MinisX uses speech recognition to convert your voice into text messages.";
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
+				INFOPLIST_KEY_NSSupportsLiveActivitiesFrequentUpdates = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = "Launch Screen";
@@ -3552,7 +3669,7 @@
 					"-lfakefs",
 				);
 				OTHER_SWIFT_FLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = com.openminis.app;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yyzzzor.minisx;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/MinisApp-Bridging-Header.h";
@@ -3567,7 +3684,7 @@
 				CODE_SIGN_ENTITLEMENTS = ShareExtension/ShareExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 42486W5YRY;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ShareExtension/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Share to MinisX";
@@ -3579,7 +3696,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.13;
-				PRODUCT_BUNDLE_IDENTIFIER = com.openminis.app.ShareExtension;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yyzzzor.minisx.ShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -3594,7 +3711,7 @@
 				CODE_SIGN_ENTITLEMENTS = ShareExtension/ShareExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 42486W5YRY;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ShareExtension/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Share to MinisX";
@@ -3606,7 +3723,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.13;
-				PRODUCT_BUNDLE_IDENTIFIER = com.openminis.app.ShareExtension;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yyzzzor.minisx.ShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -3621,7 +3738,7 @@
 				CODE_SIGN_ENTITLEMENTS = FileProvider/FileProvider.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 42486W5YRY;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FileProvider/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "MinisX Files";
@@ -3633,7 +3750,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.13;
-				PRODUCT_BUNDLE_IDENTIFIER = com.openminis.app.FileProvider;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yyzzzor.minisx.FileProvider;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -3648,7 +3765,7 @@
 				CODE_SIGN_ENTITLEMENTS = FileProvider/FileProvider.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 42486W5YRY;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FileProvider/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "MinisX Files";
@@ -3660,7 +3777,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.13;
-				PRODUCT_BUNDLE_IDENTIFIER = com.openminis.app.FileProvider;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yyzzzor.minisx.FileProvider;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -3675,7 +3792,7 @@
 				CODE_SIGN_ENTITLEMENTS = AgentWidget/AgentWidget.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 42486W5YRY;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AgentWidget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "MinisX Activity";
@@ -3687,7 +3804,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.13;
-				PRODUCT_BUNDLE_IDENTIFIER = com.openminis.app.AgentWidget;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yyzzzor.minisx.AgentWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -3702,7 +3819,7 @@
 				CODE_SIGN_ENTITLEMENTS = AgentWidget/AgentWidget.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 42486W5YRY;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AgentWidget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "MinisX Activity";
@@ -3714,7 +3831,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.13;
-				PRODUCT_BUNDLE_IDENTIFIER = com.openminis.app.AgentWidget;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yyzzzor.minisx.AgentWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -3723,30 +3840,6 @@
 			};
 			name = Release;
 		};
-		CA1E0008 = {isa = XCBuildConfiguration; buildSettings = {
-                BUNDLE_LOADER = "$(TEST_HOST)";
-                CODE_SIGN_STYLE = Automatic;
-                DEVELOPMENT_TEAM = "";
-                GENERATE_INFOPLIST_FILE = YES;
-                HEADER_SEARCH_PATHS = ("$(SRCROOT)/NativeOffloads", );
-                IPHONEOS_DEPLOYMENT_TARGET = 26.0;
-                PRODUCT_BUNDLE_IDENTIFIER = com.openminis.MinisCalendarTests;
-                PRODUCT_NAME = "$(TARGET_NAME)";
-                TARGETED_DEVICE_FAMILY = "1,2";
-                TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Minis.app/Minis";
-}; name = Debug; };
-		CA1E0009 = {isa = XCBuildConfiguration; buildSettings = {
-                BUNDLE_LOADER = "$(TEST_HOST)";
-                CODE_SIGN_STYLE = Automatic;
-                DEVELOPMENT_TEAM = "";
-                GENERATE_INFOPLIST_FILE = YES;
-                HEADER_SEARCH_PATHS = ("$(SRCROOT)/NativeOffloads", );
-                IPHONEOS_DEPLOYMENT_TARGET = 26.0;
-                PRODUCT_BUNDLE_IDENTIFIER = com.openminis.MinisCalendarTests;
-                PRODUCT_NAME = "$(TARGET_NAME)";
-                TARGETED_DEVICE_FAMILY = "1,2";
-                TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Minis.app/Minis";
-}; name = Release; };
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -3764,6 +3857,15 @@
 			buildConfigurations = (
 				BB1000080F700000000000AA /* Debug */,
 				BB1000090F700000000000AA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CA1E000A /* Build configuration list for PBXNativeTarget "MinisCalendarTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CA1E0008 /* Debug */,
+				CA1E0009 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -3813,7 +3915,6 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		CA1E000A = {isa = XCConfigurationList; buildConfigurations = (CA1E0008, CA1E0009, ); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
