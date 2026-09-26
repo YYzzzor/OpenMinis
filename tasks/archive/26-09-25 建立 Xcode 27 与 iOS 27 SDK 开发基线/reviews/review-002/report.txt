@@ -1,0 +1,18 @@
+{
+  "snapshot_id": "ad545c948fe8e8a9ce57861f1944385234f9e6e7",
+  "conclusion": "nonblocking",
+  "coverage": "Required Spec read: requirements/tasks/active/26-09-25 建立 Xcode 27 与 iOS 27 SDK 开发基线/task.md (full). Also read: BUILDING.md (full), patches/base-to-worktree.patch and patches/unstaged.patch (identical; staged.patch empty), snapshot/src/ios/Minis.xcodeproj/project.pbxproj (target list, all IPHONEOS_DEPLOYMENT_TARGET settings, PBXFileSystemSynchronizedBuildFileExceptionSet), snapshot/src/ios/Minis.xcodeproj/xcshareddata/xcschemes/Minis.xcscheme and MinisCalendarTests.xcscheme, snapshot/scripts/build_ios_simulator.sh, snapshot/deps/build_rclone_ios.sh, all nine snapshot/src/ios/MinisTests/Standalone/*.swift headers, and snapshot/src/ios/MinisTests/ThinkingLevelTests.swift. Optional Spec sections referenced by task.md (docs/specs/debug-server-api.md Connection/Protocol/Methods, docs/specs/ios-calendar-recurrence.md) were not read.",
+  "limitations": "No build or test was executed in this review; xcodebuild/simctl behavior and the task's claimed build logs (baseline-simulator-build.log, minis-tests-fixed-02.log, device-build-fixed.log) live outside the snapshot and were not verified. Several task acceptance items remain unchecked in task.md (Xcode27/iOS27 Debug Simulator build of app+3 extensions, device/simulator native dependency platform/arch audit, iOS27 launch/Chat smoke test, 16-item acceptance matrix, A-F migration report) and cannot be confirmed by static diff alone. Optional Spec sections debug-server-api.md and ios-calendar-recurrence.md were unread. Excluded paths (deps/ffmpeg-6.1.2, deps/ish, deps/lame-3.100, deps/proot, src/android) and external dependencies were not reviewed. A clean static review is not proof of runtime correctness.",
+  "findings": [
+    {
+      "id": "R1",
+      "severity": "nonblocking",
+      "requirement": "task.md 目标与验收『编译测试Target』/『16项功能验收矩阵』，以及 BUILDING.md 新增的 MinisTests 排除机制说明",
+      "location": "snapshot/src/ios/Minis.xcodeproj/project.pbxproj:1205-1220 (E5EXC0001 membershipExceptions); snapshot/src/ios/MinisTests/ThinkingLevelTests.swift",
+      "trigger": "Reviewing the membershipExceptions list against the newly added BUILDING.md text (which says only MinisTests/Standalone command-line scripts are excluded) reveals a non-Standalone XCTest file, ThinkingLevelTests.swift, is also in the exclusion list and is never run.",
+      "evidence": "ThinkingLevelTests.swift is a genuine XCTest case (import XCTest; final class ThinkingLevelTests: XCTestCase) with six test methods, but it references app types ThinkingLevel, ModelGroup and SessionInferenceConfig while only importing XCTest. Sibling test files that reference app symbols use `@testable import Minis`; this file does not, so re-including it would fail with unresolved symbols. It is silently excluded via membershipExceptions, dropping all six tests.",
+      "verification": "grep confirms @testable import Minis is present in the other MinisTests files that reference app symbols (e.g. BackupCategoryCountTests.swift:2, ToolPreflightTests.swift:2, ThinkingRulesRegressionTests.swift:2) but absent from ThinkingLevelTests.swift. The membershipExceptions array at project.pbxproj:1207-1218 contains ThinkingLevelTests.swift alongside the nine Standalone scripts. This is a pre-existing exclusion not introduced by this patch, but the new baseline documentation leaves it undocumented and the coverage loss unaddressed.",
+      "certainty": "high"
+    }
+  ]
+}

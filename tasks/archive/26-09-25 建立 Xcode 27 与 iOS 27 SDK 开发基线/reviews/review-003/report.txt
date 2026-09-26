@@ -1,0 +1,28 @@
+{
+  "snapshot_id": "e3a6775547ba4a669ebb16a3b15102fa00dd5fae0db3d619a6d19bdd1f7b2c76",
+  "conclusion": "nonblocking",
+  "coverage": "Required requirement file read in full: requirements/tasks/active/26-09-25 建立 Xcode 27 与 iOS 27 SDK 开发基线/task.md (sections: 恢复信息, 任务确认与执行边界, 目标与验收, 上下文与决定, Spec 阅读清单, 实现计划, 进展与验证, 当前停止条件与后续, 2026-09-26 用户要求继续后的进展, File Provider 只读审计). Patches read: patches/base-to-worktree.patch (full), patches/staged.patch (empty), patches/unstaged.patch (hash identical to base-to-worktree). Snapshot files read: BUILDING.md; src/ios/Minis.xcodeproj/project.pbxproj (PBXNativeTarget, PBXFileSystemSynchronizedBuildFileExceptionSet E5EXC0001, XCBuildConfiguration and XCConfigurationList for all 7 targets); scripts/build_ios_simulator.sh; Minis.xcscheme and MinisCalendarTests.xcscheme; all 9 MinisTests/Standalone/*.swift enumerated plus sampled contents; ThinkingLevelTests.swift; TestSupport_AppLogger.swift; docs/specs/ios-calendar-recurrence.md. Optional Spec docs/specs/debug-server-api.md (Connection, Protocol, Methods/debug.viewTree, debug.search, debug.inspect, debug.appInfo, debug.screenshot) was NOT read because this patch does not use the Debug RPC.",
+  "limitations": "No build or test was executed during this review; claimed BUILD SUCCEEDED/TEST BUILD SUCCEEDED results, the 16-item acceptance matrix, A-F migration report, warning triage, and simulator/screenshot evidence live in external paths (/Users/huyuanzhao/.../outputs and verification evidence archives) that are not present in the snapshot, so runtime correctness cannot be confirmed. Unexecuted tests: all 9 MinisTests/Standalone/*.swift command-line scripts and ThinkingLevelTests.swift (6 XCTest cases) are excluded from the XCTest target and have no automated execution path; no xcodebuild test run was performed. Unresolved/unverified acceptance: iOS27 launch + Chat main-flow smoke test remains unchecked, Live Activity/Dynamic Island creation and rendering not verified, File Provider paused-sync root cause unresolved, and there is no Xcode 26 baseline comparison for the 879 warnings or landscape layout clipping. Native dependency platform/arch verification could not be independently checked because built artifacts (e.g. Rclone.xcframework, libish.a) are gitignored and absent from the snapshot. Optional debug-server-api.md Spec sections were not read (not applicable).",
+  "findings": [
+    {
+      "id": "R1",
+      "severity": "low",
+      "requirement": "BUILDING.md Targets section documentation added by the patch: 'run each script using the command documented in that file' must be accurate.",
+      "location": "snapshot/BUILDING.md (Targets section) and snapshot/src/ios/MinisTests/Standalone/SkillDescriptionStaleTests.swift",
+      "trigger": "A reader follows the new BUILDING.md instruction and opens each Standalone script expecting a documented run command.",
+      "evidence": "grep for 'swift .*\\.swift' across snapshot/src/ios/MinisTests/Standalone matches 8 of the 9 files (BackupPackageNameTests, BackupZipContainmentTests, BrowserUseDOMRectCloneTests, CJKPaginationThresholdTests, InLoopCompactOrderTests, RestoreSymlinkContainmentTests, SoulIconSourceTests, UsageAttributionClobberTests). SkillDescriptionStaleTests.swift contains only 'Standalone because the MinisTests target has a pre-existing compile break...' and never documents `swift SkillDescriptionStaleTests.swift`, contradicting the added sentence.",
+      "verification": "Static comparison of BUILDING.md prose against each Standalone file's header comments; no build/execution needed.",
+      "certainty": "high"
+    },
+    {
+      "id": "R2",
+      "severity": "low",
+      "requirement": "目标与验收 '16项功能验收矩阵：逐项区分通过、失败、无法验证' and 实现计划 '编译测试Target、模拟器主流程与Extension验证' (regression coverage must not be silently dropped).",
+      "location": "snapshot/src/ios/Minis.xcodeproj/project.pbxproj, PBXFileSystemSynchronizedBuildFileExceptionSet E5EXC0001 (target MinisTests BB1000070F700000000000AA)",
+      "trigger": "Any `xcodebuild test` / `build-for-testing` run on scheme Minis, or a CI pipeline relying on XCTest for regression coverage.",
+      "evidence": "The exception set excludes all 9 MinisTests/Standalone/*.swift scripts plus ThinkingLevelTests.swift (6 XCTest cases). Static inspection found no PBXShellScriptBuildPhase, scheme TestAction, or other target that compiles/runs the excluded scripts; BUILDING.md only documents manual `swift <file>.swift` execution. Consequently regression checks for backup filename ordering, zip/symlink containment, DOM rect cloning, CJK pagination thresholds, soul icon sources, usage attribution clobbering, and ThinkingLevel decoding are absent from automated test runs even though build-for-testing now succeeds.",
+      "verification": "Static inspection of pbxproj build phases (PBXShellScriptBuildPhase entries are only provider/debug-skill/VAD-symbol scripts), both xcscheme TestAction entries, and BUILDING.md; confirmed the excluded files are not referenced by any executing target.",
+      "certainty": "high"
+    }
+  ]
+}

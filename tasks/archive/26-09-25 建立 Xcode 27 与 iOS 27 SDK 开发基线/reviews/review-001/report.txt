@@ -1,0 +1,48 @@
+{
+  "snapshot_id": "494980addababeec8176f46304047518759ffdfa189305d7fb936b1531de15cc",
+  "conclusion": "nonblocking",
+  "coverage": "Read task.md in full (目标与验收, 上下文与决定, Spec 阅读清单, 实现计划, 进展与验证). Read patches/base-to-worktree.patch in full (BUILDING.md and project.pbxproj hunks). Read BUILDING.md iOS sections and dependency list. Read src/ios/Minis.xcodeproj/project.pbxproj regions covering PBXFileSystemSynchronizedBuildFileExceptionSet, PBXNativeTarget/PBXProject attributes, and all IPHONEOS_DEPLOYMENT_TARGET build settings. Read scripts/build_ios_simulator.sh, Minis.xcscheme, MinisCalendarTests.xcscheme, and all nine src/ios/MinisTests/Standalone/*.swift headers plus representative bodies. Optional Spec docs/specs/debug-server-api.md was not read because the changed files do not touch Debug RPC; no Spec sections were required or actually read.",
+  "limitations": "Unexecuted tests: no xcodebuild or simulator run is performed or evidenced in the artifacts, so the Xcode 27/iOS 27 Debug Simulator build (main app + three extensions), XCTest bundle compilation, iOS 27 launch/Chat smoke test, 16-item acceptance matrix, and A-F migration report are all unverified; the nine Standalone scripts were not executed. Unread/excluded dependencies: deps/ (including deps/build_rclone_ios.sh, deps/rclone-mobile/go.mod, and the Rclone.xcframework output) is excluded by review policy and absent from the snapshot; docs/specs/debug-server-api.md is the only Spec listed by the task and was not read (optional, unrelated to the changed files); docs/specs/ios-calendar-recurrence.md referenced from BUILDING.md was not read in full. Only the cited pbxproj regions were parsed, not the entire project file line-by-line. No findings is not proof of runtime correctness.",
+  "findings": [
+    {
+      "id": "R1",
+      "severity": "low",
+      "requirement": "task.md 实现计划『最小修复真实失败』/『编译测试Target』 and BUILDING.md『MinisTests/Standalone/ ... intentionally excluded from the XCTest target』",
+      "location": "snapshot/src/ios/Minis.xcodeproj/project.pbxproj:1205-1214 (PBXFileSystemSynchronizedBuildFileExceptionSet E5EXC0001)",
+      "trigger": "Running the documented `xcodebuild build-for-testing -scheme Minis` relies on the folder entry `Standalone` to exclude the entire directory from the MinisTests target; if Xcode does not honor a directory path in membershipExceptions, the six scripts not individually listed are compiled into the unit-test bundle.",
+      "evidence": "membershipExceptions contains `Standalone` plus only 3 of the 9 Standalone files. The other 6 (BackupPackageNameTests.swift, BackupZipContainmentTests.swift, BrowserUseDOMRectCloneTests.swift, RestoreSymlinkContainmentTests.swift, SoulIconSourceTests.swift, UsageAttributionClobberTests.swift) have top-level code and `exit(...)` with no `import XCTest`, so their inclusion would break the MinisTests compile. No build log is present to confirm the folder-level exclusion actually works.",
+      "verification": "Static inspection of project.pbxproj and all Standalone/*.swift files; no xcodebuild execution is available in the artifacts.",
+      "certainty": "medium"
+    },
+    {
+      "id": "R2",
+      "severity": "low",
+      "requirement": "task.md 上下文与决定『核对device与simulator原生依赖的平台与架构』 and BUILDING.md dependency documentation accuracy",
+      "location": "snapshot/BUILDING.md:135-150",
+      "trigger": "A developer follows the ordered dependency list and runs `./deps/build_rclone_ios.sh`, but the following『What each produces』section omits it, and the script/output cannot be checked because deps/ is excluded from review.",
+      "evidence": "BUILDING.md:138 adds `./deps/build_rclone_ios.sh # → deps/frameworks/Rclone.xcframework (device + simulator)` while the『What each produces』bullets at lines 144-150 describe only build_lame.sh, build_ffmpeg.sh, build_ish.sh, and prepare_alpine_rootfs.sh. The manifest state.exclusions lists deps and the snapshot contains no deps files, so build_rclone_ios.sh and deps/rclone-mobile/go.mod are unverifiable.",
+      "verification": "Read BUILDING.md and manifest.json state.exclusions; confirmed no deps files exist in the snapshot.",
+      "certainty": "high"
+    },
+    {
+      "id": "R3",
+      "severity": "medium",
+      "requirement": "task.md 目标与验收 (Xcode27/iOS27 SDK Debug Simulator build of main app + three extensions, iOS27 launch/Chat smoke test, 16-item acceptance matrix, A-F migration report)",
+      "location": "patches/base-to-worktree.patch (entire change set: BUILDING.md and project.pbxproj only)",
+      "trigger": "Treating this patch as the completed baseline would claim build and runtime acceptance that no artifact demonstrates; the task record still has the build, smoke-test, matrix, and report checkboxes unchecked.",
+      "evidence": "task.md 目标与验收 shows `- [ ]` for the Debug Simulator build, launch/smoke test, 16-item matrix, and A-F report items. The patch contains only documentation edits and the Standalone membership exception, with no build log, test result, acceptance matrix, or migration report; the manifest has no verification artifacts for those criteria.",
+      "verification": "Compared the patch hunks against the task.md acceptance list and searched the manifest for build/report artifacts.",
+      "certainty": "high"
+    },
+    {
+      "id": "R4",
+      "severity": "low",
+      "requirement": "task.md 目标与验收『建立 Xcode 27 与 iOS 27 SDK 开发基线』",
+      "location": "snapshot/src/ios/Minis.xcodeproj/xcshareddata/xcschemes/Minis.xcscheme (LastUpgradeVersion=2620) vs MinisCalendarTests.xcscheme (LastUpgradeVersion=2700); project.pbxproj:2462-2463 (LastSwiftUpdateCheck/LastUpgradeCheck=1500)",
+      "trigger": "Opening/building the project with Xcode 27 may prompt『update to recommended settings』, and the main scheme's upgrade stamp still records Xcode 26.2, so the Xcode 27 baseline is not uniformly recorded.",
+      "evidence": "Minis.xcscheme declares LastUpgradeVersion 2620, MinisCalendarTests.xcscheme declares 2700, and project.pbxproj records LastUpgradeCheck 1500. This is cosmetic metadata only and does not by itself block building.",
+      "verification": "Read both scheme files and the PBXProject attributes section of project.pbxproj.",
+      "certainty": "high"
+    }
+  ]
+}
