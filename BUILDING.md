@@ -17,13 +17,17 @@ ordered by dependency, and skipping one produces confusing link errors later.
 This branch uses upstream v1.13 with MinisX branding, the existing icons,
 extended calendar recurrence, and the complete project Harness.
 The minimum supported iOS version is **26.0** for the app and extensions.
-The Xcode SDK may be newer. App identifiers and stored data names remain stable.
+The development baseline is **Xcode 27.0 with the iOS 27.0 SDK**. This does
+not raise the deployment target: the app, extensions and test targets remain
+**iOS 26.0+**. App identifiers and stored data names remain stable.
 
 For an Apple Silicon simulator build, use the same Xcode installation for
 native dependencies and the app:
 
 ```sh
 export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer
+xcodebuild -version
+xcrun --sdk iphonesimulator --show-sdk-version
 bash scripts/build_ios_simulator.sh
 ```
 
@@ -33,6 +37,12 @@ The script builds simulator-specific LAME, FFmpeg and iSH outputs under
 it (the Go modules may require a newer version than the root go directive).
 It also creates the ignored `ProviderCustomization.xcconfig` from the empty
 tracked example if absent. Existing local configuration is kept.
+
+The default destination is iPhone 18 Pro / iOS 27.0 / arm64. If
+`xcode-select -p` points to Command Line Tools, the process-local
+`DEVELOPER_DIR` above selects the full Xcode installation without changing
+the system default. Use it for direct `xcodebuild`, `simctl` and dependency
+script invocations as well.
 
 Use `SIMULATOR_NAME` and `SIMULATOR_OS` to select an installed simulator, and
 `--skip-deps` only after dependencies have been built for this checkout's
@@ -109,7 +119,7 @@ without setting this.
 | Tool | Version / notes |
 |---|---|
 | macOS | Apple Silicon strongly recommended (see the simulator note below) |
-| Xcode | With the iOS SDK; MinisX targets **iOS 26.0+**; use the Swift compiler bundled with Xcode |
+| Xcode | **27.0 / iOS 27.0 SDK** development baseline; MinisX targets **iOS 26.0+**; use the bundled Swift compiler |
 | Homebrew packages | `brew install ninja llvm libarchive pkg-config` |
 | Python 3 + Meson | `pip3 install meson` |
 
@@ -125,6 +135,7 @@ LAME, so LAME must exist first or MP3 encoding is silently dropped:
 ./deps/build_lame.sh          # → deps/lame-build/lib/libmp3lame.a
 ./deps/build_ffmpeg.sh        # → deps/frameworks/*.framework  (LGPL config)
 ./deps/build_ish.sh           # → deps/libs/*.a, deps/include/, deps/resources/
+./deps/build_rclone_ios.sh    # → deps/frameworks/Rclone.xcframework (device + simulator)
 ./deps/prepare_alpine_rootfs.sh   # → deps/resources/alpine-rootfs.zip
 ```
 
@@ -136,6 +147,9 @@ What each produces:
   `--enable-gpl` or `--enable-nonfree` — see [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md).
 - **`build_ish.sh`** — `libish`, `libish_emu`, `libfakefs` from the `deps/ish`
   submodule, plus headers and the VDSO.
+- **`build_rclone_ios.sh`** — Rclone as a static XCFramework with device and
+  simulator arm64 slices; requires a Go toolchain compatible with
+  `deps/rclone-mobile/go.mod` and its dependencies.
 - **`prepare_alpine_rootfs.sh`** — downloads Alpine aarch64 minirootfs and
   converts it to iSH's fakefs format.
 
@@ -170,7 +184,36 @@ xcodebuild -project src/ios/Minis.xcodeproj -scheme Minis \
 ### Targets
 
 `Minis` (app), `MinisShare` (share extension), `AgentWidgetExtension`,
-`MinisFileProvider`, plus `MinisTests` / `MinisUITests`.
+`MinisFileProvider`, plus `MinisTests` / `MinisUITests` / `MinisCalendarTests`.
+All seven targets retain iOS 26.0 in Debug and Release.
+
+`MinisTests/Standalone/` contains command-line Swift test scripts. These
+files are individually excluded from the XCTest target and are not run by
+XCTest. Run these command-line checks separately, consulting each script for
+any usage or setup notes. When adding another standalone script, add its
+relative file path to the test group membership exceptions
+in `project.pbxproj`; a directory-only exception does not recursively exclude
+its Swift sources in Xcode 27.
+
+`MinisTests/ThinkingLevelTests.swift` is also excluded from the `MinisTests`
+target by a pre-existing membership exception. Its six XCTest cases were not
+run during this task.
+
+To compile the XCTest bundles without running them, use the same SDK and
+dependencies as the app and an explicit simulator identifier:
+
+```sh
+xcodebuild -project src/ios/Minis.xcodeproj -scheme Minis \
+  -configuration Debug -destination "platform=iOS Simulator,id=$SIMULATOR_ID,arch=arm64" \
+  -derivedDataPath build/ios-simulator CODE_SIGN_IDENTITY=- build-for-testing
+```
+
+Set `SIMULATOR_ID` to the intended device from `xcrun simctl list devices available`.
+Use scheme `MinisCalendarTests` to compile the separate EventKit test bundle.
+Install the app only after a successful build has completed signing. A failed
+`build-for-testing` can leave an unsigned intermediate app in DerivedData.
+A successful build does not establish runtime behavior, real-device signing,
+or TestFlight readiness; keep those acceptance results separate.
 
 ---
 
