@@ -1,0 +1,13 @@
+# 第五轮独立审查处理
+
+原始固定快照98c24cfa97f1b56bbadd742e444570f8ac95fda4709c3307f0cfe304bbe47369，deepseek-flash，结论nonblocking。第四轮300秒超时原文保留；第五轮同快照600秒上限完成。报告是输入，不作最终产品验收。
+
+R1（接受并修复）：原先用全局配置epoch拒绝请求，确实可能在B保存时丢弃A新usage。现在配置epoch按Session/entry区分，并覆盖尚无已保存记录的首个请求；捕获、流打开与发布使用同一局部版本体系。新增testUnrelatedSessionConfigDoesNotRejectInFlightUsage直接验证生产recordRequest：B变更不阻止A发布，A自身配置往返则拒绝旧usage。
+
+修复后Luna只读复核补充：fallback回调发生在await后，不能用刷新后的版本掩盖请求期间provider变化。已将允许的绑定变更与实际请求路由版本拆开：captured/current routeConfigRevision必须相同；配置每次变化同步更新两类scope。testFallbackBindingChangeAllowedButProviderRoundTripRejected验证正常fallback绑定变更仍接受、endpoint A→B→A后旧结果拒绝。主Agent核对实际closure、capture与publication调用链，并以最终测试/构建验证。Luna再次核对路由版本区分正确；其指出apiKey/oauth模式参与不同provider构造，已将不含密钥的credentialType枚举及连接User-Agent纳入摘要（只存hash，不存字段值）。
+
+R2（部分接受并修复）：去掉完整ModelEntry编码，签名只含主模型来源、entry/model/window、分组窗口限制、provider连接字段，不含显示名、隐藏标记、目录展示元数据。实际来源无法解析时仍保守失效，不将来源不明的旧数值当可靠统计；配置降级/迁移缺失期间的体验未实测，保留此边界，不声称任意异常加载都会恢复。
+
+R3（未证实的布局风险，保留）：此次没有再改工具行布局。目标设备默认/应用最大基础字号已观察；编辑/语音在极端宽度下组合未完整实测，仍是整体产品验收未完成项，不据推测扩大本轮持久恢复修正。
+
+原始Pi报告对应上述旧固定快照；修复后的具体差异由主Agent和Luna定向复核、针对性回归测试与最终iOS构建验证，未把旧快照冒充最终代码相同。没有为了低风险或未经证实的布局假设连续请求新Pi轮次。真实多Session/重启观察与测试边界见validation.md。

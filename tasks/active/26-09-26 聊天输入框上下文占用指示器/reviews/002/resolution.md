@@ -1,0 +1,10 @@
+# 第二轮审查处理
+
+审查模型：deepseek/deepseek-flash。快照a22015486b9fee7bd35dfe382abdb87b9fe20ddecbb6bd10eefe127feefff888。Pi结论nonblocking；这是静态审查意见，不代替产品验收。
+
+- R1：保留已记录的首版取舍。auto-retry及reminder不能确认实际entry时保持未知，避免推断当前绑定就是实际来源。已用testRequestPublicationRejectsUnknownRetryAndUncapturedFallback直接覆盖。真实重试/提醒路径未实测；不声称能够显示每一次成功重试的统计。
+- R2：第一轮指出的route/epoch条件已从VM原样提取，6个新增测试直接运行生产recordRequest实现，覆盖正常、改配置、fallback、未知、来源变化、迟到结果，总17项通过。剩余意见是VM依赖与调用链本身未自动集成测试，接受这个证据边界；主Agent已读实际调用链，并计划用用户配置的DeepSeek验证一次真实请求到UI发布。真实fallback/改配置中的竞态仍不声称已端到端覆盖。不为这条低优先级证据意见扩建完整网络模拟架构。
+
+报告中“15 methods”计数与实际不符：最终ContextUsageTests有17个test方法，XCTest日志为17 tests, 0 failures。报告读取的任务固定稿保留初轮9项测试状态；最新构建和测试以validation.md及pure-tests-reviewed.log/build-reviewed.log为准。原始报告不改写。
+
+最终验收仍待实际请求、部分组合界面验证和用户间距确认；本轮不归档、不合并。

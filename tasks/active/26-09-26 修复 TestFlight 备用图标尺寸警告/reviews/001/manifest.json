@@ -1,0 +1,336 @@
+{
+  "artifacts": {
+    "patches/base-to-worktree.patch": {
+      "executable": false,
+      "sha256": "0f36dbce37da22a3bc511a1e0cafa26b126ed65ca9f9cbfe381ed8fddf0fe129"
+    },
+    "patches/staged.patch": {
+      "executable": false,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "patches/unstaged.patch": {
+      "executable": false,
+      "sha256": "0f36dbce37da22a3bc511a1e0cafa26b126ed65ca9f9cbfe381ed8fddf0fe129"
+    },
+    "request.md": "b35bf41c0bf4a7249c6e9e5412251489de4e31e96a83ff5640a16b980d286553",
+    "requirements/AGENTS.md": {
+      "executable": false,
+      "sha256": "c674ee42b935655d8896cf0d3bfb4be430f779c0dac915c042f11c400ddba4d9"
+    },
+    "requirements/tasks/active/26-09-26 修复 TestFlight 备用图标尺寸警告/task.md": {
+      "executable": false,
+      "sha256": "b0538f17cb8c7693c8002c10d991e49042319d5f76bab74c1ee7f4a7f0bde8bb"
+    },
+    "snapshot/AGENTS.md": {
+      "executable": false,
+      "sha256": "c674ee42b935655d8896cf0d3bfb4be430f779c0dac915c042f11c400ddba4d9"
+    },
+    "snapshot/src/ios/Assets.xcassets/AppIcon-Dark.appiconset/AppIcon-Dark.png": {
+      "executable": false,
+      "sha256": "eaaae8ef69fce69d12418df436862b8aea8351ff953ce23ee9f882e81d3a8de9"
+    },
+    "snapshot/src/ios/Assets.xcassets/AppIcon-Dark.appiconset/Contents.json": {
+      "executable": false,
+      "sha256": "d9d7a36b31e096ba144cb476b1345d20a62b5d7d1f0be6d10f849413183f47bb"
+    },
+    "snapshot/src/ios/Assets.xcassets/AppIcon-LegacyDark.appiconset/AppIcon-LegacyDark.png": {
+      "executable": false,
+      "sha256": "6530bf1f1249bff634fd25ab2a9765ad8c499041ceb1f91240bc91962c614d5c"
+    },
+    "snapshot/src/ios/Assets.xcassets/AppIcon-LegacyDark.appiconset/Contents.json": {
+      "executable": false,
+      "sha256": "859c3355e33bf20c8c29eadf079d80772f6786da3e83b4ef17f99894d2d0f46c"
+    },
+    "snapshot/src/ios/Assets.xcassets/AppIcon-LegacyLight.appiconset/AppIcon-LegacyLight.png": {
+      "executable": false,
+      "sha256": "4ece4aa7206081da13066ee868c5932c2b0533b481c45f14dcf3c7962bb59661"
+    },
+    "snapshot/src/ios/Assets.xcassets/AppIcon-LegacyLight.appiconset/Contents.json": {
+      "executable": false,
+      "sha256": "6219eb3649946b588a7dd0bbf59aa997059693391e709d9015053f112582cfa2"
+    },
+    "snapshot/src/ios/Assets.xcassets/AppIcon-Light.appiconset/AppIcon-Light.png": {
+      "executable": false,
+      "sha256": "5b1bd51738119ef8d0c0a30bfdbc87cba48df258240b11c5202c81c8fdc1ca35"
+    },
+    "snapshot/src/ios/Assets.xcassets/AppIcon-Light.appiconset/Contents.json": {
+      "executable": false,
+      "sha256": "29995e19a19df4b2198d86c80e42e10c806d00030d11af4035519209d1675924"
+    },
+    "snapshot/src/ios/Assets.xcassets/AppIcon.appiconset/Contents.json": {
+      "executable": false,
+      "sha256": "d9258ffa0d261595d693af9e5735521d5a05e8d52e05e5c8d54e93977ff86633"
+    },
+    "snapshot/src/ios/Assets.xcassets/AppIcon.appiconset/Icon-1024-Dark.png": {
+      "executable": false,
+      "sha256": "eaaae8ef69fce69d12418df436862b8aea8351ff953ce23ee9f882e81d3a8de9"
+    },
+    "snapshot/src/ios/Assets.xcassets/AppIcon.appiconset/Icon-1024.png": {
+      "executable": false,
+      "sha256": "5b1bd51738119ef8d0c0a30bfdbc87cba48df258240b11c5202c81c8fdc1ca35"
+    },
+    "snapshot/src/ios/Assets.xcassets/AppIcon.appiconset/Icon-full-dark-expanded.png": {
+      "executable": false,
+      "sha256": "d6babfc3c91ba6d41effe93f46637abc65765deb4014ce91a05b1a92a46df1ff"
+    },
+    "snapshot/src/ios/Assets.xcassets/AppIcon.appiconset/Icon-full-dark-expanded2.png": {
+      "executable": false,
+      "sha256": "ed1459f2d7578e41b73c3fda08a9486791e15c763479184daff28642295f064d"
+    },
+    "snapshot/src/ios/Assets.xcassets/AppIcon.appiconset/Icon-full-dark.png": {
+      "executable": false,
+      "sha256": "a31922e51c66a028ee90df0a705a2c86a10b458aed31c634469356a41584715e"
+    },
+    "snapshot/src/ios/Assets.xcassets/AppIcon.appiconset/Icon-full-expanded.png": {
+      "executable": false,
+      "sha256": "f04cc22ae258dca4d7f058bf60488ab92277c4a0a7fca98d5e02367ef9a96009"
+    },
+    "snapshot/src/ios/Assets.xcassets/AppIcon.appiconset/Icon-full-expanded2.png": {
+      "executable": false,
+      "sha256": "bba603820d3772283221f00351f1fd28f9657dedf3029f299fc65fc2b32f694e"
+    },
+    "snapshot/src/ios/Assets.xcassets/AppIcon.appiconset/Icon-full.png": {
+      "executable": false,
+      "sha256": "81e337c6cc804bfbc75954a5372ec544a650d9b8446076217895899ea10da0d8"
+    },
+    "snapshot/src/ios/Info.plist": {
+      "executable": false,
+      "sha256": "a89a51a3106f512ce6ea3809d0e94cbd2f5ea4683b04045907e0d5b1fb66f5c8"
+    },
+    "snapshot/src/ios/Minis.xcodeproj/project.pbxproj": {
+      "executable": false,
+      "sha256": "cc5de20a6e0ea1a75757aac9f6e5857342c1cd3a57982a36e61ddf25d895a3c6"
+    },
+    "snapshot/src/ios/Resources/AlternateIcons/AppIcon-Dark.png": {
+      "executable": false,
+      "sha256": "eaaae8ef69fce69d12418df436862b8aea8351ff953ce23ee9f882e81d3a8de9"
+    },
+    "snapshot/src/ios/Resources/AlternateIcons/AppIcon-LegacyDark.png": {
+      "executable": false,
+      "sha256": "6530bf1f1249bff634fd25ab2a9765ad8c499041ceb1f91240bc91962c614d5c"
+    },
+    "snapshot/src/ios/Resources/AlternateIcons/AppIcon-LegacyLight.png": {
+      "executable": false,
+      "sha256": "4ece4aa7206081da13066ee868c5932c2b0533b481c45f14dcf3c7962bb59661"
+    },
+    "snapshot/src/ios/Resources/AlternateIcons/AppIcon-Light.png": {
+      "executable": false,
+      "sha256": "5b1bd51738119ef8d0c0a30bfdbc87cba48df258240b11c5202c81c8fdc1ca35"
+    },
+    "snapshot/src/ios/Views/ContentView.swift": {
+      "executable": false,
+      "sha256": "c315860547ae3a6cb4cb5a3a0ef8758c6f61bafc3ba8d18a8a6dabc9a2309ecc"
+    },
+    "snapshot/tasks/active/26-09-26 修复 TestFlight 备用图标尺寸警告/task.md": {
+      "executable": false,
+      "sha256": "b0538f17cb8c7693c8002c10d991e49042319d5f76bab74c1ee7f4a7f0bde8bb"
+    }
+  },
+  "repo": "/Users/huyuanzhao/Coding/Projects/OpenMinis",
+  "schema": 1,
+  "snapshot_id": "0569187e876138f7f624b9e52fe6673dc40786b5db669f278f1d1737b63c24b0",
+  "spec_selections": [],
+  "state": {
+    "base": "2cc4ed7a3d63f59501e3f3d2712610c5afe662b8",
+    "branch": "feat/chat-context-usage",
+    "excluded_gitlinks": {
+      "deps/ish": {
+        "index_commit": "3f6384c70eefd1a370f121d3492a5f21f7767df9",
+        "status": "",
+        "worktree": "3f6384c70eefd1a370f121d3492a5f21f7767df9"
+      },
+      "deps/proot": {
+        "index_commit": "8cf13e997cdc9472997aae19df8050c073c9a86c",
+        "worktree": "uninitialized"
+      }
+    },
+    "exclusions": [
+      ".agents",
+      ".github",
+      ".gitignore",
+      ".gitmodules",
+      ".ignore",
+      "BUILDING.md",
+      "CONTRIBUTING.md",
+      "LICENSE",
+      "README.md",
+      "THIRD_PARTY_LICENSES.md",
+      "assets",
+      "deps",
+      "docs",
+      "scripts",
+      "src/android",
+      "src/ios/Agent",
+      "src/ios/AgentWidget",
+      "src/ios/AppDelegate.swift",
+      "src/ios/Assets.xcassets/AccentColor.colorset",
+      "src/ios/Assets.xcassets/Contents.json",
+      "src/ios/Assets.xcassets/TerminalCircle.imageset",
+      "src/ios/Assets.xcassets/ThinkingIcon.imageset",
+      "src/ios/CalendarTests",
+      "src/ios/Configs",
+      "src/ios/Debug",
+      "src/ios/Diagnostics",
+      "src/ios/FileProvider",
+      "src/ios/ISHCommandExecutionExample.swift",
+      "src/ios/Launch Screen.storyboard",
+      "src/ios/Localizable.xcstrings",
+      "src/ios/Minis.entitlements",
+      "src/ios/Minis.xcodeproj/project.xcworkspace",
+      "src/ios/Minis.xcodeproj/xcshareddata",
+      "src/ios/MinisApp-Bridging-Header.h",
+      "src/ios/MinisApp.swift",
+      "src/ios/MinisTests",
+      "src/ios/MinisUITests",
+      "src/ios/NativeOffloads",
+      "src/ios/Preview Content",
+      "src/ios/PrivacyInfo.xcprivacy",
+      "src/ios/Providers",
+      "src/ios/Resources/KaTeX",
+      "src/ios/Resources/hmm_model.utf8",
+      "src/ios/Resources/jieba.dict.utf8",
+      "src/ios/Resources/models-dev-api.json",
+      "src/ios/Resources/zh_background_wordfreq.txt",
+      "src/ios/ShareExtension",
+      "src/ios/Shared",
+      "src/ios/Vendor",
+      "src/ios/Views/Alarms",
+      "src/ios/Views/Backup",
+      "src/ios/Views/Chat",
+      "src/ios/Views/MCP",
+      "src/ios/Views/Providers",
+      "src/ios/Views/Rootfs",
+      "src/ios/Views/Settings",
+      "src/ios/Views/Skills",
+      "src/ios/Views/Sync",
+      "src/ios/WebApp",
+      "src/ios/de.lproj",
+      "src/ios/default_mount",
+      "src/ios/en.lproj",
+      "src/ios/es.lproj",
+      "src/ios/fr.lproj",
+      "src/ios/iSH",
+      "src/ios/ja.lproj",
+      "src/ios/ko.lproj",
+      "src/ios/ru.lproj",
+      "src/ios/zh-Hans.lproj",
+      "src/ios/zh-Hant.lproj",
+      "src/shared"
+    ],
+    "files": {
+      "AGENTS.md": {
+        "executable": false,
+        "sha256": "c674ee42b935655d8896cf0d3bfb4be430f779c0dac915c042f11c400ddba4d9"
+      },
+      "src/ios/Assets.xcassets/AppIcon-Dark.appiconset/AppIcon-Dark.png": {
+        "executable": false,
+        "sha256": "eaaae8ef69fce69d12418df436862b8aea8351ff953ce23ee9f882e81d3a8de9"
+      },
+      "src/ios/Assets.xcassets/AppIcon-Dark.appiconset/Contents.json": {
+        "executable": false,
+        "sha256": "d9d7a36b31e096ba144cb476b1345d20a62b5d7d1f0be6d10f849413183f47bb"
+      },
+      "src/ios/Assets.xcassets/AppIcon-LegacyDark.appiconset/AppIcon-LegacyDark.png": {
+        "executable": false,
+        "sha256": "6530bf1f1249bff634fd25ab2a9765ad8c499041ceb1f91240bc91962c614d5c"
+      },
+      "src/ios/Assets.xcassets/AppIcon-LegacyDark.appiconset/Contents.json": {
+        "executable": false,
+        "sha256": "859c3355e33bf20c8c29eadf079d80772f6786da3e83b4ef17f99894d2d0f46c"
+      },
+      "src/ios/Assets.xcassets/AppIcon-LegacyLight.appiconset/AppIcon-LegacyLight.png": {
+        "executable": false,
+        "sha256": "4ece4aa7206081da13066ee868c5932c2b0533b481c45f14dcf3c7962bb59661"
+      },
+      "src/ios/Assets.xcassets/AppIcon-LegacyLight.appiconset/Contents.json": {
+        "executable": false,
+        "sha256": "6219eb3649946b588a7dd0bbf59aa997059693391e709d9015053f112582cfa2"
+      },
+      "src/ios/Assets.xcassets/AppIcon-Light.appiconset/AppIcon-Light.png": {
+        "executable": false,
+        "sha256": "5b1bd51738119ef8d0c0a30bfdbc87cba48df258240b11c5202c81c8fdc1ca35"
+      },
+      "src/ios/Assets.xcassets/AppIcon-Light.appiconset/Contents.json": {
+        "executable": false,
+        "sha256": "29995e19a19df4b2198d86c80e42e10c806d00030d11af4035519209d1675924"
+      },
+      "src/ios/Assets.xcassets/AppIcon.appiconset/Contents.json": {
+        "executable": false,
+        "sha256": "d9258ffa0d261595d693af9e5735521d5a05e8d52e05e5c8d54e93977ff86633"
+      },
+      "src/ios/Assets.xcassets/AppIcon.appiconset/Icon-1024-Dark.png": {
+        "executable": false,
+        "sha256": "eaaae8ef69fce69d12418df436862b8aea8351ff953ce23ee9f882e81d3a8de9"
+      },
+      "src/ios/Assets.xcassets/AppIcon.appiconset/Icon-1024.png": {
+        "executable": false,
+        "sha256": "5b1bd51738119ef8d0c0a30bfdbc87cba48df258240b11c5202c81c8fdc1ca35"
+      },
+      "src/ios/Assets.xcassets/AppIcon.appiconset/Icon-full-dark-expanded.png": {
+        "executable": false,
+        "sha256": "d6babfc3c91ba6d41effe93f46637abc65765deb4014ce91a05b1a92a46df1ff"
+      },
+      "src/ios/Assets.xcassets/AppIcon.appiconset/Icon-full-dark-expanded2.png": {
+        "executable": false,
+        "sha256": "ed1459f2d7578e41b73c3fda08a9486791e15c763479184daff28642295f064d"
+      },
+      "src/ios/Assets.xcassets/AppIcon.appiconset/Icon-full-dark.png": {
+        "executable": false,
+        "sha256": "a31922e51c66a028ee90df0a705a2c86a10b458aed31c634469356a41584715e"
+      },
+      "src/ios/Assets.xcassets/AppIcon.appiconset/Icon-full-expanded.png": {
+        "executable": false,
+        "sha256": "f04cc22ae258dca4d7f058bf60488ab92277c4a0a7fca98d5e02367ef9a96009"
+      },
+      "src/ios/Assets.xcassets/AppIcon.appiconset/Icon-full-expanded2.png": {
+        "executable": false,
+        "sha256": "bba603820d3772283221f00351f1fd28f9657dedf3029f299fc65fc2b32f694e"
+      },
+      "src/ios/Assets.xcassets/AppIcon.appiconset/Icon-full.png": {
+        "executable": false,
+        "sha256": "81e337c6cc804bfbc75954a5372ec544a650d9b8446076217895899ea10da0d8"
+      },
+      "src/ios/Info.plist": {
+        "executable": false,
+        "sha256": "a89a51a3106f512ce6ea3809d0e94cbd2f5ea4683b04045907e0d5b1fb66f5c8"
+      },
+      "src/ios/Minis.xcodeproj/project.pbxproj": {
+        "executable": false,
+        "sha256": "cc5de20a6e0ea1a75757aac9f6e5857342c1cd3a57982a36e61ddf25d895a3c6"
+      },
+      "src/ios/Resources/AlternateIcons/AppIcon-Dark.png": {
+        "executable": false,
+        "sha256": "eaaae8ef69fce69d12418df436862b8aea8351ff953ce23ee9f882e81d3a8de9"
+      },
+      "src/ios/Resources/AlternateIcons/AppIcon-LegacyDark.png": {
+        "executable": false,
+        "sha256": "6530bf1f1249bff634fd25ab2a9765ad8c499041ceb1f91240bc91962c614d5c"
+      },
+      "src/ios/Resources/AlternateIcons/AppIcon-LegacyLight.png": {
+        "executable": false,
+        "sha256": "4ece4aa7206081da13066ee868c5932c2b0533b481c45f14dcf3c7962bb59661"
+      },
+      "src/ios/Resources/AlternateIcons/AppIcon-Light.png": {
+        "executable": false,
+        "sha256": "5b1bd51738119ef8d0c0a30bfdbc87cba48df258240b11c5202c81c8fdc1ca35"
+      },
+      "src/ios/Views/ContentView.swift": {
+        "executable": false,
+        "sha256": "c315860547ae3a6cb4cb5a3a0ef8758c6f61bafc3ba8d18a8a6dabc9a2309ecc"
+      },
+      "tasks/active/26-09-26 修复 TestFlight 备用图标尺寸警告/task.md": {
+        "executable": false,
+        "sha256": "b0538f17cb8c7693c8002c10d991e49042319d5f76bab74c1ee7f4a7f0bde8bb"
+      }
+    },
+    "head": "2cc4ed7a3d63f59501e3f3d2712610c5afe662b8",
+    "index_sha256": "9add934318df3d5db9e95a6e0309fd139d63450de226a40c9c14cab71172fc3f",
+    "requirements": {
+      "AGENTS.md": "c674ee42b935655d8896cf0d3bfb4be430f779c0dac915c042f11c400ddba4d9",
+      "tasks/active/26-09-26 修复 TestFlight 备用图标尺寸警告/task.md": "b0538f17cb8c7693c8002c10d991e49042319d5f76bab74c1ee7f4a7f0bde8bb"
+    },
+    "status": " M README.md\u0000 M src/ios/Agent/Chat/AIChatViewModel+BackgroundTask.swift\u0000 M src/ios/Agent/Chat/AIChatViewModel+Compaction.swift\u0000 M src/ios/Agent/Chat/AIChatViewModel+Fallback.swift\u0000 M src/ios/Agent/Chat/AIChatViewModel+Offloading.swift\u0000 M src/ios/Agent/Chat/AIChatViewModel+Persistence.swift\u0000 M src/ios/Agent/Chat/AIChatViewModel.swift\u0000 M src/ios/Agent/Chat/ChatLifecycleSupport.swift\u0000 M src/ios/Agent/Chat/ChatStore.swift\u0000 M src/ios/Agent/Chat/ContextPolicy.swift\u0000 M src/ios/Info.plist\u0000 M src/ios/Localizable.xcstrings\u0000 M src/ios/Minis.xcodeproj/project.pbxproj\u0000 M src/ios/Providers/ProviderConfigStore.swift\u0000 M src/ios/Views/Chat/AIChatView.swift\u0000 M src/ios/Views/Chat/ChatInputBar.swift\u0000?? docs/minisx-release-status.md\u0000?? src/ios/Agent/Chat/ContextUsagePersistence.swift\u0000?? src/ios/Assets.xcassets/AppIcon-Dark.appiconset/AppIcon-Dark.png\u0000?? src/ios/Assets.xcassets/AppIcon-Dark.appiconset/Contents.json\u0000?? src/ios/Assets.xcassets/AppIcon-LegacyDark.appiconset/AppIcon-LegacyDark.png\u0000?? src/ios/Assets.xcassets/AppIcon-LegacyDark.appiconset/Contents.json\u0000?? src/ios/Assets.xcassets/AppIcon-LegacyLight.appiconset/AppIcon-LegacyLight.png\u0000?? src/ios/Assets.xcassets/AppIcon-LegacyLight.appiconset/Contents.json\u0000?? src/ios/Assets.xcassets/AppIcon-Light.appiconset/AppIcon-Light.png\u0000?? src/ios/Assets.xcassets/AppIcon-Light.appiconset/Contents.json\u0000?? src/ios/MinisTests/ContextUsageTests.swift\u0000?? tasks/active/26-09-26 修复 TestFlight 备用图标尺寸警告/task.md\u0000",
+    "task_record_policy": "selected-only"
+  },
+  "task": "tasks/active/26-09-26 修复 TestFlight 备用图标尺寸警告/task.md"
+}
