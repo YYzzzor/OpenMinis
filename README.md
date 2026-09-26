@@ -1,5 +1,7 @@
 # OpenMinis
 
+MinisX 分支的当前版本与测试范围见 [MinisX 发布状态](docs/minisx-release-status.md)。
+
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
 [![Platforms](https://img.shields.io/badge/Platforms-iOS%20%7C%20Android-lightgrey.svg)](#beta-programme)
 
