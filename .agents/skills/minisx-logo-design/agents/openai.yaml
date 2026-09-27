@@ -1,0 +1,4 @@
+interface:
+  display_name: "MinisX 图标设计"
+  short_description: "通过分轮提问、草图探索和交互调参设计 MinisX 图标，有无参考图均可"
+  default_prompt: "使用 $minisx-logo-design 设计 MinisX 图标；没有参考图时，通过关键问题和多方向草图帮我确定方向，再进入交互调参。"

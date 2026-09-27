@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MinisX · 无字图标复现</title>
+<style>
+  :root{color-scheme:light;--ink:#352e29;--muted:#756c63;--paper:#faf8f4;--line:#e4ded5;--accent:#a74f39}
+  *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+  main{max-width:1280px;margin:auto;padding:38px 36px 52px}header{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:28px}
+  .eyebrow{color:var(--accent);font-size:12px;letter-spacing:.13em}h1{font-size:27px;letter-spacing:-.04em;font-weight:550;margin:5px 0 0}p{margin:0;color:var(--muted)}.note{font-size:13px;max-width:420px}
+  .layout{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:34px}.pair{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+  figure{margin:0;min-width:0}figcaption{display:flex;justify-content:space-between;gap:8px;margin-bottom:10px;font-size:13px;color:var(--muted)}figcaption strong{color:var(--ink);font-weight:550}
+  .art{aspect-ratio:1;overflow:hidden;background:#f1e7d9;border-radius:2px}.art svg,.art img{display:block;width:100%;height:100%}.mask .art{border-radius:22.5%}
+  .under{margin-top:19px;display:flex;flex-wrap:wrap;align-items:center;gap:10px}button,a.button{font:inherit;font-size:13px;line-height:1.4;padding:9px 12px;border:1px solid var(--line);border-radius:7px;background:transparent;color:var(--ink);cursor:pointer;text-decoration:none}button:hover,a.button:hover{background:#eee8df}button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:3px}button.active{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+  aside{border-left:1px solid var(--line);padding-left:26px}h2{font-size:15px;font-weight:550;margin:0 0 17px}.control{margin:0 0 18px}.label{display:flex;justify-content:space-between;gap:12px;font-size:13px}output{font-variant-numeric:tabular-nums;color:var(--muted)}input[type=range]{width:100%;margin:9px 0 0;accent-color:var(--accent)}
+  .divider{border:0;border-top:1px solid var(--line);margin:24px 0}.exports{display:flex;flex-wrap:wrap;gap:8px}.exports button:first-child{background:var(--ink);color:var(--paper);border-color:var(--ink)}.small{font-size:12px;color:var(--muted);margin-top:12px}
+  .sizes{margin-top:29px;padding-top:20px;border-top:1px solid var(--line);display:flex;gap:24px;align-items:end;flex-wrap:wrap}.size-preview{text-align:center;font-size:11px;color:var(--muted)}.size-preview img{display:block;margin-bottom:8px;border-radius:22.5%}.size-title{align-self:center;font-size:13px;color:var(--muted);margin-right:auto}.status{min-height:24px;margin-top:15px;font-size:12px;color:var(--muted)}
+  @media(max-width:1000px){main{padding:24px}.layout{grid-template-columns:1fr}aside{border-left:0;border-top:1px solid var(--line);padding:24px 0 0}.controls{display:grid;grid-template-columns:1fr 1fr;gap:0 24px}header{align-items:start}.note{max-width:300px}}
+  @media(max-width:540px){main{padding:20px 16px}header{display:block}.note{margin-top:10px}.pair{gap:12px}h1{font-size:24px}.controls{gap:0 18px}.size-title{width:100%}figcaption{display:block}figcaption span{display:block;font-size:11px}}
+</style>
+</head>
+<body><main>
+<header><div><div class="eyebrow">MINISX / ICON STUDY 01</div><h1>熟悉的形状，可调整的细节。</h1></div><p class="note">以当前浅色无字图标为参照。轮廓与布局重新绘制，细纹按固定种子生成。</p></header>
+<div class="layout">
+<section aria-label="原图与复现对照">
+<div class="pair" id="pair">
+<figure><figcaption><strong>当前原图</strong><span>浅色 · 无字</span></figcaption><div class="art"><img src="reference-light.png" alt="项目当前浅色无字图标" width="1024" height="1024"></div></figure>
+<figure><figcaption><strong>程序复现</strong><span id="mode-label">形状 + 渐变 + 纹理</span></figcaption><div class="art" id="rendered"></div></figure>
+</div>
+<div class="under" role="group" aria-label="显示方式"><button id="full" class="active" aria-pressed="true">完整质感</button><button id="flat" aria-pressed="false">只看轮廓</button><button id="mask" aria-pressed="false">圆角预览</button></div>
+<div class="sizes"><div class="size-title">缩小后看辨识度</div><div class="size-preview"><img id="small-96" width="96" height="96" alt="96像素复现预览">96 px</div><div class="size-preview"><img id="small-60" width="60" height="60" alt="60像素复现预览">60 px</div><div class="size-preview"><img id="small-32" width="32" height="32" alt="32像素复现预览">32 px</div></div>
+</section>
+<aside aria-label="图标参数"><h2>微调这一版</h2><div class="controls">
+<div class="control"><label class="label" for="centerScale">主体大小 <output id="centerScale-value"></output></label><input id="centerScale" type="range" min="0.8" max="1.2" step="0.01"></div>
+<div class="control"><label class="label" for="softness">主体纵向比例 <output id="softness-value"></output></label><input id="softness" type="range" min="0.88" max="1.12" step="0.01"></div>
+<div class="control"><label class="label" for="surroundSpread">外围分布 <output id="surroundSpread-value"></output></label><input id="surroundSpread" type="range" min="0.85" max="1.1" step="0.01"></div>
+<div class="control"><label class="label" for="satelliteScale">外围形状大小 <output id="satelliteScale-value"></output></label><input id="satelliteScale" type="range" min="0.75" max="1.25" step="0.01"></div>
+<div class="control"><label class="label" for="texture">细纹强度 <output id="texture-value"></output></label><input id="texture" type="range" min="0" max="1" step="0.01"></div>
+<div class="control"><label class="label" for="grain">颗粒强度 <output id="grain-value"></output></label><input id="grain" type="range" min="0" max="1" step="0.01"></div>
+<div class="control"><label class="label" for="shading">明暗层次 <output id="shading-value"></output></label><input id="shading" type="range" min="0" max="1" step="0.01"></div>
+<div class="control"><label class="label" for="warmth">冷暖偏移 <output id="warmth-value"></output></label><input id="warmth" type="range" min="-1" max="1" step="0.01"></div>
+</div><button id="reset">恢复初始复现</button><hr class="divider"><h2>保存当前选择</h2><div class="exports"><button id="export-svg">导出 SVG</button><button id="export-png">导出 PNG</button><button id="export-json">保存参数</button><button id="export-flat">导出纯矢量版</button></div><p class="small">SVG 内含生成的纹理图片；纯矢量版保留轮廓和渐变。圆角仅用于预览，不会写入导出图。</p><p id="status" class="status" aria-live="polite">固定纹理种子 270926 · 参数自动保存在本机浏览器</p></aside>
+</div></main><script src="renderer.js"></script><script src="app.js"></script></body></html>
