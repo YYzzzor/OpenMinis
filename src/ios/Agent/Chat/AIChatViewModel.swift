@@ -5726,6 +5726,9 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
                 }
             }
 
+            // await 表示等待异步操作完成，这里是等待流处理完成并返回结果。
+            // 异步指的是在后台线程执行的操作，不会阻塞主线程，允许其他操作继续进行。
+
             let streamEnd = Date()
             let assistantText = streamResult.assistantText
             let toolEntries = streamResult.toolEntries

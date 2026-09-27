@@ -167,6 +167,11 @@ struct TokenUsage {
     /// Context size of the latest API call (input + cache_read + cache_creation).
     var latestContextTokens: Int = 0
 
+    // mutating 的意思为, 该方法可能会修改 struct 的属性.
+    //  这里的属性指的是, inputTokens, outputTokens, cacheCreationTokens, cacheReadTokens, latestContextTokens.
+    // _ 表示忽略了参数标签, 在调用该方法时, 不需要写参数标签, 直接传入一个 LLMUsage 实例即可.
+    // ?? 表示如果 u.cacheCreationInputTokens 为 nil, 则使用 0 作为默认值.
+
     mutating func add(_ u: LLMUsage) {
         // Use max() instead of += to handle providers that emit cumulative usage
         // on every SSE chunk (e.g. DeepSeek-V4-Flash). With += the final count

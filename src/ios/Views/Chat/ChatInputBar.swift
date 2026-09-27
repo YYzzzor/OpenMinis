@@ -1891,23 +1891,57 @@ private extension UIView {
 
 
 // MARK: - Context Usage Indicator
+//  ContextUsageIndicator 显示当前上下文使用量的百分比和环形进度条，点击可触发 action。
+//  其本质还是为 UI
+// : View 表示为 SwiftUI 的视图组件
 
 struct ContextUsageIndicator: View {
-    let percentage: Int?
-    let fraction: Double?
-    let action: () -> Void
+    let percentage: Int?        // : Int? 表示可选整数类型，可能为Int, 也可能为 nil
+    let fraction: Double?       // : Double? 表示可选双精度浮点数类型，可能为 Double, 也可能为 nil
+    let action: () -> Void      // : () -> Void 表示一个无参数、无返回值的闭包类型，通常用于表示一个动作或事件处理器
+
+    // 闭包 指的是一个匿名函数, 可以在需要的时候被调用
+    //  这里的闭包是先声明, 然后在使用时传入具体的实现, 例如点击按钮时触发某个操作
+
+    // @OBservedObject 是 SwiftUI 中的一个属性包装器, 用于观察一个对象的变化, 当对象发生变化时, 会自动刷新视图
 
     @ObservedObject private var fontSettings = FontSettings.shared
+
+    // private 表示该属性只能在当前结构体内部访问, 外部无法直接访问
+    // : CGFloat 表示 ringDiameter 的类型是 CGFloat, 是一个浮点数类型, 用于表示图形界面中的尺寸和坐标
+    // {} 表示这是一个计算属性, 每次访问时都会执行大括号内的代码来计算值, 而不是存储一个固定的值
+    //  fontSettings.scaledChatInput(Layout.ringDiameter)
+    //   表示调用 fontSettings 对象的 scaledChatInput 方法, 并传入 Layout.ringDiameter 作为参数, 返回一个根据字体设置缩放后的值
+    // Layout.ringDiameter 是一个静态常量, 定义在 Layout enum 中, 表示环形进度条的直径
+    //  这里 Layout 就没有创建实例, 直接使用 Layout.ringDiameter 来访问静态常量
 
     private var ringDiameter: CGFloat { fontSettings.scaledChatInput(Layout.ringDiameter) }
     private var ringStrokeWidth: CGFloat { fontSettings.scaledChatInput(Layout.ringStrokeWidth) }
     private var ringNumberSpacing: CGFloat { fontSettings.scaledChatInput(Layout.ringNumberSpacing) }
 
-    /// 外部负数按零处理；超容量百分比保留，交由显示层缩写。
+    // var  表示这是一个变量属性, 可以在结构体内部修改其值
+    // {}   表示这也是一个计算属性, 每次访问时都会执行大括号内的代码来计算值
+    // : Int? 表示 normalizedPercentage 的类型是可选整数类型, 可能为 Int, 也可能为 nil
+    // guard 用法:
+    //  guard 条件 else {
+    //              条件不足的时执行
+    //              return}
+    //  表示如果 percentage 为 nil, 则直接返回 nil, 否则继续执行后续代码
+    // let  表示 声明一个常量，不能被修改
+
+    // guard let 为可选值绑定
+    // 这里的 guard let percentage else 的完整写法是 guard let percentage = percentage else { return nil }, 但是 Swift 5.7 引入了简化语法，可以省略重复的变量名。
+    //  等号右边的 percentage 是原来的 Int?
+    //  绑定成功后, percentage 就是一个非可选的 Int 类型, 可以直接使用
+
+    /// 计算百分比的归一化值，确保不低于最小百分比要求
     private var normalizedPercentage: Int? {
         guard let percentage else { return nil }
         return max(percentage, Layout.minimumPercentage)
     }
+
+    // guard 这一行表示 normalizdedPercentage 为 nil 时, 直接返回 0, 否则继续执行后续代码
+    // ?? 表示如果 fraction 为 nil , 则使用后面的默认值
 
     /// 百分比未知时保持空环；未提供独立比例时，用显示百分比作为回退值。
     private var ringProgress: Double {
@@ -1924,6 +1958,19 @@ struct ContextUsageIndicator: View {
         }
         return AppLocalized("\(normalizedPercentage) percent used")
     }
+
+
+    // .buttonStyle(...) 开始就是设置 Button 自身的样式
+    // 此处的 Button 就是圆圈+百分比的组合, 点击后触发 action
+    // .map 用于对可选值进行转换
+    // Text(..) 这一行表示, 根据 normalizedPercentage 的值, 显示不同的文本内容, 如果大于等于 1000, 显示 "999%+", 否则显示具体的百分比值, 如果为 nil, 则显示 "-"
+    //  1. normalizedPercentage.map {...}, normalizedPercentage 为 Int? 类型, map 是 Optional 提供的转换方法, 如果可选值为整数, 则执行大括号中的转换, 如果可选值为 nil, 则不执行大括号, 结果仍然为 nil. 这里的作用就是将 Int? 转换为 String? 类型
+    //  2. 大括号中的代码就是一个闭包, 而所谓"闭包", 就是一段可以作为参数传递的代码
+    //  3. $0 是闭包的简写参数, 它表示闭包接收到的第一个参数, 在此, 它是从 normalizedPercentage 中取出的整数
+    //  4. 1_000 就是整数1000, Swift 允许在数字中使用下划线提高可读性
+    //  5. $0 >= 1_000 ? "999%+" : "\($0)%" 是一个三元条件运算符: 条件 ? 条件成立时的结果 : 条件不成立时的结果
+    //  6. "\($0)%" 是字符串插值, 它会将 $0 的值转换为字符串并拼接上 "%" 符号. \(表达式) 为字符串差值, 用于将一个值插入字符串
+    //  7. ?? 表示如果 map 的结果为 nil, 则使用 Layout.unknownPercentageLabel 作为默认值, 也就是显示 "-"
 
     var body: some View {
         Button(action: action) {
@@ -1946,10 +1993,10 @@ struct ContextUsageIndicator: View {
             .overlay(Capsule().stroke(ChatColors.inputIconBorder, lineWidth: 0.5))
             .contentShape(Capsule())
         }
-        .buttonStyle(.plain)
-        .accessibilityElement(children: .ignore)
-        .accessibilityAddTraits(.isButton)
-        .accessibilityIdentifier("chat.contextUsage")
+        .buttonStyle(.plain)                                // .plain 表示没有默认的样式
+        .accessibilityElement(children: .ignore)            // children: .ignore 表示忽略子元素的辅助功能, 只显示父元素的辅助功能
+        .accessibilityAddTraits(.isButton)                  // .isButton 表示这个元素是一个按钮, 让辅助功能知道它可以被点击
+        .accessibilityIdentifier("chat.contextUsage")       // chat.contextUsage 是一个唯一的标识符, 用于 UI 测试和辅助功能, 让测试脚本或辅助功能可以找到这个元素
         .accessibilityLabel(AppLocalized("Context usage"))
         .accessibilityValue(accessibilityValue)
         .accessibilityHint(AppLocalized("Opens context usage details"))
@@ -1977,60 +2024,147 @@ struct ContextUsageIndicator: View {
         .accessibilityHidden(true)
     }
 
+    // 这里用 enum 就是为了防止参数散落, 把contextwindow 相关的参数集中起来
     enum Layout {
+        // static: 静态成员, 这里属于 Layout 类型本身, 而不是 Layout 实例
+        // let : 常量, 初始化之后不能被重新赋值
+        // CGFloat: iOS/UIKit/Core Graphics 常用的浮点数类型
+        // xx: CGFloat 表示类型或常量 xx 的类型是 CGFloat
+        //  不过 Swift 也支持类型推断, 如 let percentage = 42
+
         static let ringDiameter: CGFloat = 19.25
         static let ringStrokeWidth: CGFloat = 2.0625
-        // 圆环布局框与数字之间的间隔，随聊天输入字号缩放；保留手动调好的 7pt。
+
+        // 圆环与数字之间的间隔，随聊天输入字号缩放；保留手动调好的 7pt。
         static let ringNumberSpacing: CGFloat = 7
+
         // 下列宽度不含此留白；胶囊总宽 = 内容宽度 × 输入字号倍率 + 左右各 1pt。
         static let horizontalPadding: CGFloat = 1
 
         // 三档共用的调节入口：0–9%（以及未知“—”）的内容最小宽度，不含两侧 padding。
-        // 已确认基准为 76pt，默认胶囊总宽 78pt；调整它会同时改变三档胶囊宽度。
-        // 此值包含圆环、环字间隔和数字；小于内容实际宽度时由内容撑开，不会裁剪。
+        // 基准为 76pt，默认胶囊总宽 78pt；调整它会同时改变三档胶囊宽度(一/二/三位数对应三档胶囊)
+        // 此值包含圆环、环与字之间的间隔和数字；小于内容实际宽度时由内容撑开，不会裁剪。
         static let singleDigitContentWidth: CGFloat = 76
+
         // 每多一位数字补充的空间（16.5pt 等宽数字下为 10.5pt），随输入字号一起缩放。
         // 通常只调上方基准；若更换基础字号后多位数留白不一致，再调整此增量。
         static let additionalDigitWidth: CGFloat = 10.5
+
+        // 下面借助了类型推断
+
         // 10–99%：自动随一位数基准变化；当前内容宽 86.5pt，默认总宽 88.5pt。
         static let doubleDigitContentWidth = singleDigitContentWidth + additionalDigitWidth
         // 100%及以上：同步增加两位空间；当前内容宽 97pt，默认总宽 99pt。
         // 超限保留真实百分比，极大值仍显示 999%+；不影响统计口径。
         static let tripleDigitContentWidth = singleDigitContentWidth + 2 * additionalDigitWidth
 
+
+        // 一个静态函数:
+        // static func: 通过类型本身调用, 表示这个函数属于类型本身, 而不是某个实例对象
+        //  可以通过 Layout.contentWidth(for: 42) 来调用, 而不用预先创建 Layout:
+        //     let layout = Layout()
+        //     layout.contentWidth(for: 42)
+        //  这样设置的原因是这个函数的计算只依赖两类数据, 一是调用者传入的 percentage,二是 Layout 的静态宽度参数, 它不依赖某个具体对象保存的状态
+
+        // for: 调用的时候使用的参数标签, 而不是 for 循环
+        //  在调用的时候使用 Layout.contentWidth(for: 42) . 把这句当成自然的英文, 即 contentWidth for 42
+        //  而在函数内部则使用 percentage: switch percentage
+        // 当然, 我自己更 perfer 没有 for 的版本, 更符合写 C++ 的直觉
+
+        // percentage: 函数内部使用的参数名
+        // Int? : 可选整数, 是 Optional<Int> 的简写, 它表示这个变量有两种可能
+        //  一是 保存了一个整数, 如 42
+        //  二是 没有任何整数, 如 nil (nil 表示没有值, 而不是数字 0)
+        //  两者的含义不同, 42 表示 已知上下文使用量为 42%, 而 nil 表示上下文用量还没有被计算出来
+
+        // -> CGFloat : 函数返回一个 CGFloat 类型的值
+
         static func contentWidth(for percentage: Int?) -> CGFloat {
+            // ?? 表示 nil 合并运算符, 意义: 如果 percentage 有值, 则使用它, 如果percentage==nil,则使用备用值 0
+            // ..<10 是单位范围, 表示所有小于 10 的值
+            // 10..<100 是半开范围, 包含了 10, 但不包含 100
+
+
             switch percentage ?? 0 {
-            case ..<10: singleDigitContentWidth
-            case 10..<100: doubleDigitContentWidth
-            default: tripleDigitContentWidth
+                case ..<10:
+                    singleDigitContentWidth
+                case 10..<100:
+                    doubleDigitContentWidth
+                default:
+                    tripleDigitContentWidth
             }
         }
 
+        // 按钮的最小宽度与默认高度, 是最小约束
         static let minimumButtonWidth: CGFloat = 44
         static let defaultButtonHeight: CGFloat = 34
+
+        // 圆环的背景 透明度, 0 代表完全透明, 1 表示完全不透明. 即圆环的背景轨道比实际的进度更淡
         static let trackOpacity: Double = 0.25
-        static let minimumPercentage = 0
-        static let maximumPercentage = 100
+
+        // 百分比范围
+        static let minimumPercentage: Int = 0
+        static let maximumPercentage: Int = 100
+
+        // 圆环的进度范围, 0 表示不会只进度, 1 表示绘制整个圆
         static let minimumFraction: Double = 0
         static let maximumFraction: Double = 1
+        // 圆环的起点, SwfitUI 默认从圆形的右侧开始绘制, 这里默认将圆环旋转 -90°, 进度会从顶部开始.
         static let ringStartAngle: Double = -90
+        // 在百分比还没有被计算出来的时候, 显示 —
         static let unknownPercentageLabel = "—"
     }
 }
 
-
+// 仅用于预览的界面
 #if DEBUG
-// 测例只给真实指示器传入示例值，不写入 Session，也不替换聊天页的实际统计。
-// 先在一位数 Canvas 中调 singleDigitContentWidth；两位、三位预览会使用联动后的宽度。
+// private 表示仅允许在当前文件中使用
+// View: SwiftUI 的视图协议
+//  协议(protocol) 用于规定一个类型必须提供哪些能力.
+
 private struct ContextUsageWidthPreview: View {
+    // 没有? 所以必须提供一个有效的整数, 而不能是 nil
+    // Swift 可以自动生成成员初始化器, 因此可以用 ContextWidthPreview(percentage: 42) 来赋值
     let percentage: Int
 
+    // body 是一个计算属性
+    // 计算属性不直接保存值, 在每次读取时, 都会执行大括号里的代码来计算结果
+    // some View 是不透明返回类型
+    //  编译器知道返回的类型是某种 View, 但不需要知道具体是哪种 View, 这样可以隐藏实现细节
+    //  调用者只需要知道它是一个 View, 可以在 SwiftUI 的视图层次中使用, 而不需要关心具体类型
+
     var body: some View {
+
+        // VStack 是垂直堆叠视图 (从上到下)
+        //  alignment 表示子视图的对齐方式, .leading 在此表示左对齐
+        //  spacing 表示子视图之间的间距, 24 表示子视图之间的间距为 24pt
+        // 大括号里的内容是 VStack 的子视图, 会按顺序垂直排列
+        //  大括号内可以连续放置多个 View
+
+        // 这个预览中, 放入了两组内容
+        // 下面是第一组
+        //  Text("一位数参考 · 1%"), 始终显示 1% 的参考值, 用于对比
+        //  composer(percentage: 1), 显示一位数的上下文胶囊, 传入 percentage=1
+        //  composer 是一个自定义函数, 返回一个 View, 用于显示一个对话框的样式
+        // 下面是第二组
+        //  Text("待确认 · \(percentage)%"), 显示传入的 percentage
+        //  composer(percentage: percentage), 显示传入 percentage 的上下文胶囊, 用于预览不同百分比下的显示效果
+
+        // .padding(12) 和 .background(ChatColors.background) 是对 VStack 的 View Modifier, 视图修饰器, 用于修改视图的外观和布局
+        // SwiftUI 的基本模式是:
+        //  原始视图
+        //    .修饰器1()
+        //    .修饰器2()
+
+        // .padding(12), 给 VStack 添加内边距, 让内容不贴边.
+        //  内边距即四周的空白区域, 12 表示四周各留 12pt 的空白
+        // .background(ChatColors.background), 给 VStack 添加背景色, 使用 ChatColors.background
+
         VStack(alignment: .leading, spacing: 24) {
             Text("一位数参考 · 1%")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-            composer(percentage: 1)
+                .font(.caption)                 // 设置字体为 caption, 是系统提供的一个小号字体
+                .foregroundStyle(.secondary)    // 设置前景色为 secondary, 是系统提供的一种次要颜色, 用于提示信息或辅助信息
+            composer(percentage: 1)             // 显示其余的上下文胶囊内容, 传入 percentage=1
             Text("待确认 · \(percentage)%")
                 .font(.caption)
                 .foregroundStyle(.secondary)
@@ -2039,6 +2173,33 @@ private struct ContextUsageWidthPreview: View {
         .padding(12)
         .background(ChatColors.background)
     }
+
+    // composer 是一个私有实例方法
+    // private 表示只能在当前文件中访问, 不能被其他文件访问
+    // func 表示这是一个函数, 也可以是方法
+    // percentage: Int, 表示传入的参数 percentage 是一个整数类型,
+    //   没有用 for 表示在调用时不需要使用参数标签, 直接传入整数即可, 即 composer(percentage: 42) 而不是 composer(for: 42)
+    // -> some View, 表示返回一个遵循 View 协议的类型
+
+    //.font(...) 设置字体, 使用 FontSettings.shared.scaledChatInput(ChatInputTypography.baseFontSize) 来获取缩放后的聊天输入字体大小
+    //  1. ChatInputTypography.baseFontSize 是一个常量, 由用户定义, 表示聊天输入的基础字体大小
+    //  2. scaledChatInput 是 FontSettings 的一个方法, 用于根据用户设置的字体大小缩放聊天输入字体
+    //  3. FontSettings 是一个单例类, 用于管理应用的字体设置, 通过 shared 属性访问单例实例
+    //     单例模式是一种设计模式, 保证一个类只有一个实例, 并提供全局访问点
+    //  4. FontSetting.shared 是一个全局的字体设置实例, 可以在应用的任何地方访问和修改字体设置
+    //  5. .system(...) 设置系统字体, 可以指定大小和粗细
+    //  6. .font(.system(...)) 表示使用系统字体, 并指定了大小
+    // .foregroundStyle(...) 设置前景色, 使用 ChatColors.tertiaryText 来获取聊天输入的第三层文本颜色
+
+    // HStack 是水平堆叠视图 (从左到右)
+    // spacing: 12 表示子视图之间的间距为 12pt
+    //  1. referenceIcon("plus") 显示一个系统自带的加号图标
+    //  2. referenceIcon("slash") 显示一个斜杠
+    //  3. Spacer(minLength: 0) 是一个弹性空间, 用于在图标之间创建可伸缩的间距, minLength: 0 表示最小长度为 0
+    //  4. ContextUsageIndicator(percentage: percentage, fraction: Double(percentage) / 100) {} 显示上下文使用指示器, 传入 percentage 和 fraction, fraction 是百分比的浮点数表示
+    //  后面两个显示就不多说了, 都类似
+
+    // .background(..., in:) 中 in 的部分表示背景的形状, 这里创建了一个圆角矩形, cornerRadius: 24 表示圆角半径为 24pt
 
     private func composer(percentage: Int) -> some View {
         VStack(alignment: .leading, spacing: 18) {
@@ -2071,6 +2232,9 @@ private struct ContextUsageWidthPreview: View {
             .overlay(Circle().stroke(ChatColors.inputIconBorder, lineWidth: 0.5))
     }
 }
+
+// 预览上下文胶囊在不同百分比下的显示效果
+// traits: .fixedLayout(width: 402, height: 360) 表示预览的固定布局大小为 402pt 宽，360pt 高
 
 #Preview("上下文胶囊 · 一位数 1% / 9%", traits: .fixedLayout(width: 402, height: 360)) {
     ContextUsageWidthPreview(percentage: 9)
