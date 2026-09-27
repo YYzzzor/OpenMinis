@@ -4,6 +4,7 @@ import errno
 import os
 from pathlib import Path
 import subprocess
+import sys
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -392,6 +393,56 @@ class ReviewTests(unittest.TestCase):
         self.write('task.md', 'new acceptance')
         with self.assertRaisesRegex(review.ReviewError, 'stale'):
             review.export(self.bundle, self.repo, self.root / 'stale-export')
+
+    def test_active_review_export_rejects_missing_title_before_writing(self):
+        self.prepare()
+        review.run(self.bundle, 'deepseek', 'model', self.fake_pi(self.report_body()), 5)
+        reviews = self.repo / 'tasks/active/测试任务/reviews'
+        for name in ('', '001', '002', '001 ---', '   ', '１２３'):
+            with self.subTest(name=name):
+                with self.assertRaisesRegex(review.ReviewError, 'descriptive title'):
+                    review.export(self.bundle, self.repo, reviews / name)
+                self.assertFalse(reviews.parent.exists())
+
+    def test_active_review_export_accepts_titles_and_preserves_evidence(self):
+        self.prepare()
+        review.run(self.bundle, 'deepseek', 'model', self.fake_pi(self.report_body()), 5)
+        for name in ('001 上下文统计来源校验', '002 Session usage retry', '会话统计持久化'):
+            with self.subTest(name=name):
+                output = self.repo / 'tasks/active/测试任务/reviews' / name
+                review.export(self.bundle, self.repo, output)
+                for artifact in ('request.md', 'manifest.json', 'status.json',
+                                 'report.txt', 'report.json', 'report.md'):
+                    self.assertEqual((output / artifact).read_bytes(),
+                                     (self.bundle / artifact).read_bytes())
+
+    def test_numeric_export_outside_active_reviews_remains_compatible(self):
+        self.prepare()
+        review.run(self.bundle, 'deepseek', 'model', self.fake_pi(self.report_body()), 5)
+        output = self.root / 'external/reviews/001'
+        review.export(self.bundle, self.repo, output)
+        self.assertEqual((output / 'report.txt').read_bytes(),
+                         (self.bundle / 'report.txt').read_bytes())
+        review.verify(self.bundle, self.repo)
+
+    def test_run_cli_uses_flash_default_and_honors_explicit_override(self):
+        for index, (arguments, provider, model) in enumerate((
+                ([], 'deepseek', 'deepseek-flash'),
+                (['--provider', 'custom', '--model', 'explicit-model'], 'custom', 'explicit-model'))):
+            with self.subTest(arguments=arguments):
+                self.bundle = self.root / ('model-round-' + str(index))
+                self.prepare()
+                pi = self.fake_pi(
+                    'assert sys.argv[sys.argv.index("--provider") + 1] == ' + repr(provider) + '\n'
+                    'assert sys.argv[sys.argv.index("--model") + 1] == ' + repr(model) + '\n'
+                    + self.report_body())
+                result = subprocess.run([sys.executable, '-B', str(Path(review.__file__).resolve()),
+                                         'run', str(self.bundle), '--pi', pi] + arguments,
+                                        capture_output=True, text=True, timeout=15)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                status = json.loads(result.stdout)
+                self.assertEqual((status['provider'], status['model']), (provider, model))
+                self.assertEqual(status['state'], 'reviewed')
 
     def test_json_list_report_is_incomplete(self):
         with self.assertRaisesRegex(review.ReviewError, 'object'):

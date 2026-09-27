@@ -13,6 +13,10 @@ import tempfile
 import spec_context
 
 
+DEFAULT_PROVIDER = 'deepseek'
+DEFAULT_MODEL = 'deepseek-flash'
+
+
 class ReviewError(Exception):
     pass
 
@@ -296,7 +300,7 @@ def validate_report(raw, snapshot):
     return report
 
 
-def run(bundle, provider, model, pi='pi', timeout=300):
+def run(bundle, provider=DEFAULT_PROVIDER, model=DEFAULT_MODEL, pi='pi', timeout=300):
     bundle = Path(bundle).resolve()
     manifest = verify(bundle)
     status_file = bundle / 'status.json'
@@ -346,9 +350,24 @@ def run(bundle, provider, model, pi='pi', timeout=300):
     return status
 
 
+def validate_export_name(repo, output):
+    """检查活动任务的审查标题；历史快照与其他导出位置保持兼容。"""
+    try:
+        parts = output.relative_to(Path(repo).resolve()).parts
+    except ValueError:
+        return
+    if len(parts) < 4 or parts[:2] != ('tasks', 'active') or parts[3] != 'reviews':
+        return
+    # 中文和英文字母都可作为标题内容，纯序号或只附加空格、标点不能说明主题。
+    if len(parts) == 4 or not any(character.isalpha() for character in parts[4]):
+        raise ReviewError('Active task review directory requires a descriptive title, '
+                          'not just a number; use e.g. "001 上下文统计来源校验"')
+
+
 def export(bundle, repo, output):
     """Export small durable records; keep the full bundle at its original location."""
     bundle, output = Path(bundle).resolve(), Path(output).resolve()
+    validate_export_name(repo, output)
     manifest = verify(bundle, repo)
     if output.exists():
         raise ReviewError('Export destination already exists')
@@ -385,8 +404,8 @@ def main():
     check.add_argument('--repo', help='Also check freshness against this repository')
     launch = sub.add_parser('run')
     launch.add_argument('bundle')
-    launch.add_argument('--provider', required=True)
-    launch.add_argument('--model', required=True)
+    launch.add_argument('--provider', default=DEFAULT_PROVIDER, help='Default: %(default)s')
+    launch.add_argument('--model', default=DEFAULT_MODEL, help='Default: %(default)s')
     launch.add_argument('--pi', default='pi')
     launch.add_argument('--timeout', type=float, default=300)
     save = sub.add_parser('export')

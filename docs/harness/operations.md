@@ -1,6 +1,6 @@
 # Harness 操作说明
 
-当前入口为项目根目录的 Python 脚本与 `.agents/skills/` 中的四项技能（plan-task、ios-ui-design、resume-task、review-task）。面向用户的用途和示例见[项目技能使用说明](skills-guide.md)。Python 需要 3.9+，Git 必须有初始提交。Pi 已核验本机版本 0.85.1；模型通过命令参数指定。未自动修改全局 Pi 配置。
+当前入口为项目根目录的 Python 脚本与 `.agents/skills/` 中的四项技能（plan-task、ios-ui-design、resume-task、review-task）。面向用户的用途和示例见[项目技能使用说明](skills-guide.md)。Python 需要 3.9+，Git 必须有初始提交。Pi 已核验本机版本 0.85.1；默认使用 `deepseek / deepseek-flash`，可通过命令参数显式覆盖。未自动修改全局 Pi 配置。
 
 路径含空格时，命令参数用引号包围。任务命名使用创建日期加名称：`YY-mm-dd Name`。
 
@@ -49,8 +49,16 @@ python3 scripts/harness/review.py prepare \
 
 ```text
 python3 scripts/harness/review.py run <bundle> \
-  --provider deepseek --model deepseek-v4-pro --timeout 300
+  --provider deepseek --model deepseek-flash --timeout 300
 ```
+
+`run <bundle>` 省略 `--provider` 和 `--model` 时使用上述默认值；不修改全局 Pi 配置，也不在调用失败时自动换模型或提供商。
+
+### 持续授权与执行边界
+
+维护者于 2026-09-27 对以下具体范围明确回复“持续授权上述范围，以后不再逐次询问”：本项目 Pi 审查可将审查所需源码、选定任务记录和适用规范发送给 DeepSeek，默认使用 deepseek-flash，不包含凭据或项目外无关数据。主 Agent 在此范围内直接执行正常审查，不再逐次询问是否允许外发；此授权不自动扩大到其他外部接收方。
+
+按工具要求申请调用所需网络访问及本地 Pi 配置锁权限时，引用上述持续授权，不先向用户重复提问。项目规则不能取消工具层的沙箱或自动审批机制；若工具仍明确拒绝，报告具体原因，不绕过。持续授权只决定调用是否可以执行，原有只读审查、超时及结果有效性检查继续生效。
 
 采用 Pi 非交互模式；关闭自动扩展、skills、项目上下文和提示模板发现，传入独立 reviewer 指令，仅启用 read/grep/find/ls。共享 review-task skill 指导发起与处理，脚本给独立 reviewer 传入同范围的输出要求，避免递归调用审查流程。只读工具白名单不构成文件系统或网络沙箱。
 
@@ -68,8 +76,10 @@ conclusion 是 Pi 的建议结论。主 Agent 必须核实意见并在 resolutio
 python3 scripts/harness/review.py check <bundle>
 python3 scripts/harness/review.py check <bundle> --repo <仓库绝对路径>
 python3 scripts/harness/review.py export <bundle> \
-  --repo <仓库绝对路径> --output <任务目录/reviews/001>
+  --repo <仓库绝对路径> --output "<任务目录>/reviews/001 上下文统计来源校验"
 ```
+
+导出目录使用“序号＋内容标题”，标题应替换为本轮实际讨论的审查主题，不能只用 `001` 等序号。脚本的 `--output` 接受自定义路径；导出到 `tasks/active/<任务>/reviews/<轮次>` 时，会在创建任何导出目录前检查轮次名是否包含文字，拒绝纯数字、空白或只有标点的名称，并给出命名示例。标题是否准确表达讨论内容仍由主 Agent 核实；含空格时整体加引号。此检查仅用于活动任务的新导出，不改变历史快照核验和其他位置的导出行为。目录内脚本生成的文件名不变，详细规则见 [每轮审查](record-formats.md#每轮审查)。已有纯数字目录改名时，保留原始材料字节与历史路径，通过任务链接和迁移索引提供新入口；外部完整 bundle 不因展示目录改名而自动搬迁。
 
 不带 repo 检查快照完整性，带 repo 还检查是否仍匹配当前代码、需求与 Git 状态。export 在仓库未变化时保存请求、manifest、原始 JSON 文本、渲染 Markdown、调用状态和完整 bundle 位置。正式使用需保留完整 bundle 才能还原代码；导出文件本身不包含完整源码。
 
