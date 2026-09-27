@@ -63,7 +63,7 @@
 
 固定快照：`fe0f4ec298e58b63e036ef0ff3de498a0961e310237401515a58d9d530fd5b17`。
 完整bundle：`/Users/huyuanzhao/.codex/.chatgpt-projects/g-p-6aa8f27e863c8191be6cf501db847b1a/outputs/context-usage-review/001`。
-首轮报告已存reviews/001，R1保留为已知取舍，R2补测试并提取纯判断修正；第二轮固定快照为a22015486b9fee7bd35dfe382abdb87b9fe20ddecbb6bd10eefe127feefff888，bundle同父目录002，继续使用deepseek-flash。
+首轮报告已存reviews/001 上下文占用指示器与统计来源，R1保留为已知取舍，R2补测试并提取纯判断修正；第二轮固定快照为a22015486b9fee7bd35dfe382abdb87b9fe20ddecbb6bd10eefe127feefff888，bundle同父目录002，继续使用deepseek-flash。
 
 ## 2026-09-26 后续授权与进度
 
@@ -81,7 +81,7 @@
 - 第二条详情仍为11.8K/1.0M（显示取整精度下相同），累计输入从67.6K增到79.4K。不以取整后的相同数值声称测出了精确分子增长。新有效统计替换由纯逻辑测试直接断言。证据request-two-observed.png、request-two-details.png。
 - 两次默认AX点击未触发发送，request-two/request-two-sent系列仍是草稿状态，不能当连续生成证据。改用physical触摸后发送成功；此后未重复发送。实际有效证据以request-two-physical系列为准。
 - 真实1%状态下指标右边界280pt、麦克风x292pt，间距12pt，与＋/相同。没有额外一行、无按钮位移。详情已关闭，保留当前会话。软件键盘/语音/编辑组合布局与用户精确参数确认仍待完成；本次没有扩大测试范围。
-- Pi第三轮deepseek-flash固定快照99434063296de8df3e1271af2cb3a9abcf8090a1b949f375eb8dd80008cfd39f，结论nonblocking，原文及处理见reviews/003。导出前check通过。之后仅修正两处fallback注释及任务/验证记录，运行逻辑未变；不声称最终记录仍与旧快照hash完全一致。
+- Pi第三轮deepseek-flash固定快照99434063296de8df3e1271af2cb3a9abcf8090a1b949f375eb8dd80008cfd39f，结论nonblocking，原文及处理见reviews/003 连续对话保留上次有效占比。导出前check通过。之后仅修正两处fallback注释及任务/验证记录，运行逻辑未变；不声称最终记录仍与旧快照hash完全一致。
 
 仍处于feat/chat-context-usage，未提交、推送、归档或合并main。
 
@@ -107,7 +107,7 @@
 
 ### v8 审查后最终版本
 
-Pi005完成并提出跨会话全局epoch、签名包含展示元数据、极端组合布局三项意见，处理见reviews/005/resolution.md。主Agent接受前两项数据问题并定向修正，Luna复核补充fallback途中路由变化竞态后，增加独立路由版本保护和直接生产判断回归。最终应以pure-tests-session-route.log（26项）及build-session-route.log为准；前一版scoped日志为25项，均保留。旧Pi快照与修复后源码不同，主Agent和Luna检查具体差异，不声称旧报告hash等于最终代码。
+Pi005完成并提出跨会话全局epoch、签名包含展示元数据、极端组合布局三项意见，处理见reviews/005 会话统计持久化与恢复超时后重试/resolution.md。主Agent接受前两项数据问题并定向修正，Luna复核补充fallback途中路由变化竞态后，增加独立路由版本保护和直接生产判断回归。最终应以pure-tests-session-route.log（26项）及build-session-route.log为准；前一版scoped日志为25项，均保留。旧Pi快照与修复后源码不同，主Agent和Luna检查具体差异，不声称旧报告hash等于最终代码。
 
 审查后新增两条短请求分别返回A OK/B OK，A保存13262/1000000、B保存10471/1000000。A→B→A保持各自1%。从进程12183彻底重启到12714，未发新请求，两条记录UUID和计数完全一致（scoped-before-restart.json与scoped-after-restart.json），scoped-a-return、scoped-a-restart、scoped-b-restart截图与AX树对应。持久签名收窄属于本次未发布开发版本的调整，先前13,240/10,449的验证记录是旧阶段证据；最终两条会话已建立新的可靠记录。
 
@@ -192,3 +192,24 @@ build-typography.log：BUILD SUCCEEDED。已安装到指定普通iPhone18 Pro（
 ## 重新提交前检查（2026-09-27）
 
 重新核对工作区，相对先前功能基准的后续修改为学习注释、排版、两个常量的显式Int类型、空字符串提取项清理，以及构建号2→3。对AIChatViewModel.swift、ChatModels.swift、ChatInputBar.swift运行swiftc -frontend -parse通过；工程文件plutil与Localizable.xcstrings JSON解析通过；git diff --check及各笔提交前cached检查通过。ContextPolicy.swift、ContextUsagePersistence.swift、ContextUsageTests.swift与此前26项通过测试的源文件副本逐字节一致。没有重新执行完整构建、安装、Canvas或真机验证；旧运行证据仍限于其记录版本，用户已确认76pt基准的三档视觉效果。构建号3未上传核实；学习笔记按原意保留，不声明概念逐条审核完成。
+
+
+## Harness 审查导出标题检查（2026-09-27）
+
+维护者明确要求调整 Harness，防止活动任务的 reviews 轮次只使用序号。review.py 的 export 在写入任何导出目录前检查 tasks/active/<任务>/reviews/<轮次> 的名称，拒绝纯数字、空白、仅有标点的名称，并提示具体标题示例；中文和英文标题均可。程序只检查是否包含文字，标题是否准确反映沟通内容仍按命名规范由主 Agent 判断。历史快照核验及该路径之外的导出行为保持兼容。
+
+新增三项行为测试覆盖无效名称拒绝且不产生目录、有效标题导出且全部原始材料字节一致、外部纯数字目录兼容。运行 python3 -B -m unittest discover -s scripts/harness -p 'test_review.py' -v：共31项，30项通过、1项跳过；跳过项为当前文件系统拒绝非UTF-8文件名。git diff --check通过。测试只使用临时Git仓库和模拟Pi进程，没有发送模型请求。本轮未执行独立Pi审查，仍属待完成检查，不把先前功能审查当作本次脚本变更的审查。未修改产品源码，未创建新任务、提交、推送、合并或归档。
+
+
+## Pi 默认模型与持续授权（2026-09-27）
+
+维护者要求 Pi 默认使用 deepseek-flash，不再逐次卡住询问。首次写入持续外发授权被自动审批拒绝，理由是需明确具体接收方及材料范围；随后维护者对“本项目审查所需源码、选定任务记录和适用规范发送给 DeepSeek，不含凭据或项目外无关数据”的明确问题回复“持续授权上述范围，以后不再逐次询问”。已据此同步 AGENTS.md、review-task 技能和操作说明，后续正常调用复用这项明确授权。工具层权限机制仍适用。
+
+review.py 的函数和命令入口默认 provider=deepseek、model=deepseek-flash；仍支持显式参数覆盖，失败不自动切换模型。本地 Pi 离线模型列表确认 deepseek-flash 可用，没有调用真实模型。新增命令入口行为测试，模拟 Pi 实际接收参数并核验状态记录；test_review.py 共32项，31项通过、1项因文件系统拒绝非UTF-8名称跳过。git diff --check通过。skill-creator 的 quick_validate.py 因本机Python缺少PyYAML未能运行；手动核对技能原有frontmatter未改、引用路径有效及授权表述一致，不声称自动技能校验通过。
+
+本轮不发送真实审查请求；上一节独立审查待完成状态保留，但后续正常审查不再因缺少上述外发授权等待询问。改动未提交，任务保持active。
+
+
+## 本轮提交前复核（2026-09-27）
+
+两个活动任务的恢复检查点均match，无未完成Git操作。全部6个重命名审查轮次中的40份已跟踪文件与HEAD中原路径内容逐字节一致；产品源码无未提交改动。Harness脚本与上一轮32项测试（31通过、1跳过）对应内容一致，本轮不重复同一测试。git diff --check及分组暂存检查通过；独立Pi审查、产品组合场景和Apple上传确认的缺口按各任务记录保留，不以提交替代验收。
