@@ -2,18 +2,32 @@
 
 更新日期：2026-09-27（Asia/Shanghai）。
 
+## 最新提交：1.13（4）
+
+2026-09-27 23:10:13（Asia/Shanghai），Agent 按维护者明确指令完成签名归档并上传 **1.13（4）**；Apple 回执确认接收成功，上传结束时状态为处理中。分发配置为 **TestFlight Internal Only**，`manageAppVersionAndBuildNumber=false`。维护者随后反馈“已经推送到我的手机上了”，据此记录 Build 4 已到达维护者手机；此为用户反馈，未独立读取后台处理状态或组关联。尚未明确确认安装使用，当前已确认使用版本仍保留 1.13（3）。
+
+- 授权：当前对话用户要求“按照之前写的规范，尝试为 TestFlight Internal 提交一个新的 Build 版本”。发布阶段没有新建任务或对话，也未提交或推送 Git；后续用户授权任务归档和提交准备。
+- 构建输入：`/Users/huyuanzhao/Coding/Projects/OpenMinis`，`main`，HEAD `64a953277d32f48082b0f0c83009e36bc9d671e3`；仅将主 App、ShareExtension、FileProvider、AgentWidget 的 Debug/Release Build 3 改为 4。未跟踪的 WeatherKit 调查文档不参与打包。输入差异、索引和未跟踪清单均保存在产物目录，归档后核对 tracked diff 未改变。
+- 改动背景：WeatherKit 的问题由维护者启用 App Services 解决，原模拟器已真实取数成功；该修复无需修改天气代码。本次按明确要求重新打包当前源码为新 Build。原因与验收见[已归档调查](<../tasks/archive/26-09-27 WeatherKit 认证失败调查.md>)。
+- 环境：Xcode 27.0（27A266a），iPhoneOS 27.0 SDK，最低 iOS 26.0；Team `42486W5YRY`，Bundle ID `com.yyzzzor.minisx`。每条 Xcode 命令临时指定开发目录，没有切换全局 xcode-select。
+- 验证：`ARCHIVE SUCCEEDED`；四个正式产品均为 1.13（4），签名验证通过，Team/Bundle ID/App Group 正确，主 App 的 iCloud 和 WeatherKit 权限及描述文件已核对；主图标、四套备用图标引用及文件存在，四个正式产品 dSYM 存在。未据此声称已完成真机运行验收。
+- 上传：Xcode 已登录账户可用于命令行自动签名和上传；`EXPORT SUCCEEDED`，退出码 0，回执 `fdae7128-cfcb-40ff-9b0c-4bba4e4d4eb2`，App Store Connect app ID `6816328476`，`uploadedBuildNumber=4`。上传前未独立取得远端构建列表，最终 Apple 成功回执确认候选 4 已被接收。
+- 警告：上传有 8 项第三方库 dSYM 缺失警告：FFmpeg、RealTimeCutVADCXXLibrary、libavcodec、libavfilter、libavformat、libavutil、libswresample、libswscale。未阻断上传，但这些库的崩溃符号化可能不完整。没有出现此前 90890/90892 备用图标上传警告。本地编译还有现有并发/旧接口等警告，已保存完整日志及摘要，未在发布中扩展修复。
+- 产物根目录：`/Users/huyuanzhao/Library/Developer/Xcode/MinisXReleases/2026-09-27-2302-build4/`；归档 `MinisX.xcarchive`，上传日志 `upload.log`，完整分发日志 `distribution-logs/`，验包 `archive-verification.json`，回执和警告 `release-result.json`，构建输入 `release-input.json` 与 `source.diff`。
+- 分发反馈：维护者确认 Build 4 已推送到手机，交付结果已收到用户反馈；未独立核实后台内部组配置。下一步只待安装使用确认，不再要求用户重复证明已收到推送，不重传或增加 Build。
+
 ## 当前使用版本
 
 | 项目 | 当前状态 |
 | --- | --- |
 | 应用 | MinisX |
-| 版本 | 1.13（3） |
+| 已确认安装使用的版本 | 1.13（3）；Build 4 已收到手机推送 |
 | 分发渠道 | TestFlight Internal（内部测试） |
 | 使用范围 | 暂时仅项目维护者本人，1 人 |
 
-来源：维护者于本次对话确认，已在昨晚通过 TestFlight 提交并安装使用包含“上下文窗口胶囊”的 Build 3；当前使用版本更新为1.13（3）。TestFlight Internal、仅本人使用的范围沿用此前确认。安装使用状态依据维护者反馈。Agent随后只读核对了本机1.13（3）归档：主应用和三个扩展编号一致、签名校验通过，归档元数据记录Build 3上传成功；未重新访问App Store Connect实时后台。当前源码的主应用与三个正式扩展也均为1.13 / Build 3。
+来源：维护者于本次对话确认，已在昨晚通过 TestFlight 提交并安装使用包含“上下文窗口胶囊”的 Build 3；当前使用版本更新为1.13（3）。TestFlight Internal、仅本人使用的范围沿用此前确认。安装使用状态依据维护者反馈。Agent随后只读核对了本机1.13（3）归档：主应用和三个扩展编号一致、签名校验通过，归档元数据记录Build 3上传成功；未重新访问App Store Connect实时后台。当时源码的主应用与三个正式扩展均为1.13 / Build 3；本次发布后已同步为 Build 4。
 
-下一次发布按[MinisX TestFlight 发布流程草案](minisx-testflight-release-draft.md)核对；完整Agent自动发布仍待首次实际执行验证。
+下一次发布按[MinisX TestFlight 发布流程草案](minisx-testflight-release-draft.md)核对；Agent 已实测完成 Build 4 的签名归档与自动上传；维护者已反馈 Build 4 推送到手机；后台状态读取和组操作自动化仍未验证。
 
 此状态针对 MinisX；README 中保留的 OpenMinis 官方 App Store、TestFlight 链接属于上游项目。
 
