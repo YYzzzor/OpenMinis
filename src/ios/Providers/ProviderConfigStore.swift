@@ -146,7 +146,13 @@ struct ProviderConfig: Codable, Equatable {
 final class ProviderConfigStore: ObservableObject {
     static let shared = ProviderConfigStore()
 
-    @Published private(set) var config: ProviderConfig
+    @Published private(set) var config: ProviderConfig {
+        didSet {
+            // 同步/磁盘重载不一定调用 save，也必须让旧请求及模型解析缓存失效。
+            configRevision &+= 1
+            reconcileStoredContextUsage()
+        }
+    }
 
     /// Bumped whenever an OAuth token or string is saved/deleted in the Keychain,
     /// so views observing the store re-evaluate auth state. Also an L1 cache key
@@ -1925,6 +1931,52 @@ final class ProviderConfigStore: ObservableObject {
             config.defaultSubGroupId = newValue
             save()
         }
+    }
+
+    /// 同时覆盖本地配置修改和磁盘/同步重新载入，不依赖全局刷新版本号。
+    private func reconcileStoredContextUsage() {
+        do {
+            try ContextUsagePersistence.shared.reconcile { sessionID, entryID, includesBinding in
+                contextUsageConfigurationKey(sessionID: sessionID, entryID: entryID, includesBinding: includesBinding)
+            }
+        } catch {
+            logger.error("Failed to invalidate stored context usage: \(error)")
+        }
+    }
+
+    /// 只比较该会话的主模型选择及实际模型来源，不包含其它会话绑定或凭据。
+    func contextUsageConfigurationKey(sessionID: String, entryID: String, includesBinding: Bool = true) -> String? {
+        guard let entry = entry(for: entryID), let provider = instance(for: entry.providerInstanceId) else { return nil }
+        struct Configuration: Encodable {
+            let source: SessionModelSource?
+            let defaultGroupID: String?
+            let entryID: String
+            let modelID: String
+            let contextWindow: Int
+            let groupContextLimit: Int?
+            let providerID: String
+            let providerType: String
+            let credentialType: String
+            let userAgent: String?
+            let enabled: Bool
+            let baseURL: String?
+            let appendV1: Bool
+            let azureMode: Bool
+        }
+        let source = binding(for: sessionID)?.primarySource
+        let groupLimit: Int?
+        if case .group(let groupID, _) = source { groupLimit = group(for: groupID)?.contextLimitTokens }
+        else { groupLimit = nil }
+        return ContextUsageHistoryAnchor.digest(Configuration(
+            source: includesBinding ? source : nil,
+            defaultGroupID: includesBinding && source == nil ? config.defaultPrimaryGroupId : nil,
+            entryID: entry.id, modelID: entry.model.id, contextWindow: entry.model.contextWindowTokens,
+            groupContextLimit: groupLimit,
+            providerID: provider.id, providerType: provider.providerType.rawValue,
+            credentialType: provider.credentialType.rawValue, userAgent: provider.customUserAgent,
+            enabled: provider.isEnabled, baseURL: provider.customBaseURL,
+            appendV1: provider.appendV1Suffix, azureMode: provider.azureMode
+        ))
     }
 
     // MARK: - Session Bindings

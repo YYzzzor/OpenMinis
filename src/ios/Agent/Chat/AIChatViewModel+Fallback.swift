@@ -16,7 +16,8 @@ extension AIChatViewModel {
         systemPrompt: String?,
         tools: [AgentToolDefinition],
         maxTokens: Int,
-        chatMessage: ChatMessage?
+        chatMessage: ChatMessage?,
+        onStreamOpened: ((String?, UInt?) -> Void)? = nil
     ) async throws -> AsyncThrowingStream<AgentStreamEvent, Error> {
         var lastError: Error?
         var currentProvider = initialProvider
@@ -56,6 +57,8 @@ extension AIChatViewModel {
                 if let entry = resolveCurrentEntry() {
                     thinkLvl = min(thinkLvl, entry.effectiveMaxThinkingLevel)
                 }
+                // 这个重试接口只收到 provider，没有可靠的 entry 身份；不发布本次统计，保留仍有效的上次快照。
+                let requestConfigRevision = ProviderConfigStore.shared.configRevision
                 let stream = try await currentProvider.streamAgentMessage(
                     messages: messages,
                     systemPrompt: systemPrompt,
@@ -63,6 +66,7 @@ extension AIChatViewModel {
                     maxTokens: maxTokens,
                     thinkingLevel: thinkLvl
                 )
+                onStreamOpened?(nil, requestConfigRevision)
                 self.autoRetryAttempt = 0
                 return stream
             } catch let error as LLMError where error.isRetryable {
@@ -102,7 +106,8 @@ extension AIChatViewModel {
         lastContextTokens: Int = 0,
         chatMessage: ChatMessage?,
         activeGroupId: inout String?,
-        activeEntryId: inout String?
+        activeEntryId: inout String?,
+        onStreamOpened: ((String?, UInt?) -> Void)? = nil
     ) async throws -> AsyncThrowingStream<AgentStreamEvent, Error> {
         var currentProvider = initialProvider
         var currentSystemPrompt = initialSystemPrompt
@@ -168,6 +173,9 @@ extension AIChatViewModel {
                 } else {
                     logger.info("🔀ROUTE success with original entry=\(currentEntryId ?? "nil")")
                 }
+                // fallback 可能在成功后保存新的 session binding；记录返回时的 epoch，
+                // 消费流期间若配置再次变化，发布时会因 revision 不匹配而被拒绝。
+                onStreamOpened?(currentEntryId, ProviderConfigStore.shared.configRevision)
                 return stream
             } catch let error as LLMError where error.isFallbackable {
                 // Provider-level error (rate limit, invalid key, provider rejection):
@@ -305,6 +313,8 @@ extension AIChatViewModel {
                             Task { await ChatStore.shared.updateSessionModelId(sid, modelId: entry.model.id) }
                         }
                     }
+                    // auto-retry 可能在倒计时中改用了另一个 provider；当前分支无法确认实际 entry，因此不替换上次有效快照。
+                    onStreamOpened?(nil, ProviderConfigStore.shared.configRevision)
                     return stream
                 } catch {
                     // Auto-retry exhausted — attempt group fallback
@@ -378,7 +388,8 @@ extension AIChatViewModel {
         chatMessage: ChatMessage?,
         msgIdx: Int,
         activeGroupId: inout String?,
-        activeEntryId: inout String?
+        activeEntryId: inout String?,
+        onStreamOpened: ((String?, UInt?) -> Void)? = nil
     ) async throws -> StreamResult {
         // Track entries we've gotten empty responses from to avoid infinite loops.
         var emptyResponseEntries: Set<String> = []
@@ -394,7 +405,8 @@ extension AIChatViewModel {
                 lastContextTokens: lastContextTokens,
                 chatMessage: chatMessage,
                 activeGroupId: &activeGroupId,
-                activeEntryId: &activeEntryId
+                activeEntryId: &activeEntryId,
+                onStreamOpened: onStreamOpened
             )
             let result = try await processStreamEvents(
                 stream: fbStream,

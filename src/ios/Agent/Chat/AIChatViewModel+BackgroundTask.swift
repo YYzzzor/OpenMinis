@@ -664,6 +664,7 @@ extension AIChatViewModel {
     }
 
     func clearChat() {
+        invalidateContextUsage()
         messages.removeAll()
         agentHistory.removeAll()
         toolSnapshots.removeAll()

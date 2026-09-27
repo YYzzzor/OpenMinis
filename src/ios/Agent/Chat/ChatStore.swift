@@ -2757,6 +2757,33 @@ actor ChatStore {
         return (count, maxSo)
     }
 
+    /// 校验已统计的历史前缀；后续追加的回复、工具结果和消息不改变“上次请求”的口径。
+    /// 在 ChatStore actor 内连续读取消息和压缩标记，避免两次读取之间插入数据库写入。
+    func contextUsageHistoryAnchor(sessionID: String, prefixCount: Int? = nil) -> ContextUsageHistoryAnchor? {
+        let sql = """
+            SELECT id, role, parts_json, reasoning_content, sort_order
+            FROM messages WHERE session_id = ? ORDER BY sort_order ASC, created_at ASC, id ASC LIMIT ?
+        """
+        var stmt: OpaquePointer?
+        guard sqlite3_prepare_v2(db, sql, -1, &stmt, nil) == SQLITE_OK else { return nil }
+        defer { sqlite3_finalize(stmt) }
+        sqlite3_bind_text(stmt, 1, (sessionID as NSString).utf8String, -1, nil)
+        sqlite3_bind_int64(stmt, 2, Int64(prefixCount ?? -1))
+        var rows: [[String?]] = []
+        var step = sqlite3_step(stmt)
+        while step == SQLITE_ROW {
+            rows.append((0..<5).map { index in
+                sqlite3_column_text(stmt, Int32(index)).map { String(cString: $0) }
+            })
+            step = sqlite3_step(stmt)
+        }
+        guard step == SQLITE_DONE, !rows.isEmpty,
+              prefixCount == nil || prefixCount == rows.count,
+              let messageDigest = ContextUsageHistoryAnchor.digest(rows),
+              let compactDigest = ContextUsageHistoryAnchor.digest(compactMarkers(sessionId: sessionID).sorted { $0.id < $1.id }) else { return nil }
+        return ContextUsageHistoryAnchor(messageCount: rows.count, messageDigest: messageDigest, compactDigest: compactDigest)
+    }
+
     func loadMessages(sessionId: String) -> [RawMessage] {
         let totalStart = CFAbsoluteTimeGetCurrent()
         let sql = """

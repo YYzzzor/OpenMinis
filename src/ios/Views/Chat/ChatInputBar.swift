@@ -1338,6 +1338,11 @@ class PastableUITextView: UITextView, UIDropInteractionDelegate {
     }
 }
 
+private enum ChatInputTypography {
+    // 输入文字、占位文字与上下文数字共用字号，避免三者随设置变化后大小不一致。
+    static let baseFontSize: CGFloat = 16.5
+}
+
 struct PastableTextView: UIViewRepresentable {
     @Binding var text: String
     @Binding var isFocused: Bool
@@ -1387,7 +1392,7 @@ struct PastableTextView: UIViewRepresentable {
     func makeUIView(context: Context) -> PastableUITextView {
         let tv = PastableUITextView()
         tv.delegate = context.coordinator
-        tv.font = UIFont.systemFont(ofSize: FontSettings.shared.scaledChatInput(16.5))
+        tv.font = UIFont.systemFont(ofSize: FontSettings.shared.scaledChatInput(ChatInputTypography.baseFontSize))
         tv.backgroundColor = .clear
         if let maxHeightOverride { tv.maxHeight = maxHeightOverride }
         tv.isScrollEnabled = false
@@ -1441,7 +1446,7 @@ struct PastableTextView: UIViewRepresentable {
         // word-order per locale (e.g. zh moves the verb and uses fullwidth brackets).
         let placeholderLabel = UILabel()
         placeholderLabel.text = placeholder
-        placeholderLabel.font = UIFont.systemFont(ofSize: FontSettings.shared.scaledChatInput(16.5))
+        placeholderLabel.font = UIFont.systemFont(ofSize: FontSettings.shared.scaledChatInput(ChatInputTypography.baseFontSize))
         placeholderLabel.textColor = .placeholderText
         placeholderLabel.tag = 999
         placeholderLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -1597,7 +1602,7 @@ struct PastableTextView: UIViewRepresentable {
         }
 
         // Keep font in sync with FontSettings
-        let inputFont = UIFont.systemFont(ofSize: FontSettings.shared.scaledChatInput(16.5))
+        let inputFont = UIFont.systemFont(ofSize: FontSettings.shared.scaledChatInput(ChatInputTypography.baseFontSize))
         if tv.font != inputFont {
             tv.font = inputFont
             tv.invalidateIntrinsicContentSize()
@@ -1883,3 +1888,199 @@ private extension UIView {
         return nil
     }
 }
+
+
+// MARK: - Context Usage Indicator
+
+struct ContextUsageIndicator: View {
+    let percentage: Int?
+    let fraction: Double?
+    let action: () -> Void
+
+    @ObservedObject private var fontSettings = FontSettings.shared
+
+    private var ringDiameter: CGFloat { fontSettings.scaledChatInput(Layout.ringDiameter) }
+    private var ringStrokeWidth: CGFloat { fontSettings.scaledChatInput(Layout.ringStrokeWidth) }
+    private var ringNumberSpacing: CGFloat { fontSettings.scaledChatInput(Layout.ringNumberSpacing) }
+
+    /// 外部负数按零处理；超容量百分比保留，交由显示层缩写。
+    private var normalizedPercentage: Int? {
+        guard let percentage else { return nil }
+        return max(percentage, Layout.minimumPercentage)
+    }
+
+    /// 百分比未知时保持空环；未提供独立比例时，用显示百分比作为回退值。
+    private var ringProgress: Double {
+        guard let normalizedPercentage else { return 0 }
+        let value = fraction ?? Double(normalizedPercentage) / Double(Layout.maximumPercentage)
+        guard value.isFinite else { return 0 }
+        return min(max(value, Layout.minimumFraction), Layout.maximumFraction)
+    }
+
+    private var accessibilityValue: String {
+        guard let normalizedPercentage else { return AppLocalized("Unknown") }
+        if normalizedPercentage >= 1_000 {
+            return AppLocalized("More than 999 percent used")
+        }
+        return AppLocalized("\(normalizedPercentage) percent used")
+    }
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: ringNumberSpacing) {
+                usageRing
+                Text(normalizedPercentage.map { $0 >= 1_000 ? "999%+" : "\($0)%" } ?? Layout.unknownPercentageLabel)
+                    .lineLimit(1)
+                    .fixedSize(horizontal: true, vertical: false)
+            }
+            .font(.system(size: fontSettings.scaledChatInput(ChatInputTypography.baseFontSize)).monospacedDigit())
+            .fixedSize(horizontal: true, vertical: false)
+            .foregroundStyle(ChatColors.secondaryText)
+            // 按位数预留内容宽度并居中；只在 9→10、99→100 时换档。
+            // 用最小宽度，手动调小参数或显示 999%+ 时也不会裁掉数字。
+            .frame(minWidth: fontSettings.scaledChatInput(Layout.contentWidth(for: normalizedPercentage)))
+            .padding(.horizontal, Layout.horizontalPadding)
+            // 34pt 是默认高度；使用最小高度可让较大的动态字体完整显示。
+            .frame(minWidth: Layout.minimumButtonWidth, minHeight: Layout.defaultButtonHeight)
+            .background(ChatColors.inputIconBg, in: Capsule())
+            .overlay(Capsule().stroke(ChatColors.inputIconBorder, lineWidth: 0.5))
+            .contentShape(Capsule())
+        }
+        .buttonStyle(.plain)
+        .accessibilityElement(children: .ignore)
+        .accessibilityAddTraits(.isButton)
+        .accessibilityIdentifier("chat.contextUsage")
+        .accessibilityLabel(AppLocalized("Context usage"))
+        .accessibilityValue(accessibilityValue)
+        .accessibilityHint(AppLocalized("Opens context usage details"))
+    }
+
+    private var usageRing: some View {
+        ZStack {
+            Circle()
+                .stroke(
+                    ChatColors.secondaryText.opacity(Layout.trackOpacity),
+                    style: StrokeStyle(lineWidth: ringStrokeWidth, lineCap: .round)
+                )
+
+            if ringProgress > 0 {
+                Circle()
+                    .trim(from: CGFloat(Layout.minimumFraction), to: CGFloat(ringProgress))
+                    .stroke(
+                        ChatColors.secondaryText,
+                        style: StrokeStyle(lineWidth: ringStrokeWidth, lineCap: .round)
+                    )
+            }
+        }
+        .frame(width: ringDiameter, height: ringDiameter)
+        .rotationEffect(.degrees(Layout.ringStartAngle))
+        .accessibilityHidden(true)
+    }
+
+    enum Layout {
+        static let ringDiameter: CGFloat = 19.25
+        static let ringStrokeWidth: CGFloat = 2.0625
+        // 圆环布局框与数字之间的间隔，随聊天输入字号缩放；保留手动调好的 7pt。
+        static let ringNumberSpacing: CGFloat = 7
+        // 下列宽度不含此留白；胶囊总宽 = 内容宽度 × 输入字号倍率 + 左右各 1pt。
+        static let horizontalPadding: CGFloat = 1
+
+        // 三档共用的调节入口：0–9%（以及未知“—”）的内容最小宽度，不含两侧 padding。
+        // 已确认基准为 76pt，默认胶囊总宽 78pt；调整它会同时改变三档胶囊宽度。
+        // 此值包含圆环、环字间隔和数字；小于内容实际宽度时由内容撑开，不会裁剪。
+        static let singleDigitContentWidth: CGFloat = 76
+        // 每多一位数字补充的空间（16.5pt 等宽数字下为 10.5pt），随输入字号一起缩放。
+        // 通常只调上方基准；若更换基础字号后多位数留白不一致，再调整此增量。
+        static let additionalDigitWidth: CGFloat = 10.5
+        // 10–99%：自动随一位数基准变化；当前内容宽 86.5pt，默认总宽 88.5pt。
+        static let doubleDigitContentWidth = singleDigitContentWidth + additionalDigitWidth
+        // 100%及以上：同步增加两位空间；当前内容宽 97pt，默认总宽 99pt。
+        // 超限保留真实百分比，极大值仍显示 999%+；不影响统计口径。
+        static let tripleDigitContentWidth = singleDigitContentWidth + 2 * additionalDigitWidth
+
+        static func contentWidth(for percentage: Int?) -> CGFloat {
+            switch percentage ?? 0 {
+            case ..<10: singleDigitContentWidth
+            case 10..<100: doubleDigitContentWidth
+            default: tripleDigitContentWidth
+            }
+        }
+
+        static let minimumButtonWidth: CGFloat = 44
+        static let defaultButtonHeight: CGFloat = 34
+        static let trackOpacity: Double = 0.25
+        static let minimumPercentage = 0
+        static let maximumPercentage = 100
+        static let minimumFraction: Double = 0
+        static let maximumFraction: Double = 1
+        static let ringStartAngle: Double = -90
+        static let unknownPercentageLabel = "—"
+    }
+}
+
+
+#if DEBUG
+// 测例只给真实指示器传入示例值，不写入 Session，也不替换聊天页的实际统计。
+// 先在一位数 Canvas 中调 singleDigitContentWidth；两位、三位预览会使用联动后的宽度。
+private struct ContextUsageWidthPreview: View {
+    let percentage: Int
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 24) {
+            Text("一位数参考 · 1%")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            composer(percentage: 1)
+            Text("待确认 · \(percentage)%")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            composer(percentage: percentage)
+        }
+        .padding(12)
+        .background(ChatColors.background)
+    }
+
+    private func composer(percentage: Int) -> some View {
+        VStack(alignment: .leading, spacing: 18) {
+            Text("Message MinisX")
+                .font(.system(size: FontSettings.shared.scaledChatInput(ChatInputTypography.baseFontSize)))
+                .foregroundStyle(ChatColors.tertiaryText)
+            HStack(spacing: 12) {
+                referenceIcon("plus")
+                referenceIcon("slash")
+                Spacer(minLength: 0)
+                ContextUsageIndicator(percentage: percentage, fraction: Double(percentage) / 100) {}
+                referenceIcon("mic")
+                Image(systemName: "arrow.up")
+                    .font(.system(size: 20, weight: .medium))
+                    .foregroundStyle(Color(uiColor: .systemBackground))
+                    .frame(width: 40, height: 40)
+                    .background(ChatColors.sendButtonDisabled, in: Circle())
+            }
+        }
+        .padding(12)
+        .background(ChatColors.inputBg, in: RoundedRectangle(cornerRadius: 24))
+    }
+
+    private func referenceIcon(_ name: String) -> some View {
+        Image(systemName: name)
+            .font(.system(size: 18, weight: .medium))
+            .foregroundStyle(ChatColors.secondaryText)
+            .frame(width: 34, height: 34)
+            .background(ChatColors.inputIconBg, in: Circle())
+            .overlay(Circle().stroke(ChatColors.inputIconBorder, lineWidth: 0.5))
+    }
+}
+
+#Preview("上下文胶囊 · 一位数 1% / 9%", traits: .fixedLayout(width: 402, height: 360)) {
+    ContextUsageWidthPreview(percentage: 9)
+}
+
+#Preview("上下文胶囊 · 两位数 42%", traits: .fixedLayout(width: 402, height: 360)) {
+    ContextUsageWidthPreview(percentage: 42)
+}
+
+#Preview("上下文胶囊 · 三位数 100%", traits: .fixedLayout(width: 402, height: 360)) {
+    ContextUsageWidthPreview(percentage: 100)
+}
+#endif

@@ -3208,28 +3208,43 @@ struct AIChatView: View {
     /// Bottom toolbar under the text field (+ / edit-exit / mic / send).
     /// Returns AnyView to keep `inputBar`'s generic type compact; SwiftUI
     /// runtime demangle chokes on deep nested types otherwise.
+    // 胶囊与麦克风按可见背景边界保持 12pt，与 + 和 / 按钮一致。
+    private static let inputControlSpacing: CGFloat = 12
+
     private var inputBottomRow: AnyView {
-        let row = HStack(spacing: 12) {
+        AnyView(
+            ViewThatFits(in: .horizontal) {
+                inputBottomControls(compactAccessory: false)
+                inputBottomControls(compactAccessory: true)
+            }
+        )
+    }
+
+    private func inputBottomControls(compactAccessory: Bool) -> some View {
+        let usage = vm.currentContextUsage
+        return HStack(spacing: Self.inputControlSpacing) {
             attachmentMenuButton
             slashMenuButton
-            if vm.editingMessageIndex != nil { editExitButton }
-            Spacer()
-            // Mutually exclusive with editExitButton: while editing a past
-            // message the exit capsule owns this row — showing both capsules
-            // overflows the row and they render overlapped.
+            if vm.editingMessageIndex != nil {
+                editExitButton(compact: compactAccessory)
+            }
+            Spacer(minLength: 0)
+            // 空间不足时只收起辅助按钮文字，保留其操作和辅助朗读名称。
             if voiceInputActive, vm.editingMessageIndex == nil {
-                readAloudToolbarToggle
-                Spacer()
+                readAloudToolbarToggle(compact: compactAccessory)
+                Spacer(minLength: 0)
+            }
+            ContextUsageIndicator(percentage: usage?.percentage, fraction: usage?.fraction) {
+                showTokenUsage = true
             }
             micButtonContainer
             sendButton
         }
-        return AnyView(row)
     }
 
     /// "Read replies aloud" toggle shown centered in the toolbar during voice
     /// input (TTS on/off). Styled like the other secondary toolbar controls.
-    private var readAloudToolbarToggle: some View {
+    private func readAloudToolbarToggle(compact: Bool) -> some View {
         // Source of truth = vm.speakEnabled (also driven by the floating speaker's
         // tap-cycle / long-press-off), so this toggle reflects those changes too.
         // Three states, in lockstep with the global voice-output capsule:
@@ -3265,8 +3280,10 @@ struct AIChatView: View {
                     .font(.system(size: 12))
                     .frame(width: 16)
                     .accessibilityHidden(true)
-                Text("Read replies", comment: "Voice TTS toggle (compact)")
-                    .font(.subheadline)
+                if !compact {
+                    Text("Read replies", comment: "Voice TTS toggle (compact)")
+                        .font(.subheadline)
+                }
             }
             .foregroundStyle(on ? Color.accentColor : .secondary)
             .padding(.horizontal, 10)
@@ -3289,6 +3306,7 @@ struct AIChatView: View {
                     : AppLocalized("On", comment: "VoiceOver value for the read-replies toggle when enabled"))
                : AppLocalized("Off", comment: "VoiceOver value for the read-replies toggle when disabled")
         ))
+        .accessibilityLabel(Text("Read replies", comment: "Voice TTS toggle (compact)"))
         .accessibilityHint(Text("Toggles reading replies aloud", comment: "VoiceOver hint for the read-replies toggle"))
     }
 
@@ -3314,19 +3332,28 @@ struct AIChatView: View {
     }
 
     /// "Exit Edit Mode" capsule shown while editing a past message.
-    private var editExitButton: some View {
+    private func editExitButton(compact: Bool) -> some View {
         Button {
             vm.cancelEdit()
         } label: {
-            Text("Exit Edit Mode", comment: "Cancel message editing")
-                .font(.system(size: 13, weight: .medium))
-                .foregroundStyle(ChatColors.secondaryText)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 6)
-                .background(ChatColors.inputIconBg)
-                .clipShape(Capsule())
-                .overlay(Capsule().stroke(ChatColors.inputIconBorder, lineWidth: 0.5))
+            Group {
+                if compact {
+                    Image(systemName: "xmark")
+                        .frame(width: 14, height: 16)
+                } else {
+                    Text("Exit Edit Mode", comment: "Cancel message editing")
+                }
+            }
+            .font(.system(size: 13, weight: .medium))
+            .foregroundStyle(ChatColors.secondaryText)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            .background(ChatColors.inputIconBg)
+            .clipShape(Capsule())
+            .overlay(Capsule().stroke(ChatColors.inputIconBorder, lineWidth: 0.5))
+            .fixedSize()
         }
+        .accessibilityLabel(Text("Exit Edit Mode", comment: "Cancel message editing"))
     }
 
     /// Speech language badge shown only while recording.
@@ -6048,14 +6075,19 @@ private struct TokenUsageSheet: View {
             List {
                 let s = vm.sessionTokenStats
 
-                Section("Context") {
-                    StatRow(label: "Context Used", value: formatted(s.context), icon: "text.alignleft")
+                Section {
+                    let contextUsage = vm.currentContextUsage
+                    StatRow(label: "Context Used", value: contextUsage.map { formatted($0.usedTokens) } ?? "—", icon: "text.alignleft")
                     if let window = vm.currentModelContextWindow {
                         StatRow(label: "Context Window", value: formatted(window), icon: "arrow.left.and.right")
                     }
                     if let maxOut = vm.currentModelMaxOutputTokens {
                         StatRow(label: "Max Output", value: formatted(maxOut), icon: "arrow.up.to.line")
                     }
+                } header: {
+                    Text("Context")
+                } footer: {
+                    Text("Based on the last valid request's input, including cache. Excludes your draft, the reply, and later tool results. Preserved when switching sessions or restarting the app. If model or context changes invalidate it, a new request must report usage.", comment: "Explains the context indicator's last-request measurement and unavailable state")
                 }
 
                 if let thinkingInfo = vm.currentModelThinkingInfo {

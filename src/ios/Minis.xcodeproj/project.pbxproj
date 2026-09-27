@@ -60,7 +60,9 @@
 		AC0000202 /* ProviderCustomizationGenerated.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0000201 /* ProviderCustomizationGenerated.swift */; };
 		B02B7ADBAB47BDB33F664A21 /* VoiceProvider+Vendors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BB45FC87D39AE9AB4495BE9 /* VoiceProvider+Vendors.swift */; };
 		BB1000100F700000000000AA /* ContextPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB1000110F700000000000AA /* ContextPolicy.swift */; };
+		BB1000100F700000000000AB /* ContextUsagePersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB1000110F700000000000AB /* ContextUsagePersistence.swift */; };
 		BB1000120F700000000000AA /* ContextPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB1000110F700000000000AA /* ContextPolicy.swift */; };
+		BB1000120F700000000000AB /* ContextUsagePersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB1000110F700000000000AB /* ContextUsagePersistence.swift */; };
 		BKP000101 /* BackupFormat.swift in Sources */ = {isa = PBXBuildFile; fileRef = BKP000201 /* BackupFormat.swift */; };
 		BKP000102 /* BackupBlobStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = BKP000202 /* BackupBlobStore.swift */; };
 		BKP000103 /* BackupJSONLWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = BKP000203 /* BackupJSONLWriter.swift */; };
@@ -719,6 +721,7 @@
 		B7E2CB0D0D63E6D6FDB45568 /* VoiceActivityDetector.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VoiceActivityDetector.swift; sourceTree = "<group>"; };
 		BB1000010F700000000000AA /* MinisTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MinisTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB1000110F700000000000AA /* ContextPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextPolicy.swift; sourceTree = "<group>"; };
+		BB1000110F700000000000AB /* ContextUsagePersistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextUsagePersistence.swift; sourceTree = "<group>"; };
 		BKP000201 /* BackupFormat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupFormat.swift; sourceTree = "<group>"; };
 		BKP000202 /* BackupBlobStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupBlobStore.swift; sourceTree = "<group>"; };
 		BKP000203 /* BackupJSONLWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupJSONLWriter.swift; sourceTree = "<group>"; };
@@ -2054,6 +2057,7 @@
 				E5VMC0017 /* AIChatViewModel+ConcurrentTools.swift */,
 				E53000014 /* ChatStore.swift */,
 				BB1000110F700000000000AA /* ContextPolicy.swift */,
+				BB1000110F700000000000AB /* ContextUsagePersistence.swift */,
 				E5FMI0011 /* FileMentionIndex.swift */,
 			);
 			path = Chat;
@@ -2684,6 +2688,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BB1000120F700000000000AA /* ContextPolicy.swift in Sources */,
+				BB1000120F700000000000AB /* ContextUsagePersistence.swift in Sources */,
 				E5LD00002 /* ToolLoopDetector.swift in Sources */,
 				E5GWF0004 /* GeminiWireFormat.swift in Sources */,
 				E5JB10001 /* JiebaWrapper.mm in Sources */,
@@ -2725,6 +2730,7 @@
 				E5FP00100 /* AppGroupChangeWatcher.swift in Sources */,
 				AA0838A02F3B941A00049557 /* AboutView.swift in Sources */,
 				BB1000100F700000000000AA /* ContextPolicy.swift in Sources */,
+				BB1000100F700000000000AB /* ContextUsagePersistence.swift in Sources */,
 				AADDA9E12F6ECCF400B66649 /* ThumbnailCache.swift in Sources */,
 				E51000002 /* ContentView.swift in Sources */,
 				AA26CCBA2F31080100AECF2D /* ISHKernel.m in Sources */,

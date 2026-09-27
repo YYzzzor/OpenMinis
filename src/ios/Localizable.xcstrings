@@ -3370,6 +3370,29 @@
         }
       }
     },
+    "%lld percent used" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld percent used"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已用百分之 %lld"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已用百分之 %lld"
+          }
+        }
+      }
+    },
     "%lld rec/s" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -13843,6 +13866,29 @@
         }
       }
     },
+    "Based on the last valid request's input, including cache. Excludes your draft, the reply, and later tool results. Preserved when switching sessions or restarting the app. If model or context changes invalidate it, a new request must report usage." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Based on the last valid request's input, including cache. Excludes your draft, the reply, and later tool results. Preserved when switching sessions or restarting the app. If model or context changes invalidate it, a new request must report usage."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "基于上次有效请求的输入统计，包含缓存，不包含草稿、该次回复及之后的工具结果。切换会话或重启 App 后保留上次统计；模型或上下文变更使统计失效时，等待新的请求用量更新。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "以最近一次有效請求的輸入統計為準，包含快取，不包含草稿、該次回覆及之後的工具結果。切換對話或重新啟動 App 後保留上次統計；模型或上下文變更使統計失效時，等待新的請求用量更新。"
+          }
+        }
+      }
+    },
     "Bearer token" : {
       "localizations" : {
         "de" : {
@@ -21290,6 +21336,29 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "上下文接近容量上限"
+          }
+        }
+      }
+    },
+    "Context usage" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Context usage"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "上下文用量"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "上下文用量"
           }
         }
       }
@@ -53117,6 +53186,29 @@
         }
       }
     },
+    "More than 999 percent used" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "More than 999 percent used"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已用超过百分之 999"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已用超過百分之 999"
+          }
+        }
+      }
+    },
     "Morning Briefing" : {
       "localizations" : {
         "de" : {
@@ -61212,6 +61304,29 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "在應用中打開一個 MinisX 聊天會話。"
+          }
+        }
+      }
+    },
+    "Opens context usage details" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opens context usage details"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "查看上下文用量详情"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "查看上下文用量詳細資訊"
           }
         }
       }

@@ -918,6 +918,21 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
     @Published var memoryEnabled = true
 
     // MARK: - Session Stats
+    /// 请求序号拒绝迟到结果；持久记录独立于页面缓存。
+    private var contextUsageState = ContextUsageState()
+    @Published private var loadedContextUsage: PersistedContextUsage?
+    private var contextUsageGeneration: UInt64 = 0
+
+    /// 只在统计仍属于当前已解析模型时返回，避免显示历史会话或旧模型的占比。
+    var currentContextUsage: ContextUsageSnapshot? {
+        guard remoteDeviceId == nil, let sessionId, let record = loadedContextUsage,
+              record.sessionID == sessionId,
+              ContextUsagePersistence.shared.record(for: sessionId)?.id == record.id,
+              let entry = resolveCurrentEntry(),
+              ProviderConfigStore.shared.contextUsageConfigurationKey(sessionID: sessionId, entryID: entry.id) == record.configurationKey else { return nil }
+        return record.snapshot(matching: contextUsageIdentity(for: entry))
+    }
+
     /// Accumulated streaming duration (seconds) for output token speed calculation.
     var sessionStreamDuration: TimeInterval = 0
     /// Total output tokens produced during streaming (for speed calculation).
@@ -956,6 +971,121 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
     var currentModelContextWindow: Int? {
         guard let entry = resolveCurrentEntry() else { return nil }
         return effectiveContextWindow(for: entry.model)
+    }
+
+    private func contextUsageIdentity(for entry: ModelEntry) -> ContextUsageIdentity {
+        let sid = sessionId ?? ""
+        let key = ProviderConfigStore.shared.contextUsageConfigurationKey(sessionID: sid, entryID: entry.id)
+        let routeKey = ProviderConfigStore.shared.contextUsageConfigurationKey(sessionID: sid, entryID: entry.id, includesBinding: false)
+        return ContextUsageIdentity(
+            entryID: entry.id, modelID: entry.model.id, providerID: entry.providerInstanceId,
+            contextWindow: effectiveContextWindow(for: entry.model),
+            // 配置版本按会话和请求来源分开，另一会话的保存不丢弃本次有效 usage。
+            configRevision: ContextUsagePersistence.shared.configurationRevision(sessionID: sid, entryID: entry.id, key: key),
+            // fallback 可以改写绑定，但不能借此接受请求途中被改过的 provider 配置。
+            routeConfigRevision: ContextUsagePersistence.shared.configurationRevision(sessionID: sid, entryID: entry.id, key: routeKey, includesBinding: false)
+        )
+    }
+
+    private func captureContextUsageIdentities(
+        activeEntryId: String?,
+        activeGroupId: String?
+    ) -> [String: ContextUsageIdentity] {
+        let store = ProviderConfigStore.shared
+        var entryIDs = Set<String>()
+        if let activeEntryId { entryIDs.insert(activeEntryId) }
+        if let activeGroupId, let group = store.group(for: activeGroupId) {
+            entryIDs.formUnion(group.memberEntryIds)
+        }
+
+        var identities: [String: ContextUsageIdentity] = [:]
+        for entryID in entryIDs {
+            guard let entry = store.entry(for: entryID) else { continue }
+            identities[entryID] = contextUsageIdentity(for: entry)
+        }
+        return identities
+    }
+
+    private func beginContextUsageRequest() -> UInt64 {
+        if let sessionId { contextUsageGeneration = ContextUsagePersistence.shared.beginOperation(sessionID: sessionId) }
+        var state = contextUsageState
+        let revision = state.beginRequest()
+        contextUsageState = state
+        return revision
+    }
+
+    /// 真正截断或改写上下文时，同时清除内存与持久记录。
+    func invalidateContextUsage() {
+        contextUsageState.invalidate()
+        loadedContextUsage = nil
+        if let sessionId, remoteDeviceId == nil {
+            do { try ContextUsagePersistence.shared.remove(sessionID: sessionId) }
+            catch { logger.error("Failed to remove stored context usage: \(error)") }
+        }
+    }
+
+    /// 页面重载只作废旧回调；会话记录验证通过后可以继续使用。
+    func beginContextUsageReload() -> UInt64 {
+        if let sessionId { contextUsageGeneration = ContextUsagePersistence.shared.beginOperation(sessionID: sessionId) }
+        contextUsageState.invalidate()
+        return contextUsageState.requestRevision
+    }
+
+    func restoreContextUsage(sessionID: String, revision: UInt64) async {
+        guard remoteDeviceId == nil,
+              let record = ContextUsagePersistence.shared.record(for: sessionID) else { return }
+        let generation = contextUsageGeneration
+        let history = await ChatStore.shared.contextUsageHistoryAnchor(sessionID: sessionID, prefixCount: record.history.messageCount)
+        guard ContextUsagePersistence.shared.isCurrent(sessionID: sessionID, generation: generation),
+              self.sessionId == sessionID, contextUsageState.requestRevision == revision,
+              ContextUsagePersistence.shared.record(for: sessionID)?.id == record.id else { return }
+        guard history == record.history,
+              let entry = resolveCurrentEntry(), record.snapshot(matching: contextUsageIdentity(for: entry)) != nil,
+              ProviderConfigStore.shared.contextUsageConfigurationKey(sessionID: sessionID, entryID: entry.id) == record.configurationKey else {
+            invalidateContextUsage()
+            return
+        }
+        loadedContextUsage = record
+    }
+
+    private func recordContextUsage(
+        _ usage: TokenUsage,
+        initialEntryId: String?,
+        streamEntryId: String?,
+        streamConfigRevision: UInt?,
+        identities: [String: ContextUsageIdentity],
+        requestRevision: UInt64
+    ) async {
+        guard remoteDeviceId == nil, let sessionId else { return }
+        let generation = contextUsageGeneration
+        let history = await ChatStore.shared.contextUsageHistoryAnchor(sessionID: sessionId)
+        guard ContextUsagePersistence.shared.isCurrent(sessionID: sessionId, generation: generation),
+              self.sessionId == sessionId, let history else { return }
+        let currentIdentity = resolveCurrentEntry().map { contextUsageIdentity(for: $0) }
+        var state = contextUsageState
+        guard state.recordRequest(
+            usedTokens: usage.latestContextTokens,
+            initialEntryID: initialEntryId,
+            streamEntryID: streamEntryId,
+            streamConfigRevision: streamConfigRevision,
+            capturedIdentities: identities,
+            currentIdentity: currentIdentity,
+            requestRevision: requestRevision
+        ) else {
+            return
+        }
+        guard let identity = currentIdentity,
+              let configurationKey = ProviderConfigStore.shared.contextUsageConfigurationKey(sessionID: sessionId, entryID: identity.entryID) else { return }
+        let record = PersistedContextUsage(
+            id: UUID(), sessionID: sessionId, usedTokens: usage.latestContextTokens,
+            entryID: identity.entryID, modelID: identity.modelID, providerID: identity.providerID,
+            contextWindow: identity.contextWindow, configurationKey: configurationKey, history: history
+        )
+        do {
+            guard try ContextUsagePersistence.shared.save(record, generation: generation) else { return }
+        } catch { logger.error("Failed to save context usage: \(error)") }
+        contextUsageState = state
+        loadedContextUsage = record
     }
 
     /// Whether the current model (or any model in the group) supports reasoning/thinking.
@@ -2239,6 +2369,9 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
             return
         }
 
+        // 普通续聊保留上次请求统计；编辑发送会改写历史，才需要清空。
+        if editingMessageIndex != nil { invalidateContextUsage() }
+
         // Don't stop TTS here — let the previous reply finish playing. The stream
         // handler will clear the queue on the FIRST textDelta of the new reply, so
         // the old audio plays until actual new content starts arriving.
@@ -2758,6 +2891,8 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
         guard !isProcessing else { return }
         guard let lastMsg = messages.last, lastMsg.role == .assistant else { return }
 
+        invalidateContextUsage()
+
         // [T-ios-retry-keyboard] This turn exists because the user re-sent an
         // old failure, so its completion must not be treated as "a reply
         // arrived" by the auto-focus observer.
@@ -2941,9 +3076,12 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
         guard let lastMsg = messages.last else { return }
         if lastMsg.role != .assistant {
             guard lastMsg.role == .user else { return }
+            invalidateContextUsage()
             resumeUnansweredUserTurn()
             return
         }
+
+        invalidateContextUsage()
 
         // [T-ios-retry-keyboard] Same origin as retry(): continuing an
         // interrupted turn is not a fresh send.
@@ -3238,6 +3376,8 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
             return
         }
 
+        invalidateContextUsage()
+
         // Remove everything AFTER the selected user message (keep the user message itself)
         if idx + 1 < messages.count {
             messages.removeSubrange((idx + 1)...)
@@ -3368,6 +3508,8 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
             isTruncatingForRetry = false
             return
         }
+
+        invalidateContextUsage()
 
         let deletedCount = messages.count - idx
 
@@ -3645,6 +3787,7 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
             // its agentHistory entry + everything after) and re-run fresh.
             canResume = false
             userDidCancel = false
+            invalidateContextUsage()
             messages.removeSubrange(asstMsgIdx...)
             // [T-ios-retry-ui-clear] mirror the sub-message path: force a
             // top-level publish so the UI clears immediately on this tick
@@ -3683,6 +3826,7 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
         userDidCancel = false
 
         // --- Sub-message cut ---
+        invalidateContextUsage()
         // 1. UI: trim this assistant message's blocks to before the target,
         //    and drop all later messages.
         // [T-ios-retry-ui-clear] Mutating `messages[asstMsgIdx].blocks` only
@@ -3854,6 +3998,8 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
         guard !isProcessing else { return }
         guard let idx = messages.firstIndex(where: { $0.id == messageId }),
               messages[idx].role == .user else { return }
+
+        invalidateContextUsage()
 
         let msg = messages[idx]
 
@@ -5237,6 +5383,20 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
                 logger.warning("🔀STREAM round-start: msgIdx resynced → \(resynced) (count=\(messages.count))")
                 msgIdx = resynced
             }
+            let contextUsageRevision = beginContextUsageRequest()
+            let contextUsageIdentities = captureContextUsageIdentities(
+                activeEntryId: activeEntryId,
+                activeGroupId: activeGroupId
+            )
+            let contextUsageInitialEntryId = activeEntryId
+            var contextUsageStreamEntryId: String?
+            var contextUsageStreamConfigRevision: UInt?
+            let onContextUsageStreamOpened: (String?, UInt?) -> Void = { [self] entryID, _ in
+                contextUsageStreamEntryId = entryID
+                contextUsageStreamConfigRevision = entryID
+                    .flatMap { ProviderConfigStore.shared.entry(for: $0) }
+                    .map { contextUsageIdentity(for: $0).configRevision }
+            }
             let stream = try await streamWithGroupFallback(
                 provider: provider,
                 messages: contextHistory,
@@ -5247,7 +5407,8 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
                 lastContextTokens: turnUsage.latestContextTokens,
                 chatMessage: messages[msgIdx],
                 activeGroupId: &activeGroupId,
-                activeEntryId: &activeEntryId
+                activeEntryId: &activeEntryId,
+                onStreamOpened: onContextUsageStreamOpened
             )
             // [StreamDiag] (#181) The stream object now exists. Note this is
             // "request accepted / stream handle obtained", NOT first byte — the
@@ -5404,7 +5565,8 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
                         systemPrompt: userSystemPrompt,
                         tools: tools,
                         maxTokens: dynamicMaxTokens(provider: provider, model: activeModel, lastContextTokens: turnUsage.latestContextTokens),
-                        chatMessage: messages[msgIdx]
+                        chatMessage: messages[msgIdx],
+                        onStreamOpened: onContextUsageStreamOpened
                     )
                     let reminderResult = try await processStreamEvents(
                         stream: reminderStream,
@@ -5480,7 +5642,8 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
                         chatMessage: messages[msgIdx],
                         msgIdx: msgIdx,
                         activeGroupId: &activeGroupId,
-                        activeEntryId: &activeEntryId
+                        activeEntryId: &activeEntryId,
+                        onStreamOpened: onContextUsageStreamOpened
                     )
                     await applyFallbackSwitch()
                 } else {
@@ -5498,7 +5661,8 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
                             systemPrompt: userSystemPrompt,
                             tools: tools,
                             maxTokens: dynamicMaxTokens(provider: provider, model: activeModel, lastContextTokens: turnUsage.latestContextTokens),
-                            chatMessage: messages[msgIdx]
+                            chatMessage: messages[msgIdx],
+                            onStreamOpened: onContextUsageStreamOpened
                         )
                         let retryResult = try await processStreamEvents(
                             stream: retryStream,
@@ -5554,7 +5718,8 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
                             chatMessage: messages[msgIdx],
                             msgIdx: msgIdx,
                             activeGroupId: &activeGroupId,
-                            activeEntryId: &activeEntryId
+                            activeEntryId: &activeEntryId,
+                            onStreamOpened: onContextUsageStreamOpened
                         )
                         await applyFallbackSwitch()
                     }
@@ -5566,6 +5731,14 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
             let toolEntries = streamResult.toolEntries
             let stopReason = streamResult.stopReason
             turnUsage = streamResult.turnUsage
+            await recordContextUsage(
+                streamResult.turnUsage,
+                initialEntryId: contextUsageInitialEntryId,
+                streamEntryId: contextUsageStreamEntryId,
+                streamConfigRevision: contextUsageStreamConfigRevision,
+                identities: contextUsageIdentities,
+                requestRevision: contextUsageRevision
+            )
             logger.info("📐 Context after API: latestContextTokens=\(turnUsage.latestContextTokens) (in:\(turnUsage.inputTokens) cache_read:\(turnUsage.cacheReadTokens) cache_create:\(turnUsage.cacheCreationTokens))")
 
             // Track session-level token stats
@@ -6496,4 +6669,3 @@ enum LLMProviderError: LocalizedError {
         }
     }
 }
-

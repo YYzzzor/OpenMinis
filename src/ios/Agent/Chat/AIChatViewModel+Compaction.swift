@@ -443,6 +443,8 @@ extension AIChatViewModel {
             return
         }
 
+        invalidateContextUsage()
+
         // Refresh cached marker to the next-most-recent one (or nil).
         let next = await ChatStore.shared.latestCompactMarker(sessionId: sessionId)
         self.cachedLatestMarker = next
@@ -797,6 +799,7 @@ extension AIChatViewModel {
 
         // Phase B: update cache so effectiveAgentHistory() starts using the new summary immediately.
         self.cachedLatestMarker = marker
+        invalidateContextUsage()
 
         // Phase B: do NOT mutate agentHistory. It stays full; summary is synthesized
         // at inference time via effectiveAgentHistory().

@@ -288,6 +288,7 @@ extension AIChatViewModel {
         }
 
         if evicted > 0 {
+            invalidateContextUsage()
             logger.info("🖼️ Context image trim: evicted \(evicted) old image(s) (snapshots: \(snapshotsWritten)), kept last \(keep) (total was \(totalImages))")
         }
     }
@@ -555,6 +556,7 @@ extension AIChatViewModel {
         }
 
         if offloadedCount > 0 {
+            invalidateContextUsage()
             let afterPct = Int(Double(currentTokens) / Double(contextWindow) * 100)
             logger.info("━━━ Context Offload Complete ━━━")
             logger.info("  Parts offloaded: \(offloadedCount)")

@@ -444,6 +444,8 @@ final class ViewModelCache {
 
     /// Remove a session's ViewModel from the cache (e.g. on session delete).
     func remove(sessionId: String) {
+        do { try ContextUsagePersistence.shared.remove(sessionID: sessionId) }
+        catch { logger.error("Failed to remove deleted session context usage: \(error)") }
         lruOrder.removeAll { $0 == sessionId }
         if let removed = cache.removeValue(forKey: sessionId) {
             removed.cancel()

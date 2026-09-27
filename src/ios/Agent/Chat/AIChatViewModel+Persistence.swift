@@ -136,6 +136,7 @@ extension AIChatViewModel {
     /// matching how they appeared during the live session.
     func loadSession() async {
         guard let sessionId else { return }
+        let contextUsageReloadRevision = beginContextUsageReload()
 
         let sinceAppear = (CFAbsoluteTimeGetCurrent() - Self.onAppearTimestamp) * 1000
         logger.info("[SessionLoad] loadSession START T+\(String(format: "%.0f", sinceAppear))ms session=\(sessionId) msgs=\(self.messages.count)")
@@ -218,6 +219,7 @@ extension AIChatViewModel {
         } else {
             rawMessages = await ChatStore.shared.loadMessages(sessionId: sessionId)
         }
+        await restoreContextUsage(sessionID: sessionId, revision: contextUsageReloadRevision)
         let dbElapsed = (CFAbsoluteTimeGetCurrent() - dbStart) * 1000
         // Track the highest sortOrder and count so iCloud sync reload triggers for new or removed messages.
         lastKnownDbSortOrder = rawMessages.last?.sortOrder ?? 0
