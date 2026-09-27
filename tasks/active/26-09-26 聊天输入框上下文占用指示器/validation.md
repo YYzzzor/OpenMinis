@@ -187,3 +187,8 @@ build-typography.log：BUILD SUCCEEDED。已安装到指定普通iPhone18 Pro（
 ## 注释前提交核验（2026-09-27）
 
 本轮只整理本地提交、更新交接记录，不改运行逻辑。核对ContextPolicy.swift、ContextUsagePersistence.swift、ContextUsageTests.swift与此前pure-tests/Tests中的已测副本逐字节一致；pure-tests-session-route.log记录26项通过、0失败。此前build-width-linked.log记录BUILD SUCCEEDED，但其时间早于用户将64改为76；最终三档视觉确认来自用户，不把旧构建记录改称新版本完整验证。本轮各笔提交前git diff --cached --check通过。任务保持active，待用户写学习注释；未重新安装、请求模型、推送、合并、归档或上传。
+
+
+## 重新提交前检查（2026-09-27）
+
+重新核对工作区，相对先前功能基准的后续修改为学习注释、排版、两个常量的显式Int类型、空字符串提取项清理，以及构建号2→3。对AIChatViewModel.swift、ChatModels.swift、ChatInputBar.swift运行swiftc -frontend -parse通过；工程文件plutil与Localizable.xcstrings JSON解析通过；git diff --check及各笔提交前cached检查通过。ContextPolicy.swift、ContextUsagePersistence.swift、ContextUsageTests.swift与此前26项通过测试的源文件副本逐字节一致。没有重新执行完整构建、安装、Canvas或真机验证；旧运行证据仍限于其记录版本，用户已确认76pt基准的三档视觉效果。构建号3未上传核实；学习笔记按原意保留，不声明概念逐条审核完成。
