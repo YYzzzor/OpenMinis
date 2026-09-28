@@ -1,0 +1,78 @@
+{
+  "snapshot_id": "877219a1e64894bc2796d20218161bcb914e232540b8da8867f61f1b31fa2f0a",
+  "conclusion": "nonblocking",
+  "coverage": "Required Spec read in full: requirements/tasks/active/26-09-28 实时语音转录/task.md — 恢复信息; 任务确认与执行边界; 目标与验收 (all 11 acceptance bullets); 当前事实与源码依据 (items 1-6); 推荐方案与取舍 (首版推荐 + 路线比较表); 设计图 (功能位置与关系图, 典型场景运行图); 实现计划; 首轮验收与停止条件; Spec 与资料清单; 进展与验证; 2026-09-28 实施恢复 (含 当前集成检查点, 首版实现与本轮验证收口, 自动验证). Optional Spec selections: none (manifest spec_selections is empty); docs/specs/debug-server-api.md was not read because the change adds no debug RPC (only a DEBUG notification bridge already present). Code artefacts read: patches/base-to-worktree.patch (full), snapshot/src/ios/Providers/Voice/SystemVoiceStreamingSession.swift, VoiceActivityDetector.swift, VoiceInputModels.swift, VoiceProvider+System.swift, VoiceProviderResolver.swift, VoiceOutputPlayer.swift, snapshot/src/ios/Views/Chat/AIChatView.swift (voice/composer/send regions), Views/Chat/Voice/InlineVoiceInputView.swift, VoiceComposerPanel.swift, VoiceInputPanel.swift (VoiceInputViewModel, full), ShortVoiceComposerPreview.swift, Views/Providers/UnifiedModelPicker.swift (capability-label region), MinisTests/VoiceComposerLifecycleTests.swift, MinisTests/VoiceStreamingAudioPipeTests.swift, Minis.xcodeproj/project.pbxproj (target membership, PBXFileSystemSynchronizedRootGroup for MinisTests).",
+  "limitations": "No test, build, simulator run or device run was executed by this review; the task record's claims (Debug build on iPhone 18 Pro / iOS27 simulator, 15 passing tests, log /private/tmp/minisx-live-tests.log, xcresult Test-Minis-2026.09.28_12-13-03) could not be reproduced or verified, so 'tests pass' is unproven evidence and no runtime behaviour (real microphone, SFSpeechRecognizer partial/final timing, latency target of 1-2s first word, zh-CN/zh-HK/en capability) is established. The new tests are statically reachable in the MinisTests target (filesystem-synchronized group with no exclusion), but they only exercise SystemVoiceAudioInputPipe, VoiceStreamingDraft, VoiceTranscriptOrderBuffer and VoiceInputViewModel; SystemVoiceStreamingSession's orchestration (finish(), 4s handoff timeout, natural-final replay wiring, .documentedEmptyEnd) is untested. Required dependencies that could not be read because they are excluded from the bundle even though the change depends on them: src/ios/Providers/ProviderConfigStore.swift (modified in git status and omitted from the patch — configRevision and ensureDefaultVoiceInputGroup are therefore unverified), plus AudioSessionCoordinator.swift, VoiceLog.swift, SpeechRecognitionManager.swift, ProviderInstance/VoiceProviderFactory/LLMTypes, MinisToast, and the rest of UnifiedModelPicker, so compile-level integration beyond the read regions is unproven. Also unread/unresolved: the exact prior 'approved' voice-panel implementation (base version of VoiceComposerPanel/InlineVoiceInputView layout) is not in the snapshot, so design-compliance claims (e.g. the black stop key) cannot be settled; ignored untracked files, other submodules, other task records and the live working tree were out of scope; no dynamic analysis (Instruments, thread sanitiser, audio-session intent ordering) was performed. Absence of findings here is not proof of runtime correctness.",
+  "findings": [
+    {
+      "id": "R1",
+      "severity": "medium",
+      "requirement": "支持长句和跨引擎请求边界的连续讲话；必要的请求轮换不能丢前后衔接音频或重复最终文本 — 45秒主动轮换后若终稿迟到，不应在句子中间终止整次录音。",
+      "location": "snapshot/src/ios/Providers/Voice/SystemVoiceStreamingSession.swift:151-156 (handleRolloverStarted), 209-220 (scheduleTimeout / fail at 218)",
+      "trigger": "用户连续讲话超过 45 秒（maximumSegmentDuration, line 328）触发请求轮换，且被轮换请求的 final 回调未在 4 秒内到达（在线/服务器识别整理 45 秒音频 + 网络延迟时容易发生）。",
+      "evidence": "append() 在 .active 模式达到 45s 时 request.endAudio() 并返回 .rolloverStarted(segmentID)；该结果经 Task 跳到 MainActor 后 handleRolloverStarted 对同一个仍在使用的 segmentID 直接 scheduleTimeout(for:)，scheduleTimeout 固定 try await Task.sleep(for: .seconds(4)) 后调用 fail(\"Recognition did not finish before the audio handoff timed out\")。fail() 置 isTerminal、关掉 inputPipe 并发 .failed；VM 的 receiveStreamingEvent(.failed) (VoiceInputPanel.swift:663-668) 会置 hasUnconfirmedTranscript = true 并 endStreamingRecognition()，即轮换期的迟到终稿会让整次录音在用户仍说话时结束（文字保留但后续语音不再进入识别）。",
+      "verification": "已做静态路径追踪。需补：(a) 真机/模拟器上测量 45s 轮换点到 final 回调的实测耗时分布；(b) 为 SystemVoiceSession 写一条注入式测试，驱动 rollover 后 final 迟到 >4s，断言期望行为；现有 6 条 pipe 测试与 9 条 VM 测试均未覆盖该超时分支。",
+      "certainty": "high（超时分支与后果在代码中确定；4 秒阈值在真实网络/设备上是否触发未实测）"
+    },
+    {
+      "id": "R2",
+      "severity": "medium",
+      "requirement": "点击麦克风立即反馈并请求启动，无人为等待；允许先停顿再说，停顿后继续同次录音；首轮验收明确要求测“停顿10秒后继续一句，再停止”。",
+      "location": "snapshot/src/ios/Providers/Voice/SystemVoiceStreamingSession.swift:466-471 (recognitionFinished .active → replayBuffers 失败 → .unexpectedNaturalEnd), 177-179 (receive → fail), 536-549 (8.0s 时间窗 + 0.1 容差)",
+      "trigger": "用户说完一句后停顿约 8 秒以上（验收脚本用 10 秒），期间 SFSpeechRecognizer 对当前请求自然返回 isFinal。",
+      "evidence": "replayBuffers 要求 activeDuration - recognizedAudioEnd <= maximumReplayDuration + 0.1（8.1s）且 recognizedAudioEnd >= 最早保留缓冲的起点，否则返回 nil，recognitionFinished 返回 .unexpectedNaturalEnd，receive 调用 fail(\"Recognition ended before a safe audio boundary was reached\") 结束本次录音。任务记录自身把它列为已知限制（“自然终稿的末词时间边界缺失或超出8秒时间窗时会明确结束本次录音…尚未证明长初始停顿的目标体验”），但“停顿10秒后继续一句”是写进目标与验收的场景，因此该条必须先用设备证据证实是否触发，再判断是否需要换 API 路线。",
+      "verification": "已做静态追踪并与任务文档已知限制对照。需真机按首轮验收脚本实测该停顿场景；可行的静态验证是单测直接调用 recognitionFinished(segmentID:recognizedAudioEnd:) 传尾长 >8s 的边界，断言 disposition 与随后的事件序列（当前为 .unexpectedNaturalEnd → .failed）。",
+      "certainty": "medium（失败分支确定；SFSpeech 是否恰在该停顿时刻自然终稿需实测）"
+    },
+    {
+      "id": "R3",
+      "severity": "low",
+      "requirement": "首次权限、资源未就绪必须真实提示，不能显示假录音/假文本；终稿失败时保留已显示文字并说明未确认状态，不能悄悄丢字。",
+      "location": "snapshot/src/ios/Providers/Voice/SystemVoiceStreamingSession.swift:184-190 (.documentedEmptyEnd → enqueue(.final(segmentID: text: \"\"))); snapshot/src/ios/Views/Chat/Voice/VoiceInputPanel.swift:651-668 (receiveStreamingEvent) 对比 1372 (批处理路径 report(.noSpeechRecognized))",
+      "trigger": "流式路径下用户点麦克风后完全没有说话（或麦克风实际无有效输入）再点停止，识别以 kAFAssistantErrorDomain/1110 或空终稿收尾。",
+      "evidence": "空终稿被当成正常 .final(\"\") 交付：VoiceStreamingDraft.update 只提交空串并推进编号（VoiceInputPanel.swift:171-178），VM 不设置 transcribeError/lastFailure、不报 .noSpeechRecognized，hasUnconfirmedTranscript 保持 false；面板 statusText 落回“录音已结束 · 点文字可编辑”，用户得不到“没有识别到语音”的真实提示。同一情形在 VAD/批处理路径会 report(.noSpeechRecognized) 并弹 1 秒胶囊，两条路径行为不一致。",
+      "verification": "已做与批处理路径的代码对照。建议加单测：按 .final(segmentID:0, text:\"\") + .finished 的序列驱动 beginStreamingDraft/receiveStreamingEvent，断言 VM 产生可见失败反馈（当前实现会失败）。",
+      "certainty": "high"
+    },
+    {
+      "id": "R4",
+      "severity": "low",
+      "requirement": "保留已认可的波形、黑色停止键、键盘出口、短失败胶囊和同屏文字布局（拟议改动边界：不重做 UI）。",
+      "location": "snapshot/src/ios/Views/Chat/AIChatView.swift:3702-3708 (if !voiceInputActive { inputBottomRow }), 3214-3230 (inputBottomControls 内 if voiceInputActive { readAloudToolbarToggle }), 3390-3392 (micButtonContainer); snapshot/src/ios/Views/Chat/Voice/VoiceComposerPanel.swift:130-140 (circleButton 停止键样式)",
+      "trigger": "voiceInputActive 为真（语音模式下）。",
+      "evidence": "inputBottomRow 在语音模式下整体不渲染，因此其中的 attachmentMenuButton/slashMenuButton/ContextUsageIndicator/readAloudToolbarToggle 在语音模式全部不可达，而 inputBottomControls 里 'if voiceInputActive … readAloudToolbarToggle' 分支因此永远不成立（死分支）——朗读开关在语音模式下只剩设置面板内的一项，附件/斜杠/上下文用量入口消失（改动前 inputBottomRow 在语音模式下可见）。停止控件为 VoiceComposerStyle.buttonSize 圆圈 + .primary.opacity(0.06) 底 + stop.fill 图标（浅色模式下浅底黑字），与任务要求保留的“已认可黑色停止键”是否一致无法判定，因为旧面板实现不在快照或补丁中。",
+      "verification": "已做静态可达性分析（死分支与不可达控件可确定）。需在指定模拟器上核对语音模式下朗读开关/附件/斜杠/上下文用量的可达性，并与已认可设计稿对照停止键样式后再决定是否需要补回。",
+      "certainty": "high（分支不可达为确定事实；设计一致性因缺基线未断言为违反）"
+    },
+    {
+      "id": "R5",
+      "severity": "low",
+      "requirement": "不能同时启动旧 SpeechRecognitionManager 与现有 VAD 的两套录音引擎；中途取消/离场/发送、迟到回调不能复活旧会话或覆盖草稿。",
+      "location": "snapshot/src/ios/Views/Chat/AIChatView.swift:228 (speechManager), 3349-3356 (languageBadgeButton), 3714-3723 (onReceive(speechManager.$recognizedText) 按长度追加写 vm.inputText), 5886 (SpeechLanguagePickerSheet); snapshot/src/ios/Views/Chat/Voice/VoiceInputPanel.swift:732 (handleMainButtonTap), 1507 (beginEditing), 1529 (endEditing), 327-328 (hasUnconfirmedTranscript)",
+      "trigger": "任何把 SpeechRecognitionManager.state 置为 .recording 的路径（当前快照内已无调用者），或将来重新接通旧入口。",
+      "evidence": "MicButton 去掉 speechManager 参数后，MicButton 不再驱动旧路径，SpeechLanguagePickerSheet/languageBadgeButton 已无呈现点（showLanguagePicker 全仓仅剩 3351 一处赋值），但 inputBar 仍保留旧策略：.onReceive(speechManager.$recognizedText) 在 state == .recording || text 非空时按长度差追加到 vm.inputText——这正是任务文档第 5 点指出“不能复用到新实时路径”的策略，现处“代码还在、入口已断”状态；同样 handleMainButtonTap/beginEditing/endEditing 已无调用者（isEditingTranscript 永远为 false，AIChatView 中依赖它的键盘/后台分支恒走非编辑分支），hasUnconfirmedTranscript 也没有任何 UI 消费点。",
+      "verification": "已用 grep 全仓核对引用（startRecording 无调用者、showLanguagePicker 无 sheet 呈现点）。建议删除死路径或在编译期隔离，并保留一条断言防止旧追加策略被重新接通后覆盖流式草稿。",
+      "certainty": "high（无调用者与死状态为确定事实；实际覆盖风险需重新接通才会显现）"
+    },
+    {
+      "id": "R6",
+      "severity": "low",
+      "requirement": "音频实时回调不做网络、字符串拼接、UI更新或阻塞等待；确认缓冲区生命周期、背压/队列上限，防止复用音频内存或持续积压。",
+      "location": "snapshot/src/ios/Providers/Voice/VoiceActivityDetector.swift:625-643 (processLiveAudioBuffer), snapshot/src/ios/Providers/Voice/SystemVoiceStreamingSession.swift:341-380 (append + Self.copy) 与 570-606 (copy 实现)",
+      "trigger": "每个 512 帧（约 10ms @48kHz）的 installTap 回调。",
+      "evidence": "音频线程上每个缓冲区至少两次堆分配 + memcpy（Self.copy 保留一份供 8 秒 replay 窗口，request.append 内部另有一份），外加一次 Data(bytes:count:) 波形拷贝，以及每个缓冲区多次 NSLock.lock()（非 try，可阻塞等待）。主线程在 recognitionFinished/start/cancel 上持同一把锁，存在 RT 线程与主线程争锁的优先级反转窗口。队列上限（8.5s）与“波形一次待派发（waveformDeliveryPending）”已按需求实现，但没有任何关于 RT 回调耗时/锁等待的测量证据。",
+      "verification": "已做静态分析（分配与加锁点在代码中确定）。需真机用 Instruments（Time Profiler / Audio）测 tap 回调耗时与锁等待，并核对主线程临界区（start、recognitionFinished、recognitionFailed、close）确实足够短；无测量前不应宣称满足实时预算。",
+      "certainty": "medium（分配/加锁事实确定；是否造成实际掉帧或抖动未测）"
+    },
+    {
+      "id": "R7",
+      "severity": "low",
+      "requirement": "必要的请求轮换不能丢前后衔接音频；有界超时下保留最好结果并说明状态——不应在可安全跳过零长度尾部时直接结束整次录音。",
+      "location": "snapshot/src/ios/Providers/Voice/SystemVoiceStreamingSession.swift:536-566 (replayBuffers), 551-559 (offset/ceil 与 guard let copy else { return nil })，调用点 466-471",
+      "trigger": "自然终稿的 recognizedAudioEnd 落在距某缓冲末尾不足一个采样点的区间（end > recognizedAudioEnd 成立但 ceil((recognizedAudioEnd - start) * sampleRate) == frameLength），或任一缓冲因 mDataByteSize 等原因复制失败。",
+      "evidence": "循环用严格 end > recognizedAudioEnd 判定该缓冲需要重放，随后按 ceil 计算切点；当 ceil 等于 frameLength 时 Self.copy 因 remainingFrames <= 0 返回 nil，replayBuffers 立即 return nil，recognitionFinished 返回 .unexpectedNaturalEnd，receive 调用 fail(\"Recognition ended before a safe audio boundary was reached\")，整次录音结束。零长度尾部本可安全跳过（continue），单点浮点边界即可把“跳过”放大为“结束本次录音”。",
+      "verification": "已做静态推导。可用单测固定验证：在 recentBuffers 中放入两个 1s 缓冲后调用 recognitionFinished(segmentID:recognizedAudioEnd: 2.0 - 1e-9)，观察是否返回 .unexpectedNaturalEnd；现有 testNaturalFinalReplaysOnlyUnrecognizedTail 用的是整洁边界（1.5/0.25），不覆盖该窗口。",
+      "certainty": "medium（代码路径确定；浮点边界是否出现在真实识别时间戳上未测）"
+    }
+  ]
+}

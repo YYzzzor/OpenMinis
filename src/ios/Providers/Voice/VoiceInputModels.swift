@@ -1,4 +1,5 @@
 import Foundation
+import AVFoundation
 
 // MARK: - Request / Response models
 //
@@ -82,6 +83,34 @@ enum VoiceOutputFormat: String {
 protocol VoiceInputCapable {
     func transcribe(_ request: VoiceInputRequest) async throws -> VoiceInputResponse
     var supportsVoiceInput: Bool { get }
+}
+
+/// 流式识别事件按片段编号交付，空终稿也必须推进编号。
+enum VoiceStreamingEvent: Sendable {
+    /// 定稿前文字可修订或变短，调用方应替换整个当前片段。
+    case partial(segmentID: Int, text: String)
+    case final(segmentID: Int, text: String)
+    case finished
+    case failed(String)
+}
+
+/// 音频回调同步交付 PCM；实现须控制缓存上限，不能每帧创建一个异步任务。
+protocol VoiceStreamingSession: AnyObject {
+    func append(buffer: AVAudioPCMBuffer)
+    @MainActor
+    func finish()
+    @MainActor
+    func cancel()
+}
+
+/// 可选实时能力；未实现的服务继续使用完整音频批处理接口。
+protocol VoiceStreamingCapable {
+    @MainActor
+    func makeStreamingSession(
+        language: String,
+        onDevice: Bool?,
+        onEvent: @escaping @MainActor (VoiceStreamingEvent) -> Void
+    ) throws -> any VoiceStreamingSession
 }
 
 protocol VoiceOutputCapable {

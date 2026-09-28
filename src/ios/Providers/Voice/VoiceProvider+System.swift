@@ -8,7 +8,7 @@ import AVFoundation
 // offline with no API key. Exposed through the provider system as a built-in
 // fallback so voice input/output is always available.
 
-final class SystemVoiceProvider: NSObject, VoiceInputCapable, VoiceOutputCapable {
+final class SystemVoiceProvider: NSObject, VoiceInputCapable, VoiceOutputCapable, VoiceStreamingCapable {
 
     static let builtinProviderId = "__builtin_system_speech__"
     static let shared = SystemVoiceProvider()
@@ -103,6 +103,40 @@ final class SystemVoiceProvider: NSObject, VoiceInputCapable, VoiceOutputCapable
         VoiceLog.log("prewarm recognizer for \(loc.identifier)")
     }
 
+    /// 流式路径严格使用所选地区语言，不能把 zh-HK 静默替换成 zh-CN。
+    @MainActor
+    func makeStreamingSession(
+        language: String,
+        onDevice: Bool?,
+        onEvent: @escaping @MainActor (VoiceStreamingEvent) -> Void
+    ) throws -> any VoiceStreamingSession {
+        guard SFSpeechRecognizer.authorizationStatus() == .authorized else {
+            throw VoiceProviderError.unsupported("Speech recognition permission not granted")
+        }
+
+        guard let supportedLocale = SFSpeechRecognizer.supportedLocales().first(where: {
+            $0.identifier.caseInsensitiveCompare(language) == .orderedSame
+        }) else {
+            throw VoiceProviderError.unsupported("System speech recognition does not support locale \(language)")
+        }
+
+        let exactLocale = Locale(identifier: supportedLocale.identifier)
+        guard let recognizer = cachedRecognizer(for: exactLocale), recognizer.isAvailable else {
+            throw VoiceProviderError.unsupported("System speech recognizer unavailable for locale \(supportedLocale.identifier)")
+        }
+
+        let supportsOnDevice = recognizer.supportsOnDeviceRecognition
+        if onDevice == true && !supportsOnDevice {
+            throw VoiceProviderError.unsupported("On-device speech recognition is unavailable for locale \(supportedLocale.identifier)")
+        }
+        let useOnDevice = onDevice ?? supportsOnDevice
+        return SystemVoiceStreamingSession(
+            recognizer: recognizer,
+            onDevice: useOnDevice,
+            onEvent: onEvent
+        )
+    }
+
     // MARK: - Audio validation
 
     /// Smallest buffer that could plausibly hold decodable audio. A canonical
@@ -155,14 +189,12 @@ final class SystemVoiceProvider: NSObject, VoiceInputCapable, VoiceOutputCapable
             throw VoiceProviderError.unsupported("System speech recognizer unavailable for this language")
         }
 
-        // Decide on-device vs server. The Offline model forces on-device; Online
-        // forces server; .auto (nil) prefers on-device when the recognizer supports
-        // it for this locale. On-device that isn't supported here would fail, so we
-        // only set the flag when the recognizer reports support — otherwise fall back
-        // to server so recognition still works (Offline for an unsupported language
-        // degrades to Online rather than erroring).
-        let wantOnDevice = request.onDeviceRecognition ?? recognizer.supportsOnDeviceRecognition
-        let useOnDevice = wantOnDevice && recognizer.supportsOnDeviceRecognition
+        // Explicit Offline selection must fail when this locale cannot run on-device;
+        // only Auto may choose the recognizer's available server route.
+        if request.onDeviceRecognition == true && !recognizer.supportsOnDeviceRecognition {
+            throw VoiceProviderError.unsupported("On-device speech recognition is unavailable for this language")
+        }
+        let useOnDevice = request.onDeviceRecognition ?? recognizer.supportsOnDeviceRecognition
 
         // [T-ios-speech-no-audio-track] Reject an empty/undersized buffer before
         // it ever becomes a file. A WAV header alone is 44 bytes and carries no
@@ -441,4 +473,3 @@ private extension Data {
         Swift.withUnsafeBytes(of: &v) { append(contentsOf: $0) }
     }
 }
-

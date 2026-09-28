@@ -1,0 +1,448 @@
+{
+  "artifacts": {
+    "patches/base-to-worktree.patch": {
+      "executable": false,
+      "sha256": "12ef01b4e6c778f8ce496b77417bbc07ce5a3445ca740c6d00d36ba63f387881"
+    },
+    "patches/staged.patch": {
+      "executable": false,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "patches/unstaged.patch": {
+      "executable": false,
+      "sha256": "12ef01b4e6c778f8ce496b77417bbc07ce5a3445ca740c6d00d36ba63f387881"
+    },
+    "request.md": "7487f754eb6c072982a4f64108029b34d58a04e1df98c30bd0ce1c1d15385c95",
+    "requirements/tasks/active/26-09-28 语音输入 UI 正式接入/task.md": {
+      "executable": false,
+      "sha256": "7734d6371a6d203a01d96a040255e41d3ab1d9c83550ca8edfcc72ed3beefd0a"
+    },
+    "snapshot/src/ios/Agent/Chat/AIChatViewModel.swift": {
+      "executable": false,
+      "sha256": "386408664407a9a4f78eaee61b6372da5d6ef5f11c262606c7c7d6351a2f2972"
+    },
+    "snapshot/src/ios/Agent/Speech/VoiceCorrectionEngine.swift": {
+      "executable": false,
+      "sha256": "af6c4f64004a045f4f06ec195f2854d20cf8860d5d5274b0ce347ec72ceae74a"
+    },
+    "snapshot/src/ios/Agent/Speech/VoiceCorrectionRecorder.swift": {
+      "executable": false,
+      "sha256": "f1d2efe2aaef6daf05e3447806e156c738d80a2ed89cdc17ba10037bded73bef"
+    },
+    "snapshot/src/ios/Minis.xcodeproj/project.pbxproj": {
+      "executable": false,
+      "sha256": "ee564a764efb46ec9d9c418bf1ba14bccf7c0f4e8fcd07f0aca8bcfe6ac9164a"
+    },
+    "snapshot/src/ios/MinisTests/VoiceComposerLifecycleTests.swift": {
+      "executable": false,
+      "sha256": "fd1219f46acc15a0cacb1d6bbe5193869af5601dcc5fcb1750f94a88f1b574b4"
+    },
+    "snapshot/src/ios/Providers/ModelEntry.swift": {
+      "executable": false,
+      "sha256": "f277068c368308caa2231b41f60abddcac4cf142d16af3bf8635f1f0486792ef"
+    },
+    "snapshot/src/ios/Providers/ModelGroupRouter.swift": {
+      "executable": false,
+      "sha256": "0a4a4f8a8ed814e38c002307cf58d5c5a181487016724630c629c0faa5672c65"
+    },
+    "snapshot/src/ios/Providers/ProviderConfigStore.swift": {
+      "executable": false,
+      "sha256": "d6913f05fb6bcf1b95090ccc63cb69f70282e77d07d2f6977513d968867ed2bf"
+    },
+    "snapshot/src/ios/Providers/Voice/VoiceActivityDetector.swift": {
+      "executable": false,
+      "sha256": "b2a629b52b8c46c5a1ac7aba71e396d73a9d59d8a63d2b6ce8318e32c44cf551"
+    },
+    "snapshot/src/ios/Providers/Voice/VoiceCorrectionDB.swift": {
+      "executable": false,
+      "sha256": "065e25992ea60111478f65709d76c08f244e81e447d1b9b69c3259d3da7feb9b"
+    },
+    "snapshot/src/ios/Providers/Voice/VoiceInputModels.swift": {
+      "executable": false,
+      "sha256": "b402e4a211bcada6cdcede49dc41062a6c6b2533ebf4f0e23158bc512e620842"
+    },
+    "snapshot/src/ios/Providers/Voice/VoiceOutputPlayer.swift": {
+      "executable": false,
+      "sha256": "b9f85aed0748c60d6d50652688afa2295f4e8f60da90b7a9872c0cb368c3f924"
+    },
+    "snapshot/src/ios/Providers/Voice/VoiceProvider+System.swift": {
+      "executable": false,
+      "sha256": "2e68650a0e8741eba37d4cc3273f6d9cfe74cc085eba748803de288a8a3063d3"
+    },
+    "snapshot/src/ios/Providers/Voice/VoiceProviderResolver.swift": {
+      "executable": false,
+      "sha256": "0d6d9255865b22e326fcc897e95db43b15398d1668eb2c3518186b5f1831dae9"
+    },
+    "snapshot/src/ios/Views/Chat/AIChatView.swift": {
+      "executable": false,
+      "sha256": "ab3597d0967d11999124b72a00ed12f3b6e5e1d90e899012201022966e3f6776"
+    },
+    "snapshot/src/ios/Views/Chat/ChatInputBar.swift": {
+      "executable": false,
+      "sha256": "62552ed05d3bcc20b8366c7d1cb75dfc93893200022b415e098b023866a0b649"
+    },
+    "snapshot/src/ios/Views/Chat/Voice/InlineVoiceInputView.swift": {
+      "executable": false,
+      "sha256": "a0d91d246ee988071d8bf7a5dd78aff4c83bb4ded415bad619c5379b71036453"
+    },
+    "snapshot/src/ios/Views/Chat/Voice/ShortVoiceComposerPreview.swift": {
+      "executable": false,
+      "sha256": "30426b1c49b5ee94bde4f6732e9eadcbbc168bdcdb0f8e58583ab3a0d7315268"
+    },
+    "snapshot/src/ios/Views/Chat/Voice/VoiceComposerPanel.swift": {
+      "executable": false,
+      "sha256": "2c0a179f04c564868b1dbc52187aa4b255cdd5a0ef616947a205fd53994db6f6"
+    },
+    "snapshot/src/ios/Views/Chat/Voice/VoiceInputPanel.swift": {
+      "executable": false,
+      "sha256": "2353ba6e60ac3740f18a677dcf900be5f7b7b8a5656c0d5882ef9fd4feee5218"
+    },
+    "snapshot/src/ios/Views/Providers/UnifiedModelPicker.swift": {
+      "executable": false,
+      "sha256": "a32f6e222224fb89ff6bff012d6ff7f062e889ddb171681ff39c795f2550b371"
+    },
+    "snapshot/tasks/active/26-09-28 语音输入 UI 正式接入/task.md": {
+      "executable": false,
+      "sha256": "7734d6371a6d203a01d96a040255e41d3ab1d9c83550ca8edfcc72ed3beefd0a"
+    }
+  },
+  "repo": "/Users/huyuanzhao/Coding/Projects/OpenMinis",
+  "schema": 1,
+  "snapshot_id": "c899ce5ea16bd3122ff15e193b69d0141f1e596799435175ea7e232aff5ea665",
+  "spec_selections": [],
+  "state": {
+    "base": "40ac6a55e1861827df68927dd78fc8cdf8f79d65",
+    "branch": "main",
+    "excluded_gitlinks": {
+      "deps/ish": {
+        "index_commit": "3f6384c70eefd1a370f121d3492a5f21f7767df9",
+        "status": "",
+        "worktree": "3f6384c70eefd1a370f121d3492a5f21f7767df9"
+      },
+      "deps/proot": {
+        "index_commit": "8cf13e997cdc9472997aae19df8050c073c9a86c",
+        "worktree": "uninitialized"
+      }
+    },
+    "exclusions": [
+      ".agents",
+      ".github",
+      ".gitignore",
+      ".gitmodules",
+      ".ignore",
+      "AGENTS.md",
+      "BUILDING.md",
+      "CONTRIBUTING.md",
+      "LICENSE",
+      "README.md",
+      "THIRD_PARTY_LICENSES.md",
+      "assets",
+      "deps",
+      "docs",
+      "scripts",
+      "src/android",
+      "src/ios/Agent/Background",
+      "src/ios/Agent/Backup",
+      "src/ios/Agent/BrowserUse",
+      "src/ios/Agent/Chat/AIChatViewModel+Attachments.swift",
+      "src/ios/Agent/Chat/AIChatViewModel+BackgroundTask.swift",
+      "src/ios/Agent/Chat/AIChatViewModel+Compaction.swift",
+      "src/ios/Agent/Chat/AIChatViewModel+ConcurrentTools.swift",
+      "src/ios/Agent/Chat/AIChatViewModel+Fallback.swift",
+      "src/ios/Agent/Chat/AIChatViewModel+FileTools.swift",
+      "src/ios/Agent/Chat/AIChatViewModel+ISHCommand.swift",
+      "src/ios/Agent/Chat/AIChatViewModel+MemoryTools.swift",
+      "src/ios/Agent/Chat/AIChatViewModel+MentionMenu.swift",
+      "src/ios/Agent/Chat/AIChatViewModel+Misc.swift",
+      "src/ios/Agent/Chat/AIChatViewModel+Offloading.swift",
+      "src/ios/Agent/Chat/AIChatViewModel+Persistence.swift",
+      "src/ios/Agent/Chat/AIChatViewModel+ProviderFactory.swift",
+      "src/ios/Agent/Chat/AIChatViewModel+RequestBudget.swift",
+      "src/ios/Agent/Chat/AIChatViewModel+SSEStream.swift",
+      "src/ios/Agent/Chat/AIChatViewModel+SlashCommands.swift",
+      "src/ios/Agent/Chat/AIChatViewModel+TitleGeneration.swift",
+      "src/ios/Agent/Chat/AIChatViewModel+ToolDefinitions.swift",
+      "src/ios/Agent/Chat/AIChatViewModel+ToolPreflight.swift",
+      "src/ios/Agent/Chat/ChatLifecycleSupport.swift",
+      "src/ios/Agent/Chat/ChatModels.swift",
+      "src/ios/Agent/Chat/ChatStore.swift",
+      "src/ios/Agent/Chat/ChatURLBrokerage.swift",
+      "src/ios/Agent/Chat/ContextPolicy.swift",
+      "src/ios/Agent/Chat/ContextUsagePersistence.swift",
+      "src/ios/Agent/Chat/FileMentionIndex.swift",
+      "src/ios/Agent/Chat/MinisURLPathDecoding.swift",
+      "src/ios/Agent/ISH",
+      "src/ios/Agent/Intents",
+      "src/ios/Agent/Markdown",
+      "src/ios/Agent/MessageList",
+      "src/ios/Agent/Offload",
+      "src/ios/Agent/Session",
+      "src/ios/Agent/Shell",
+      "src/ios/Agent/Speech/ConversationContextTruncator.swift",
+      "src/ios/Agent/Speech/CorrectionAdmission.swift",
+      "src/ios/Agent/Speech/CorrectionContextBuilder.swift",
+      "src/ios/Agent/Speech/SpeechRecognitionManager.swift",
+      "src/ios/Agent/Speech/TypedVocabularyBuilder.swift",
+      "src/ios/Agent/Speech/VocabularyFilter.swift",
+      "src/ios/Agent/Speech/VoiceCorrectionDiff.swift",
+      "src/ios/Agent/Sync",
+      "src/ios/Agent/ToolLoopDetector.swift",
+      "src/ios/AgentWidget",
+      "src/ios/AppDelegate.swift",
+      "src/ios/Assets.xcassets",
+      "src/ios/CalendarTests",
+      "src/ios/Configs",
+      "src/ios/Debug",
+      "src/ios/Diagnostics",
+      "src/ios/FileProvider",
+      "src/ios/ISHCommandExecutionExample.swift",
+      "src/ios/Info.plist",
+      "src/ios/Launch Screen.storyboard",
+      "src/ios/Localizable.xcstrings",
+      "src/ios/Minis.entitlements",
+      "src/ios/Minis.xcodeproj/project.xcworkspace",
+      "src/ios/Minis.xcodeproj/xcshareddata",
+      "src/ios/MinisApp-Bridging-Header.h",
+      "src/ios/MinisApp.swift",
+      "src/ios/MinisTests/BackupCategoryCountTests.swift",
+      "src/ios/MinisTests/BackupCryptoTests.swift",
+      "src/ios/MinisTests/BackupFormatCompatibilityTests.swift",
+      "src/ios/MinisTests/BackupIncompletenessTests.swift",
+      "src/ios/MinisTests/BackupOrderPreservationTests.swift",
+      "src/ios/MinisTests/BackupPackagingTests.swift",
+      "src/ios/MinisTests/BackupThinkingRulesRoundTripTests.swift",
+      "src/ios/MinisTests/ClaudeOAuthRefreshRaceTests.swift",
+      "src/ios/MinisTests/ContextPolicyTests.swift",
+      "src/ios/MinisTests/ContextUsageTests.swift",
+      "src/ios/MinisTests/CorrectionAdmissionTests.swift",
+      "src/ios/MinisTests/GeminiWireFormatTests.swift",
+      "src/ios/MinisTests/ISHContinuationResumeRaceTests.swift",
+      "src/ios/MinisTests/KimiOAuthTests.swift",
+      "src/ios/MinisTests/ModelUseTransientRetryTests.swift",
+      "src/ios/MinisTests/OAuthRefreshErrorClassifierTests.swift",
+      "src/ios/MinisTests/OAuthRefreshRaceAllProvidersTests.swift",
+      "src/ios/MinisTests/OffloadPermissionBypassTests.swift",
+      "src/ios/MinisTests/PastableTextViewSelectionTests.swift",
+      "src/ios/MinisTests/SFTPAbsolutePathTests.swift",
+      "src/ios/MinisTests/SessionBadgeFreshnessTests.swift",
+      "src/ios/MinisTests/ShareBufferTargetingTests.swift",
+      "src/ios/MinisTests/Standalone",
+      "src/ios/MinisTests/TestSupport_AppLogger.swift",
+      "src/ios/MinisTests/TextSegmenterTests.swift",
+      "src/ios/MinisTests/ThinkingLevelTests.swift",
+      "src/ios/MinisTests/ThinkingRulePersistenceTests.swift",
+      "src/ios/MinisTests/ThinkingRulesRegressionTests.swift",
+      "src/ios/MinisTests/ThinkingWireGeminiAnthropicSnapshotTests.swift",
+      "src/ios/MinisTests/ThinkingWireGoldenSnapshotTests.swift",
+      "src/ios/MinisTests/ToolLoopDetectorTests.swift",
+      "src/ios/MinisTests/ToolPreflightTests.swift",
+      "src/ios/MinisTests/VoiceCorrectionTests.swift",
+      "src/ios/MinisTests/VoiceInputCaptureTests.swift",
+      "src/ios/MinisTests/VoiceTextSanitizerTests.swift",
+      "src/ios/MinisUITests",
+      "src/ios/NativeOffloads",
+      "src/ios/Preview Content",
+      "src/ios/PrivacyInfo.xcprivacy",
+      "src/ios/Providers/AgentProvider.swift",
+      "src/ios/Providers/Anthropic",
+      "src/ios/Providers/Antigravity",
+      "src/ios/Providers/Gemini",
+      "src/ios/Providers/Kimi",
+      "src/ios/Providers/LLMError.swift",
+      "src/ios/Providers/LLMProvider.swift",
+      "src/ios/Providers/LLMProviderFactory.swift",
+      "src/ios/Providers/LLMTypes.swift",
+      "src/ios/Providers/ModelGroup.swift",
+      "src/ios/Providers/ModelReleaseIndex.swift",
+      "src/ios/Providers/ModelsDevAPI.swift",
+      "src/ios/Providers/OAuthRefreshCoordinator.swift",
+      "src/ios/Providers/OAuthRefreshSingleFlight.swift",
+      "src/ios/Providers/OpenAI",
+      "src/ios/Providers/OpenRouter",
+      "src/ios/Providers/ProviderConfigDB.swift",
+      "src/ios/Providers/ProviderInstance.swift",
+      "src/ios/Providers/ProviderMigration.swift",
+      "src/ios/Providers/ProviderTypes.swift",
+      "src/ios/Providers/Thinking",
+      "src/ios/Providers/ThinkingLevelCatalog.swift",
+      "src/ios/Providers/URLBuilding.swift",
+      "src/ios/Providers/VisionGroupResolver.swift",
+      "src/ios/Providers/Voice/AudioSessionCoordinator.swift",
+      "src/ios/Providers/Voice/CorrectionSignalSource.swift",
+      "src/ios/Providers/Voice/CorrectionStrategy.swift",
+      "src/ios/Providers/Voice/PhoneticNormalizer.swift",
+      "src/ios/Providers/Voice/SystemVoiceCatalog.swift",
+      "src/ios/Providers/Voice/VoiceLog.swift",
+      "src/ios/Providers/Voice/VoiceProvider+Vendors.swift",
+      "src/ios/Providers/Voice/VoiceProvider.swift",
+      "src/ios/Providers/Voice/VoiceProviderFactory.swift",
+      "src/ios/Providers/Voice/VoiceProviderTemplate.swift",
+      "src/ios/Providers/Voice/VoiceTextSanitizer.swift",
+      "src/ios/Providers/xAI",
+      "src/ios/Resources",
+      "src/ios/ShareExtension",
+      "src/ios/Shared",
+      "src/ios/Vendor",
+      "src/ios/Views/Alarms",
+      "src/ios/Views/Backup",
+      "src/ios/Views/Chat/AssistantBlockView.swift",
+      "src/ios/Views/Chat/AudioWaveformView.swift",
+      "src/ios/Views/Chat/ChatAccessibilityAnnouncer.swift",
+      "src/ios/Views/Chat/ChatMessageViews.swift",
+      "src/ios/Views/Chat/ChatTurnScreenshot.swift",
+      "src/ios/Views/Chat/EquatableContextMenu.swift",
+      "src/ios/Views/Chat/MarkdownPrepRegex.swift",
+      "src/ios/Views/Chat/MarkdownRenderView.swift",
+      "src/ios/Views/Chat/Media",
+      "src/ios/Views/Chat/MemoryWriteRevoker.swift",
+      "src/ios/Views/Chat/MinisMediaViews.swift",
+      "src/ios/Views/Chat/MinisShareSheet.swift",
+      "src/ios/Views/Chat/OffloadPermissionDialog.swift",
+      "src/ios/Views/Chat/PaginatedMarkdownView.swift",
+      "src/ios/Views/Chat/PrintHelper.swift",
+      "src/ios/Views/Chat/SelectableMarkdownView.swift",
+      "src/ios/Views/Chat/SessionMemoryView.swift",
+      "src/ios/Views/Chat/SessionSkillsView.swift",
+      "src/ios/Views/Chat/TextFadeAnimator.swift",
+      "src/ios/Views/Chat/ToolLiveSheet.swift",
+      "src/ios/Views/Chat/UsageStatsView.swift",
+      "src/ios/Views/Chat/Voice/SpeechPlayerControl.swift",
+      "src/ios/Views/Chat/Voice/VoiceWaveformView.swift",
+      "src/ios/Views/Chat/WebLoadError.swift",
+      "src/ios/Views/Chat/WebPreviewSheet.swift",
+      "src/ios/Views/ContentView.swift",
+      "src/ios/Views/MCP",
+      "src/ios/Views/Providers/AddProviderView.swift",
+      "src/ios/Views/Providers/AgentLoopModelsView.swift",
+      "src/ios/Views/Providers/GroupSlotPicker.swift",
+      "src/ios/Views/Providers/GroupVoiceModelsView.swift",
+      "src/ios/Views/Providers/KimiDeviceLoginSheet.swift",
+      "src/ios/Views/Providers/ModelDisplayTraits.swift",
+      "src/ios/Views/Providers/ModelGroupDetailView.swift",
+      "src/ios/Views/Providers/ModelGroupsView.swift",
+      "src/ios/Views/Providers/ModelQuickTestSheet.swift",
+      "src/ios/Views/Providers/OnboardingModelSelectionView.swift",
+      "src/ios/Views/Providers/ProviderInstanceDetailView.swift",
+      "src/ios/Views/Providers/ProviderInstancesView.swift",
+      "src/ios/Views/Providers/SessionModelPicker.swift",
+      "src/ios/Views/Providers/ShadowVoiceProviderDetailView.swift",
+      "src/ios/Views/Providers/ThinkingRuleEditorView.swift",
+      "src/ios/Views/Providers/ThinkingRulesSection.swift",
+      "src/ios/Views/Rootfs",
+      "src/ios/Views/Settings",
+      "src/ios/Views/Skills",
+      "src/ios/Views/Sync",
+      "src/ios/WebApp",
+      "src/ios/de.lproj",
+      "src/ios/default_mount",
+      "src/ios/en.lproj",
+      "src/ios/es.lproj",
+      "src/ios/fr.lproj",
+      "src/ios/iSH",
+      "src/ios/ja.lproj",
+      "src/ios/ko.lproj",
+      "src/ios/ru.lproj",
+      "src/ios/zh-Hans.lproj",
+      "src/ios/zh-Hant.lproj",
+      "src/shared"
+    ],
+    "files": {
+      "src/ios/Agent/Chat/AIChatViewModel.swift": {
+        "executable": false,
+        "sha256": "386408664407a9a4f78eaee61b6372da5d6ef5f11c262606c7c7d6351a2f2972"
+      },
+      "src/ios/Agent/Speech/VoiceCorrectionEngine.swift": {
+        "executable": false,
+        "sha256": "af6c4f64004a045f4f06ec195f2854d20cf8860d5d5274b0ce347ec72ceae74a"
+      },
+      "src/ios/Agent/Speech/VoiceCorrectionRecorder.swift": {
+        "executable": false,
+        "sha256": "f1d2efe2aaef6daf05e3447806e156c738d80a2ed89cdc17ba10037bded73bef"
+      },
+      "src/ios/Minis.xcodeproj/project.pbxproj": {
+        "executable": false,
+        "sha256": "ee564a764efb46ec9d9c418bf1ba14bccf7c0f4e8fcd07f0aca8bcfe6ac9164a"
+      },
+      "src/ios/MinisTests/VoiceComposerLifecycleTests.swift": {
+        "executable": false,
+        "sha256": "fd1219f46acc15a0cacb1d6bbe5193869af5601dcc5fcb1750f94a88f1b574b4"
+      },
+      "src/ios/Providers/ModelEntry.swift": {
+        "executable": false,
+        "sha256": "f277068c368308caa2231b41f60abddcac4cf142d16af3bf8635f1f0486792ef"
+      },
+      "src/ios/Providers/ModelGroupRouter.swift": {
+        "executable": false,
+        "sha256": "0a4a4f8a8ed814e38c002307cf58d5c5a181487016724630c629c0faa5672c65"
+      },
+      "src/ios/Providers/ProviderConfigStore.swift": {
+        "executable": false,
+        "sha256": "d6913f05fb6bcf1b95090ccc63cb69f70282e77d07d2f6977513d968867ed2bf"
+      },
+      "src/ios/Providers/Voice/VoiceActivityDetector.swift": {
+        "executable": false,
+        "sha256": "b2a629b52b8c46c5a1ac7aba71e396d73a9d59d8a63d2b6ce8318e32c44cf551"
+      },
+      "src/ios/Providers/Voice/VoiceCorrectionDB.swift": {
+        "executable": false,
+        "sha256": "065e25992ea60111478f65709d76c08f244e81e447d1b9b69c3259d3da7feb9b"
+      },
+      "src/ios/Providers/Voice/VoiceInputModels.swift": {
+        "executable": false,
+        "sha256": "b402e4a211bcada6cdcede49dc41062a6c6b2533ebf4f0e23158bc512e620842"
+      },
+      "src/ios/Providers/Voice/VoiceOutputPlayer.swift": {
+        "executable": false,
+        "sha256": "b9f85aed0748c60d6d50652688afa2295f4e8f60da90b7a9872c0cb368c3f924"
+      },
+      "src/ios/Providers/Voice/VoiceProvider+System.swift": {
+        "executable": false,
+        "sha256": "2e68650a0e8741eba37d4cc3273f6d9cfe74cc085eba748803de288a8a3063d3"
+      },
+      "src/ios/Providers/Voice/VoiceProviderResolver.swift": {
+        "executable": false,
+        "sha256": "0d6d9255865b22e326fcc897e95db43b15398d1668eb2c3518186b5f1831dae9"
+      },
+      "src/ios/Views/Chat/AIChatView.swift": {
+        "executable": false,
+        "sha256": "ab3597d0967d11999124b72a00ed12f3b6e5e1d90e899012201022966e3f6776"
+      },
+      "src/ios/Views/Chat/ChatInputBar.swift": {
+        "executable": false,
+        "sha256": "62552ed05d3bcc20b8366c7d1cb75dfc93893200022b415e098b023866a0b649"
+      },
+      "src/ios/Views/Chat/Voice/InlineVoiceInputView.swift": {
+        "executable": false,
+        "sha256": "a0d91d246ee988071d8bf7a5dd78aff4c83bb4ded415bad619c5379b71036453"
+      },
+      "src/ios/Views/Chat/Voice/ShortVoiceComposerPreview.swift": {
+        "executable": false,
+        "sha256": "30426b1c49b5ee94bde4f6732e9eadcbbc168bdcdb0f8e58583ab3a0d7315268"
+      },
+      "src/ios/Views/Chat/Voice/VoiceComposerPanel.swift": {
+        "executable": false,
+        "sha256": "2c0a179f04c564868b1dbc52187aa4b255cdd5a0ef616947a205fd53994db6f6"
+      },
+      "src/ios/Views/Chat/Voice/VoiceInputPanel.swift": {
+        "executable": false,
+        "sha256": "2353ba6e60ac3740f18a677dcf900be5f7b7b8a5656c0d5882ef9fd4feee5218"
+      },
+      "src/ios/Views/Providers/UnifiedModelPicker.swift": {
+        "executable": false,
+        "sha256": "a32f6e222224fb89ff6bff012d6ff7f062e889ddb171681ff39c795f2550b371"
+      },
+      "tasks/active/26-09-28 语音输入 UI 正式接入/task.md": {
+        "executable": false,
+        "sha256": "7734d6371a6d203a01d96a040255e41d3ab1d9c83550ca8edfcc72ed3beefd0a"
+      }
+    },
+    "head": "40ac6a55e1861827df68927dd78fc8cdf8f79d65",
+    "index_sha256": "f5adc0699070b9de7b18871a4f69242ab19026efdd18d323b33c82e8c3a165ff",
+    "requirements": {
+      "tasks/active/26-09-28 语音输入 UI 正式接入/task.md": "7734d6371a6d203a01d96a040255e41d3ab1d9c83550ca8edfcc72ed3beefd0a"
+    },
+    "status": " M src/ios/Minis.xcodeproj/project.pbxproj\u0000 M src/ios/Providers/ProviderConfigStore.swift\u0000 M src/ios/Views/Chat/AIChatView.swift\u0000 M src/ios/Views/Chat/Voice/InlineVoiceInputView.swift\u0000 M src/ios/Views/Chat/Voice/VoiceInputPanel.swift\u0000 M src/ios/Views/Providers/UnifiedModelPicker.swift\u0000?? src/ios/MinisTests/VoiceComposerLifecycleTests.swift\u0000?? src/ios/Views/Chat/Voice/ShortVoiceComposerPreview.swift\u0000?? src/ios/Views/Chat/Voice/VoiceComposerPanel.swift\u0000?? tasks/active/26-09-28 语音输入 UI 正式接入/task.md\u0000",
+    "task_record_policy": "selected-only"
+  },
+  "task": "tasks/active/26-09-28 语音输入 UI 正式接入/task.md"
+}

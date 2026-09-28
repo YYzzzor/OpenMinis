@@ -19,6 +19,7 @@
     },
     "… %lld chars …" : {
       "comment" : "Compact voice buffered char count",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -15679,6 +15680,7 @@
     },
     "Cancel transcription" : {
       "comment" : "Voice cancel transcription",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -19511,6 +19513,7 @@
     },
     "Collapse voice panel" : {
       "comment" : "Voice panel collapse",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -24021,6 +24024,7 @@
     },
     "Couldn't start microphone: %@" : {
       "comment" : "Inline voice start error",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -26421,6 +26425,7 @@
     },
     "Delete dictated text" : {
       "comment" : "Voice delete button",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -29427,6 +29432,7 @@
     },
     "Double-tap text to edit" : {
       "comment" : "Voice tip: edit transcript",
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -30697,6 +30703,7 @@
     },
     "Editing — tap mic to resume" : {
       "comment" : "Inline voice editing state",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -33603,6 +33610,7 @@
     },
     "Exit" : {
       "comment" : "Exit transcript editing",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -33837,6 +33845,7 @@
     },
     "Expand voice panel" : {
       "comment" : "Voice panel expand",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -39938,6 +39947,7 @@
     },
     "Hold ⌫ to clear all" : {
       "comment" : "Voice tip: long press delete to clear",
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -46405,6 +46415,7 @@
     },
     "Listening…" : {
       "comment" : "Voice tip: steady recording",
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -48223,6 +48234,7 @@
     },
     "Long press to paste" : {
       "comment" : "Voice tip: paste from clipboard",
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -54622,6 +54634,7 @@
       }
     },
     "Network error, retrying in %llds…" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -62878,6 +62891,7 @@
       }
     },
     "Paste Image" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -68632,6 +68646,7 @@
     },
     "Recognition language: %@" : {
       "comment" : "Inline voice language switch",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -68691,6 +68706,7 @@
     },
     "Recognizing…" : {
       "comment" : "Inline voice processing",
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -84442,6 +84458,7 @@
     },
     "Switch to text input" : {
       "comment" : "Mic button exits voice mode",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -86020,6 +86037,7 @@
     },
     "Tap mic to continue" : {
       "comment" : "Voice tip: resume dictation",
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -86164,6 +86182,7 @@
     },
     "Tap to speak" : {
       "comment" : "Inline voice waiting",
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -86181,6 +86200,7 @@
     },
     "Tap to transcribe" : {
       "comment" : "Voice tip: tap mic to stop and transcribe",
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -92352,6 +92372,7 @@
     },
     "Toggle recording" : {
       "comment" : "Inline voice mic",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -93474,6 +93495,9 @@
           }
         }
       }
+    },
+    "Transcription cancelled" : {
+
     },
     "Transcription test" : {
       "extractionState" : "stale",
@@ -98135,6 +98159,7 @@
     },
     "Voice input" : {
       "comment" : "Mic button opens voice panel",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -101545,6 +101570,9 @@
         }
       }
     },
+    "保留文字；录音中切换会先结束录音并完成转录" : {
+
+    },
     "健康报告" : {
       "localizations" : {
         "de" : {
@@ -101661,6 +101689,15 @@
         }
       }
     },
+    "完成" : {
+
+    },
+    "开始语音输入" : {
+
+    },
+    "录音波形" : {
+
+    },
     "拍照" : {
       "localizations" : {
         "de" : {
@@ -101718,6 +101755,9 @@
           }
         }
       }
+    },
+    "文字校对" : {
+
     },
     "早间简报" : {
       "localizations" : {
@@ -101835,6 +101875,9 @@
         }
       }
     },
+    "朗读回复" : {
+
+    },
     "查看天气" : {
       "localizations" : {
         "de" : {
@@ -101951,6 +101994,21 @@
         }
       }
     },
+    "正在编辑历史消息" : {
+
+    },
+    "正在转录…" : {
+
+    },
+    "用 AI 校对文字" : {
+
+    },
+    "结束录音后检查文字，不会发送" : {
+
+    },
+    "编辑文字" : {
+
+    },
     "设置闹钟" : {
       "localizations" : {
         "de" : {
@@ -102008,6 +102066,24 @@
           }
         }
       }
+    },
+    "识别语言" : {
+
+    },
+    "语音设置" : {
+
+    },
+    "语音设置 · %@" : {
+
+    },
+    "语音输入模型" : {
+
+    },
+    "重试" : {
+
+    },
+    "键盘输入" : {
+
     }
   },
   "version" : "1.0"

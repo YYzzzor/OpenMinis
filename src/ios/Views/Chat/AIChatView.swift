@@ -314,7 +314,7 @@ struct AIChatView: View {
     /// `inputAtScrollBottom` is trivially true when the text does not overflow,
     /// so the short-text path is unchanged by construction.
     private var swipeToSendAllowed: Bool {
-        !inputIsScrollable || inputAtScrollBottom
+        !voiceInputActive && (!inputIsScrollable || inputAtScrollBottom)
     }
 
     @State private var floatingBarHeight: CGFloat = 0
@@ -353,6 +353,11 @@ struct AIChatView: View {
         nonmutating set { voiceMode.isVoiceActive = newValue }
     }
     @StateObject private var voiceVM = VoiceInputViewModel()
+    @Environment(\.accessibilityReduceMotion) private var reduceVoiceMotion
+    private var voiceTransition: Animation? {
+        reduceVoiceMotion ? nil : .smooth(duration: VoiceComposerStyle.transitionDuration)
+    }
+
     /// Global read-replies state — observed so the voice-mode "Read replies" toggle
     /// reflects enabled/muted in lockstep with the global voice-output capsule.
     @ObservedObject private var voiceOutput = VoiceOutputState.shared
@@ -1636,23 +1641,7 @@ struct AIChatView: View {
         }
         switch action {
         case .startVoice:
-            // Mirror the mic button's action: ask for speech +
-            // microphone permission, then start recording. Drop
-            // input-focus so the keyboard doesn't fight the speech
-            // session for focus.
-            Task { @MainActor in
-                guard speechManager.state == .idle else { return }
-                let granted = await speechManager.requestPermissions()
-                guard granted else { return }
-                inputFocused = false
-                lastRecognizedLength = 0
-                try? speechManager.startRecording()
-                // [T-voice-input-mode-preference-ios] Mark the composition as
-                // voice-assisted so the send doesn't flip the preference to
-                // "text". (No preference write here — the quick action is its
-                // own explicit intent, not a mic tap.)
-                vm.voiceUsedInComposition = true
-            }
+            beginVoiceInput()
             // No cover for voice — close the workflow loop immediately
             // so the retry timer doesn't fire and re-trigger the mic.
             QuickActionWorkflow.shared.markCoverPresented()
@@ -3371,27 +3360,35 @@ struct AIChatView: View {
         }
     }
 
-    /// Mic button plus the attached language-picker sheet.
-    private var micButtonContainer: some View {
-        MicButton(speechManager: speechManager, inputFocused: $inputFocused, onTap: {
-            if voiceInputActive {
-                // Already in voice mode — the "T" button switches back to text.
-                // [T-ios-voice-keyboard-text-carry] Keep the transcript: the
-                // composer mirrors it, so clearing here would empty the input
-                // box and lose the dictated text on the way back to keyboard.
-                voiceVM.reset(clearTranscript: false)
-                withAnimation(.easeInOut(duration: 0.2)) { voiceInputActive = false }
-            } else {
-                // Mark the composition as voice-assisted (committed to the
-                // "voice" input-mode preference only at send time). Switch the
-                // composer into inline voice mode — the single voice entry point.
-                vm.voiceUsedInComposition = true
-                // Switching text→voice opens the panel expanded this one time;
-                // afterwards it resumes the remembered expand/compact state.
-                VoiceModePreference.shared.enteredFromText = true
-                withAnimation(.easeInOut(duration: 0.2)) { voiceInputActive = true }
+    /// 普通输入与语音输入共用同一草稿；启动不等待面板动画完成。
+    private func beginVoiceInput() {
+        guard !voiceVM.isBusyForComposer else { return }
+        inputFocused = false
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+        vm.dismissSlashMenu()
+        vm.voiceUsedInComposition = true
+        voiceVM.prepare()
+        voiceVM.accumulate = true
+        voiceVM.setTranscript(vm.inputText)
+        withAnimation(voiceTransition) { voiceInputActive = true }
+        voiceVM.startFromComposer()
+    }
+
+    private func returnToKeyboard() {
+        vm.inputText = voiceVM.transcript
+        // 离场视图的结束编辑回调会清空共享焦点，必须等它退出后再交接。
+        withAnimation(voiceTransition, completionCriteria: .removed) {
+            voiceInputActive = false
+        } completion: {
+            DispatchQueue.main.async {
+                guard !voiceInputActive else { return }
+                inputFocused = true
             }
-        }, isVoiceActive: voiceInputActive)
+        }
+    }
+
+    private var micButtonContainer: some View {
+        MicButton(inputFocused: $inputFocused, onTap: beginVoiceInput)
     }
 
     /// Send / Enqueue / Stop circular button.
@@ -3405,9 +3402,7 @@ struct AIChatView: View {
     private var sendButton: some View {
         if vm.isProcessing && canEnqueue {
             Button { performEnqueue() } label: {
-                Image(systemName: "arrow.up.circle.fill")
-                    .font(.system(size: 34))
-                    .foregroundStyle(ChatColors.sendButton)
+                sendArrowIcon(enabled: true)
             }
             .keyboardShortcut(.return, modifiers: .command)
             .accessibilityLabel(Text("Add to queue", comment: "VoiceOver label for the send button while a reply is generating"))
@@ -3417,18 +3412,31 @@ struct AIChatView: View {
                 Image(systemName: "stop.circle.fill")
                     .font(.system(size: 34))
                     .foregroundStyle(.red)
+                    .frame(width: 44, height: 44)
+                    .contentShape(Rectangle())
             }
             .accessibilityLabel(Text("Stop generating", comment: "VoiceOver label for the stop button"))
             .accessibilityHint(Text("Stops the reply that is being generated", comment: "VoiceOver hint for the stop button"))
         } else {
             Button { performSend() } label: {
-                Image(systemName: "arrow.up.circle.fill")
-                    .font(.system(size: 34))
-                    .foregroundStyle(canSend ? ChatColors.sendButton : ChatColors.sendButtonDisabled)
+                sendArrowIcon(enabled: canSend)
             }
             .disabled(!canSend)
             .keyboardShortcut(.return, modifiers: .command)
             .accessibilityLabel(Text("Send", comment: "VoiceOver label for the send button"))
+        }
+    }
+
+    @ViewBuilder
+    private func sendArrowIcon(enabled: Bool) -> some View {
+        if voiceInputActive {
+            VoiceComposerSendLabel(isEnabled: enabled)
+        } else {
+            Image(systemName: "arrow.up.circle.fill")
+                .font(.system(size: 34))
+                .foregroundStyle(enabled ? ChatColors.sendButton : ChatColors.sendButtonDisabled)
+                .frame(width: 44, height: 44)
+                .contentShape(Rectangle())
         }
     }
 
@@ -3445,13 +3453,25 @@ struct AIChatView: View {
                 // [voice-correction §6] Recent conversation turns, straight from the
                 // already-loaded in-memory list (§12.1 forbids a DB query on this path),
                 // budgeted by CorrectionContextBuilder.
-                InlineVoiceInputView(
-                    viewModel: voiceVM,
-                    inputText: inputTextBinding,
-                    onPasteImage: { image in vm.addImageAttachment(image) },
-                    onPasteFile: { url in vm.addFileAttachment(from: url) },
-                    conversationContext: { voiceCorrectionContext(from: vm.messages) }
-                )
+                VStack(spacing: 0) {
+                    if vm.editingMessageIndex != nil {
+                        HStack {
+                            Text("正在编辑历史消息").font(.caption).foregroundStyle(.secondary)
+                            Spacer()
+                            editExitButton(compact: false)
+                                .disabled(voiceVM.isBusyForComposer)
+                        }
+                        .padding(.horizontal, VoiceComposerStyle.contentPadding)
+                        .padding(.top, 8)
+                    }
+                    InlineVoiceInputView(
+                        viewModel: voiceVM,
+                        inputText: inputTextBinding,
+                        onKeyboard: returnToKeyboard,
+                        sendControl: { AnyView(sendButton) },
+                        conversationContext: { voiceCorrectionContext(from: vm.messages) }
+                    )
+                }
             )
         }
         if speechManager.state == .recording {
@@ -3678,14 +3698,19 @@ struct AIChatView: View {
                     .padding(.top, 8)
                 }
 
-                inputFieldOrWaveform
+                VStack(spacing: 5) {
+                    inputFieldOrWaveform
 
-                inputBottomRow
-                    .padding(.horizontal, 12)
-                    .padding(.bottom, 10)
+                    if !voiceInputActive {
+                        inputBottomRow
+                            .padding(.horizontal, 12)
+                            .padding(.bottom, 10)
+                    }
+                }
+                .modifier(ComposerContentTransition(isVoice: voiceInputActive))
             }
             .contentShape(RoundedRectangle(cornerRadius: 20))
-            .onTapGesture { inputFocused = true }
+            .onTapGesture { if !voiceInputActive { inputFocused = true } }
             .onReceive(speechManager.$recognizedText) { text in
                 guard speechManager.state == .recording || !text.isEmpty else { return }
                 // Append only the new delta to preserve existing input text
@@ -3717,7 +3742,7 @@ struct AIChatView: View {
                     .padding(.trailing, 10)
                 }
             }
-            .modifier(ComposerSurface())
+            .modifier(ComposerSurface(voiceStyle: voiceInputActive))
             .frame(maxWidth: maxContentWidth)
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
@@ -4545,11 +4570,11 @@ struct AIChatView: View {
         // still loading. Only count `.ready` attachments as sendable content, so
         // a composer holding ONLY failed/loading chips (and no text) can't send.
         let hasReadyAttachment = vm.attachments.contains { $0.loadState == .ready }
-        return ready && !vm.hasLoadingAttachments && (hasText || hasReadyAttachment)
+        return !voiceVM.isBusyForComposer && ready && !vm.hasLoadingAttachments && (hasText || hasReadyAttachment)
     }
 
     private var canEnqueue: Bool {
-        vm.isProcessing && !vm.inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        !voiceVM.isBusyForComposer && vm.isProcessing && !vm.inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
     /// Whether the composer actually holds something worth moving to another
@@ -4562,6 +4587,7 @@ struct AIChatView: View {
 
 
     private func performEnqueue() {
+        guard !voiceVM.isBusyForComposer else { return }
         // Dismiss the software keyboard on enqueue. With a hardware keyboard,
         // keep focus so the user can continue typing the next candidate.
         if GCKeyboard.coalesced == nil {
@@ -4582,11 +4608,13 @@ struct AIChatView: View {
         // agent is processing) was missing it.
         if voiceInputActive {
             voiceVM.clearAndRearm()
+            withAnimation(voiceTransition) { voiceInputActive = false }
         }
     }
 
     /// Dismiss keyboard (commit dictation/marked text) before sending.
     private func performSend() {
+        guard !voiceVM.isBusyForComposer else { return }
         // Intercept slash commands — execute instead of sending to LLM
         if vm.tryExecuteInputAsSlashCommand() { return }
 
@@ -4616,10 +4644,10 @@ struct AIChatView: View {
         // → "send() GUARD FAILED" and nothing was sent. send() consumes and clears
         // inputText itself; we re-arm voice listening only AFTER it has run.
         vm.send()
-        // [inline-voice] Stay in voice mode after sending — clear the recognized
-        // text and re-arm listening for the next utterance (close with ✕).
+        // 发送完成后回到普通输入；下一次点麦克风才开启新的录音。
         if voiceInputActive {
             voiceVM.clearAndRearm()
+            withAnimation(voiceTransition) { voiceInputActive = false }
         }
     }
 
@@ -4660,13 +4688,19 @@ struct AIChatView: View {
 /// the same finding as the FAB conversion). The sub-26 branch keeps the original
 /// fill and BOTH shadows byte-for-byte, including the dark-mode-only top shadow
 /// that lifts the bar off the message list.
-private struct ComposerSurface: ViewModifier {
+// 正式文字/语音输入及 Canvas 共用材质，切换模式只改变容器尺寸与圆角。
+struct ComposerSurface: ViewModifier {
+    var voiceStyle = false
+    var isEnabled = true
+
     private var shape: RoundedRectangle {
-        RoundedRectangle(cornerRadius: 20, style: .continuous)
+        RoundedRectangle(cornerRadius: voiceStyle ? VoiceComposerStyle.cornerRadius : 20, style: .continuous)
     }
 
     func body(content: Content) -> some View {
-        if #available(iOS 26.0, *) {
+        if !isEnabled {
+            content
+        } else if #available(iOS 26.0, *) {
             content
                 .glassEffect(.regular, in: shape)
                 .clipShape(shape)
@@ -5822,68 +5856,28 @@ private struct SessionLockGateOverlay: View {
 
 // MARK: - Mic Button (touch-release activation)
 
-/// Mic button that triggers on touch-release (finger lift) to avoid accidental activation.
-/// Press highlight is provided via GestureState.
+/// 点击一次直接进入录音；图标保留原尺寸，命中区域使用 44pt。
 private struct MicButton: View {
-    @ObservedObject var speechManager: SpeechRecognitionManager
     @Binding var inputFocused: Bool
-    /// Opens the voice-input (VAD) panel. The mic button no longer drives the
-    /// in-bar SFSpeech live dictation directly — the panel (with the configured
-    /// ASR provider, or the offline System fallback) is the single voice entry
-    /// point. The SpeechRecognitionManager path stays in place but is no longer
-    /// triggered from here.
-    var onTap: () -> Void = {}
-    /// True while inline voice mode is active — the button flips to a "T" glyph
-    /// that switches back to text input.
-    var isVoiceActive: Bool = false
-    /// Press feedback for the custom-gesture button.
-    @State private var micPressed = false
-
-    private static let diameter: CGFloat = 34
+    var onTap: () -> Void
 
     var body: some View {
-        // NOT a Button: SwiftUI's Button has a generous system touch-slop / touch-
-        // up tolerance that fires when the finger lifts slightly outside, or moves
-        // a little during a scroll/drag — which made this toggle very easy to
-        // mis-tap. We use a DragGesture(minimumDistance: 0) and only activate when
-        // BOTH the press and release land inside the circle AND movement is tiny.
-        // In voice mode: a keyboard glyph = switch back to text input. The keyboard
-        // glyph is wider than the mic, so render it ~4pt smaller for parity.
-        Image(systemName: isVoiceActive ? "keyboard" : "mic")
-            .font(.system(size: isVoiceActive ? 15 : 18, weight: .medium))
-            .foregroundStyle(ChatColors.secondaryText)
-            .frame(width: Self.diameter, height: Self.diameter)
-            .background(ChatColors.inputIconBg)
-            .clipShape(Circle())
-            .overlay(Circle().stroke(ChatColors.inputIconBorder, lineWidth: 0.5))
-            .scaleEffect(micPressed ? 0.9 : 1.0)
-            .contentShape(Circle())
-            .gesture(
-                DragGesture(minimumDistance: 0)
-                    .onChanged { value in
-                        micPressed = Self.isInside(value.location)
-                    }
-                    .onEnded { value in
-                        let started = Self.isInside(value.startLocation)
-                        let ended = Self.isInside(value.location)
-                        let moved = hypot(value.translation.width, value.translation.height)
-                        micPressed = false
-                        guard started, ended, moved < 10 else { return }
-                        inputFocused = false
-                        onTap()
-                    }
-            )
-            .accessibilityAddTraits(.isButton)
-            .accessibilityLabel(isVoiceActive
-                ? Text("Switch to text input", comment: "Mic button exits voice mode")
-                : Text("Voice input", comment: "Mic button opens voice panel"))
-    }
-
-    /// Whether a point (in the button's local space) is within the visible circle.
-    private static func isInside(_ p: CGPoint) -> Bool {
-        let r = diameter / 2
-        let dx = p.x - r, dy = p.y - r
-        return (dx * dx + dy * dy) <= r * r
+        Button {
+            inputFocused = false
+            onTap()
+        } label: {
+            Image(systemName: "mic")
+                .font(.system(size: 18, weight: .medium))
+                .foregroundStyle(ChatColors.secondaryText)
+                .frame(width: 34, height: 34)
+                .background(ChatColors.inputIconBg, in: Circle())
+                .overlay(Circle().stroke(ChatColors.inputIconBorder, lineWidth: 0.5))
+                .frame(width: VoiceComposerStyle.buttonSize, height: VoiceComposerStyle.buttonSize)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("开始语音输入")
+        .accessibilityIdentifier("voice.enter")
     }
 }
 

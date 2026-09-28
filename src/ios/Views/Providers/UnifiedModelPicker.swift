@@ -21,10 +21,7 @@ extension ModelEntry {
         ),
         isHidden: true
     )
-    /// System ASR — Offline (on-device). Fully offline, no time/rate limits, audio
-    /// stays on device, and the recognition-language switch actually matters
-    /// (on-device is monolingual per locale). Falls back to Online when the chosen
-    /// language has no on-device model.
+    /// 离线识别强制使用所选语言的设备端能力；不可用时明确报错，不切换在线。
     static let systemASROffline = ModelEntry(
         uuid: "system-asr-offline",
         providerInstanceId: SystemVoiceProvider.builtinProviderId,
@@ -99,6 +96,8 @@ struct ModelPickerConfig {
     var showCreateGroup: Bool = false
     var createGroupDirection: VoiceDirection?
     var dismissOnSelect: Bool = true
+    /// 选择界面可单独禁用配置管理和联网测试；Canvas 只演示本地选择。
+    var allowsManagementAndTesting: Bool = true
 
     var currentEntryId: (@MainActor () -> String?)?
     var currentGroupId: (@MainActor () -> String?)?
@@ -248,7 +247,12 @@ struct ModelPickerConfig {
 
 struct UnifiedModelPicker: View {
     let config: ModelPickerConfig
-    @ObservedObject private var store = ProviderConfigStore.shared
+    @ObservedObject private var store: ProviderConfigStore
+
+    init(config: ModelPickerConfig, store: ProviderConfigStore = .shared) {
+        self.config = config
+        self._store = ObservedObject(wrappedValue: store)
+    }
     /// Observed so the System voice rows rebuild when the available-voices roster
     /// changes (Enhanced/Premium pack download, Personal Voice creation).
     @ObservedObject private var systemVoiceRoster = SystemVoiceRoster.shared
@@ -464,6 +468,7 @@ struct UnifiedModelPicker: View {
                         }
                         .buttonStyle(.plain)
                         .foregroundStyle(.tint)
+                        .disabled(!config.allowsManagementAndTesting)
                     }
                 } footer: {
                     if searchText.isEmpty {
@@ -495,6 +500,7 @@ struct UnifiedModelPicker: View {
                         Label("Create group from models…", systemImage: "plus.rectangle.on.folder")
                             .font(.subheadline)
                     }
+                    .disabled(!config.allowsManagementAndTesting)
                 }
             }
         }
@@ -551,6 +557,7 @@ struct UnifiedModelPicker: View {
         }
         .buttonStyle(.borderless)
         .accessibilityLabel(Text("Quick Test \(entry.model.displayName)"))
+        .disabled(!config.allowsManagementAndTesting)
     }
 
     /// Nested multi-select picker for "Create group from models…". The voice
@@ -830,6 +837,8 @@ struct UnifiedModelPicker: View {
         // A specific voice id → its real per-voice entry (localized voice name).
         if VoiceProviderResolver.selectedSystemVoiceId(id) != nil,
            let e = Self.systemEntry(for: id) { return e }
+        if id.hasSuffix("/system-asr-online") { return .systemASROnline }
+        if id.hasSuffix("/system-asr-offline") { return .systemASROffline }
         if id.hasSuffix("/output") || id.hasSuffix("/system-tts") { return .systemTTS }
         if id.hasSuffix("/input") || id.hasSuffix("/system-asr") { return .systemASR }
         // Bare sentinel — pick by the picker's modality preference.
@@ -869,11 +878,20 @@ struct UnifiedModelPicker: View {
         }
     }
 
+    private func inputCapabilityLabel(for entry: ModelEntry) -> String? {
+        guard config.effectivePreferModality?.contains(.audioInput) == true else { return nil }
+        return VoiceProviderResolver.isSystemEntry(entry.providerInstanceId)
+            ? "支持实时文字 · 依语言和设备可用性"
+            : "分段识别 · 停顿或停止后出字"
+    }
+
     @ViewBuilder
     private func expandedEntryRow(_ entry: ModelEntry, parentGroup: ModelGroup) -> some View {
         let isSystem = VoiceProviderResolver.isSystemEntry(entry.providerInstanceId)
         let isActive = (config.currentGroupId?() == parentGroup.id && config.currentEntryId?() == entry.id)
-            || (isSystem && VoiceProviderResolver.isSystemEntry(config.currentEntryId?()))
+            || (isSystem && config.currentGroupId?() == nil
+                && VoiceProviderResolver.isSystemEntry(config.currentEntryId?())
+                && Self.systemRowKey(config.currentEntryId?()) == Self.systemRowKey(entry.id))
         let disabled = config.isDisabled?(entry) ?? false
 
         HStack(spacing: 10) {
@@ -907,6 +925,9 @@ struct UnifiedModelPicker: View {
                     Text(entry.model.id)
                         .font(.caption2)
                         .foregroundStyle(.tertiary)
+                }
+                if let capability = inputCapabilityLabel(for: entry) {
+                    Text(capability).font(.caption2).foregroundStyle(.secondary)
                 }
             }
 
@@ -1094,6 +1115,9 @@ struct UnifiedModelPicker: View {
                     Text(entry.model.displayName)
                         .font(.subheadline)
                         .foregroundStyle(disabled ? Color(UIColor.tertiaryLabel) : Color(UIColor.label))
+                    if let capability = inputCapabilityLabel(for: entry) {
+                        Text(capability).font(.caption2).foregroundStyle(.secondary)
+                    }
                     HStack(spacing: 4) {
                         // Subtitle from traits (e.g. "iOS built-in, works offline")
                         // for built-ins; the raw model id for cloud models.

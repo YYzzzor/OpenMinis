@@ -105,6 +105,83 @@ struct NoUsableASRProviderError: LocalizedError {
     var errorDescription: String? { VoiceInputFailure.noUsableProvider.message }
 }
 
+/// 识别可以乱序完成，正文始终按录音分段顺序追加。
+struct VoiceTranscriptOrderBuffer {
+    private(set) var nextSequence = 0
+    private var nextToRelease = 0
+    private var completed: [Int: String] = [:]
+
+    var hasPending: Bool { nextToRelease < nextSequence }
+
+    mutating func reserve() -> Int {
+        defer { nextSequence += 1 }
+        return nextSequence
+    }
+
+    mutating func resolve(_ sequence: Int, text: String) -> [String] {
+        guard sequence >= nextToRelease, sequence < nextSequence else { return [] }
+        completed[sequence] = text
+        var ready: [String] = []
+        while let text = completed.removeValue(forKey: nextToRelease) {
+            if !text.isEmpty { ready.append(text) }
+            nextToRelease += 1
+        }
+        return ready
+    }
+
+    mutating func reset() {
+        nextSequence = 0
+        nextToRelease = 0
+        completed.removeAll(keepingCapacity: true)
+    }
+}
+
+struct VoiceAutoRetryRequest {
+    let audioData: Data
+    let sequence: Int
+}
+
+/// 把启动、采集、转录和收尾合并为输入框的编辑/发送门禁。
+struct VoiceComposerBusySnapshot: Equatable {
+    var isStarting = false
+    var isFinishing = false
+    var isCapturing = false
+    var isTranscribing = false
+    var hasPendingRecognition = false
+    var hasPendingAudioFlush = false
+    var isRetrying = false
+
+    var isBusy: Bool {
+        isStarting || isFinishing || isCapturing || isTranscribing
+            || hasPendingRecognition || hasPendingAudioFlush || isRetrying
+    }
+}
+
+/// 草稿和已定稿片段不被中间结果改写；当前片段即使变短或变空也整段替换。
+struct VoiceStreamingDraft {
+    let base: String
+    private var committed: [String] = []
+    private var current = ""
+    private var nextSegment = 0
+
+    init(base: String) { self.base = base }
+
+    var text: String { ([base] + committed + [current]).filter { !$0.isEmpty }.joined(separator: " ") }
+    var hasDictatedText: Bool {
+        (committed + [current]).contains { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+    }
+
+    mutating func update(segmentID: Int, text: String, isFinal: Bool) {
+        guard segmentID == nextSegment else { return }
+        current = text
+        if isFinal {
+            committed.append(current)
+            current = ""
+            nextSegment += 1
+        }
+    }
+}
+
 @MainActor
 final class VoiceInputViewModel: ObservableObject {
 
@@ -125,8 +202,12 @@ final class VoiceInputViewModel: ObservableObject {
             }
         }
     }
+    /// 覆盖异步权限请求与最终音频派发之间的空隙。
+    @Published private(set) var isStarting = false
+    @Published private(set) var isFinishing = false
     @Published var transcript: String = ""
-    @Published var waveformLevels: [Float] = Array(repeating: 0.1, count: 20)
+    /// 高频音量只由波形叶子观察，避免向聊天页广播 objectWillChange。
+    let waveformSource = VoiceWaveformSource()
     @Published var rippleScale: [CGFloat] = [1.0, 1.0, 1.0]
     /// Inline mode: user double-tapped the transcript to correct it by keyboard.
     /// While editing, VAD is paused so new speech doesn't clobber manual edits.
@@ -149,31 +230,37 @@ final class VoiceInputViewModel: ObservableObject {
     @Published var retryCountdown: Int?
     @Published var canManualRetry = false
 
-    /// [T-voice-input-failure-feedback] (#144) Last reason a voice utterance
-    /// produced no text. Published so the panel can reflect it inline; also
-    /// toasted by `report(_:)` so it is visible in COMPACT mode, where the
-    /// existing `stateLabel` and error pill do not render at all (that
-    /// expanded-only limitation is why these failures read as "nothing
-    /// happened").
+    /// Stable composer-facing signals. Capture is separate from ASR progress.
+    var isCaptureActive: Bool { vad.isRunning }
+    var isBusyForComposer: Bool {
+        VoiceComposerBusySnapshot(
+            isStarting: isStarting,
+            isFinishing: isFinishing,
+            isCapturing: isCaptureActive,
+            isTranscribing: isTranscribing,
+            hasPendingRecognition: transcriptOrder.hasPending,
+            hasPendingAudioFlush: !pendingSegments.isEmpty || pendingFlushTimer != nil || finishFlushDispatchPending,
+        isRetrying: retryCountdown != nil || currentAutoRetry != nil
+            || !autoRetryQueue.isEmpty || isAutoRetryRequestRunning
+        ).isBusy
+    }
+
+    /// 保留最近一次识别失败，供面板持续展示原因和重试入口。
     @Published var lastFailure: VoiceInputFailure?
 
-    /// Surface a failure: log it with a greppable tag and toast it.
-    ///
-    /// Toast rather than an inline row on purpose — an inline pill inserts a
-    /// row into the panel VStack and shifts the mic button, which users already
-    /// complained about (see the note in InlineVoiceInputView's error pill).
-    ///
-    /// `silent: true` records the failure for diagnostics without a toast, for
-    /// paths that are expected during normal use and would otherwise nag.
+    /// 胶囊只短暂提醒；完整原因保留在面板中，避免长时间遮挡录音控件。
+    /// silent 用于自动重试等常规路径，只记录失败而不弹提示。
     func report(_ failure: VoiceInputFailure, silent: Bool = false) {
         lastFailure = failure
         VoiceLog.log("[voice-failure] \(failure.logTag): \(failure.message)")
         guard !silent else { return }
-        MinisToast.show(failure.message, duration: 2.2, systemImage: failure.systemImage)
+        MinisToast.show(failure.message, duration: 1.0, systemImage: failure.systemImage)
     }
     private var retryAudioData: Data?
     private var retryTimer: Timer?
-    private var isAutoRetry = false
+    private var autoRetryQueue: [VoiceAutoRetryRequest] = []
+    private var currentAutoRetry: VoiceAutoRetryRequest?
+    private var isAutoRetryRequestRunning = false
 
     /// Total recording session cap (5 minutes). When continuous recording
     /// (from first mic start) exceeds this, force a full auto-stop.
@@ -210,6 +297,7 @@ final class VoiceInputViewModel: ObservableObject {
     /// The resolved model entry — passed to VoiceInputRequest so the provider can
     /// detect chat-based ASR (audio+text multimodal models vs dedicated Whisper).
     private var inputResolvedModel: LLMModel?
+    private var inputSystemOnDevice: Bool?
     /// Ordered ASR fail-over candidates from the configured input group (override
     /// first, then group members per the group's routing strategy). Empty = use
     /// the offline System engine.
@@ -230,6 +318,24 @@ final class VoiceInputViewModel: ObservableObject {
     private var idleTimer: Timer?
     private var backgroundTimer: Timer?
     private var didObserveLifecycle = false
+    /// The composer keeps capture open across VAD silence segments.
+    private var acceptsVADCallbacks = false
+    private var composerSessionActive = false
+    private var composerHasDetectedSpeech = false
+    private var startRequestGeneration = 0
+    /// True until the main-queue barrier after VAD's async flush delegate runs.
+    private var finishFlushDispatchPending = false
+    private var streamingSession: (any VoiceStreamingSession)?
+    private var streamingGeneration: UUID?
+    private var streamingDraft: VoiceStreamingDraft?
+    @Published private(set) var usesRealtimeRecognition = false
+    @Published private(set) var hasUnconfirmedTranscript = false
+
+    var inputCapabilityDescription: String {
+        inputProvider is any VoiceStreamingCapable
+            ? "系统识别可在说话时更新文字；可用性取决于语言与设备。"
+            : "当前模型按完整片段识别，停顿或停止后出字，不支持实时中间结果。"
+    }
 
     /// Inline mode: append each VAD segment to the running transcript instead of
     /// replacing, and notify the host so the input box can mirror the text.
@@ -283,12 +389,17 @@ final class VoiceInputViewModel: ObservableObject {
     }
 
     @objc private func appDidEnterBackground() {
+        if isStarting { invalidatePendingStart() }
         guard vad.isRunning else { return }
         backgroundTimer?.invalidate()
         backgroundTimer = Timer.scheduledTimer(withTimeInterval: Self.backgroundTimeout, repeats: false) { [weak self] _ in
             Task { @MainActor in
                 guard let self, self.vad.isRunning else { return }
                 VoiceLog.log("backgrounded \(Int(Self.backgroundTimeout))s — auto-stopping mic")
+                if self.composerSessionActive {
+                    self.finishFromComposer()
+                    return
+                }
                 self.stopListening()
             }
         }
@@ -302,6 +413,7 @@ final class VoiceInputViewModel: ObservableObject {
 
     /// Re-resolve the ASR provider (e.g. after the user switches engine).
     func refreshInputProvider() {
+        guard !isBusyForComposer else { return }
         resolveInputCandidates(reseed: false)
     }
 
@@ -318,8 +430,13 @@ final class VoiceInputViewModel: ObservableObject {
         }
         let active = activeInputEntry()
         inputProvider = active.flatMap { VoiceProviderResolver.inputProvider(for: $0) }
-            ?? SystemVoiceProvider.shared
+            ?? (active == nil ? SystemVoiceProvider.shared : nil)
         inputResolvedModel = active?.model
+        switch VoiceProviderResolver.resolvedSystemInputMode() {
+        case .offline: inputSystemOnDevice = true
+        case .online: inputSystemOnDevice = false
+        case .auto: inputSystemOnDevice = nil
+        }
         VoiceLog.log("ASR candidates: [\(inputCandidates.map { $0.model.displayName }.joined(separator: ", "))] active=\(active?.model.displayName ?? "System") sticky=\(stickyInputEntryId ?? "none")")
     }
 
@@ -353,7 +470,9 @@ final class VoiceInputViewModel: ObservableObject {
         ProviderConfigStore.shared.ensureDefaultVoiceOutputGroup()
         resolveInputCandidates(reseed: true)
         permissionDenied = (VoiceActivityDetector.microphonePermission == .denied)
-        state = .waiting
+        if !isStarting && !isFinishing && !vad.isRunning {
+            state = .waiting
+        }
         // Warm up the offline recognizer so the first utterance isn't dropped.
         prewarmIfSystem()
     }
@@ -367,15 +486,14 @@ final class VoiceInputViewModel: ObservableObject {
         }
     }
 
-    /// True when the resolved ASR is Apple's on-device recognizer — the only
-    /// case where Speech permission matters. Mirrors `prewarmIfSystem`'s test.
-    /// A nil `inputProvider` also counts: `transcribeWithFailover` falls back to
-    /// `SystemVoiceProvider.shared` when the candidate chain is empty.
+    /// 系统在线和离线识别均需 Speech 权限；无可用第三方配置不冒充系统入口。
     private var willUseSystemASR: Bool {
-        inputProvider == nil || inputProvider is SystemVoiceProvider
+        inputProvider is SystemVoiceProvider
     }
 
     func stopListening() {
+        if streamingSession != nil { finishFromComposer(); return }
+        invalidatePendingStart()
         vad.stop()
         state = .waiting
         listeningLabelToken &+= 1
@@ -383,8 +501,235 @@ final class VoiceInputViewModel: ObservableObject {
         recordingTipIndex = 0
         cancelIdleTimer()
         backgroundTimer?.invalidate(); backgroundTimer = nil
+        if !isFinishing {
+            composerSessionActive = false
+            composerHasDetectedSpeech = false
+        }
         // Capture stopped — reply TTS may resume.
         VoiceModePreference.shared.isCapturing = false
+    }
+
+    /// 调用方先解析模型并传入草稿；重复点击不会启动第二次录音。
+    func startFromComposer() {
+        guard !isBusyForComposer else { return }
+        waveformSource.reset()
+        startRequestGeneration &+= 1
+        let requestGeneration = startRequestGeneration
+        startError = nil
+        lastFailure = nil
+        transcribeError = nil
+        isStarting = true
+        Task { [weak self] in
+            guard let self else { return }
+            await self.startComposerCapture(requestGeneration: requestGeneration)
+        }
+    }
+
+    /// 停止后送出尾段，直到音频回调和识别都完成才允许编辑或发送。
+    func finishFromComposer() {
+        guard !isFinishing else { return }
+        if isStarting {
+            invalidatePendingStart()
+            return
+        }
+        if let streamingSession {
+            isFinishing = true
+            stopStreamingCapture()
+            streamingSession.finish()
+            return
+        }
+        guard composerSessionActive || vad.isRunning else { return }
+
+        isFinishing = true
+        composerSessionActive = true
+        finishFlushDispatchPending = vad.isRunning
+
+        if vad.isRunning {
+            let wasSpeaking = vad.isSpeaking
+            let duration = vad.runningDuration
+            vad.flush()
+            if !composerHasDetectedSpeech && !wasSpeaking && duration > 1.0 {
+                vad.flushRawFallback()
+            }
+            vad.stop()
+            state = .waiting
+            listeningLabelToken &+= 1
+            cancelTipCycle()
+            recordingTipIndex = 0
+            cancelIdleTimer()
+            backgroundTimer?.invalidate(); backgroundTimer = nil
+            cancelTotalRecordingTimer()
+            VoiceModePreference.shared.isCapturing = false
+        }
+
+        // 等 VAD 已排队的最终音频进入识别，期间保持忙碌，防止提前发送。
+        let finishGeneration = transcriptGeneration
+        DispatchQueue.main.async { [weak self] in
+            guard let self, self.isFinishing, self.transcriptGeneration == finishGeneration else { return }
+            self.flushPendingSegments()
+            self.finishFlushDispatchPending = false
+            self.completeComposerFinishIfDrained()
+        }
+    }
+
+    private func startComposerCapture(requestGeneration: Int) async {
+        guard requestGeneration == startRequestGeneration else { return }
+        defer {
+            if requestGeneration == startRequestGeneration {
+                isStarting = false
+                completeComposerFinishIfDrained()
+            }
+        }
+
+        switch VoiceActivityDetector.microphonePermission {
+        case .granted:
+            guard await ensureSpeechAuthReportingDenial(requestGeneration: requestGeneration) else { return }
+        case .undetermined:
+            let granted = await VoiceActivityDetector.requestMicrophonePermission()
+            guard requestGeneration == startRequestGeneration else { return }
+            guard granted else {
+                permissionDenied = true
+                report(.micPermissionDenied)
+                return
+            }
+            guard await ensureSpeechAuthReportingDenial(requestGeneration: requestGeneration) else { return }
+        case .denied:
+            permissionDenied = true
+            report(.micPermissionDenied)
+            return
+        }
+
+        guard requestGeneration == startRequestGeneration else { return }
+        guard let inputProvider else {
+            startError = VoiceInputFailure.noUsableProvider.message
+            report(.noUsableProvider)
+            return
+        }
+        if let streamingProvider = inputProvider as? any VoiceStreamingCapable {
+            startStreamingCapture(provider: streamingProvider)
+        } else {
+            usesRealtimeRecognition = false
+            hasUnconfirmedTranscript = false
+            startVAD(forComposer: true)
+        }
+    }
+
+    private func startStreamingCapture(provider: any VoiceStreamingCapable) {
+        VoiceOutputPlayer.shared.stopAll()
+        let generation = beginStreamingDraft()
+        // 解析模型时一并固定在线/离线选择，不在权限等待后重新读取全局设置。
+        let onDevice = inputSystemOnDevice
+        do {
+            let session = try provider.makeStreamingSession(language: language, onDevice: onDevice) { [weak self] event in
+                self?.receiveStreamingEvent(event, generation: generation)
+            }
+            streamingSession = session
+            VoiceModePreference.shared.isCapturing = true
+            try vad.start(streamingSession: session)
+            acceptsVADCallbacks = true
+            composerSessionActive = true
+            state = .recording
+            beginRecordingLabelCycle()
+            startRippleAnimation()
+            cancelIdleTimer()
+            startTotalRecordingTimer()
+        } catch {
+            cancelStreamingRecognition()
+            stopStreamingCapture()
+            composerSessionActive = false
+            startError = error.localizedDescription
+            report(.startFailed(error.localizedDescription))
+        }
+    }
+
+    /// 独立代次也供生命周期测试驱动真实的草稿合并入口，不启动麦克风。
+    @discardableResult
+    func beginStreamingDraft() -> UUID {
+        let generation = UUID()
+        streamingGeneration = generation
+        streamingDraft = VoiceStreamingDraft(base: transcript)
+        usesRealtimeRecognition = true
+        hasUnconfirmedTranscript = false
+        return generation
+    }
+
+    func receiveStreamingEvent(_ event: VoiceStreamingEvent, generation: UUID) {
+        guard generation == streamingGeneration else { return }
+        switch event {
+        case .partial(let segmentID, let text):
+            streamingDraft?.update(segmentID: segmentID, text: text, isFinal: false)
+            publishStreamingDraft()
+        case .final(let segmentID, let text):
+            streamingDraft?.update(segmentID: segmentID, text: text, isFinal: true)
+            publishStreamingDraft()
+        case .finished:
+            let hasDictatedText = streamingDraft?.hasDictatedText == true
+            endStreamingRecognition()
+            if !hasDictatedText { report(.noSpeechRecognized) }
+        case .failed(let detail):
+            // 保留最好结果，但明确说明尾句未经确认，不能伪装成成功终稿。
+            hasUnconfirmedTranscript = true
+            endStreamingRecognition()
+            transcribeError = "实时识别未完成；已保留显示的文字，请检查尾句。\(detail)"
+            report(.transcribeFailed(transcribeError!))
+        }
+    }
+
+    private func publishStreamingDraft() {
+        guard let text = streamingDraft?.text, transcript != text else { return }
+        transcript = text
+        onTranscript?(text)
+    }
+
+    private func stopStreamingCapture() {
+        acceptsVADCallbacks = false
+        vad.stop()
+        state = .waiting
+        listeningLabelToken &+= 1
+        cancelTipCycle()
+        cancelIdleTimer()
+        cancelTotalRecordingTimer()
+        backgroundTimer?.invalidate(); backgroundTimer = nil
+        VoiceModePreference.shared.isCapturing = false
+    }
+
+    private func endStreamingRecognition() {
+        stopStreamingCapture()
+        streamingGeneration = nil
+        streamingSession?.cancel()
+        streamingSession = nil
+        streamingDraft = nil
+        composerSessionActive = false
+        isFinishing = false
+    }
+
+    private func cancelStreamingRecognition() {
+        streamingGeneration = nil
+        streamingSession?.cancel()
+        streamingSession = nil
+        streamingDraft = nil
+    }
+
+    private func invalidatePendingStart() {
+        startRequestGeneration &+= 1
+        isStarting = false
+    }
+
+    private func completeComposerFinishIfDrained() {
+        guard isFinishing,
+              !finishFlushDispatchPending,
+              !vad.isRunning,
+              pendingTranscriptions == 0,
+              transcriptOrder.hasPending == false,
+              pendingSegments.isEmpty,
+              pendingFlushTimer == nil,
+              retryCountdown == nil,
+              currentAutoRetry == nil,
+              autoRetryQueue.isEmpty,
+              !isAutoRetryRequestRunning else { return }
+        isFinishing = false
+        composerSessionActive = false
+        composerHasDetectedSpeech = false
     }
 
     /// Mic button: start listening on the first tap (requesting permission if
@@ -392,6 +737,14 @@ final class VoiceInputViewModel: ObservableObject {
     /// (continuous dictation) — segments transcribe as silence is detected while
     /// capture keeps running, so we never stop it just to transcribe.
     func handleMainButtonTap() {
+        if composerSessionActive {
+            if vad.isRunning {
+                finishFromComposer()
+            } else {
+                startFromComposer()
+            }
+            return
+        }
         VoiceLog.log("[VoiceInputDebug] handleMainButtonTap called, state=\(state), vad.isRunning=\(vad.isRunning), isSpeaking=\(vad.isSpeaking), runningDuration=\(String(format: "%.1f", vad.runningDuration))s, ttsPlaying=\(VoiceOutputPlayer.shared.isPlaying), micPerm=\(VoiceActivityDetector.microphonePermission)")
         if vad.isRunning {
             let wasSpeaking = vad.isSpeaking
@@ -423,7 +776,7 @@ final class VoiceInputViewModel: ObservableObject {
             // System (offline) ASR also needs Speech permission — request it
             // (no-op once granted) before starting capture.
             Task {
-                await self.ensureSpeechAuthReportingDenial()
+                guard await self.ensureSpeechAuthReportingDenial() else { return }
                 self.prewarmIfSystem()
                 self.startVAD()
             }
@@ -444,7 +797,16 @@ final class VoiceInputViewModel: ObservableObject {
     /// Leaving it lets the text carry over; the next voice-mode entry re-seeds
     /// the transcript from inputText anyway (InlineVoiceInputView.onAppear).
     func reset(clearTranscript: Bool = true) {
+        acceptsVADCallbacks = false
+        invalidatePendingStart()
+        cancelAllTranscriptionWork()
         vad.stop()
+        composerSessionActive = false
+        composerHasDetectedSpeech = false
+        isFinishing = false
+        finishFlushDispatchPending = false
+        cancelPendingForceFlush()
+        pendingSegments.removeAll(keepingCapacity: true)
         if clearTranscript { transcript = "" }
         // [T-voice-panel-gap-after-edit] Leaving voice mode (mic/"T" toggle) while
         // the transcript editor was open used to leave this flag TRUE, so the next
@@ -467,7 +829,7 @@ final class VoiceInputViewModel: ObservableObject {
 
     // MARK: - Private
 
-    private func startVAD() {
+    private func startVAD(forComposer: Bool = false) {
         // Mutually exclusive with TTS playback: stop any reply being read aloud so
         // it doesn't echo into the mic / fight the audio session, and mark capture
         // active so further reply TTS is suppressed until we stop.
@@ -488,16 +850,27 @@ final class VoiceInputViewModel: ObservableObject {
             let isSystemASR = inputProvider is SystemVoiceProvider
             vad.maxSegmentSeconds = isSystemASR ? 59 : Self.maxTotalRecordingSeconds
             try vad.start()
+            acceptsVADCallbacks = true
+            composerSessionActive = forComposer
+            composerHasDetectedSpeech = false
             state = .recording
             startError = nil
             transcribeError = nil
             lastFailure = nil
             beginRecordingLabelCycle()
             startRippleAnimation()
-            resetIdleTimer()
+            if forComposer {
+                // Composer sessions may wait as long as needed before the first
+                // utterance. The legacy voice panel keeps its idle timeout.
+                cancelIdleTimer()
+            } else {
+                resetIdleTimer()
+            }
             startTotalRecordingTimer()
             VoiceLog.log("[VoiceInputDebug] startVAD OK — state=.recording")
         } catch {
+            composerSessionActive = false
+            composerHasDetectedSpeech = false
             VoiceModePreference.shared.isCapturing = false
             logger.error("Failed to start VAD: \(error.localizedDescription)")
             // [VoiceInputDebug] This is the branch that produced the reported
@@ -522,7 +895,7 @@ final class VoiceInputViewModel: ObservableObject {
             report(.micPermissionDenied)
             return
         }
-        await ensureSpeechAuthReportingDenial()
+        guard await ensureSpeechAuthReportingDenial() else { return }
         prewarmIfSystem()
         startVAD()
     }
@@ -539,10 +912,13 @@ final class VoiceInputViewModel: ObservableObject {
     /// Only reported when the system ASR is actually the one that would run;
     /// with a remote (Whisper-style) provider configured, Speech permission is
     /// irrelevant and warning about it would be noise.
-    private func ensureSpeechAuthReportingDenial() async {
+    private func ensureSpeechAuthReportingDenial(requestGeneration: Int? = nil) async -> Bool {
+        guard willUseSystemASR else { return true }
         let ok = await SystemVoiceProvider.ensureSpeechAuthorization()
-        guard !ok, willUseSystemASR else { return }
+        if let requestGeneration, requestGeneration != startRequestGeneration { return false }
+        guard !ok, willUseSystemASR else { return true }
         report(.speechPermissionDenied)
+        return false
     }
 
     private func beginRecordingLabelCycle() {
@@ -615,6 +991,7 @@ final class VoiceInputViewModel: ObservableObject {
     /// Bumped on send/clear; in-flight transcriptions tagged with an older value
     /// discard their result so they can't repopulate the emptied composer.
     private var transcriptGeneration = 0
+    private var transcriptOrder = VoiceTranscriptOrderBuffer()
 
     #if DEBUG
     /// VAD context for the debug voice-input capture (`debug.voiceInputs`),
@@ -641,6 +1018,18 @@ final class VoiceInputViewModel: ObservableObject {
 
         switch reason {
         case .silenceDetected:
+            if composerSessionActive {
+                // A pause closes this ASR segment, but the composer keeps the mic
+                // open so the user can continue the same draft later.
+                guard totalSeconds >= 0.3 else { return }
+                #if DEBUG
+                noteMergeContext(count: pendingSegments.count, reason: reason)
+                #endif
+                let merged = Self.mergeWavSegments(pendingSegments)
+                pendingSegments.removeAll(keepingCapacity: true)
+                transcribeMerged(merged)
+                return
+            }
             vad.stop()
             state = .waiting
             listeningLabelToken &+= 1
@@ -677,6 +1066,11 @@ final class VoiceInputViewModel: ObservableObject {
             transcribeMerged(merged)
 
         case .manualFlush:
+            if isFinishing {
+                // The finish barrier merges short utterances after this async
+                // delegate callback, once all VAD output has reached the main queue.
+                return
+            }
             guard totalSeconds >= Self.minSegmentSeconds else {
                 schedulePendingForceFlush()
                 return
@@ -708,6 +1102,10 @@ final class VoiceInputViewModel: ObservableObject {
             Task { @MainActor in
                 guard let self, self.vad.isRunning else { return }
                 VoiceLog.log("total recording cap (\(Int(Self.maxTotalRecordingSeconds))s) reached — full auto-stop")
+                if self.composerSessionActive {
+                    self.finishFromComposer()
+                    return
+                }
                 self.vad.flush()
                 DispatchQueue.main.async { [weak self] in self?.flushPendingSegments() }
                 self.vad.stop()
@@ -741,7 +1139,16 @@ final class VoiceInputViewModel: ObservableObject {
         }
     }
 
-    private func startRetryCountdown() {
+    private func startRetryCountdown(for request: VoiceAutoRetryRequest) {
+        autoRetryQueue.append(request)
+        startNextAutoRetryCountdown()
+    }
+
+    private func startNextAutoRetryCountdown() {
+        guard retryCountdown == nil,
+              !isAutoRetryRequestRunning,
+              !autoRetryQueue.isEmpty else { return }
+        currentAutoRetry = autoRetryQueue.removeFirst()
         retryCountdown = 5
         canManualRetry = false
         retryTimer?.invalidate()
@@ -760,19 +1167,20 @@ final class VoiceInputViewModel: ObservableObject {
     }
 
     private func executeRetry() {
-        guard let data = retryAudioData else { return }
-        isAutoRetry = true
+        guard let request = currentAutoRetry else { return }
         retryAudioData = nil
         transcribeError = nil
-        transcribeAudio(data)
+        lastFailure = nil
+        isAutoRetryRequestRunning = true
+        transcribeAudio(request.audioData, sequence: request.sequence, isAutomaticRetry: true)
     }
 
     func manualRetry() {
         guard let data = retryAudioData else { return }
         canManualRetry = false
-        isAutoRetry = false
         retryAudioData = nil
         transcribeError = nil
+        lastFailure = nil
         transcribeAudio(data)
     }
 
@@ -790,6 +1198,23 @@ final class VoiceInputViewModel: ObservableObject {
     private func cancelPendingForceFlush() {
         pendingFlushTimer?.invalidate()
         pendingFlushTimer = nil
+    }
+
+    private func cancelAllTranscriptionWork() {
+        cancelStreamingRecognition()
+        for task in pendingTranscriptionTasks { task.cancel() }
+        pendingTranscriptionTasks.removeAll()
+        transcriptGeneration &+= 1
+        transcriptOrder.reset()
+        pendingTranscriptions = 0
+        retryTimer?.invalidate()
+        retryTimer = nil
+        retryCountdown = nil
+        retryAudioData = nil
+        canManualRetry = false
+        autoRetryQueue.removeAll(keepingCapacity: true)
+        currentAutoRetry = nil
+        isAutoRetryRequestRunning = false
     }
 
     /// Flush whatever sub-threshold audio is pending NOW (e.g. on pause / send),
@@ -822,8 +1247,10 @@ final class VoiceInputViewModel: ObservableObject {
 
     /// Transcribe ONE (possibly merged) utterance. The VAD engine keeps running
     /// the whole time, so while this is transcribed the next utterance is still
-    /// captured. Results append in completion order.
-    private func transcribeAudio(_ audioData: Data) {
+    /// captured. Results append in capture order.
+    private func transcribeAudio(_ audioData: Data,
+                                 sequence: Int? = nil,
+                                 isAutomaticRetry: Bool = false) {
         guard !audioData.isEmpty else { return }
         // While the user hand-edits the transcript, drop new speech so it can't
         // overwrite their corrections.
@@ -870,6 +1297,7 @@ final class VoiceInputViewModel: ObservableObject {
         #endif
 
         let generation = transcriptGeneration
+        let requestSequence = sequence ?? transcriptOrder.reserve()
         let candidates = orderedInputCandidates()
         let requestLanguage = language
         let task = Task { [weak self] in
@@ -881,19 +1309,23 @@ final class VoiceInputViewModel: ObservableObject {
             // "no speech recognized" report on the next empty-but-successful
             // attempt, re-creating the exact silent failure this fixes.
             var attemptFailed = false
+            var retryScheduled = false
             do {
                 try Task.checkCancellation()
                 text = try await self.transcribeWithFailover(audioData: audioData,
                                                              candidates: candidates,
                                                              language: requestLanguage,
                                                              onDevice: onDevice)
+                guard generation == self.transcriptGeneration, !Task.isCancelled else { return }
                 VoiceLog.log("transcript: \"\(text)\"")
                 self.transcribeError = nil
             } catch is CancellationError {
-                VoiceLog.log("transcription task cancelled")
-                return
+                guard generation == self.transcriptGeneration, !Task.isCancelled else { return }
+                // 服务主动取消也必须释放该段，避免面板永久停在转录中。
+                attemptFailed = true
+                self.report(.transcribeFailed(AppLocalized("Transcription cancelled")))
             } catch {
-                if Task.isCancelled {
+                if Task.isCancelled || generation != self.transcriptGeneration {
                     VoiceLog.log("transcription task cancelled (post-error)")
                     return
                 }
@@ -914,11 +1346,12 @@ final class VoiceInputViewModel: ObservableObject {
                 } else {
                     self.lastFailure = failure
                 }
-                if Self.isTransientNetworkError(error) && !self.isAutoRetry {
-                    self.retryAudioData = audioData
-                    self.startRetryCountdown()
-                } else if Self.isTransientNetworkError(error) && self.isAutoRetry {
-                    self.isAutoRetry = false
+                if Self.isTransientNetworkError(error) && !isAutomaticRetry {
+                    self.retryAudioData = nil
+                    self.startRetryCountdown(for: VoiceAutoRetryRequest(audioData: audioData,
+                                                                         sequence: requestSequence))
+                    retryScheduled = true
+                } else if Self.isTransientNetworkError(error) && isAutomaticRetry {
                     self.canManualRetry = true
                     self.retryAudioData = audioData
                 } else {
@@ -926,33 +1359,49 @@ final class VoiceInputViewModel: ObservableObject {
                     self.canManualRetry = false
                 }
             }
-            if generation == self.transcriptGeneration,
-               !text.isEmpty, !self.isEditingTranscript {
-                self.transcript = self.transcript.isEmpty ? text : self.transcript + " " + text
-                VoiceLog.log("UI update: text=\"\(self.transcript)\"")
-                self.onTranscript?(self.transcript)
-            } else if generation != self.transcriptGeneration {
+            if generation != self.transcriptGeneration {
                 // Superseded by clearAndRearm()/cancelTranscription() (e.g. the
                 // user sent the message while this was in flight). Expected —
                 // record it, but don't nag.
                 VoiceLog.log("[voice-failure] staleGeneration: result dropped (gen \(generation) != \(self.transcriptGeneration))")
-            } else if self.isEditingTranscript {
-                self.report(.droppedWhileEditing)
-            } else if !attemptFailed {
-                // [T-voice-input-failure-feedback] (#134) The request SUCCEEDED
-                // and returned an empty string. This is the path that used to
-                // vanish without a trace: no throw, no error pill, no transcript
-                // change. Whisper returning "", the chat-ASR prompt honoring
-                // "output an empty string", and SystemVoiceProvider's 8s
-                // watchdog salvaging an empty result all land here.
-                self.report(.noSpeechRecognized)
-            }
-            if self.pendingTranscriptions > 0 {
-                self.pendingTranscriptions -= 1
+            } else {
+                if !retryScheduled {
+                    if self.isEditingTranscript {
+                        self.report(.droppedWhileEditing)
+                        self.releaseTranscriptionResult(sequence: requestSequence, text: "")
+                    } else if !text.isEmpty {
+                        self.releaseTranscriptionResult(sequence: requestSequence, text: text)
+                    } else {
+                        if !attemptFailed {
+                            // [T-voice-input-failure-feedback] (#134) A successful
+                            // request can still return no speech; release its slot so
+                            // later utterances remain ordered.
+                            self.report(.noSpeechRecognized)
+                        }
+                        self.releaseTranscriptionResult(sequence: requestSequence, text: "")
+                    }
+                }
+                if self.pendingTranscriptions > 0 {
+                    self.pendingTranscriptions -= 1
+                }
+                if isAutomaticRetry {
+                    self.isAutoRetryRequestRunning = false
+                    self.currentAutoRetry = nil
+                    self.startNextAutoRetryCountdown()
+                }
+                self.completeComposerFinishIfDrained()
             }
         }
         pendingTranscriptionTasks.removeAll { $0.isCancelled }
         pendingTranscriptionTasks.append(task)
+    }
+
+    private func releaseTranscriptionResult(sequence: Int, text: String) {
+        for readyText in transcriptOrder.resolve(sequence, text: text) {
+            transcript = transcript.isEmpty ? readyText : transcript + " " + readyText
+            VoiceLog.log("UI update: text=\"\(transcript)\"")
+            onTranscript?(transcript)
+        }
     }
 
     /// Transcribe one utterance with SEAMLESS fail-over across the candidate
@@ -996,6 +1445,7 @@ final class VoiceInputViewModel: ObservableObject {
                                             onDeviceRecognition: onDevice)
             do {
                 let text = try await provider.transcribe(request).text
+                try Task.checkCancellation()
                 if stickyInputEntryId != entry.id {
                     stickyInputEntryId = entry.id
                     inputProvider = provider
@@ -1021,21 +1471,26 @@ final class VoiceInputViewModel: ObservableObject {
     }
 
     func cancelTranscription() {
-        for task in pendingTranscriptionTasks { task.cancel() }
-        pendingTranscriptionTasks.removeAll()
-        transcriptGeneration &+= 1
-        pendingTranscriptions = 0
+        if streamingSession != nil { stopStreamingCapture() }
+        cancelAllTranscriptionWork()
+        if isFinishing {
+            isFinishing = false
+            finishFlushDispatchPending = false
+            if !vad.isRunning { composerSessionActive = false }
+        }
         VoiceLog.log("transcription cancelled by user tap")
     }
 
-    /// After a send: clear the accumulated transcript and STOP capturing. The
-    /// user stays in voice mode (the inline panel remains), but the mic is no
-    /// longer listening — they tap the mic again to dictate the next message.
+    /// 发送后清理本轮录音；聊天页负责回到文字入口。
     func clearAndRearm() {
-        // Invalidate any in-flight transcription so a late result can't refill the
-        // field after the send (residual-text bug).
-        transcriptGeneration &+= 1
+        acceptsVADCallbacks = false
+        invalidatePendingStart()
+        cancelAllTranscriptionWork()
         transcript = ""
+        isFinishing = false
+        finishFlushDispatchPending = false
+        composerSessionActive = false
+        composerHasDetectedSpeech = false
         if isEditingTranscript { VoiceLog.log("[voice-edit-site] clearAndRearm(send) true→false") }
         isEditingTranscript = false
         // The message was sent — drop any sub-threshold audio still pending so it
@@ -1043,7 +1498,11 @@ final class VoiceInputViewModel: ObservableObject {
         cancelPendingForceFlush()
         pendingSegments.removeAll(keepingCapacity: true)
         // Stop the mic on send (and cancel idle/background timers via stopListening).
-        if vad.isRunning { stopListening() }
+        vad.stop()
+        cancelIdleTimer()
+        cancelTotalRecordingTimer()
+        backgroundTimer?.invalidate(); backgroundTimer = nil
+        VoiceModePreference.shared.isCapturing = false
         state = .waiting
         // Signal the inline view to collapse to compact mode after a send.
         collapseAfterSendToken &+= 1
@@ -1061,6 +1520,7 @@ final class VoiceInputViewModel: ObservableObject {
             VoiceLog.log("[voice-edit-site] beginEditing() ignored — already editing")
             return
         }
+        guard streamingSession == nil else { finishFromComposer(); return }
         VoiceLog.log("[voice-edit-site] beginEditing(double-tap) false→true state=\(state)")
         isEditingTranscript = true
         // [voice-correction §5] Snapshot the pre-edit text. Whatever the user changes from
@@ -1104,19 +1564,27 @@ final class VoiceInputViewModel: ObservableObject {
 
     /// Sync external (input-box) edits back into the transcript.
     func setTranscript(_ text: String) {
+        guard transcript != text else { return }
+        if streamingGeneration != nil {
+            // 外部编辑优先，先失效旧回调，避免下一次中间结果覆盖手动修改。
+            cancelStreamingRecognition()
+            stopStreamingCapture()
+            composerSessionActive = false
+            isFinishing = false
+        }
         transcript = text
     }
 
     /// Delete the last character of the transcript (backspace).
     func deleteLastCharacter() {
         guard !transcript.isEmpty else { return }
-        transcript.removeLast()
+        setTranscript(String(transcript.dropLast()))
     }
 
     /// Clear the whole transcript (the "clear all" affordance).
     func clearTranscript() {
         guard !transcript.isEmpty else { return }
-        transcript = ""
+        setTranscript("")
     }
 }
 
@@ -1124,27 +1592,43 @@ final class VoiceInputViewModel: ObservableObject {
 
 extension VoiceInputViewModel: VoiceActivityDelegate {
     func voiceActivityDidStart() {
+        guard acceptsVADCallbacks, vad.isRunning else { return }
         VoiceLog.log("delegate voiceActivityDidStart (state=\(state), editing=\(isEditingTranscript))")
         // Ignore detected speech while the user is hand-editing the transcript.
         guard !isEditingTranscript else { return }
         state = .recording
-        // Speech detected — push the no-speech idle deadline back out.
-        resetIdleTimer()
+        if composerSessionActive {
+            composerHasDetectedSpeech = true
+            cancelIdleTimer()
+        } else {
+            // Legacy voice-panel mode retains its no-speech timeout.
+            resetIdleTimer()
+        }
     }
 
     func voiceActivityDidEnd(audioData: Data, reason: SegmentEndReason) {
+        guard acceptsVADCallbacks, streamingSession == nil else { return }
         handleSegment(audioData, reason: reason)
     }
 
     func voiceActivityDidUpdate(pcmData: Data) {
-        waveformLevels = Self.computeWaveformLevels(from: pcmData)
+        guard acceptsVADCallbacks else { return }
+        waveformSource.update(Self.computeWaveformLevels(from: pcmData))
     }
 
     /// Capture was interrupted (call/Siri/route) and couldn't auto-resume — reset
     /// to idle so the mic button reflects "stopped" instead of a frozen waveform.
     func voiceActivityInterrupted() {
+        guard acceptsVADCallbacks else { return }
+        if let generation = streamingGeneration {
+            streamingSession?.cancel()
+            receiveStreamingEvent(.failed("录音被系统中断，请重新开始。"), generation: generation)
+            return
+        }
         // Flush any audio captured before the interruption, then return to idle.
         flushPendingSegments()
+        composerSessionActive = false
+        composerHasDetectedSpeech = false
         state = .waiting
         listeningLabelToken &+= 1
         cancelTipCycle()
@@ -1155,27 +1639,28 @@ extension VoiceInputViewModel: VoiceActivityDelegate {
         startError = AppLocalized("Recording was interrupted — tap the mic to resume", comment: "Voice capture interrupted")
     }
 
-    private static func computeWaveformLevels(from pcmData: Data) -> [Float] {
-        let count = 20
-        let samples = pcmData.withUnsafeBytes { ptr -> [Float] in
-            guard let base = ptr.baseAddress?.assumingMemoryBound(to: Float.self) else { return [] }
-            return Array(UnsafeBufferPointer(start: base, count: pcmData.count / 4))
-        }
-        guard !samples.isEmpty else { return Array(repeating: 0.1, count: count) }
-
-        let chunkSize = max(1, samples.count / count)
-        return (0..<count).map { i in
-            let start = i * chunkSize
-            let end = min(start + chunkSize, samples.count)
-            guard start < end else { return 0.05 }
-            let chunk = samples[start..<end]
-            let rms = sqrt(chunk.map { $0 * $0 }.reduce(0, +) / Float(chunk.count))
-            // Perceptual curve: quiet speech has a tiny linear RMS, so `rms * 8`
-            // saturated to the floor and the bars looked frozen. Take a sqrt to
-            // lift low amplitudes, apply a higher gain, and use a very small floor
-            // so silence reads as near-flat while any sound visibly moves.
-            let level = sqrt(min(1.0, rms * 14)) * 0.95
-            return min(1.0, max(0.04, level))
+    static func computeWaveformLevels(from pcmData: Data) -> [Float] {
+        // 直接遍历 PCM，避免先复制整块音频、再为每条柱生成临时平方数组。
+        pcmData.withUnsafeBytes { bytes in
+            let count = 20
+            let sampleCount = bytes.count / MemoryLayout<Float>.size
+            var levels = Array(repeating: Float(0.04), count: count)
+            guard sampleCount > 0 else { return levels }
+            let chunkSize = max(1, sampleCount / count)
+            for i in 0..<count {
+                let start = i * chunkSize
+                let end = min(start + chunkSize, sampleCount)
+                guard start < end else { continue }
+                var sum: Float = 0
+                for sampleIndex in start..<end {
+                    let sample = bytes.loadUnaligned(fromByteOffset: sampleIndex * MemoryLayout<Float>.size, as: Float.self)
+                    if sample.isFinite { sum += sample * sample }
+                }
+                let rms = sqrt(sum / Float(end - start))
+                let level = sqrt(min(1.0, rms * 14)) * 0.95
+                levels[i] = min(1.0, max(0.04, level))
+            }
+            return levels
         }
     }
 

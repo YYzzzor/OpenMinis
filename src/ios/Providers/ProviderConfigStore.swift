@@ -459,6 +459,16 @@ final class ProviderConfigStore: ObservableObject {
         // Tests don't open the DB by default.
     }
 
+    #if DEBUG
+    /// Canvas 使用独立样本，不读取真实配置，也不启动数据库迁移或同步。
+    init(previewConfig: ProviderConfig) {
+        self.fileURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("voice-preview-\(UUID().uuidString).json")
+        self.config = previewConfig
+        self.lastSavedSnapshot = previewConfig
+    }
+    #endif
+
     /// Async DB open + one-shot migration from provider-config.json.
     /// Runs off the main thread so a slow open doesn't block UI launch.
     private static func setupDBAndMigrate(jsonURL: URL, completion: @escaping (ProviderConfigDB?) -> Void) {

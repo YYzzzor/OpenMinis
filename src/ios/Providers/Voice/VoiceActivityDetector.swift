@@ -51,6 +51,11 @@ final class VoiceActivityDetector: NSObject {
     private let audioEngine = AVAudioEngine()
     private let vadQueue = DispatchQueue(label: "com.openminis.app.vad", qos: .userInteractive)
     private var vad: VADWrapper?
+    // 仅由控制线程设置；音频 tap 捕获固定会话，停止后不再读取可变引用。
+    private var streamingSession: (any VoiceStreamingSession)?
+    private let waveformDeliveryLock = NSLock()
+    private var waveformDeliveryPending = false
+    private var liveWaveformFrame = 0
 
     // MARK: - Adaptive gain (noise-aware AGC)
     /// Smoothed gain carried frame-to-frame so it doesn't jump on transients.
@@ -163,8 +168,18 @@ final class VoiceActivityDetector: NSObject {
     // MARK: - Control
 
     /// Begin listening. Caller must hold microphone permission first.
-    func start() throws {
+    func start(streamingSession: (any VoiceStreamingSession)? = nil) throws {
         guard !isRunning else { return }
+        self.streamingSession = streamingSession
+        do {
+            try startCapture()
+        } catch {
+            tearDown()
+            throw error
+        }
+    }
+
+    private func startCapture() throws {
         try configureSession()
         try setupEngineAndVAD()
         // `audioEngine.start()` can throw an Objective-C NSException (not a Swift
@@ -193,8 +208,8 @@ final class VoiceActivityDetector: NSObject {
         fullSessionTruncated = false
         captureLock.unlock()
         let sessionId = UUID().uuidString
-        currentSessionId = sessionId
-        VoiceInputCapture.shared.beginSession(id: sessionId)
+        currentSessionId = streamingSession == nil ? sessionId : nil
+        if streamingSession == nil { VoiceInputCapture.shared.beginSession(id: sessionId) }
         #endif
         isRunning = true
         interruptedWhileRunning = false
@@ -226,6 +241,10 @@ final class VoiceActivityDetector: NSObject {
         guard let info = note.userInfo,
               let raw = info[AVAudioSessionInterruptionTypeKey] as? UInt,
               let type = AVAudioSession.InterruptionType(rawValue: raw) else { return }
+        if streamingSession != nil, type == .began {
+            fullStopFromInterruption()
+            return
+        }
         switch type {
         case .began:
             if isRunning {
@@ -256,6 +275,10 @@ final class VoiceActivityDetector: NSObject {
         // A route change (e.g. AirPods unplugged) can stop the engine. If we think
         // we're running but the engine actually stopped, rebuild it.
         guard isRunning, !audioEngine.isRunning else { return }
+        if streamingSession != nil {
+            fullStopFromInterruption()
+            return
+        }
         VoiceLog.log("route change while running but engine stopped — resuming")
         attemptResume()
     }
@@ -468,6 +491,7 @@ final class VoiceActivityDetector: NSObject {
         _ = noff_try_objc { self.audioEngine.inputNode.removeTap(onBus: 0) }
         vad?.delegate = nil
         vad = nil
+        streamingSession = nil
         isRunning = false
         isSpeaking = false
         // Belt-and-braces: drop any segment residue so the NEXT start() begins
@@ -539,27 +563,31 @@ final class VoiceActivityDetector: NSObject {
             throw VoiceProviderError.parseError("Microphone input unavailable")
         }
 
-        guard let wrapper = VADWrapper() else {
-            throw VoiceProviderError.parseError("Failed to initialize VAD")
+        if streamingSession == nil {
+            guard let wrapper = VADWrapper() else {
+                throw VoiceProviderError.parseError("Failed to initialize VAD")
+            }
+            wrapper.setSileroModel(.v5)
+            wrapper.setSamplerate(Self.sampleRateEnum(for: sampleRate))
+            wrapper.setThresholdWithVadStartDetectionProbability(
+                configuration.startProbability,
+                vadEndDetectionProbability: configuration.endProbability,
+                voiceStartVadTrueRatio: configuration.voiceStartTrueRatio,
+                voiceEndVadFalseRatio: configuration.voiceEndFalseRatio,
+                voiceStartFrameCount: Int32(configuration.voiceStartFrameCount),
+                voiceEndFrameCount: Int32(configuration.voiceEndFrameCount)
+            )
+            wrapper.delegate = self
+            self.vad = wrapper
         }
-        wrapper.setSileroModel(.v5)
-        wrapper.setSamplerate(Self.sampleRateEnum(for: sampleRate))
-        wrapper.setThresholdWithVadStartDetectionProbability(
-            configuration.startProbability,
-            vadEndDetectionProbability: configuration.endProbability,
-            voiceStartVadTrueRatio: configuration.voiceStartTrueRatio,
-            voiceEndVadFalseRatio: configuration.voiceEndFalseRatio,
-            voiceStartFrameCount: Int32(configuration.voiceStartFrameCount),
-            voiceEndFrameCount: Int32(configuration.voiceEndFrameCount)
-        )
-        wrapper.delegate = self
-        self.vad = wrapper
 
+        let stream = streamingSession
         // 512-frame buffer (~10 ms @ 48 kHz) matches the VAD frame size.
         // installTap can also throw an ObjC NSException — wrap it.
         let installed = noff_try_objc {
             inputNode.installTap(onBus: 0, bufferSize: 512, format: inputFormat) { [weak self] buffer, _ in
-                self?.processAudioBuffer(buffer)
+                if let stream { self?.processLiveAudioBuffer(buffer, session: stream) }
+                else { self?.processAudioBuffer(buffer) }
             }
         }
         if !installed {
@@ -569,7 +597,8 @@ final class VoiceActivityDetector: NSObject {
             VoiceLog.log("installTap explicit format failed; retrying with nil (native) format")
             let retried = noff_try_objc {
                 inputNode.installTap(onBus: 0, bufferSize: 512, format: nil) { [weak self] buffer, _ in
-                    self?.processAudioBuffer(buffer)
+                    if let stream { self?.processLiveAudioBuffer(buffer, session: stream) }
+                    else { self?.processAudioBuffer(buffer) }
                 }
             }
             guard retried else {
@@ -591,6 +620,27 @@ final class VoiceActivityDetector: NSObject {
     }
 
     private var tapFrameCounter = 0
+
+    /// 连续识别不等待 VAD，也不累积 WAV 或调试录音；波形最多约 20Hz、一次待派发。
+    private func processLiveAudioBuffer(_ buffer: AVAudioPCMBuffer, session: any VoiceStreamingSession) {
+        session.append(buffer: buffer)
+        liveWaveformFrame += Int(buffer.frameLength)
+        guard liveWaveformFrame >= Int(buffer.format.sampleRate / 20) else { return }
+        liveWaveformFrame = 0
+        guard let channel = buffer.floatChannelData?[0], waveformDeliveryLock.try() else { return }
+        guard !waveformDeliveryPending else { waveformDeliveryLock.unlock(); return }
+        waveformDeliveryPending = true
+        waveformDeliveryLock.unlock()
+        let data = Data(bytes: channel, count: Int(buffer.frameLength) * MemoryLayout<Float>.size)
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.waveformDeliveryLock.lock()
+            self.waveformDeliveryPending = false
+            self.waveformDeliveryLock.unlock()
+            guard self.isRunning, self.streamingSession != nil else { return }
+            self.delegate?.voiceActivityDidUpdate(pcmData: data)
+        }
+    }
 
     private func processAudioBuffer(_ buffer: AVAudioPCMBuffer) {
         guard let channelData = buffer.floatChannelData else { return }
