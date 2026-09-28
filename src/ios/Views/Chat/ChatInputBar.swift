@@ -1338,9 +1338,16 @@ class PastableUITextView: UITextView, UIDropInteractionDelegate {
     }
 }
 
-private enum ChatInputTypography {
+enum ChatInputTypography {
     // 输入文字、占位文字与上下文数字共用字号，避免三者随设置变化后大小不一致。
     static let baseFontSize: CGFloat = 16.5
+
+    // 空白和单行草稿预留两行空间，随输入字号设置变化。
+    @MainActor
+    static var minimumTextHeight: CGFloat {
+        let fontSize = FontSettings.shared.scaledChatInput(baseFontSize)
+        return ceil(UIFont.systemFont(ofSize: fontSize).lineHeight * 2)
+    }
 }
 
 struct PastableTextView: UIViewRepresentable {

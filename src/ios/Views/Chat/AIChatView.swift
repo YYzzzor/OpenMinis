@@ -3569,6 +3569,7 @@ struct AIChatView: View {
                 field.frame(height: height)
             } else {
                 field.fixedSize(horizontal: false, vertical: true)
+                    .frame(minHeight: ChatInputTypography.minimumTextHeight, alignment: .top)
             }
         }
         .padding(.horizontal, 16)
