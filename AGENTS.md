@@ -123,6 +123,12 @@ When explaining code at the user's request, explain the actual effect of relevan
 - For an upstream upgrade, inspect the requested official branch or fixed commit, compare it with the MinisX baseline, and preserve the accepted customizations and Harness. Do not replace or rebase `main` onto official `upstream/main` merely to enforce the former mirror convention. Preserve existing annotation/history branches unless the user requests changes to them.
 - When resolving conflicts, verify that affected comments are still correct for the new implementation. Do not preserve text without checking the changed code.
 
+## Resource Efficiency
+
+- Keeping resource costs within reasonable bounds is mandatory at all times, across every feature and all development stages, including prototypes, debugging and validation. Treat CPU, GPU, memory, energy, network, disk and background work as part of correctness and quality, not optional polish.
+- Follow [Resource efficiency and performance review](docs/specs/resource-efficiency.md). Avoid unnecessary work, bound sustained work and growing resources, and tie cancellation and cleanup to actual lifecycle needs. Do not sacrifice correctness or add unproven complexity merely to claim optimization.
+- Resource efficiency is a required focus of both author checks and independent reviews. Explicitly include this specification in every review's required material; record relevant resource impact, evidence and unverified limits. Pure documentation changes may be marked not applicable with a reason. A build or smooth-looking demo does not establish measured device performance.
+
 ## Changes and Validation
 
 - Modify only the files and areas requested by the user.
@@ -167,6 +173,7 @@ The user-facing guide is [项目技能使用说明](docs/harness/skills-guide.md
 
 | Document | Read when working on |
 | --- | --- |
+| `docs/specs/resource-efficiency.md` | All development stages and every review; mandatory resource bounds, lifecycle efficiency and performance evidence |
 | `docs/specs/debug-server-api.md` | Debug server connection/protocol, provider management, chat automation or browser/log debugging |
 | `docs/specs/ios-sandbox-ish-summary.md` | iSH integration, mounts, native offloads or Agent command execution |
 | `docs/specs/ios-device-data-capabilities.md` | Current iOS data read/write capabilities, Agent-facing commands, permissions and implementation limits |
