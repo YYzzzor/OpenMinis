@@ -4,84 +4,80 @@ description: MinisX iOS App 内 Skill 的导入更新、元数据发现、会话
 
 # MinisX iOS Skill 生命周期
 
-导航：[Spec 索引](index.md)；全局文件地址见[URL作用域](minis-url-scheme.md#全局资源)，副作用见[工具权限](ios-tool-permissions-and-side-effects.md)，同步与备份分别见[同步](ios-sync-and-conflict-resolution.md)和[备份恢复](ios-backup-restore.md)。
+导航：[Spec 索引](index.md)；全局文件地址见 [URL 作用域](minis-url-scheme.md)，副作用见 [工具权限](ios-tool-permissions-and-side-effects.md)，同步与备份见 [同步](ios-sync-and-conflict-resolution.md) 和 [备份恢复](ios-backup-restore.md)。
 
-Skill是App内可安装的`SKILL.md`及附件包，不是仓库`.agents/skills`开发协作技能，也不是已注册的原生工具。本文记录2026-09-30当前工作区静态状态、延续已有权限/证据规范的维护要求及未决语义，没有运行或真机验收。不能把“文件存在、已启用、描述已注入、正文已读取、模型执行正确”当成同一状态。
+范围：App 内可安装的 Skill（`SKILL.md` 及附件包）。它不是仓库 `.agents/skills` 下的开发协作技能，也不是注册的原生工具。“文件存在”“已启用”“描述已注入”“正文已读取”“模型执行正确”是五种不同状态，不能互相推断。
 
-## 范围、状态与来源
+## 身份与文件
 
-主要入口：[SkillStore](../../src/ios/Agent/Session/SkillStore.swift)、[SkillsManagementView](../../src/ios/Views/Skills/SkillsManagementView.swift)、[SessionSkillsView](../../src/ios/Views/Chat/SessionSkillsView.swift)、[SlashCommands](../../src/ios/Agent/Chat/AIChatViewModel+SlashCommands.swift)、[ConcurrentTools](../../src/ios/Agent/Chat/AIChatViewModel+ConcurrentTools.swift)和[V2 hydrators](../../src/ios/Agent/Sync/V2/ChatStoreSyncHydrators.swift)。
+- **I1** SkillStore 在 `skills.db` 中保存 id、名称、描述、版本、来源、全局启用状态和时间；正文和附件存放在全局技能目录。
+- **I2** 常规导入以名称 slugify 得到 id。同 id 重新导入会覆盖内容，并保留原有的启用状态和安装时间；它不是创建新版本。
+- **I3** 在 shell 中新建的目录由 `reconcileOrphanSkill` 注册：id 取目录名，来源标为 `session`。这个来源标签不表示技能是会话私有的。
+- **I4** `/var/minis/skills/<id>/SKILL.md` 与 `minis://skills/...` 是全局资源，其他会话可以读取。改名只更新名称，不改变目录 id 和既有链接。
 
-## 身份、文件与作用域
+## 导入与更新
 
-SkillStore将id、名称、描述、版本、来源、全局启用状态与时间保存于skills.db，正文和附件保存于全局技能目录。常规importSkill将名称slugify得到id，同id重导入更新内容并保留原启用状态/安装时间；这是覆盖身份规则，不是每次导入创建全新版本。
-
-shell新建目录通过reconcileOrphanSkill注册时保留目录名作为id，来源为session；这个来源标签不意味着会话私有技能。`/var/minis/skills/<id>/SKILL.md`与`minis://skills/...`为全局文件资源，可以被其他会话读取。rename更新名称不能据此推断目录id或既有链接同时改变。
-
-## 导入、更新与失败完成条件
-
-当前支持粘贴/文件、ZIP和GitHub URL。parse处理frontmatter及正文，缺失名称有fallback；不是完整Anthropic格式验证器，解析成功不保证脚本/依赖可运行。
-
-GitHub preflight只下载解析SKILL.md，commit先安装正文，再由独立后台Task递归下载同目录附件。导入返回成功时附件可能尚未完成，部分失败目前记录日志；手动Update from URL等待附件下载并可返回partialSuccess。离开导入界面不意味着该后台Task取消。维护者必须分别观察正文安装和附件完整性，不能只检查Skill行出现。
-
-ZIP入口需要根目录或单层父目录的SKILL.md，写入正文后再写入附件；错误可能发生在已部分写入之后，不能宣称所有导入原子回滚。GitHub覆盖确认在部分UI入口存在；importSkill自身同id覆盖，不是统一的每路径确认屏障。文件路径安全、外部依赖与凭证处理仍受[权限规范](ios-tool-permissions-and-side-effects.md)约束，不能因其来自Skill包而放宽。
-
-源码：SkillStore.importSkill/preflightGitHubImport/commitGitHubImport/updateFromURL/importFromArchive。未调用网络、导入ZIP或执行附件。
+- **M1** 支持的入口：粘贴或文件、ZIP、GitHub URL。解析处理 frontmatter 和正文，缺少名称时有兜底；它不是完整的格式校验器，解析成功不代表脚本和依赖可以运行。
+- **M2** GitHub 导入：先只下载并解析 `SKILL.md`，提交时先安装正文，再由独立的后台 Task 递归下载同目录附件。导入返回成功时附件可能尚未下载完，部分失败目前只写日志；离开导入界面不取消这个 Task。
+- **M3** 手动 “Update from URL” 会等待附件下载完成，部分失败时返回 `partialSuccess`。
+- **M4** ZIP 要求 `SKILL.md` 位于根目录或单层父目录下，先写正文再写附件；中途出错时可能已部分写入，导入不是原子的。
+- **M5** 部分界面入口在 GitHub 覆盖前要求确认；`importSkill` 本身对同 id 直接覆盖，没有统一的确认屏障。
+- **M6** Skill 包中的路径、外部依赖和凭证处理遵守 [工具权限](ios-tool-permissions-and-side-effects.md)，不因来自 Skill 包而放宽。
 
 ## 全局启停与会话覆盖
 
-isEnabledForSession先读session_skill_overrides，有覆盖则优先，否则使用全局isEnabled。会话可以启用全局关闭的Skill，也可以禁用全局开启的Skill；全局关闭不是强制所有会话关闭。
+- **O1** 会话中是否启用：先查 `session_skill_overrides`，有覆盖就用覆盖值，否则用全局值。会话可以启用全局关闭的 Skill，也可以禁用全局开启的 Skill。
+- **O2** `setSessionOverride` 在设置值等于当前全局值时删除覆盖行，否则保存。覆盖表示“当前的例外”；没有覆盖的会话随全局值变化。
+- **O3** 在尚未发送的草稿中切换 Skill 时，先创建真实会话再保存覆盖，不写入空 session id。
+- **O4** 全局启停会把 Skill 标记为待同步；会话覆盖只写本地数据库。Skill 的同步和备份不包含会话覆盖与使用次数。
+- **O5** 删除 Skill 时一并清理它的覆盖记录。
+- **O6** 启停只控制发现片段和斜杠菜单，不卸载技能目录，也不给一般文件读写加门禁；已读取的正文和之前的工具结果不会被撤回。
 
-setSessionOverride在值等于当前全局默认时删除覆盖行，否则保存。它表达当前例外，不是永远固定一次选择；后续全局值变化时没有覆盖的会话会跟随。草稿第一次在SessionSkillsView切换时先创建真实session，再绑定覆盖，不能使用空session id。
+## 发现、读取与斜杠入口
 
-全局setEnabled请求Skill dirty；session override只写本地skills.db并更新UI版本计数。当前Skill同步和新格式SkillRecord备份没有携带会话覆盖和使用频率，不能把“Skill已同步/恢复”解释为每个会话选择和排序历史已复制。删除Skill会清理对应覆盖；会话删除后的残留覆盖清理不在此静态核查中承诺。
+- **D1** 发现片段只包含名称、截断到 200 字符的描述，以及 `SKILL.md` 路径，并提示使用前先读取正文。App 不自动执行技能，不自动注入正文。
+- **D2** 启用的 Skill 较多时，片段按以下顺序挑选，目标 20 项：内置技能；最近 7 天修改或创建的，最多 10 项；再按使用次数补足。并提示还有多少未展示、如何搜索。内置技能一项没有单独的上限，所以 20 是目标值，不是严格上限。
+- **D3** 片段在 Agent 循环开始时生成，Provider fallback 重建请求时重新生成。
+- **D4** 只有通过 `file_read` 成功读取 `SKILL.md` 才记一次使用；shell `cat`、其他读取方式或菜单展示不计。任一 Skill 的次数超过 1000 时，所有计数归一化到 0–100。使用次数不代表任务成功。
+- **D5** 斜杠菜单按会话中的有效启用状态列出 Skill；选择后只在输入框插入 `/<名称> ` 并保留原文本。之后仍靠模型理解并读取正文，不是确定性的执行路由。
 
-### 关闭不等于禁止文件访问
+## 文件变更、同步与删除
 
-当前启停控制发现片段及斜杠菜单，未把技能目录撤载或为一般文件读写增加Skill开关门禁。已读正文和既有工具结果也不会被追溯清除。需要阻止读取或执行某个Skill时，不能只依赖发现开关；是否提升为执行许可是[待决定事项](#待验证与待决定)。
+- **F1** `file_write` / `file_edit` 成功写入 `SKILL.md` 会触发重新加载；磁盘扫描（`rescanFromDisk`、`rescanAndMarkChangedSkillsDirty`）负责其他刷新与待同步入队。重新加载不代表附件修改已进入同步队列。
+- **F2** 重新扫描时解析失败的 `SKILL.md` 保留原有元数据，不抹掉已知描述。
+- **F3** 同步的 Skill 记录包含全局启用值、正文和可选的 ZIP 附件。Skill 目录中所有文件 60 秒内无修改才视为稳定、可以打包；缓存和包管理目录不打包。
+- **F4** 本地删除会请求远端删除；收到远端删除时调用 `applyRemoteDeletion`，并避免回声。同步规则见 [同步与冲突处理](ios-sync-and-conflict-resolution.md)。
+- **F5** `deleteSkill` 删除全局文件、数据库条目和覆盖，并请求云端删除。文件删除是尽力而为，界面上条目消失不代表每份副本都已清理。
 
-## 发现、正文读取与斜杠入口
+## 资源与安全
 
-skillPromptFragment只提供名称、截断至200字符的description和SKILL.md路径，提示使用前读取正文；它没有在App中自动执行技能、自动注入全部正文或强制模型遵循内容。
+- **S1** Skill 正文和附件可以触发 shell、网络和设备工具，但文字指令不授予新的权限或操作确认。
+- **S2** 导入递归、目录扫描、ZIP 内存、元数据加载、附件读取与取消遵守 [资源开销规范](resource-efficiency.md)。页面关闭不代表后台附件任务已释放资源；目前没有整个包大小的硬上限。
 
-启用数较少时按更新时间展示；较多时优先bundled、最近7天最多10项，再以use_count填充目标20项，并给出有限的未展示名称及目录搜索提示。该实现的bundled分支没有同等硬截断，因此20是当前选择目标，不能宣称对任意数据都严格20项。description限制也不是正文/附件读取预算。
+## 待决定
 
-初始Agent loop及Provider fallback重建时生成片段。启停或文件修改对已组装请求的生效时点需要验收；正文读取通常作为工具结果进入历史，不等同于下一次描述更新。
+- [待决定] 禁用 Skill 是否应同时禁止读取和执行它（O6）。
+- [待决定] 同名冲突在各导入入口的确认方式（M5）。
+- [待决定] 是否同步或备份会话覆盖与使用次数（O4）。
+- [待决定] 技能更新是否保留可回滚的旧版本（I2）。
+- [待决定] 会话删除后残留覆盖记录的清理。
 
-成功file_read且路径匹配SKILL.md时recordSkillUse记录使用次数；shell cat、其他资源读取或菜单展示不能据此推导同样计数。次数代表特定读取事件，不是技能任务成功率。
+## 验收场景
 
-斜杠菜单按会话有效启用值列出Skill；选中后只在输入框插入`/<名称> `及保留原文本。发送后仍依赖模型理解与工具读取，不是确定性的技能执行路由，也不保证跳过描述筛选后自动加载正确文件。
-
-## 文件变更、同步和删除
-
-file_write/file_edit成功写入SKILL.md会触发reload；磁盘发现、rescanFromDisk和rescanAndMarkChangedSkillsDirty负责不同的元数据刷新/dirty入队路径。普通reload不等于所有附件修改均已进入同步队列；fakefs事件、quiet窗口与mtime扫描需分别核查。
-
-当前rescanFromDisk对解析失败保留旧元数据，loadSkills对空/旧block标记description有专门刷新分支；不能由这些分支推出任何文件编辑都实时刷新全部元数据。新增或删除磁盘目录、Library/rootfs双副本、前台恢复分别需要验收。
-
-同步SkillV2包含全局启用值、正文及可选ZIP附件，普通删除请求远端delete，入站删除调用applyRemoteDeletion并避免回声。quietSeconds默认60、排除缓存/包管理目录和ZIP构造是当前资源策略，不是iCloud必然及时成功的证据。同步初始化/类别前提及冲突规则见[同步规范](ios-sync-and-conflict-resolution.md#启停离线与发送)。
-
-deleteSkill删除全局文件、数据库条目及覆盖，并请求云端删除；文件移除为best effort，故界面条目消失不证明每份文件副本已清理。另一设备的删除传播、后台下载尚未完成时的竞态和备份恢复后重建需要验证，不在本轮升级为保证。
-
-## 资源与安全边界
-
-Skill正文及附件可触发shell、网络和设备工具，但文字指令不授予新权限或操作确认。[资源规范](resource-efficiency.md)适用于导入递归、目录扫描、ZIP内存、主线程元数据加载、附件读取和取消。当前存在后台附件任务，不能声明页面关闭就释放全部资源，也没有从描述筛选推出完整包大小硬上限。
-
-## 场景与验收
-
-以下为待执行的可观察条件，本轮未运行。
-
-| 场景与前提 | 可观察验收 |
+| 场景 | 期望 |
 | --- | --- |
-| 全局关闭Skill，A会话显式启用，B无覆盖 | A的描述和菜单可见，B不可见；普通文件访问例外单独观察，不宣称全局封禁。 |
-| 草稿尚未发送时改变Skill选择 | 创建真实会话并保存覆盖，首次发送/重载使用同一id，未写空id记录。 |
-| 同id重复导入与GitHub附件失败 | 全局启用/安装时间按当前规则保留；正文成功、附件未完成及partialSuccess分别可见，不把成功返回当完整包。 |
-| 输入框选择Skill后发送 | 原文本保留；实际请求只有发现信息，后续file_read读取正确正文；模型行为另行验证。 |
-| shell创建/编辑SKILL.md及附件 | id和链接稳定，元数据刷新与dirty入队分别观察；malformed正文不静默抹掉已知描述。 |
-| 删除Skill并让旧云记录回流 | 检查双目录、覆盖、delete和防复活；后台下载重建风险单独观察。 |
-| 备份恢复或另一设备同步 | 正文/附件和全局启用状态符合格式；会话覆盖与use_count不得伪报已迁移。 |
+| 全局关闭某 Skill，会话 A 显式启用，会话 B 无覆盖 | A 的发现片段和菜单中可见，B 不可见；普通文件访问不受影响（O1、O6） |
+| 草稿未发送时切换 Skill | 创建真实会话并保存覆盖，首次发送和重新加载使用同一 id（O3） |
+| 同 id 重新导入；GitHub 附件下载失败 | 启用状态和安装时间保留；正文成功、附件未完成和 `partialSuccess` 分别可见（I2、M2、M3） |
+| 在输入框选择 Skill 后发送 | 原文本保留；请求中只有发现信息，模型随后通过 `file_read` 读取正确正文（D1、D5） |
+| 在 shell 中创建或编辑 `SKILL.md` 与附件 | id 和链接稳定；格式错误的正文不抹掉已知描述（I3、F1、F2） |
+| 删除 Skill 后旧的云记录回流 | 本地文件、覆盖记录已清理，已删除的 Skill 不复活（F4、F5） |
+| 备份恢复或另一台设备同步 | 正文、附件和全局启用状态正确；不声称会话覆盖和使用次数已迁移（O4） |
 
-## 待验证与待决定
+## 代码入口
 
-[SkillDescriptionStaleTests.swift](../../src/ios/MinisTests/Standalone/SkillDescriptionStaleTests.swift)只包含独立复制谓词的回归入口，不证明生产导入、数据库、iSH、同步或模型使用成功；本轮未执行它。
-
-待验证：多会话覆盖、草稿首次发送、GitHub/ZIP部分写入与取消、正文更新的prompt时点、磁盘双副本和iCloud删除竞态、资源峰值。待决定：禁用是否必须成为读取/执行禁止；同名冲突的各入口确认形式；是否同步/备份会话覆盖；技能更新是否保留可回滚版本。未决事项不自动变成现行产品保证。
+- [SkillStore](../../src/ios/Agent/Session/SkillStore.swift)：导入、更新、启停、覆盖、发现片段、使用次数、删除、稳定性判断
+- [SkillsManagementView](../../src/ios/Views/Skills/SkillsManagementView.swift)、[SessionSkillsView](../../src/ios/Views/Chat/SessionSkillsView.swift)
+- 斜杠菜单：[SlashCommands](../../src/ios/Agent/Chat/AIChatViewModel+SlashCommands.swift)；读取计数：[ConcurrentTools](../../src/ios/Agent/Chat/AIChatViewModel+ConcurrentTools.swift)
+- 同步：[ChatStoreSyncHydrators](../../src/ios/Agent/Sync/V2/ChatStoreSyncHydrators.swift)
+- 测试：[SkillDescriptionStaleTests](../../src/ios/MinisTests/Standalone/SkillDescriptionStaleTests.swift)（独立脚本，只覆盖复制出来的判断逻辑）

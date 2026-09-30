@@ -4,88 +4,88 @@ description: MinisX iOS MCP 的配置身份、HTTP与STDIO调用、发现启停�
 
 # MinisX iOS MCP 集成
 
-导航：[Spec 索引](index.md)；shell执行与停止见[iSH runtime](ios-sandbox-ish-summary.md)，授权与远端副作用见[工具权限](ios-tool-permissions-and-side-effects.md)，配置传播及恢复见[同步](ios-sync-and-conflict-resolution.md)与[备份](ios-backup-restore.md)。
+导航：[Spec 索引](index.md)；shell 执行与停止见 [iSH 运行契约](ios-sandbox-ish-summary.md)，授权与远端副作用见 [工具权限](ios-tool-permissions-and-side-effects.md)，配置传播与恢复见 [同步](ios-sync-and-conflict-resolution.md) 和 [备份](ios-backup-restore.md)。
 
-MCP集成由原生配置/授权UI与iSH内CLI/daemon协作。本文记录2026-09-30当前工作区静态状态及已有安全、资源和证据规范的维护要求，不证明外部MCP服务、OAuth、网络、iSH子进程或真机后台行为已成功；没有新增运行证据。仅覆盖iOS当前入口，不把同目录Android实现当iOS验收。
+范围：iOS 上的 MCP 集成，由原生配置与授权界面、iSH 中的 CLI 与 daemon 协作完成。不包括同目录下的 Android 实现。
 
-## 范围、状态与来源
+## 配置与导入
 
-源码：[MCPStore](../../src/ios/Agent/Session/MCPStore.swift)、[MCPOAuthController](../../src/ios/Agent/Session/MCPOAuthController.swift)、[CLI main](../../src/ios/default_mount/usr/local/lib/minis-mcp-cli/main.py)、[daemon](../../src/ios/default_mount/usr/local/lib/minis-mcp-cli/daemon.py)、[配置](../../src/ios/default_mount/usr/local/lib/minis-mcp-cli/utils/config.py)、[HTTP transport](../../src/ios/default_mount/usr/local/lib/minis-mcp-cli/transport/http.py)。
+- **C1** `servers.json` 的格式为 `{"mcpServers":{"<name>":{...}}}`。server name 同时是配置 id，也用于 OAuth 凭证和会话覆盖。
+- **C2** HTTP 配置 `url` / `headers`；STDIO 配置 `command` / `args` / `env`；另有 `enabled`、`note`、`createdAt` / `updatedAt`、`oauth`、`startupTimeoutSeconds`。
+- **C3** `parseImport` 接受标准的 `mcpServers`、按名称组织的对象和单条配置，`disabled` 映射为 `enabled=false`；`commitImport` 同名覆盖，保留原有的 `createdAt`。导入成功只表示配置已解析并保存，不代表依赖已安装、握手或工具可用；配置更新也不代表已有的 daemon 连接改用了新的端点或凭证。
+- **C4** 配置位于隐藏的 MinisConfig 持久目录，通过 `/var/minis/mcp-servers` 提供给 guest，不在“文件”App 中公开。
+- **C5** 普通 JSON 导出原样保留 `url` / `headers` / `env`，包括内联 token 和占位符；它不是脱敏分享。
 
-## 配置身份、导入与文件
+## 发现与启停
 
-`servers.json`采用`{"mcpServers":{"<name>":{...}}}`，server name既是配置id，也用于OAuth凭证和会话覆盖。HTTP配置url/headers，STDIO配置command/args/env，另有enabled、note、createdAt/updatedAt、oauth及startupTimeoutSeconds。当前daemon优先有command的STDIO，而列表/原生摘要优先url的HTTP；两种目标同时填写时解释不一致，配置验收应分别检查，统一优先级仍待决定。
+- **D1** 会话中是否启用：会话覆盖优先于全局 `enabled`；与全局相同的覆盖会被删除。
+- **D2** 发现片段按会话中的有效启用状态，选出 `createdAt` 最新的 20 个 server，`note` 截断到 200 字符。它只提供 server 信息和 CLI 用法提示，不把每个远端 MCP 工具注册为原生 Agent 工具。
+- **D3** 斜杠菜单按同样的有效启用状态插入 `/<name> `，只是输入辅助；实际调用仍需通过 `shell_execute` 运行 `minis-mcp-cli`。
+- **D4** 发现片段在 Agent 循环开始和 fallback 重建时生成；已发出的请求和已读取的工具清单不会因为开关变化而被撤回。
+- **D5** 启停的作用范围各不相同，合起来也不是完整的执行许可：
+  - 会话覆盖只影响发现片段和斜杠菜单；
+  - 全局 `enabled` 还决定 daemon 能否建立新的（冷）连接，关闭时返回 `DISABLED`；
+  - 已有的 warm 连接复用时不重新检查全局 `enabled`。
+  现状缺口见“待决定”。
 
-MCPStore.parseImport接受标准mcpServers、按名称对象及单条配置，disabled映射enabled=false；commitImport同名覆盖，保留既有createdAt。导入成功只代表配置解析/持久化，不代表依赖安装、握手或工具执行可用。配置更新不会自动证明已有daemon连接已使用新端点/凭证。
+## 调用
 
-配置位于隐藏MinisConfig持久目录，通过`/var/minis/mcp-servers`提供给guest，不能因共享挂载而声称可在iOS Files公开读取。普通JSON导出保留url/headers/env原值，包括内联token和占位符；它不是脱敏分享功能。
+- **P1** `list` / `tools` / `ping` / `call` 通过 loopback TCP 与自动启动的 daemon 通信。STDIO 是长期运行的子进程，通过 stdin / stdout 传 JSON-RPC；HTTP 用 POST initialize 及后续请求，携带 `Mcp-Session-Id`，解析 JSON 或 SSE 文本。这不代表支持完整的 MCP 协议版本、通知或流式能力。
+- **P2** `tools <server>` 获取远端工具清单；`refresh` 或 `tools --refresh` 断开该连接后重新握手。原生的 `refreshTools` 要求 iSH 已启动，外层超时 120 秒。
+- **P3** `call <server> <tool> --input ...` 执行具体工具。server 存在、ping 成功、tools/list 成功、tools/call 业务成功是四个不同阶段；daemon 返回 ok 不代表远端结果成功（需看 `isError`）或副作用已发生。
+- **P4** STDIO 缺少命令、握手失败、server 不存在、全局关闭（`DISABLED`）、工具不存在、HTTP 失败、`AUTH_REQUIRED`、参数错误，都保留可诊断的错误类别，不把空工具列表当成功。
+- **P5** 当 daemon 同时看到 `command` 和 `url` 时优先按 STDIO 处理，而列表和原生摘要优先按 HTTP 显示（见“待决定”）。
 
-## 发现、全局启停与会话覆盖
+## 凭证与 OAuth
 
-isEnabledForSession以会话覆盖优先于全局enabled；与默认相同的覆盖被删除。systemPromptSnippet按有效启用状态选最新createdAt优先的20个server，note最多200字符，只提供server发现信息与CLI使用提示，不向模型注册每个远端MCP工具为原生Agent工具。
-
-App斜杠菜单按同一有效启用值插入`/<name> `；它是输入辅助，实际调用仍需shell_execute运行minis-mcp-cli。初始Agent loop和fallback重建会生成发现片段；已发请求或已读工具清单不会因开关追溯删除。
-
-### 启停不是统一执行许可
-
-CLI没有App会话覆盖id，daemon建立新session时只检查servers.json全局enabled。全局开启但某会话关闭仍可能通过显式CLI调用；全局关闭而会话开启可展示名称，但冷连接会得到DISABLED。已有warm session在pool.get中先复用，未重新检查全局enabled，所以切换全局开关不能承诺即时阻止缓存连接。
-
-设置页toggle/delete没有直接驱逐daemon缓存连接。此处披露实现缺口，不把它写成允许绕过用户拒绝的规范。需要强制拒绝所有调用的产品，必须定义执行门禁、生效时点与缓存失效并验证；现行[副作用原则](ios-tool-permissions-and-side-effects.md)仍适用。
-
-## 握手、工具列表与调用
-
-首次list/tools/ping/call通过loopback TCP与自启动daemon通信。STDIO为长期子进程stdin/stdout JSON-RPC；HTTP当前为POST initialize及后续请求，携带Mcp-Session-Id，可解析JSON或SSE文本。不能由支持这两种返回推导完整MCP协议版本、通知/流式能力或任意服务器兼容。
-
-`tools <server>`发现远端清单，`refresh`或`tools --refresh`驱逐该连接后重新握手；原生refreshTools要求iSH已启动并以mcp-settings执行，外层超时120秒。`call <server> <tool> --input ...`执行具体工具；server存在、ping成功、tools/list成功和tools/call业务成功是不同阶段。daemon的ok envelope不能取代远端结果/isError或实际副作用核对。
-
-STDIO缺命令、握手失败、服务不存在、全局关闭、工具不存在、HTTP失败、AUTH_REQUIRED及参数错误应保留可诊断类别，不伪报空工具列表为成功。当前config.load_config对缺失或畸形配置返回空对象；不能把这一兼容行为当无错误配置的证明。
-
-## 凭证、OAuth与分享
-
-维护要求延续现有秘密保护：Agent配置优先使用`$$NAME`引用App/进程环境变量，不在聊天/日志输出值。HTTP expand_env同时支持$VAR/${VAR}/$$VAR/$${VAR}，未设置变量当前展开为空；未检查有效鉴权前不能宣称占位符已解决。
-
-OAuth原生使用交互授权、PKCE和Keychain非同步存储，并生成guest可读取的oauth bridge文件，含access/refresh token及必要client secret，权限设置为600。guest可刷新并改写bridge；跨设备只同步oauth配置不代表另一设备已授权。CLI client secret临时种子文件与Keychain/bridge的同步由MCPOAuthController处理，不应在日志展示。
-
-原生authorize当前只检查endpoint scheme以http开头，错误文案却要求https；不能宣称已有严格HTTPS endpoint校验或统一重定向目标保护。通用安全要求与当前实现差异必须保留，是否限制HTTP开发端点仍待维护者决定。
-
-guest缺token返回AUTH_REQUIRED及App授权深链；到期/401有refresh路径，401最多进行一次额外OAuth重试。存在token只说明isAuthorized的本地判断，不证明有效期、服务器接受或revocation状态。signOut清tokens与bridge并保留client secret；purge额外清secret。缓存连接和并发refresh的失效/清理需验证，不能把本地文件删除当远端token已撤销。
+- **A1** 配置中优先用 `$$NAME` 引用 App 或进程的环境变量，不在聊天或日志中输出值。HTTP 的变量展开支持 `$VAR`、`${VAR}`、`$$VAR`、`$${VAR}`；未设置的变量展开为空字符串。
+- **A2** OAuth 使用交互授权、PKCE 和不同步的 Keychain 存储，并生成 guest 可读的 OAuth bridge 文件（含 access / refresh token 和必要的 client secret，权限 600）。guest 可以刷新并改写 bridge。只同步 OAuth 配置不代表另一台设备已授权。
+- **A3** guest 缺 token 时返回 `AUTH_REQUIRED` 和 App 授权深链；token 过期或 401 时有刷新路径，401 最多额外重试一次 OAuth。本地有 token 不代表未过期、服务器接受或未被撤销。
+- **A4** `signOut` 清除 token 和 bridge，保留 client secret；`purge` 另外清除 secret。删除本地文件不代表远端 token 已撤销。
+- **A5** client secret 的临时种子文件与 Keychain / bridge 的同步由 `MCPOAuthController` 处理，不出现在日志中。
 
 ### 内联凭证与同步备份例外
 
-MCPServerItem包含原配置JSON，JSON导出和mcp_servers备份均保留headers/env/url内联值。OAuth Keychain/bridge不走普通MCP配置同步，但内联秘密可能随配置传播；这些路径并不是“所有凭证不离开本机”的保证。
+- **A6** 配置 JSON 中的 `headers` / `env` / `url` 内联值会出现在 JSON 导出和 `mcp_servers` 备份中；OAuth 的 Keychain 与 bridge 不走普通配置同步，但内联秘密可能随配置同步传播。
+- **A7** MCP OAuth secrets 随含凭证的 providers 备份类别处理，需要密码；关闭 `includeCredentials` 不会清除 `mcp_servers` 中的内联值，无密码的分享副本也不代表没有秘密。见 [备份](ios-backup-restore.md)。
 
-专用MCP OAuth secrets随含凭证的providers备份类别处理，另有密码前提；仅关闭includeCredentials不会清除mcp_servers内联值。无密码share copy也不能由此推导完全无秘密。详见[备份内联凭证缺口](ios-backup-restore.md#内联mcp凭证与分享副本限制)。
+## 超时、重试与取消
 
-## 超时、重试与取消边界
+- **T1** STDIO initialize 的 `startupTimeoutSeconds` 默认 60 秒，接受 1–900 的整数及可转为整数的数值字符串；CLI 支持兼容的别名字段，主字段优先。布尔值、非数值、非整数、越界值回落到默认值并警告。原生端只保存字段，实际计时在 daemon。
+- **T2** RPC / HTTP 超时 300 秒，loopback 连接 310 秒，设置页外层 120 秒。多层超时不是统一的保证：较长的启动超时也可能先被外层切断。
+- **T3** Stop 或超时可以结束所属的 shell 调用，但不代表独立的 daemon、长期的 STDIO 子进程或远端请求一并取消。调用失败或断开也不代表外部动作没有执行：创建、发送、购买等要区分“失败”与“结果未知”，不盲目重试。
 
-STDIO initialize的startupTimeoutSeconds缺省60秒，接受1—900整数及可转为整数的数值字符串；CLI支持兼容别名，primary字段优先。布尔值、一般非数值、非整数及越界值回落默认并警告，但非有限数值字符串NaN/Infinity可在int转换时抛出未捕获异常；不能保证任意畸形值都会回落或握手成功。原生仅保留字段，真正计时在daemon。RPC/HTTP当前300秒，loopback连接310秒，设置页外层120秒；多个层次的超时不是一个统一保证，更长startup值也可能先被外层切断。
+## 资源与同步
 
-daemon.call_with_retry对TIMEOUT/STDIO_CRASH驱逐并重试一次，且作用于tools/call；HTTP会话错误另有重新握手重试，OAuth有独立401重试。这些路径不检查远端工具是否幂等，可能在响应丢失后重放副作用，是与[安全重试要求](ios-tool-permissions-and-side-effects.md#拒绝超时和错误语义)不一致的现状；本轮仅披露，未修复代码。
+- **R1** daemon 按 server 复用连接：空闲 600 秒断开，巡检间隔 30 秒，连接池清空后再等 60 秒退出，期间有新活动则取消退出。`shutdown` 提供统一的停止路径。计时依赖 iSH / App 在运行，不是后台持续执行的保证。
+- **R2** `MCPStore.sync` 按 server 记录同步，以 `updatedAt` 后写者胜；扫描 CLI 在外部的修改，用语义指纹抑制回声；本地删除发出远端删除，收到的删除单独处理。
+- **R3** 会话覆盖保存在本地 SQLite，不在按 server 的同步和配置 JSON 备份中。运行中的连接不随配置同步迁移；恢复 OAuth 秘密不代表远端授权有效。
 
-Stop/超时能够结束所属shell调用，不代表独立daemon、长期STDIO子进程或远端请求同时取消。调用失败/断开也不证明外部动作未执行；创建、发送、购买等必须区分失败与结果未知，不能盲目重试。何时驱逐共享连接不得从会话PID停止路径推导。
+## 待决定
 
-## 资源生命周期与同步
+- [待决定] D5 的缺口：CLI 不知道 App 的会话覆盖，daemon 建新连接时只检查全局 `enabled`。全局开启而某会话关闭时，显式 CLI 调用仍可成功；已有的 warm 连接复用时不重新检查全局 `enabled`；设置页的开关和删除不驱逐 daemon 中的缓存连接。启停是否应成为强制的执行许可、何时让缓存失效，待决定。
+- [待决定] 有副作用工具的重试：`call_with_retry` 对 `TIMEOUT` / `STDIO_CRASH` 驱逐后重试一次，也作用于 `tools/call`；HTTP 会话错误会重新握手重试；OAuth 另有 401 重试。这些都不检查工具是否幂等，响应丢失后可能重放副作用，与 [工具权限](ios-tool-permissions-and-side-effects.md) 的 F4 不一致。
+- [待决定] OAuth 端点：原生授权只检查 scheme 以 `http` 开头，错误文案却要求 https；是否允许 HTTP 开发端点、如何校验重定向目标。
+- [待决定] P5 的优先级：同时配置 `command` 和 `url` 时，daemon 与界面的解释不一致。
+- [待决定] 非有限的数值字符串（`NaN`、`Infinity`）作为启动超时时，转换整数会抛出未捕获的异常（T1）。
+- [待决定] `config.load_config` 对缺失或格式错误的配置返回空对象，与“无错误配置”无法区分。
+- [待决定] 删除或登出时并发刷新的清理；内联秘密在同步、导出、备份中的保护；共享连接的取消归属，以及连接数、响应大小的资源上限。
 
-daemon按server复用连接，空闲TTL600秒，watchdog间隔30秒，池变空后有60秒退出宽限；新活动清除宽限。shutdown提供统一停止路径。计时器受iSH/App运行前提影响，不是后台持续执行保证，也没有从TTL推出池数量、线程或响应大小的硬上限。
+## 验收场景
 
-MCPStore.sync使用per-server记录及updatedAt LWW，扫描CLI外部修改并保留语义fingerprint抑制回声；本地删除请求delete，入站删除有单独处理。会话覆盖在本地SQLite，当前per-server同步与配置JSON备份不包含它。运行连接不随配置同步迁移；OAuth秘密恢复也不证明远端授权有效。协议/门禁见[同步规范](ios-sync-and-conflict-resolution.md)。
-
-## 场景与验收
-
-本次未执行下列场景；应以测试服务和可丢弃数据取得独立证据。
-
-| 场景与前提 | 可观察验收 |
+| 场景 | 期望 |
 | --- | --- |
-| 导入同名server、分别配置HTTP或STDIO | 覆盖规则、字段保留和错误可见；另检查双目标优先级，不由配置存在推导连接成功。 |
-| 全局/会话相反启停，已有warm连接 | 比较发现、菜单、冷连接与warm调用，明确现有门禁缺口，不将UI隐藏当拒绝证据。 |
-| 远端新增工具后执行refresh | 重新握手后列表变化，原生外层120秒前提可见；列表存在不代替实际工具结果。 |
-| OAuth取消、过期、401及另一设备同步 | 取消不伪报授权；refresh有界；设备侧凭证单独取得；端点HTTPS校验缺口保持开放。 |
-| 有副作用工具提交后丢失响应 | 观察实际调用次数和远端结果，不能把自动重试当安全幂等；当前未满足项明确记录。 |
-| Stop、离开设置页、空闲TTL或shutdown | 区分shell PID、daemon、子进程和远端动作；检查资源释放，不承诺会话退出全部取消。 |
-| 配置含内联token或$$引用后导出/备份 | 使用占位测试值检查JSON字节是否保留；不输出真实秘密，不将share copy称为自动脱敏。 |
+| 导入同名 server；分别配置 HTTP 和 STDIO | 覆盖规则、字段保留和错误都可见；同时配置两种目标时分别检查解释是否一致；不由“配置存在”推断能连接（C3、P5） |
+| 全局与会话启停相反，且已有 warm 连接 | 对比发现片段、菜单、冷连接与 warm 调用的表现，记录现有门禁缺口；界面隐藏不作为拒绝的证据（D1、D5） |
+| 远端新增工具后执行 refresh | 重新握手后清单变化；原生外层 120 秒超时可见；清单存在不代替实际的工具结果（P2、P3） |
+| OAuth 取消、过期、401、另一台设备同步 | 取消不伪报已授权；刷新有界；另一台设备需要单独授权（A2、A3） |
+| 有副作用的工具提交后丢失响应 | 观察实际调用次数和远端结果，不把自动重试当作安全的幂等（T3，待决定的重试缺口） |
+| Stop、离开设置页、空闲超时、shutdown | 分别检查 shell PID、daemon、子进程、远端动作；检查资源释放，不承诺会话退出即全部取消（T3、R1） |
+| 配置含内联 token 或 `$$` 引用后导出、备份 | 用占位测试值检查 JSON 是否原样保留；不输出真实秘密，不把分享副本称为自动脱敏（C5、A6、A7） |
 
-## 证据与待维护者决定
+## 代码入口
 
-[test_startup_timeout.py](../../src/ios/default_mount/usr/local/lib/minis-mcp-cli/test_startup_timeout.py)和[test_http_reinit.py](../../src/ios/default_mount/usr/local/lib/minis-mcp-cli/test_http_reinit.py)提供超时和重连测试入口，本轮未运行；它们不能证明真实iSH/OAuth/后台或外部动作正确。
-
-待决定：启停是否为强制执行许可及warm缓存失效；HTTP开发端点与HTTPS策略；有副作用工具重试/幂等策略；删除/登出的并发refresh清理；内联秘密同步、导出和备份保护；共享连接的取消归属及数量/响应资源上限。新增Spec不意味着这些决定或缺陷已关闭。
+- 配置、启停、发现片段、同步：[MCPStore](../../src/ios/Agent/Session/MCPStore.swift)
+- OAuth：[MCPOAuthController](../../src/ios/Agent/Session/MCPOAuthController.swift)
+- CLI 与 daemon：[main.py](../../src/ios/default_mount/usr/local/lib/minis-mcp-cli/main.py)、[daemon.py](../../src/ios/default_mount/usr/local/lib/minis-mcp-cli/daemon.py)、[config.py](../../src/ios/default_mount/usr/local/lib/minis-mcp-cli/utils/config.py)、[http.py](../../src/ios/default_mount/usr/local/lib/minis-mcp-cli/transport/http.py)
+- 测试：[test_startup_timeout.py](../../src/ios/default_mount/usr/local/lib/minis-mcp-cli/test_startup_timeout.py)、[test_http_reinit.py](../../src/ios/default_mount/usr/local/lib/minis-mcp-cli/test_http_reinit.py)

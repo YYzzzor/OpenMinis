@@ -6,163 +6,111 @@ description: iOS .minisbak 的格式兼容、备份范围、凭证加密、完�
 
 导航：[Spec 索引](index.md)。
 
-状态：现行格式和行为契约。本文补足源码曾引用但仓库缺失的 `backup-restore-design.md`；[backup-streaming-package-design.md](../backup-streaming-package-design.md) 是分阶段设计资料，只有已由当前源码确认的部分才构成现状。
+范围：创建、恢复、分享、迁移或诊断 `.minisbak` 备份包，包括格式兼容、类别、加密、完整性、不完整结果、恢复与中断恢复。[backup-streaming-package-design.md](../backup-streaming-package-design.md) 是分阶段的设计资料，其中只有源码已实现的部分属于现状。
 
-## 范围与来源
+## 包格式
 
-本文适用于用户创建、恢复、分享、迁移或诊断 `.minisbak` 包的场景，覆盖格式兼容、类别、加密、完整性、不完整结果、恢复和中断恢复。
-
-源码依据：
-
-- [BackupFormat.swift](../../src/ios/Agent/Backup/BackupFormat.swift)：wire format 与类别。
-- [BackupExporter.swift](../../src/ios/Agent/Backup/BackupExporter.swift)：快照、导出、加密、续传和结果报告。
-- [BackupImporter.swift](../../src/ios/Agent/Backup/BackupImporter.swift)：检查、预检、分类恢复和报告。
-- [BackupRestoreJournal.swift](../../src/ios/Agent/Backup/BackupRestoreJournal.swift)：持久 rollback staging 与启动协调。
-
-本轮没有实际打包或恢复用户数据；运行正确性只能由定向测试和受控样本验证。
-
-## 包格式与兼容
-
-- 扩展名为 `.minisbak`，当前 major format 为 `minisbak/1`。
-- 不认识 major version 的 reader 必须拒绝并提示更新，不能 best-effort 写入用户数据。
-- 同一 major 内，未知字段应忽略；非结构必需的缺失字段使用兼容默认值。
-- 记录以类型 `t` 和记录版本 `v` 支持分类解析和逐记录迁移。
-- JSONL shard 最大 64 MiB，超出后滚动到下一 shard，避免 importer 一次加载巨型文件。
-- `manifest.json` 始终明文，允许用户在输入密码前查看来源、时间、类别和计数。
-
-manifest 至少承载 format、创建/快照时间、App 信息、显示用设备名、backup id、类别统计、限制、加密说明和内容完整性哈希。不得写入会导致两台设备争用同步身份的内部 device id。
+- **P1** 扩展名 `.minisbak`，当前主版本 `minisbak/1`。
+- **P2** 读取方遇到不认识的主版本时拒绝并提示更新，不尽力写入用户数据。
+- **P3** 同一主版本内，忽略未知字段；非结构必需的缺失字段使用兼容的默认值。
+- **P4** 每条记录用类型 `t` 和版本 `v` 支持分类解析与逐条迁移。
+- **P5** JSONL 分片最大 64 MiB，超出后写入下一个分片，避免导入时一次加载巨型文件。
+- **P6** `manifest.json` 始终是明文，用户输入密码前就能看到来源、时间、类别和数量。它至少包含：格式、创建与快照时间、App 信息、显示用的设备名、backup id、类别统计、限制、加密说明、内容完整性哈希；不写入内部 device id，避免两台设备争用同步身份。
 
 ## 备份范围
 
-当前 wire format 类别：
-
-| 类别 | 当前普通 UI 新导出 | 兼容恢复 |
-|---|---|---|
+| 类别 | 普通界面新导出 | 恢复 |
+| --- | --- | --- |
 | chats | 是 | 是 |
 | shared_files | 是 | 是 |
 | skills | 是 | 是 |
 | memory | 是 | 是 |
 | providers | 是 | 是 |
 | mcp_servers | 是 | 是 |
-| environment_variables | 是，仅条目元数据；值另走凭证路径 | 是；值依赖 providers 凭证恢复或本地已有 Keychain 值 |
-| voice_corrections | 否；显式选择类别的调用仍可导出 | 是，兼容旧包及显式导出包 |
+| environment_variables | 是，只含条目元数据；值走凭证路径 | 是；值依赖 providers 凭证的恢复或本地已有的 Keychain 值 |
+| voice_corrections | 否；显式选择该类别的调用仍可导出 | 是，兼容旧包和显式导出的包 |
 
-所有可导出类别的 UI 默认选中是当前实现。文件型类别可以应用单文件上限；默认是不限，而不是静默丢弃大文件。无法下载的 iCloud placeholder、超限文件或快照竞态造成的缺失 blob 必须进入 manifest/index 和最终报告，不得把不完整导出显示成完整成功。
-
-类别选择不等于其中的凭证已包含。环境变量、Provider 和 MCP OAuth 的依赖见[凭证与加密](#凭证与加密)；普通 UI 未提供 `voice_corrections`，但 exporter 保留显式选择该类别的路径，不能假设所有新包均无此类别。
-
-### 截止时间与快照范围
-
-当前导出续跑保留原 `snapshotAt`，不把时间字段推进到重试时刻；聊天导出用它筛选会话和消息。它不是所有类别的历史版本快照：[BackupExporter.swift](../../src/ios/Agent/Backup/BackupExporter.swift) 的 Memory 复制当前文件，Provider 和环境变量读取执行当时的 store，已完成类别在续跑时跳过，尚未完成类别则继续执行。
-
-因此，中断期间发生修改时，包中可能混合不同类别在不同时间取得的内容。调用方不得仅凭 manifest 的时间未变宣称跨类别一致快照，也不能把 activity lock 当作所有用户编辑均被冻结。是否需要统一的跨类别快照，以及其一致性范围，仍待维护者确认；本轮未做中断续跑运行验证。
+- **S1** 界面默认选中所有可导出的类别。
+- **S2** 文件类类别可以设置单文件上限，默认不限。无法下载的 iCloud 占位文件、超限文件、快照期间消失的 blob，都写入 manifest / index 和最终报告，不把不完整的导出显示为完全成功。
+- **S3** 导出续跑时保留原来的 `snapshotAt`，聊天按它筛选会话和消息。它不是所有类别的统一快照：Memory 复制当前文件，Provider 和环境变量读取执行时的数据；已完成的类别在续跑时跳过，未完成的继续执行。因此中断期间发生修改时，包中各类别可能来自不同时间（见“待决定”）。
 
 ## 凭证与加密
 
-- 敏感凭证只能在用户选择包含凭证且提供非空 passphrase 时进入包。当前 exporter 的实际凭证条件是选择 `providers` 类别且 `includeCredentials = true`；这个组合没有密码时必须拒绝。单独设置 `includeCredentials` 或密码不保证包内有凭证。
-- 用户不提供 passphrase 时，可以关闭凭证生成 share copy；环境变量类别仍可含条目元数据，但不因此包含值。
-- passphrase 不持久化。加密导出恢复执行时必须再次提供，不能因为存在 staging 就降级生成明文包。
-- 内容文件加密后，integrity 记录包内实际字节的 SHA-256，即密文哈希，因而可在知道密码前发现截断或损坏。
-- 加密包使用 verifier 区分错误密码，并使用 manifest MAC（优先校验 `manifest.mac` 原始字节 sidecar）认证 manifest。
-- `manifest.json` 保持明文不代表凭证明文；敏感 payload 必须只出现在加密成员中。
-
-当前类别与凭证依赖：
+- **E1** 只有选择了 `providers` 类别、开启 `includeCredentials`、且提供了非空密码时，凭证才进入包；前两者满足而没有密码时，导出被拒绝。单独开启 `includeCredentials` 或只设密码，不保证包中有凭证。
+- **E2** 不提供密码时，可以关闭凭证生成分享副本；环境变量类别仍可包含条目元数据，但不含值。
+- **E3** 密码不持久化。续跑加密导出时必须再次提供，不能因为存在 staging 而降级为明文包。
+- **E4** 内容加密后，完整性记录的是包内实际字节（密文）的 SHA-256，因此不知道密码也能发现截断或损坏。
+- **E5** 加密包用 verifier 区分密码错误，用 manifest MAC（优先校验 `manifest.mac` 原始字节）认证 manifest。敏感内容只出现在加密成员中；manifest 是明文不代表凭证是明文。
+- **E6** 凭证集合归在 `providers` 下，包含收集到的环境变量值和 MCP OAuth，即使对应的元数据类别没有选。
 
 | 内容 | 导出前提 | 恢复前提 |
-|---|---|---|
-| 环境变量名称、备注等条目元数据 | 选择 `environment_variables`；写入 `env_vars.json`，不包含值 | 选择 `environment_variables`；已有条目保留，新条目从 Keychain 取值，缺值时为空 |
-| Provider 凭证、环境变量值、MCP OAuth | 选择 `providers`、包含凭证并提供密码；[BackupSecrets.swift](../../src/ios/Agent/Backup/BackupSecrets.swift) 收集当前可取得的值进入 secrets | 包含并选择 `providers`，完成密码验证和解密后由其 importer 应用 secrets；不是选择环境变量或 MCP 类别就会应用 |
+| --- | --- | --- |
+| 环境变量的名称、备注等元数据 | 选择 `environment_variables`，写入 `env_vars.json`，不含值 | 选择 `environment_variables`：已有条目保留，新条目从 Keychain 取值，缺值时为空 |
+| Provider 凭证、环境变量值、MCP OAuth | 选择 `providers`、包含凭证并提供密码，由 [BackupSecrets](../../src/ios/Agent/Backup/BackupSecrets.swift) 收集 | 包中含 `providers` 且被选中，密码验证和解密后由其 importer 应用；只选环境变量或 MCP 类别不会应用这些凭证 |
 
-凭证集合目前归在 `providers`，会包含收集到的环境变量值和 MCP OAuth，即使对应元数据类别未选。要迁移环境变量条目和值，应同时选择 `environment_variables` 和含凭证的 `providers`；仅环境变量的加密包仍可能只有元数据。恢复完整包时只选环境变量也不会应用包内 secrets；本地已有值可能使结果看似完整，验收应使用目标设备没有这些值的样本。
-
-[BackupImporter.swift](../../src/ios/Agent/Backup/BackupImporter.swift) 把选中的 providers 排在环境变量前，避免创建新条目时读不到刚恢复的值；它不自动补选依赖类别。这是当前实现依赖，不是类别间可独立完整迁移的承诺；是否保留该耦合仍待维护者确认。
+- **E7** 要迁移环境变量的条目和值，需同时选择 `environment_variables` 和含凭证的 `providers`。恢复时 importer 把选中的 providers 排在环境变量之前，以便新条目读到刚恢复的值；它不自动补选依赖的类别。
 
 ### 内联MCP凭证与分享副本限制
 
-上述密码与includeCredentials前提覆盖专用secrets导出路径，不是对所有类别内容的自动秘密检测或脱敏保证。[BackupExporter.exportMCPServers](../../src/ios/Agent/Backup/BackupExporter.swift)直接复制servers.json；headers/env/url里的内联token可能进入mcp_servers类别，即使未选择providers或关闭includeCredentials。未提供密码时该复制路径也不检查或移除这些值，故当前实现不全面满足“敏感凭证只进入加密成员”的安全要求。
+- **E8** 敏感凭证只出现在加密成员中（现状见“待决定”）。
+- **E9** 分享副本只表示不含专用的凭证集合，不代表完全没有凭证或已自动脱敏；其他文件中的敏感内容也不会因类别开关而被清除。
 
-MCP JSON分享导出同样保留原值。share copy只能解释为未包含专用secrets，不能称为完全无凭证或自动安全脱敏；其他任意文件中的敏感内容也不能由类别开关推导已清除。可观察验收使用占位测试值检查各成员，不输出真实秘密；内联凭证拒绝/脱敏/强制加密方案待维护者决定，产品缺口未在本轮修复。凭证和设备授权边界见[MCP集成](ios-mcp-integrations.md#内联凭证与同步备份例外)。
+### Skill、Memory 与费用的恢复范围
 
-### Skill、Memory与费用恢复范围
+- **E10** Skill 恢复元数据和附件，不恢复 `session_skill_overrides` 和 `use_count`。Memory 恢复复制包中的 Markdown 文件，不做日志并集合并，也不保证之前撤销的条目仍然不存在。会话费用账本不在聊天记录中，恢复聊天不恢复费用历史。分别见 [Skill](ios-skills-lifecycle.md#全局启停与会话覆盖)、[Memory](ios-memory-lifecycle.md#用户编辑撤销与跨设备删除)、[费用](ios-usage-cost-and-balance.md#不在范围内)。
 
-Skill元数据/附件恢复不代表session_skill_overrides或use_count已迁移；当前新格式SkillRecord没有这些字段。Memory恢复复制包中的Markdown文件，不采用日志同步的并集合并，也不能保证此前撤销的条目仍然缺失。会话费用专用账本未包含在当前新格式聊天记录中，恢复聊天不应显示为已恢复完整费用历史。分别见[Skill](ios-skills-lifecycle.md#全局启停与会话覆盖)、[Memory](ios-memory-lifecycle.md#用户编辑撤销与跨设备删除)与[费用](ios-usage-cost-and-balance.md#不在范围内)。
+## 导出完成与中断
 
-## 导出完成与可恢复中断
+- **X1** 导出与恢复通过进程级 activity lock 互斥，不能同时修改共享数据或 staging。
+- **X2** 干净完成后清理对应的 journal 和 staging。取消、进程退出或可恢复的中断时保留 staging，由之后的尝试以相同的范围、限制和加密策略认领。
+- **X3** 续跑要求类别集合、单文件上限、是否包含凭证、加密意图都匹配，并沿用原 backup id 和 `snapshotAt`；不匹配的旧 staging 不拼入新包。选项匹配只决定能否认领 staging，不保证未完成类别的源内容没有变化（S3）。
+- **X4** 最终结果报告包大小、已完成类别、续跑类别，以及跳过的文件数、字节数和路径。生成了归档文件不代表所有源数据都已包含。
 
-- Export 与 restore 由进程级 activity lock 互斥；不能同时修改共享数据/staging。
-- 新的无密码、非续跑导出当前可直接把 blob 流入包；加密或续跑仍可能使用 staging。这是实现策略，不是调用方可依赖的包格式差异。
-- 干净完成后清理对应 journal/staging。取消、进程退出或可恢复中断应保留恢复所需的 staging，并由后续尝试按相同范围、限制和加密策略认领。
-- 当前续跑匹配类别集合、单文件上限、包含凭证开关和加密意图，并沿用原 backup id 与 `snapshotAt`；不匹配的旧 staging 不得拼进新包。选项匹配只决定能否认领 staging，不保证尚未完成类别的源内容未变化，见[截止时间与快照范围](#截止时间与快照范围)。
-- 最终结果必须报告包大小、完成类别、续跑类别以及 skipped file/byte/path；“归档文件已生成”不等于“所有源数据都已包含”。
+## 恢复
 
-## 恢复顺序与事务边界
+- **R1** 恢复顺序：
+  1. 安全解包到临时工作目录，拒绝 ZIP 路径逃逸和符号链接逃逸；
+  2. 读取 manifest，检查主版本；
+  3. 默认先按包内字节校验完整性；
+  4. 若已加密，要求密码，校验 verifier 和 manifest MAC 后解密；
+  5. 执行容量、运行中会话、类别等预检；
+  6. 为每个类别建立持久的回滚快照，按依赖顺序导入；
+  7. 刷新相关 store，返回分类报告和警告。
+- **R2** 事务以类别为单位：某类别失败时回滚该类别，已成功的前序类别保留，然后继续其余类别并报告。界面不把部分成功显示成“全部成功”或“全部失败”。
+- **R3** 回滚快照位于不会随临时目录删除的位置；App 在恢复中被终止时，下次启动根据 journal 处理遗留的 staging。完成标记在数据真正落盘之后才写入。
+- **R7** 任何实际恢复的首轮验证，都先使用可丢弃的样本或备份副本，不用用户唯一的数据。回滚规则（R2、R3）不能代替这一前提，各类别的回滚能力不同（[BackupImporter+Categories](../../src/ios/Agent/Backup/BackupImporter+Categories.swift)）：
+  - chats、skills、voice_corrections、environment_variables 以合并方式写入，没有建立能恢复原状态的快照（见“待决定”）；
+  - providers 有配置文件级的快照：恢复前复制 Provider 配置文件并记录恢复目标，失败时写回该文件并重新加载配置，App 启动时由 [BackupRestoreJournal](../../src/ios/Agent/Backup/BackupRestoreJournal.swift) 处理遗留的文件快照。这只覆盖该配置文件，不代表所有 Provider 相关数据和凭证（如 Keychain 中的值）都能完整回滚，其他范围需按具体源码另行判断。
+- **R4** 以合并为主；会话 id 冲突时可以选择合并或复制为新会话。本地已存在的凭证保留，旧备份不覆盖用户后来更换的 key。
+- **R5** 聊天类别内部先建立会话，再导入引用它的消息和文件；消息顺序与压缩标记的引用保持一致。
+- **R6** 未知类别或记录版本按 P2、P3 处理并写入警告，不产生看似成功的空恢复。
 
-规范顺序：
+## 待决定
 
-1. 安全解包到临时工作目录；拒绝 ZIP 路径逃逸和符号链接逃逸。
-2. 读取 manifest 并检查 major format。
-3. 默认先按包内字节校验 integrity。
-4. 若加密，要求 passphrase，校验 verifier 和 manifest MAC，再解密。
-5. 执行容量、运行会话和类别等 preflight。
-6. 对每个类别建立持久 rollback snapshot，按依赖顺序导入。
-7. 刷新相关 store，返回分类报告和 warning。
+- [待决定] E8 的缺口：[BackupExporter](../../src/ios/Agent/Backup/BackupExporter.swift) 的 `exportMCPServers` 原样复制 `servers.json`，`headers` / `env` / `url` 中的内联 token 可能进入 `mcp_servers` 类别；即使没有选 `providers`、关闭了 `includeCredentials`、或没有密码，也不检查或移除这些值。内联凭证是拒绝、脱敏还是强制加密，待决定。
+- [待决定] R2 的缺口：chats、skills、voice_corrections、environment_variables 以合并方式写入，没有能恢复原状态的快照，失败时无法回滚到恢复前；是否及如何补齐，待决定。
+- [待决定] providers 的配置文件级快照之外（如凭证），失败时能回滚到什么程度，需按源码确认（R7）。
+- [待决定] 是否需要跨类别统一的快照，以及一致性范围（S3）。
+- [待决定] 是否保留环境变量值依赖 `providers` 凭证集合的耦合（E6、E7）。
 
-步骤 6 的类别选择必须同时核对[凭证与加密](#凭证与加密)中的依赖。选择环境变量元数据不等于选择包内 secrets；成功类别数不能代替值完整性的核查。
+## 验收场景
 
-当前事务边界是“每个类别”：某类别失败时回滚该类别，已经成功的前序类别保留，然后继续/报告其他类别。UI 和调用方不得把部分成功显示成全有或全无。
+| 场景 | 期望 |
+| --- | --- |
+| 选择 providers、开启包含凭证，但没有设置密码 | 写出分享包之前拒绝；界面提示设置密码或关闭凭证；磁盘上不留下含明文凭证的包（E1） |
+| 加密包被截断或篡改；完整包输入错误密码 | 前者在完整性阶段失败；后者提示密码错误而不是数据损坏；任何失败都没有部分写入业务数据（E4、E5） |
+| 源文件超限、iCloud 未下载、或索引后 blob 消失 | 导出报告列出跳过和缺失的原因与数量；恢复报告不把缺失标记当作已恢复的文件；用户在删除旧设备数据前能看出备份不完整（S2、X4） |
+| 恢复中途被终止 | 已开始的类别有持久的快照和 journal；下次启动时回滚或处理，不把写了一半的目录当成功；其他恢复不误删它的 staging（R3） |
+| 格式兼容 | 未知主版本被拒绝；`minisbak/1` 的未知字段被忽略；缺少可选字段时按默认值读取；旧包或显式导出的 `voice_corrections` 可恢复（P2、P3） |
+| 恢复后的顺序与覆盖 | 会话消息顺序与备份一致，压缩标记引用有效；已有本地凭证保持不变，报告中标为 kept（R4、R5） |
+| 只迁移环境变量（目标设备没有同名条目和值） | 只导出或只恢复环境变量时能看到条目，但不报告值已迁移；同时导出并恢复环境变量与含凭证的 providers 才核查值是否完整（E6、E7） |
+| 导出中断后修改未完成的 Memory、Provider 或环境变量，再续跑 | 保留原 backup id 和 `snapshotAt`；分别核查已完成与续跑类别的实际内容时间，不只凭 manifest 时间判定统一快照（S3、X3） |
+| 配置含内联 token 的 MCP server 后导出 | 用占位测试值检查各成员是否包含该值，不输出真实秘密（E8、E9） |
 
-rollback snapshot 必须位于非临时、不会随解包工作目录删除的位置；若 App 在恢复中被终止，下一次启动可根据 journal 调和孤儿 staging。结束标记不能先于数据真正稳定落盘。
+## 代码入口
 
-## 合并与冲突
-
-当前 importer 以 merge 为主；会话 id 冲突可选择合并或复制为新会话。恢复凭证时，本地已存在的凭证应保留，旧备份不得静默覆盖用户后来轮换的 key。
-
-顺序、会话消息与 compact marker 必须保持引用一致；聊天类别内部要先建立会话，再导入引用它的消息/文件。未知类别或记录版本的行为必须遵守格式兼容策略并进入 warning，不能产生看似成功的空恢复。
-
-## 场景与验收
-
-### 场景 A：包含凭证但未设置密码
-
-前提：选择 providers 且开启包含凭证。仅选择环境变量元数据不触发这一凭证组合，见[凭证与加密](#凭证与加密)。
-
-可观察验收：导出在写出可分享包前拒绝；界面说明设置密码或关闭凭证；磁盘上没有含明文凭证的残留包。
-
-### 场景 B：加密包损坏或密码错误
-
-可观察验收：截断/篡改成员先在 integrity 阶段失败；完整包的错误密码得到密码错误而不是“数据损坏”；在任何失败下都没有部分应用业务数据。
-
-### 场景 C：部分文件不可用
-
-前提：源文件超限、iCloud 未下载或索引后 blob 消失。
-
-可观察验收：导出报告列出 skipped/missing 原因和数量；恢复报告不会把 tombstone 当成已恢复文件；用户在删除旧设备数据前能识别备份不完整。
-
-### 场景 D：恢复中途被终止
-
-可观察验收：已开始类别存在持久 snapshot/journal；下次启动能够回滚或调和，不把半写目录当成成功；其他并发 restore 不会误删它的 staging。
-
-### 场景 E：格式兼容
-
-可观察验收：未知 major 被拒绝；`minisbak/1` 的未知字段被忽略；缺少可选字段仍按默认值读取；普通 UI 新备份不提供 `voice_corrections`，旧包或显式选择该类别导出的包仍可恢复。
-
-### 场景 F：顺序和覆盖
-
-可观察验收：恢复后会话消息顺序与备份一致，compact marker 引用有效；已存在本地凭证保持不变并在报告中标记 kept。
-
-### 场景 G：只迁移环境变量
-
-前提：源设备有带值的变量，目标样本没有同名条目或 Keychain 值。
-
-可观察验收：仅导出/恢复环境变量时能看到条目，但不能报告值已迁移；同时导出环境变量与含凭证 providers 并在恢复时选择两者，才按实际恢复后的值核查完整性。给仅元数据包设置密码不会补出值；完整包仅选环境变量恢复也不会应用 secrets。既有目标条目和值仍保留，不用覆盖旧值来伪造成功。
-
-### 场景 H：中断期间修改未完成类别
-
-前提：使用可丢弃样本，导出中断后修改尚未完成的 Memory、Provider 或环境变量，再按兼容选项续跑。
-
-可观察验收：原 backup id 和 `snapshotAt` 保留；分别核查已完成类别和续跑类别的实际内容时间。不能仅检查 manifest 时间就判定统一快照通过；当前未保证跨类别一致，相关产品决定和运行证据另行记录。
-
-## 现有测试与待验证边界
-
-仓库已有格式兼容、加密、不完整结果、打包、顺序、类别计数、thinking rules round-trip、ZIP containment 和 restore symlink containment 测试。本轮未运行它们，存在测试文件不等于当前工作区已通过。
-
-还需在后续验证：大包内存/磁盘压力、真实 iCloud placeholder、App 被系统终止后的 journal 恢复、File Provider 输入包，以及跨版本真实样本。任何实际恢复都应先使用可丢弃样本或备份副本，不能以用户唯一数据作首轮验证。
+- 格式与类别：[BackupFormat](../../src/ios/Agent/Backup/BackupFormat.swift)
+- 导出、加密、续跑、报告：[BackupExporter](../../src/ios/Agent/Backup/BackupExporter.swift)、[BackupSecrets](../../src/ios/Agent/Backup/BackupSecrets.swift)
+- 检查、预检、分类恢复：[BackupImporter](../../src/ios/Agent/Backup/BackupImporter.swift)
+- 回滚与启动协调：[BackupRestoreJournal](../../src/ios/Agent/Backup/BackupRestoreJournal.swift)
+- 已有测试覆盖格式兼容、加密、不完整结果、打包、顺序、类别计数、thinking 规则往返、ZIP 与符号链接的路径约束。
