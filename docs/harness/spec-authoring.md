@@ -42,4 +42,4 @@ description 是描述的唯一维护源；[生成索引](../specs/index.md)复�
 
 按改动风险选择验证：确认入口链接与标题定位有效，索引与源 description 一致，场景能找到相关条件和验收；文档修改运行 `git diff --check`。涉及上下文工具时验证完整章节、来源一致性和字符预算；纯文字变动不启动全产品构建。任务收尾按 [archive-task](../../.agents/skills/archive-task/SKILL.md)处理。
 
-本指南不新增提交、推送、发布或外部写入授权。现有[协作边界](../../AGENTS.md#task-execution)继续适用。
+本指南不新增提交、推送、发布或外部写入授权。现有[协作边界](collaboration.md)继续适用。

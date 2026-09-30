@@ -1,0 +1,5 @@
+git diff --check: exit=0
+no-index whitespace check hooks.json: exit=1; diagnostics=''
+no-index whitespace check pre_tool_use_policy.py: exit=1; diagnostics=''
+no-index whitespace check test_pre_tool_use_policy.py: exit=1; diagnostics=''
+All whitespace checks passed.

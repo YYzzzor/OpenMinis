@@ -1,0 +1,30 @@
+{
+  "sourceFilter": "project hooks with sourcePath under OpenMinis only",
+  "data": [
+    {
+      "cwd": "/Users/huyuanzhao/Coding/Projects/OpenMinis",
+      "hooks": [
+        {
+          "key": "/Users/huyuanzhao/Coding/Projects/OpenMinis/.codex/hooks.json:pre_tool_use:0:0",
+          "source": "project",
+          "sourcePath": "/Users/huyuanzhao/Coding/Projects/OpenMinis/.codex/hooks.json",
+          "eventName": "preToolUse",
+          "matcher": "^(spawn_agent|Agent|collaboration\\.spawn_agent)$",
+          "currentHash": "sha256:b0cad75c64352df2eb348bbd62cf1feec714c638a55618cd29efd3cbae21de60",
+          "enabled": true,
+          "trustStatus": "modified"
+        },
+        {
+          "key": "/Users/huyuanzhao/Coding/Projects/OpenMinis/.codex/hooks.json:pre_tool_use:1:0",
+          "source": "project",
+          "sourcePath": "/Users/huyuanzhao/Coding/Projects/OpenMinis/.codex/hooks.json",
+          "eventName": "preToolUse",
+          "matcher": "^(apply_patch|Edit|Write)$",
+          "currentHash": "sha256:fc48e6ec9716cc625bf8c5993703763c7f23e954ee63cd0f769b1010d8eaad17",
+          "enabled": true,
+          "trustStatus": "trusted"
+        }
+      ]
+    }
+  ]
+}

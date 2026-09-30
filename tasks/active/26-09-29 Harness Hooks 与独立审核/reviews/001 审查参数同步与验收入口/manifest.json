@@ -1,0 +1,50 @@
+{
+  "repo": "/Users/huyuanzhao/Coding/Projects/OpenMinis",
+  "head": "2551a268b10873ecb7f2d601e71629f5b61ce6d8",
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "8ad96504a89c1002b9708d6f37a09edbc4650cd51ee0eac233616af9625a8731"
+    },
+    {
+      "path": "scripts/harness/pre_tool_use_policy.py",
+      "sha256": "8591a442254e9a04d8c08d6329177bf07ca205307abc34795aec65a03a2be165"
+    },
+    {
+      "path": "scripts/harness/test_pre_tool_use_policy.py",
+      "sha256": "bd2c4de659f128d1229d25be30ea10e888f08c5e8fa378fe0c0c6ec9dc7ad9ce"
+    },
+    {
+      "path": ".codex/hooks.json",
+      "sha256": "11bdeb6bef39c9ad4d5bc5d565f2b60167b95f604d3a5e7f54ad1650129a144c"
+    },
+    {
+      "path": "docs/harness/design.md",
+      "sha256": "accec149c342c2c0f1cdad79d8ed6305e6c55500490a33d19d9fd27830a6aa47"
+    },
+    {
+      "path": "docs/harness/operations.md",
+      "sha256": "004de0cb37b92be7334ad405d27312571f629040aa8fd5a6488ea51249e01de7"
+    },
+    {
+      "path": "docs/harness/skills-guide.md",
+      "sha256": "b3b01e4d45f888019294139b6899fd62859d0293ff9a646b34d9365036c86641"
+    },
+    {
+      "path": "docs/harness/collaboration.md",
+      "sha256": "3c67012e38e05b3a818325bce33290abbfbc44fd82b644ba61bd459b57dde387"
+    },
+    {
+      "path": ".agents/skills/review-task/SKILL.md",
+      "sha256": "b9b6860746d20eaa27f76d39bbc68b7f4c5f25bcad6b412d4defa8ba68803264"
+    },
+    {
+      "path": "docs/specs/resource-efficiency.md",
+      "sha256": "63ac0c5ba934c17d061bafd625dfdafe7a2a4277e99a8fde5ef84346fabf7235"
+    },
+    {
+      "path": "tasks/active/26-09-29 Harness Hooks 与独立审核/task.md",
+      "sha256": "3287a298193eb741a7f984efe558b5ae3f8cc0c12ea536b903e667344a683404"
+    }
+  ]
+}

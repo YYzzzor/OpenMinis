@@ -1,172 +1,49 @@
-# OpenMinis Code Analysis Guidelines
+# MinisX project guidance
 
-This file defines how to analyze, comment on, and modify code in this repository. Follow these rules unless the user gives more specific instructions in the current conversation.
+These are persistent project defaults. More specific user instructions take precedence; read linked guidance only when the task needs it.
 
 ## Project Defaults
 
-- The forked app is named **MinisX**; use this name for user-facing app labels and discussion.
-- The minimum supported system is **iOS 26.0**, including app extensions and simulator builds. The SDK or simulator runtime may be newer; using iOS 27 for validation does not raise the minimum supported version.
+- The app is **MinisX**, primarily under `src/ios`; minimum iOS version is **26.0** for the app and extensions. A newer test runtime does not raise the deployment target.
+- `main` is the MinisX development baseline, not a mirror of upstream. Verify the actual branch and working tree and preserve unrelated changes.
 
 ## Task Execution
 
-- Within the confirmed goal and authorization, independently complete necessary reading, implementation, fixes and validation. Resolve reversible local implementation choices without asking again.
-- Ask when missing information would materially change the goal, scope or acceptance criteria, or when new authorization is required. If one step is blocked, continue useful work that does not depend on it.
-- Implementing an already approved plan does not require repeated rule approval. New or materially changed rules affecting future tasks still require the review described under Development Harness. Existing tool and environment permission boundaries continue to apply.
-
-### Confirm intent before execution
-
-- For a new substantial development or validation task, first present a concise task brief in the current conversation: the real user scenario and expected outcome, scope/exclusions, deliverables and acceptance evidence, execution location and affected devices/data, and the first validation step plus stopping conditions. Obtain the user's review and confirmation before implementation or costly/state-changing validation. Read-only investigation and drafting the brief may precede confirmation; creating a worktree, adding fixtures, installing/launching tests on devices, or broadening a test matrix is not planning-only work.
-- Bind confirmation to the brief/version and the user's actual words or a recoverable message reference, recording the authorized actions and exclusions. A sufficiently specific direct instruction can authorize a bounded edit; do not repeat approvals already supplied. A vague request to investigate, discussion of options, silence, a permission for one tool call, or the agent's own summary is not approval of a broader task. Missing evidence stays unconfirmed. Later permission never retroactively authorizes earlier actions.
-- Stay in the current conversation by default. Create a separate user-visible task/conversation only when the user explicitly requests it; subagent delegation is not that request. Whenever planning to use a worktree, tell the user before creating or starting work in it: explain why this task needs it, what benefit it provides over the current working directory, and the intended location, branch and base. Put this explanation in the conversation, not only in a task file or an after-the-fact report. Create it only when that arrangement is included in the confirmed task or the user explicitly requests it; reuse existing confirmation without asking again. Isolation and reversibility do not enlarge authorization. Within the confirmed boundary, ordinary implementation choices and authorized delegation remain autonomous.
-- When new evidence requires material changes to scope, execution environment, side effects, cost, approach, or acceptance, pause the affected work and present the revision for confirmation. Do not turn a request to assess whether changes are needed into permission to implement them. If the user corrects the goal or disputes authorization, reconcile the original request and confirmation before continuing; record the deviation without rewriting history as approved.
-
-### Keep validation proportional to the user outcome
-
-- Start with a representative real-use path and verify that the observation method can prove the required behavior before expanding to more devices/states. Test deployment, app launch, screenshot capture and a passing test framework each prove only their own step; use explicit behavior assertions or inspected interaction evidence for product acceptance.
-- State stopping conditions in the task brief. When an observation method repeatedly fails or yields no new evidence, stop expanding it; continue only with a concrete new hypothesis and bounded check inside the approved scope. If completing the task requires new tooling or a different route, explain the expected value and revised scope before expanding. Do not add fixtures, agents, review rounds or logs merely to make the process look complete.
-- Before a mutating device/test command, validate the exact approved target identifier against the selected destination, including deployment performed implicitly by the test runner. On mismatch, stop before deployment. Pass the same target constraints to delegates and verify returned device attribution.
-- Report product defects with a real user trigger, observable impact and evidence. Separate them from test-tool defects and unverified risks. A tool defect may undermine evidence and require correction within authorized scope, but its severity or a Pi finding alone does not make it a product repair requirement. Progress updates should identify new evidence, remaining uncertainty and the value of the next check.
+- Continue independently within the confirmed goal. For substantial new work or material scope changes, use `plan-task`; a specific direct edit request can already supply authorization. Do not ask again for approved work.
+- Stay in this conversation. New visible conversations, worktrees, commits and pushes require the applicable explicit user authorization. See [execution boundaries](docs/harness/collaboration.md#task-execution) and [Git workflow](docs/harness/collaboration.md#git-workflow) when relevant.
+- Keep implementation and verification proportional to the task: avoid unnecessary process, overengineering, speculative defensive code and repeated checks without a new reason. Report what was actually verified and what remains unknown.
+- For very simple UI tweaks, prefer one small guided step at a time for the user to apply and observe; no coding delegate, task record or independent review is needed for guidance alone.
 
 ## Codex Model Delegation
 
-- The project default division of work is GPT-6-Astra (`gpt-6-astra`) for planning, complex problems, integration, code review and final acceptance, with GPT-6-Luna (`gpt-6-luna`) at `max` reasoning effort for clearly scoped implementation subtasks (user decision: 2026-09-23).
-- Within an authorized task, the main agent may assign suitable implementation subtasks to Luna Max without asking the user to launch or approve each subagent. Explicitly select both the model and reasoning effort; do not rely on the subagent inheriting the main task's settings.
-- Follow the Development Harness delegation rules below. The main agent may handle small edits and work requiring continuous shared context directly when delegation would add more overhead than benefit.
-- This policy does not switch the active main task's model. If it differs from Astra, report that limitation rather than claiming the work is being performed by Astra. If Luna Max is unavailable, report the limitation and continue suitable work with the main agent; do not silently substitute another subagent model.
-- Luna Max performs author self-checks and relevant validation before handing work back. Its handoff identifies changed files, validation results and evidence locations, known concerns and unverified scope.
-- The main agent checks the actual diff and relevant code against confirmed requirements, including integration effects, edge cases and whether test assertions cover the intended behavior. Inspect original validation evidence and verify that it applies to the final code; do not rely only on the implementation agent's summary. Scale review depth to the change's impact and follow Changes and Validation below to avoid unnecessary repeated checks.
-- The main agent retains responsibility for integration and final acceptance. Existing Harness validation and independent Pi review requirements still apply: verify Pi findings, arrange fixes and relevant revalidation or re-review, and record their disposition. Neither a subagent's completion report nor Pi's conclusion is final acceptance.
-- These defaults apply to this project. A more specific user instruction for the current task takes precedence.
+- Main session: requirements, planning, coordination, evidence and final acceptance; it may maintain policy/task/review documents. All agent-authored code edits, including small fixes, comments, configuration and tests, go to **`gpt-6-luna` / `xhigh`**. If unavailable, report it; do not silently substitute or take over coding.
+- When code review is needed, use a **fresh `gpt-6.1-sol` / `high`** session, `task_name=review_*`, `fork_turns=none`, read-only. Do not repeat a full review in the main session. **Pi is paused.**
+- Explicitly set delegation parameters. Correct recoverable parameter mismatches and retry automatically without asking the user or ending the task. For code delegates, use `fork_turns=none` or a supported positive integer string.
+- Before delegating, read [model responsibilities and handoff](docs/harness/collaboration.md#codex-model-delegation); before reviewing, use `review-task`. These defaults do not change the active main model.
 
 ## Reader Background
 
-The detailed teaching guidance in Reader Background, Explanation Style and Swift Topics That Need Explanation applies when the user requests code explanation, analysis or learning. For implementation, review and progress reports, explain only what is needed to assess the work; do not teach every language feature encountered.
-
-- Assume the reader knows basic C++ syntax but is not familiar with Modern C++, Swift, SwiftUI, or iOS development.
-- Use clear and direct language. Explain what the code actually does before introducing technical terms.
-- Explain a technical term in one sentence when it first appears. Do not assume the reader already knows it.
-- Do not use advanced Modern C++ concepts to explain Swift unless the C++ concept is also explained.
-- Compare Swift with C++ only when the comparison makes the code easier to understand. Prefer basic concepts such as classes, objects, pointers, value copies, and callbacks.
-- Do not use analogies in place of technical explanations. When a Swift or iOS concept has no direct C++ equivalent, state the difference clearly.
-
-## Explanation Style
-
-For complex code, prefer the following order:
-
-1. Explain what the code is responsible for.
-2. Explain what happens immediately before and after it in the current execution flow.
-3. Explain the Swift, Objective-C, or iOS syntax needed to understand it.
-4. Explain object lifetime, threads, asynchronous tasks, state updates, and possible side effects.
-5. Explain why OpenMinis uses this implementation and what must remain true when the code changes.
-
-Keep these categories separate:
-
-- Language syntax: rules from Swift or Objective-C itself.
-- Platform behavior: rules from SwiftUI, UIKit, the iOS sandbox, permissions, background execution, and related frameworks.
-- Project logic: rules defined by OpenMinis for agents, sessions, tools, providers, and synchronization.
-
-Answer simple questions directly. Do not force every answer into the full structure above.
-
-## Swift Topics That Need Explanation
-
-When explaining code at the user's request, explain the actual effect of relevant features in that code instead of only naming them:
-
-- Value semantics and reference semantics for `struct` and `class`.
-- Optionals, `if let`, `guard let`, and `nil`.
-- Protocols, extensions, generics, and type constraints.
-- Closure parameters, return values, captures, and `@escaping`.
-- ARC, strong references, `weak`, `unowned`, and `deinit`.
-- `async`, `await`, `Task`, actors, and `@MainActor`.
-- Property wrappers such as `@State`, `@Binding`, `@Published`, and `@Environment`.
-- SwiftUI `body`, state-driven updates, and View lifecycle.
-- Bridging between Swift, Objective-C, and C interfaces.
-
-## Analysis Scope
-
-- The primary analysis target is `src/ios`.
-- Focus first on `Agent`, `Providers`, `NativeOffloads`, `iSH`, `Views`, `Shared`, and the app extensions.
-- When the iOS sandbox or native dependencies matter, also inspect `deps/ish`, build scripts under `deps`, `src/shared`, and `docs/specs`.
-- Do not mix Android implementation details into an iOS explanation unless the execution path genuinely crosses platforms or a comparison is explicitly useful.
-- Do not target `Vendor`, resource files, or generated files for comments unless the user explicitly asks for them.
-
-## UI Preview Collaboration
-
-- For UI adjustments, prefer Xcode Canvas previews of the production component with centrally located, clearly commented parameters the maintainer can edit to compare results. Preserve the maintainer's edits and apply confirmed values to the shared production implementation. Follow [ios-ui-design: Canvas collaboration](.agents/skills/ios-ui-design/SKILL.md#优先用-canvas-协作调整-ui) for the workflow and validation boundaries; use simulator or device checks for behavior previews cannot adequately verify. This is a preference, not a mandatory preview stage for every UI task.
-
-## Using CodeGraph
-
-- Prefer CodeGraph for structural questions such as symbol definitions, callers, callees, execution paths, and change impact when it is available and its index applies to the current code. If unavailable or insufficient, continue with direct source reading and searches.
-- Include `src/ios`, a full file name, or an unambiguous Swift symbol in queries so that similarly named Android code is not returned first.
-- Use `rg` for literal searches such as strings, log messages, and existing comment text.
-- Avoid repeating verified CodeGraph results without a reason. Source changes, stale indexes or conflicting evidence justify direct verification.
-- Read files named in synchronization warnings directly; read other related files when the task requires them.
-
-## Source Comments
-
-- Write source comments in Chinese by default, using direct and concise wording.
-- Comments should explain reasons, constraints, invariants, side effects, thread requirements, permission boundaries, data contracts, edge cases, or compatibility workarounds.
-- Do not add comments that only repeat variable names, function names, or simple control flow.
-- Do not refactor code merely to make it easier to comment on, and do not change runtime behavior as part of a comment-only task.
-- Understand the full function and its call relationships before adding a comment, and make sure the comment matches the implementation.
-- When an existing comment is stale, update or remove it instead of adding another explanation beside it.
-- Keep long teaching explanations in the analysis. Source comments should contain only information needed to maintain the code.
-
-## Git Workflow
-
-- Perform personal analysis and comment work on the `ios-annotated` branch.
-- `main` is the MinisX development baseline, based on official OpenMinis v1.13 plus the accepted MinisX customizations and Harness (user decision: 2026-09-22). It is not a mirror of official `upstream/main`.
-- For development, use the branch and working directory established for the confirmed task; agree a new branch/worktree arrangement before creating one rather than inferring permission from the usefulness of isolation. Approved new feature/fix branches start from local MinisX `main` unless the user specifies another base. Follow an explicit user request to work on or update `main`.
-- `origin` points to the personal fork, and `upstream` points to the official read-only mirror.
-- Confirm the current branch and uncommitted changes before modifying files or switching branches. Do not automatically move or discard existing changes to satisfy a branch convention.
-- Do not create commits or push to a remote unless the user explicitly asks.
-- When the user asks for commits, split them into small commits by analysis area instead of combining many unrelated comments.
-- For an upstream upgrade, inspect the requested official branch or fixed commit, compare it with the MinisX baseline, and preserve the accepted customizations and Harness. Do not replace or rebase `main` onto official `upstream/main` merely to enforce the former mirror convention. Preserve existing annotation/history branches unless the user requests changes to them.
-- When resolving conflicts, verify that affected comments are still correct for the new implementation. Do not preserve text without checking the changed code.
-
-## Resource Efficiency
-
-- Keeping resource costs within reasonable bounds is mandatory at all times, across every feature and all development stages, including prototypes, debugging and validation. Treat CPU, GPU, memory, energy, network, disk and background work as part of correctness and quality, not optional polish.
-- Follow [Resource efficiency and performance review](docs/specs/resource-efficiency.md). Avoid unnecessary work, bound sustained work and growing resources, and tie cancellation and cleanup to actual lifecycle needs. Do not sacrifice correctness or add unproven complexity merely to claim optimization.
-- Resource efficiency is a required focus of both author checks and independent reviews. Explicitly include this specification in every review's required material; record relevant resource impact, evidence and unverified limits. Pure documentation changes may be marked not applicable with a reason. A build or smooth-looking demo does not establish measured device performance.
-
-## Changes and Validation
-
-- Modify only the files and areas requested by the user.
-- Run at least `git diff --check` after changing comments or documentation.
-- A full build is usually unnecessary for comment-only changes. Run an appropriate check if a comment can affect syntax, generated documentation, or compilation.
-- When runtime behavior changes, run tests or builds appropriate to the affected area and clearly report any validation that could not be performed.
-- Choose checks sufficient for the goal and relevant risks. Once they pass, do not repeat or broaden testing unless new changes, failures or unresolved concerns justify it. Record unavailable checks explicitly; unrelated tests do not substitute for them.
-- At the end of the task, explain what changed, what was validated, and whether any questions still require the user's judgment.
+- The user knows basic C++ but is learning Swift/iOS. Explain relevant terms plainly when explanation is requested; avoid a tutorial during routine implementation updates.
+- For code explanation, comments, CodeGraph use or Canvas collaboration, read the relevant section of [code guidance](docs/harness/code-guidance.md). Source comments default to concise Chinese explaining intent and constraints.
 
 ## Project Skills
 
-Use the shared skills below when the task fits; read the linked SKILL.md before applying it. If automatic discovery is unavailable, load it directly. For new development, use plan-task to settle material goals, choices and acceptance before implementation. Reuse explicit prior approval; ordinary code questions do not start a planning workflow.
+Read the matching skill when needed; ordinary questions and trivial edits do not activate a full workflow. If automatic discovery is unavailable, open the linked SKILL.md directly.
 
 | Skill | Use when |
 | --- | --- |
-| [plan-task](.agents/skills/plan-task/SKILL.md) | Clarifying a development goal, researching relevant constraints, comparing viable approaches and confirming the implementation and acceptance plan |
-| [ios-ui-design](.agents/skills/ios-ui-design/SKILL.md) | Designing or checking native iOS hierarchy, navigation, feedback, motion and accessibility using Apple guidance and explained tradeoffs |
-| [resume-task](.agents/skills/resume-task/SKILL.md) | Resuming an existing task and verifying its records against current Git and code state |
-| [review-task](.agents/skills/review-task/SKILL.md) | Preparing, performing or resolving a review against fixed code and confirmed requirements |
-
-The user-facing guide is [项目技能使用说明](docs/harness/skills-guide.md). These skills use the Development Harness below for records, checkpoints and acceptance.
+| [plan-task](.agents/skills/plan-task/SKILL.md) | Clarifying substantial new work and acceptance; include a useful runtime diagram, preferably a sequence diagram for interactions |
+| [ios-ui-design](.agents/skills/ios-ui-design/SKILL.md) | Native iOS design decisions or Canvas collaboration |
+| [resume-task](.agents/skills/resume-task/SKILL.md) | Continuing a selected existing task against current code and records |
+| [review-task](.agents/skills/review-task/SKILL.md) | Necessary independent code review and disposition |
+| [archive-task](.agents/skills/archive-task/SKILL.md) | Closing a recorded task or checking whether a resumed task can be archived |
 
 ## Development Harness
 
-- For complex or cross-session development, maintain a task record under `tasks/active/` using `docs/harness/record-formats.md`. Name task titles and record files/directories `YY-mm-dd Name` using the creation date; retain the name when archiving. Small self-contained edits do not require a task record.
-- Task records live at repository-root `tasks/`, separate from `docs/`. Keep planned, active, and blocked tasks in `tasks/active/`; after completion or cancellation, move the record and its attachments to `tasks/archive/` without changing its creation-date name. Record acceptance before archiving; do not infer completion from age or a clean worktree.
-- Default task discovery and recovery must inspect only `tasks/active/`. Do not recursively search, read, follow links into, or attach `tasks/archive/` as ambient context. Read a specific archived record only when the user asks for it or a current task has an identified need for that exact evidence; state the reason first and load only the necessary files. No active match is not a reason to fall back to the archive.
-- When resuming, locate the relevant task, read its intent, decisions, next action and pending approvals, then verify the actual branch, HEAD and working-tree state. Resolve stale records before continuing; do not overwrite work to match a record.
-- Keep task checkpoints current after meaningful progress, changed decisions, blockers and handoffs. Track implementation and verified acceptance separately.
-- For applicable development planning, provide a feature relationship diagram and a typical scenario flow as defined in [plan-task](.agents/skills/plan-task/SKILL.md#用两张图解释设计). Keep their scope local to the feature and its direct collaborators. The main agent keeps affected diagrams synchronized with implementation changes and checks their code references before delivery; preserve fixed review snapshots. Store diagrams using [task diagram records](docs/harness/record-formats.md#任务设计图), without creating a separate task just for diagrams.
-- The main agent owns intent, integration and acceptance, and handles small edits or work requiring continuous shared context. Use subagents for bounded work that can progress and be verified independently when the expected benefit exceeds handoff cost. Supply scope, constraints, acceptance criteria and write boundaries; avoid overlapping concurrent edits. Delegation is not mandatory for every task.
-- For behavior changes, bug fixes and cross-module refactors, the main agent checks the implementation and available tests before requesting independent Pi review. Bind each review to fixed code, Git state and requirements. Preserve the original report and record the disposition of findings separately.
-- Pi review defaults to provider `deepseek` and model `deepseek-flash` (user instruction: 2026-09-27). The user explicitly grants standing authorization to send this project’s review-scoped source, selected task records and applicable specifications to DeepSeek for independent Pi review; proceed without asking on every normal invocation. This excludes credentials and unrelated data outside the project. Use the default model unless the user specifies otherwise; do not silently fall back to another model or provider after a failure. See [Pi invocation](docs/harness/operations.md#调用-pi) for authorization and execution boundaries.
-- Name review rounds under active tasks with a sequence number and a descriptive title based on the actual review topic, never a bare number. Follow [review record naming](docs/harness/record-formats.md#每轮审查); preserve original evidence bytes and historical paths when renaming existing rounds.
-- A failed, incomplete or stale review is not a passing review. Record unavailable validation and pending review explicitly; do not mark the task complete while required acceptance remains unmet.
-- Pi conclusions are review input, not acceptance decisions. The main agent verifies findings against confirmed intent, code and relevant validation, records evidence for accepting or rejecting them, and determines whether acceptance criteria are met. Neither a blocking label nor no findings decides acceptance automatically; unresolved material concerns remain open, and goal or scope tradeoffs go to the user.
-- Automatically correct current task records after significant misalignment. Before changing rules, specifications or skills that affect future tasks, present the concrete change, reason, scope and validation plan for user approval. Pending proposals are not active instructions.
-- Shared skills and records must remain usable by Codex and Pi. Keep tool-specific execution and project-specific settings outside portable instructions where practical.
+- Discover current tasks in `tasks/active/`; do not scan `tasks/archive/` as background context. Read a specific archived record only for an explicit request or an identified evidence need.
+- At task wrap-up, use `archive-task` to judge readiness and archive eligible project records autonomously. No background scan or archive Hook is installed.
+- For task/checkpoint/review formats, use [record-formats.md](docs/harness/record-formats.md); for Harness maintenance, see [design](docs/harness/design.md) and [collaboration details](docs/harness/collaboration.md#development-harness).
+- Validate documentation changes with `git diff --check`; choose meaningful tests for code changes without redundant full builds. Further boundaries are in [validation guidance](docs/harness/collaboration.md#changes-and-validation).
 
 ## Spec Context
 

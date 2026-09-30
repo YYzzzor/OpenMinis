@@ -1,0 +1,36 @@
+{
+  "date": "2026-09-30",
+  "user_confirmation": "我已经同意了, 你看 x",
+  "trust_config_source": "/Users/huyuanzhao/.codex/config.toml",
+  "stored_trust_records": [
+    {
+      "source_key": "/Users/huyuanzhao/Coding/Projects/OpenMinis/.codex/hooks.json:pre_tool_use:0:0",
+      "trusted_hash": "sha256:6235452b88991b565753e9638102a76c73bdc5c93ea4615481b7d832008fa0da"
+    },
+    {
+      "source_key": "/Users/huyuanzhao/Coding/Projects/OpenMinis/.codex/hooks.json:pre_tool_use:1:0",
+      "trusted_hash": "sha256:fc48e6ec9716cc625bf8c5993703763c7f23e954ee63cd0f769b1010d8eaad17"
+    }
+  ],
+  "current_thread": {
+    "id": "01a0f056-f76c-7641-a217-11d116161c3e",
+    "cwd": "/Users/huyuanzhao/Documents/Codex/2026-09-30/new-chat",
+    "runtime_version_record": "0.159.0"
+  },
+  "source_sha256": {
+    ".codex/hooks.json": "11bdeb6bef39c9ad4d5bc5d565f2b60167b95f604d3a5e7f54ad1650129a144c",
+    "scripts/harness/pre_tool_use_policy.py": "8591a442254e9a04d8c08d6329177bf07ca205307abc34795aec65a03a2be165"
+  },
+  "native_tool_probe": {
+    "tool": "apply_patch",
+    "input": "*** Begin Patch\n*** End Patch",
+    "result": "patch rejected: empty patch",
+    "files_modified": false,
+    "project_policy_denial_observed": false
+  },
+  "limitations": [
+    "Stored trusted_hash records were read; no trust store was changed.",
+    "The empty patch reached the patch validator without the project policy denial message.",
+    "The current session is outside the repository; this probe does not prove a native project Hook trigger."
+  ]
+}

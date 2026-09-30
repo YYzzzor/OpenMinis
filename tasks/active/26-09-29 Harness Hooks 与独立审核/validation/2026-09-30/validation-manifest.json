@@ -1,0 +1,96 @@
+{
+  "repository": "/Users/huyuanzhao/Coding/Projects/OpenMinis",
+  "head_at_validation": "2551a268b10873ecb7f2d601e71629f5b61ce6d8",
+  "scope": "review_ delegation policy and targeted regression tests only",
+  "checks": [
+    {
+      "name": "policy-tests",
+      "command": [
+        "python3",
+        "-B",
+        "scripts/harness/test_pre_tool_use_policy.py",
+        "-v"
+      ],
+      "returncode": 0,
+      "accepted": true,
+      "log": "policy-tests.log"
+    },
+    {
+      "name": "hooks-json-parse",
+      "command": [
+        "python3",
+        "-m",
+        "json.tool",
+        ".codex/hooks.json"
+      ],
+      "returncode": 0,
+      "accepted": true,
+      "log": "hooks-json-parse.log"
+    },
+    {
+      "name": "hooks-json-structure",
+      "command": [
+        "python3",
+        "-c",
+        "validate .codex/hooks.json schema and PreToolUse entries"
+      ],
+      "returncode": 0,
+      "accepted": true,
+      "log": "hooks-json-structure.log"
+    },
+    {
+      "name": "git-diff-check",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "returncode": 0,
+      "accepted": true,
+      "log": "git-diff-check.log"
+    },
+    {
+      "name": "target-diff-check-pre_tool_use_policy",
+      "command": [
+        "git",
+        "diff",
+        "--check",
+        "--no-index",
+        "/dev/null",
+        "scripts/harness/pre_tool_use_policy.py"
+      ],
+      "returncode": 1,
+      "accepted": true,
+      "log": "target-diff-check-pre_tool_use_policy.log"
+    },
+    {
+      "name": "target-diff-check-test_pre_tool_use_policy",
+      "command": [
+        "git",
+        "diff",
+        "--check",
+        "--no-index",
+        "/dev/null",
+        "scripts/harness/test_pre_tool_use_policy.py"
+      ],
+      "returncode": 1,
+      "accepted": true,
+      "log": "target-diff-check-test_pre_tool_use_policy.log"
+    }
+  ],
+  "code_sha256": {
+    "scripts/harness/pre_tool_use_policy.py": "8591a442254e9a04d8c08d6329177bf07ca205307abc34795aec65a03a2be165",
+    "scripts/harness/test_pre_tool_use_policy.py": "bd2c4de659f128d1229d25be30ea10e888f08c5e8fa378fe0c0c6ec9dc7ad9ce"
+  },
+  "patch": "reviewer-policy.patch",
+  "patch_sha256": "34b0b233419efe72fdcd6f6c27bff77cbf181cb610ba274e43d9e3402072dfc6",
+  "log_sha256": {
+    "policy-tests.log": "bdfc68dab743d3ae034f24b85808756f18652a96908eb02c1da0cacf066cb067",
+    "hooks-json-parse.log": "f8d6cc153a81a812581631740c6ab2b6fc6017e575e5eb0d587373946bb960a6",
+    "hooks-json-structure.log": "840369ecbecee548e7fcebaf9966ea2c8cac7b0a1b31e444e2b89f89252a0dde",
+    "git-diff-check.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "target-diff-check-pre_tool_use_policy.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "target-diff-check-test_pre_tool_use_policy.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "baseline_note": "Patch was reconstructed from the unique old/new text substitutions used for this turn; no complete pre-edit file snapshot is claimed."
+}

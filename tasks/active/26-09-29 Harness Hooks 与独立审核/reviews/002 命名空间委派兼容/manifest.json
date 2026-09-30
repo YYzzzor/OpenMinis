@@ -1,0 +1,60 @@
+{
+  "repo": "/Users/huyuanzhao/Coding/Projects/OpenMinis",
+  "head": "2551a268b10873ecb7f2d601e71629f5b61ce6d8",
+  "files": [
+    {
+      "path": ".codex/hooks.json",
+      "sha256": "3465bfabf1cf60022bcf0f8620ae4b027a5f947604d7db5f36503f659eab7123"
+    },
+    {
+      "path": "scripts/harness/pre_tool_use_policy.py",
+      "sha256": "63353991b701d65486342471826e26845ae44bd9b74f7ca6e34c251ce5d8e655"
+    },
+    {
+      "path": "scripts/harness/test_pre_tool_use_policy.py",
+      "sha256": "9f13aa1909dd48814db93f84619608d3c2c40ab85e9b762ed957efff45acd0d3"
+    },
+    {
+      "path": "docs/harness/operations.md",
+      "sha256": "7e9b2c6e3036bde409484d0d6c399d419bcb6d8209973b1d6a81ed649b592bcd"
+    },
+    {
+      "path": "AGENTS.md",
+      "sha256": "8ad96504a89c1002b9708d6f37a09edbc4650cd51ee0eac233616af9625a8731"
+    },
+    {
+      "path": ".agents/skills/review-task/SKILL.md",
+      "sha256": "b9b6860746d20eaa27f76d39bbc68b7f4c5f25bcad6b412d4defa8ba68803264"
+    },
+    {
+      "path": "docs/specs/resource-efficiency.md",
+      "sha256": "63ac0c5ba934c17d061bafd625dfdafe7a2a4277e99a8fde5ef84346fabf7235"
+    },
+    {
+      "path": "tasks/active/26-09-29 Harness Hooks 与独立审核/task.md",
+      "sha256": "cfaa7e9fe190bc5ad96fe05b697c14f01eed2843d071908acb37b9a582cb9288"
+    }
+  ],
+  "validation": [
+    {
+      "path": "validation/policy-tests.log",
+      "sha256": "30457a7eb19b6c6aa76dd77154ada48d9b6c7e5b48d1ff5faeaea1971e002c75"
+    },
+    {
+      "path": "validation/json-structure.log",
+      "sha256": "23602e7d0e1dd459f060abb9c1a13151298586bd782d50df838cb0ce56ef416a"
+    },
+    {
+      "path": "validation/current.diff",
+      "sha256": "bb87142841f6910a08fff611a3c2dbaf72b4c6fd29035bfd2abc052c78f8cb8f"
+    },
+    {
+      "path": "validation/diff-check.log",
+      "sha256": "325ca2ae08e1f751257ecff96b58a4937d9f4b5a11cc7ccba0387da7d07076de"
+    },
+    {
+      "path": "validation/trust-after-fix.json",
+      "sha256": "68df66cd41720186036aacdf9ecb1416a515e22111a70d61a240a1523837dcba"
+    }
+  ]
+}

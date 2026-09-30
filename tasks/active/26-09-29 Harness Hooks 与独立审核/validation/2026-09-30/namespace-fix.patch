@@ -1,0 +1,106 @@
+--- before/hooks.json
++++ repo/.codex/hooks.json
+@@ -3,7 +3,7 @@
+   "hooks": {
+     "PreToolUse": [
+       {
+-        "matcher": "^(spawn_agent|Agent)$",
++        "matcher": "^(spawn_agent|Agent|collaboration\\.spawn_agent)$",
+         "hooks": [
+           {
+             "type": "command",
+--- before/pre_tool_use_policy.py
++++ repo/scripts/harness/pre_tool_use_policy.py
+@@ -63,7 +63,7 @@
+     tool = event.get("tool_name")
+     args = event.get("tool_input") or {}
+ 
+-    if tool in {"spawn_agent", "Agent"}:
++    if tool in {"spawn_agent", "Agent", "collaboration.spawn_agent"}:
+         name = args.get("task_name", "")
+         model = args.get("model")
+         effort = args.get("reasoning_effort")
+--- before/test_pre_tool_use_policy.py
++++ repo/scripts/harness/test_pre_tool_use_policy.py
+@@ -8,8 +8,8 @@
+ 
+ 
+ class PolicyTests(unittest.TestCase):
+-    def spawn(self, **args):
+-        return policy.reason_for({"tool_name": "spawn_agent", "tool_input": args})
++    def spawn(self, tool_name="spawn_agent", **args):
++        return policy.reason_for({"tool_name": tool_name, "tool_input": args})
+ 
+     def patch(self, model, target, move_to=None):
+         command = f"*** Begin Patch\n*** Update File: {target}\n"
+@@ -57,6 +57,70 @@
+             reasoning_effort="high",
+             fork_turns="none",
+         ))
++
++    def test_namespaced_review_delegate_rejects_old_parameters_with_retry_guidance(self):
++        reason = self.spawn(
++            tool_name="collaboration.spawn_agent",
++            task_name="review_voice_path",
++            model="gpt-6-astra",
++            reasoning_effort="medium",
++            fork_turns="none",
++        )
++        self.assertIn("gpt-6.1-sol", reason)
++        self.assertIn("reasoning_effort 'high'", reason)
++        self.assertIn("retry automatically", reason)
++
++    def test_namespaced_review_delegate_accepts_sol_high_without_history(self):
++        self.assertIsNone(self.spawn(
++            tool_name="collaboration.spawn_agent",
++            task_name="review_voice_path",
++            model="gpt-6.1-sol",
++            reasoning_effort="high",
++            fork_turns="none",
++        ))
++
++    def test_namespaced_code_delegate_rejects_wrong_parameters(self):
++        reason = self.spawn(
++            tool_name="collaboration.spawn_agent",
++            task_name="implement",
++            model="gpt-6-astra",
++            reasoning_effort="medium",
++            fork_turns="none",
++        )
++        self.assertIn("gpt-6-luna", reason)
++        self.assertIn("retry automatically", reason)
++
++    def test_namespaced_code_delegate_accepts_luna_xhigh_with_explicit_fork(self):
++        self.assertIsNone(self.spawn(
++            tool_name="collaboration.spawn_agent",
++            task_name="implement",
++            model="gpt-6-luna",
++            reasoning_effort="xhigh",
++            fork_turns="3",
++        ))
++
++    def test_hook_matcher_matches_only_the_supported_spawn_names(self):
++        import json
++        import re
++
++        config_path = Path(__file__).parents[2] / ".codex" / "hooks.json"
++        config = json.loads(config_path.read_text())
++        hooks = config["hooks"]["PreToolUse"]
++        matcher = hooks[0]["matcher"]
++        self.assertEqual(matcher, r"^(spawn_agent|Agent|collaboration\.spawn_agent)$")
++        self.assertEqual(hooks[1]["matcher"], r"^(apply_patch|Edit|Write)$")
++        pattern = re.compile(matcher)
++        for name in ("spawn_agent", "Agent", "collaboration.spawn_agent"):
++            with self.subTest(name=name):
++                self.assertIsNotNone(pattern.fullmatch(name))
++        for name in (
++            "xspawn_agent",
++            "spawn_agent_extra",
++            "collaborationXspawn_agent",
++            "collaboration.spawn_agent.extra",
++        ):
++            with self.subTest(name=name):
++                self.assertIsNone(pattern.fullmatch(name))
+ 
+     def test_review_delegate_rejects_astra_medium_with_retry_guidance(self):
+         reason = self.spawn(

@@ -1,0 +1,9 @@
+# 命名空间兼容审查处置
+
+2026-09-30。全新 reviewer review_hooks_namespace_compat，gpt-6.1-sol/high/fork_turns=none，只读固定8份snapshot与5份验证附件，SHA256一致。原报告保持原文。本轮精确名称兼容和operations同步获静态no_findings，主Agent接受其限定范围；未以此通过原生验收。
+
+17项策略测试、JSON结构与第二组Hook不变、空白检查均通过。既有Astra-only主文档gate和shell等未覆盖路径不变。新定义的宿主 currentHash 为 sha256:b0cad75c64352df2eb348bbd62cf1feec714c638a55618cd29efd3cbae21de60，trustStatus=modified；原patch Hook仍trusted。专用客户端实际连接成功，在trust前置检查处停止，未创建线程或turn，未绕过信任。
+
+剩余验收：用户在Hooks界面审阅信任此精确定义后，实际核对namespaced旧review参数拒绝、Sol high none纠正重试允许及helper完成，再核对patch拒绝/允许与清理。原始事件须来自宿主，不使用手工stdin替代。用户开发授权持续有效，唯一待用户动作是宿主对新定义的信任；不能因旧定义批准而自动改写trust存储。
+
+无产品契约变化，无须更新产品Spec与索引；本轮配置兼容和实际信任边界已同步Harness operations。任务保留active，未提交推送。

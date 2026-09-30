@@ -1,0 +1,22 @@
+test_code_delegate_rejects_implicit_or_all_fork_turns_with_retry_guidance (__main__.PolicyTests.test_code_delegate_rejects_implicit_or_all_fork_turns_with_retry_guidance) ... ok
+test_code_delegate_requires_luna_xhigh_and_explicit_fork_turns (__main__.PolicyTests.test_code_delegate_requires_luna_xhigh_and_explicit_fork_turns) ... ok
+test_hook_matcher_matches_only_the_supported_spawn_names (__main__.PolicyTests.test_hook_matcher_matches_only_the_supported_spawn_names) ... ok
+test_luna_can_patch_code (__main__.PolicyTests.test_luna_can_patch_code) ... ok
+test_main_model_can_patch_migrated_policy_documents (__main__.PolicyTests.test_main_model_can_patch_migrated_policy_documents) ... ok
+test_main_model_can_patch_planning_document (__main__.PolicyTests.test_main_model_can_patch_planning_document) ... ok
+test_main_model_cannot_move_document_into_code_path (__main__.PolicyTests.test_main_model_cannot_move_document_into_code_path) ... ok
+test_main_model_cannot_patch_code (__main__.PolicyTests.test_main_model_cannot_patch_code) ... ok
+test_namespaced_code_delegate_accepts_luna_xhigh_with_explicit_fork (__main__.PolicyTests.test_namespaced_code_delegate_accepts_luna_xhigh_with_explicit_fork) ... ok
+test_namespaced_code_delegate_rejects_wrong_parameters (__main__.PolicyTests.test_namespaced_code_delegate_rejects_wrong_parameters) ... ok
+test_namespaced_review_delegate_accepts_sol_high_without_history (__main__.PolicyTests.test_namespaced_review_delegate_accepts_sol_high_without_history) ... ok
+test_namespaced_review_delegate_rejects_old_parameters_with_retry_guidance (__main__.PolicyTests.test_namespaced_review_delegate_rejects_old_parameters_with_retry_guidance) ... ok
+test_patch_outside_repository_is_denied (__main__.PolicyTests.test_patch_outside_repository_is_denied) ... ok
+test_review_delegate_rejects_astra_medium_with_retry_guidance (__main__.PolicyTests.test_review_delegate_rejects_astra_medium_with_retry_guidance) ... ok
+test_review_delegate_rejects_inherited_history (__main__.PolicyTests.test_review_delegate_rejects_inherited_history) ... ok
+test_review_delegate_requires_fresh_sol_high_session (__main__.PolicyTests.test_review_delegate_requires_fresh_sol_high_session) ... ok
+test_wrong_code_delegate_is_denied_with_retry_guidance (__main__.PolicyTests.test_wrong_code_delegate_is_denied_with_retry_guidance) ... ok
+
+----------------------------------------------------------------------
+Ran 17 tests in 0.001s
+
+OK
