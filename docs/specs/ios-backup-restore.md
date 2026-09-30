@@ -85,7 +85,7 @@ MCP JSON分享导出同样保留原值。share copy只能解释为未包含专�
 
 ### Skill、Memory与费用恢复范围
 
-Skill元数据/附件恢复不代表session_skill_overrides或use_count已迁移；当前新格式SkillRecord没有这些字段。Memory恢复复制包中的Markdown文件，不采用日志同步的并集合并，也不能保证此前撤销的条目仍然缺失。会话费用专用账本未包含在当前新格式聊天记录中，恢复聊天不应显示为已恢复完整费用历史。分别见[Skill](ios-skills-lifecycle.md#全局启停与会话覆盖)、[Memory](ios-memory-lifecycle.md#用户编辑撤销与跨设备删除)与[费用](ios-usage-cost-and-balance.md#展示与持久化边界)。
+Skill元数据/附件恢复不代表session_skill_overrides或use_count已迁移；当前新格式SkillRecord没有这些字段。Memory恢复复制包中的Markdown文件，不采用日志同步的并集合并，也不能保证此前撤销的条目仍然缺失。会话费用专用账本未包含在当前新格式聊天记录中，恢复聊天不应显示为已恢复完整费用历史。分别见[Skill](ios-skills-lifecycle.md#全局启停与会话覆盖)、[Memory](ios-memory-lifecycle.md#用户编辑撤销与跨设备删除)与[费用](ios-usage-cost-and-balance.md#不在范围内)。
 
 ## 导出完成与可恢复中断
 

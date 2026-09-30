@@ -154,7 +154,7 @@ Stop 不应删除已经提交的文本/终端结果，也不保证撤销工具�
 
 初始Agent loop和Provider fallback重建时组装Skill/MCP发现信息及按memoryEnabled控制的GLOBAL/近期日志。发现列表不代表正文已读取、MCP工具已执行或模型已正确遵守。Skill/MCP会话开关目前不是全面执行许可，Memory关闭不清除既有工具历史或阻止一般文件路径；SOUL身份部分不受该开关控制。
 
-具体范围及冲突由[Skill生命周期](ios-skills-lifecycle.md)、[MCP集成](ios-mcp-integrations.md)和[Memory生命周期](ios-memory-lifecycle.md)维护；本节不把开关切换、消息截断、清空会话或Retry解释为全局数据删除和撤销已发生的副作用。费用请求在消息展示之外单独记账，详见[用量与费用](ios-usage-cost-and-balance.md#会话账本与未知状态)。
+具体范围及冲突由[Skill生命周期](ios-skills-lifecycle.md)、[MCP集成](ios-mcp-integrations.md)和[Memory生命周期](ios-memory-lifecycle.md)维护；本节不把开关切换、消息截断、清空会话或Retry解释为全局数据删除和撤销已发生的副作用。费用请求在消息展示之外单独记账，详见[用量与费用](ios-usage-cost-and-balance.md#账本规则)。
 
 ## 待验证与待确认
 
