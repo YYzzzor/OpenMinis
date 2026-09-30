@@ -4,7 +4,7 @@ description: iOS 内嵌 iSH shell 的运行、并发、文件作用域、超时�
 
 # iOS iSH Runtime and Isolation Contract
 
-导航：[Spec 索引](index.md)；章节目录由[上下文工具](../harness/spec-context.md#受控阅读入口)从本文标题生成。
+导航：[Spec 索引](index.md)。
 
 状态：现行运行契约与当前实现说明。本文面向 shell 工具、会话文件、原生 offload 和取消/超时相关改动；它不是 iSH 内部库或类文件的逐项架构清单。
 

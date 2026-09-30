@@ -4,7 +4,7 @@ description: MinisX iOS 原生设备数据、系统能力与命令入口的当�
 
 # MinisX iOS 设备数据与原生能力
 
-导航：[Spec 索引](index.md)；权限与副作用规则见 [iOS 工具权限与副作用](ios-tool-permissions-and-side-effects.md)；浏览器细节见 [iOS 浏览器自动化](ios-browser-automation.md)。章节目录由[上下文工具](../harness/spec-context.md#受控阅读入口)从本文标题生成。
+导航：[Spec 索引](index.md)；权限与副作用规则见 [iOS 工具权限与副作用](ios-tool-permissions-and-side-effects.md)；浏览器细节见 [iOS 浏览器自动化](ios-browser-automation.md)。
 
 状态：当前实现清单，核查于 2026-09-29，源码基线为工作区 `main` / `272da5d` 及其未提交修改。本文不是未来功能承诺；静态存在处理路径不等于系统已授权、外设兼容或真机执行成功。
 

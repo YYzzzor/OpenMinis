@@ -4,7 +4,7 @@ description: DEBUG 调试服务的暴露边界、发现与认证协议、JSON-RP
 
 # Debug Server API
 
-导航：[Spec 索引](index.md)；章节目录由[上下文工具](../harness/spec-context.md#受控阅读入口)从本文标题生成。
+导航：[Spec 索引](index.md)。
 
 状态：现行约定与当前实现并列记录。本文规范 DEBUG 调试入口的安全边界和客户端契约；具体 RPC 方法、参数与返回值以运行时 `rpc.discover` 为准，不在 Spec 中复制一份容易漂移的方法全集。
 

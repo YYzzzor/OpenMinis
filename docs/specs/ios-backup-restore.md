@@ -4,7 +4,7 @@ description: iOS .minisbak 的格式兼容、备份范围、凭证加密、完�
 
 # iOS Backup and Restore
 
-导航：[Spec 索引](index.md)；章节目录由[上下文工具](../harness/spec-context.md#受控阅读入口)从本文标题生成。
+导航：[Spec 索引](index.md)。
 
 状态：现行格式和行为契约。本文补足源码曾引用但仓库缺失的 `backup-restore-design.md`；[backup-streaming-package-design.md](../backup-streaming-package-design.md) 是分阶段设计资料，只有已由当前源码确认的部分才构成现状。
 

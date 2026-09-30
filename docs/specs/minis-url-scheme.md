@@ -4,7 +4,7 @@ description: minis:// 资源地址与应用导航的双重契约，覆盖会话�
 
 # Minis URL Contract
 
-导航：[Spec 索引](index.md)；章节目录由[上下文工具](../harness/spec-context.md#受控阅读入口)从本文标题生成。
+导航：[Spec 索引](index.md)。
 
 状态：现行安全契约与当前实现并列记录。`minis://` 同时承载资源引用和应用导航，两类 URL 共享 scheme，但不得用同一解析规则处理。
 

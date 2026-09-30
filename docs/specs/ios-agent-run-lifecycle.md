@@ -4,7 +4,7 @@ description: iOS Agent 从发送、流式响应和工具循环到停止、重试
 
 # iOS Agent Run Lifecycle
 
-导航：[Spec 索引](index.md)；章节目录由[上下文工具](../harness/spec-context.md#受控阅读入口)从本文标题生成。
+导航：[Spec 索引](index.md)。
 
 状态：现行用户可见契约与当前实现说明。本文规范一次会话 turn 如何开始、推进、持久化、中断和恢复；Provider 特有传输与模型路由细节不在本文展开。
 

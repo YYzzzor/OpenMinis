@@ -4,7 +4,7 @@ description: iOS Agent 工具的系统授权、App 许可、操作确认、副�
 
 # iOS Tool Permissions and Side Effects
 
-导航：[Spec 索引](index.md)；章节目录由[上下文工具](../harness/spec-context.md#受控阅读入口)从本文标题生成。
+导航：[Spec 索引](index.md)。
 
 状态：现行安全规范与当前实现并列记录。本文适用于 shell/offload、文件、设备数据、系统动作、配置和外部服务工具；具体数据类型能力另见 [iOS 设备数据能力](ios-device-data-capabilities.md)。
 

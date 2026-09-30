@@ -4,7 +4,7 @@ description: apple-calendar 重复事件创建、两套参数兼容、结束条�
 
 # MinisX 日历重复创建接口
 
-导航：[Spec 索引](index.md)；章节目录由[上下文工具](../harness/spec-context.md#受控阅读入口)从本文标题生成，不另手写目录。
+导航：[Spec 索引](index.md)。
 
 状态：现行规范。本文描述 `apple-calendar create` 的重复创建契约、兼容参数和已接受限制；最低 iOS 26.0。参数表和示例说明调用约定，不等于当前分支、模拟器或真机已经运行验证。每次实现变更必须单独记录实际验证范围。
 
