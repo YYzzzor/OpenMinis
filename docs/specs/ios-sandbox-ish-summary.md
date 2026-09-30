@@ -1,263 +1,133 @@
-# iOS Sandbox Environment: iSH Virtualization Summary
-
-## Overview
-
-MinisApp uses a customized fork of [iSH](https://github.com/OpenMinis/ish-arm64) (OpenMinis/ish-arm64) to provide a full Linux sandbox execution environment on iOS. The iSH kernel runs an Alpine Linux (aarch64) guest inside the app process, giving the AI agent a real shell with networking, filesystem, and process management — while native offloads bridge guest commands to iOS frameworks for hardware and system access.
-
+---
+description: iOS 内嵌 iSH shell 的运行、并发、文件作用域、超时取消、原生 offload 与安全边界。
 ---
 
-## 1. iSH Virtualization Capabilities
+# iOS iSH Runtime and Isolation Contract
 
-### 1.1 Emulation Engine
+导航：[Spec 索引](index.md)；章节目录由[上下文工具](../harness/spec-context.md#受控阅读入口)从本文标题生成。
 
-| Property | Value |
+状态：现行运行契约与当前实现说明。本文面向 shell 工具、会话文件、原生 offload 和取消/超时相关改动；它不是 iSH 内部库或类文件的逐项架构清单。
+
+## 范围与证据
+
+当前工程的 iOS deployment target 为 26.0。旧文档中的“iOS 14+”、全局 FIFO、固定 handler 数量、100 KB 输出上限等描述不再作为事实。
+
+主要源码来源：
+
+- [ISHExecutionCoordinator.swift](../../src/ios/Agent/ISH/ISHExecutionCoordinator.swift)：命令执行、并发、环境变量、超时和停止。
+- [MinisFsRouter.swift](../../src/ios/Agent/ISH/MinisFsRouter.swift)：会话文件路由。
+- [ISHKernel.m](../../src/ios/iSH/ISHKernel.m)：kernel 启动和 native offload 注册。
+- [OffloadPermissionManager.swift](../../src/ios/Agent/Offload/OffloadPermissionManager.swift)：App 层工具许可；详见 [iOS 工具权限与副作用](ios-tool-permissions-and-side-effects.md)。
+
+底层模拟器、网络栈和长时间稳定性未在本轮运行验证。
+
+## 执行前提
+
+一次 Agent shell 执行必须具备：
+
+- 已启动的 `ISHKernel`；否则返回 `kernelNotBooted`；
+- 非空 session id；文件作用域和停止范围以它为边界；
+- 可创建独立 `/bin/sh` 进程及 stdin/stdout/stderr pipe；
+- 对命令访问的外部挂载或 iOS 数据具备对应授权。
+
+shell 默认工作目录为 `/root`。用户环境变量由 `EnvVarStore` 注入；其值属于凭证/个人配置，不得写入普通日志或错误回显。
+
+## 并发与进程模型
+
+### 现行契约
+
+- 不同会话可以并发执行 shell。
+- 同一会话内的多个 `shell_execute` 也可以并发执行。
+- 每次调用创建独立 shell、PID、pipe 和会话 `fs_context`；不存在可依赖的共享交互式 shell 状态。
+- 调用方不得依赖提交顺序等于完成顺序，也不得通过一个命令的 `cd`、局部环境变量或 shell 变量影响下一个命令。
+- 并发写同一文件、端口、数据库或外部资源时，调用方负责避免竞态或显式串行化。
+
+`perSessionInflight` 名称和部分遗留注释仍提到“队列/一个 shell”，但当前 `execute` 不等待前项；该表只用于记录 PID、停止和清理。实现判断以执行路径而非过时注释为准。
+
+## 文件系统作用域
+
+### 会话目录
+
+`MinisFsRouter` 为每个 session id 分配稳定的 `fs_context`，并把四个 guest bucket 路由到对应会话目录：
+
+| Guest 路径 | Host 作用域 |
 |---|---|
-| Guest Architecture | ARM64 (aarch64) |
-| Engine | Asbestos (threaded-code JIT interpreter) |
-| Guest OS | Alpine Linux aarch64 |
-| Upstream Fork | `OpenMinis/ish-arm64`, branch `feature-arm64` |
-| Build System | Meson (cross-compile for iOS arm64) |
-| iOS Deployment Target | 14.0+ |
+| `/var/minis/attachments` | `<minis-base>/<session-id>/attachments` |
+| `/var/minis/offloads` | `<minis-base>/<session-id>/offloads` |
+| `/var/minis/workspace` | `<minis-base>/<session-id>/workspace` |
+| `/var/minis/browser` | `<minis-base>/<session-id>/browser` |
 
-**Feature flags**: `GUEST_ARM64=1`, `ENGINE_ASBESTOS=1`, `KERNEL_ISH=1`
+fork 出的子进程应继承同一 context。并发会话不得通过“最后挂载的 session”互相覆盖四个 bucket。
 
-### 1.2 Kernel Capabilities
+### 全局与外部目录
 
-- **Process management**: fork, exec, exit, PID tracking, parent-child hierarchy, signal handling (SIGTERM, SIGKILL, etc.), pthread support
-- **Filesystem (fakefs)**: SQLite-based virtual FS with metadata (`meta.db`), permissions, ownership, symlinks, device nodes
-- **Networking**: AF_INET/AF_INET6/AF_LOCAL, TCP/UDP/RAW sockets, DNS resolution, full host network stack passthrough
-- **Devices**: TTY (`/dev/tty1-7`, `/dev/console`, `/dev/ptmx`), memory devices (`/dev/null`, `/dev/zero`, `/dev/random`, `/dev/urandom`), PTY support
-- **Syscalls**: 100+ Linux syscalls — mmap, brk, poll/epoll, pipes, eventfd, inotify, etc.
-- **JIT safety**: SIGSEGV/SIGBUS crash recovery handler for stale TLB pointers from CoW
+`/var/minis/memory`、`/var/minis/skills`、`/var/minis/shared` 走静态全局挂载，可以跨会话访问。用户外部目录位于 `/var/minis/mounts`，依赖 security-scoped bookmark/File Provider 权限，并可能只读或暂时不可达。
 
-### 1.3 Build Output (`deps/libs/`)
+“全局可见”不等于“可任意写入”。文件工具和 offload 仍需执行路径、只读、授权及操作级别检查。
 
-| Library | Purpose |
-|---|---|
-| `libish.a` | Core kernel (init, process, memory, syscalls) |
-| `libish_emu.a` | ARM64 emulator (Asbestos engine) |
-| `libfakefs.a` | SQLite-based virtual filesystem |
-| `libvdso.so.elf` | ARM64 guest VDSO |
+### MCP独立daemon的边界
 
-Build via: `deps/build_ish.sh`
+MCP CLI通过独立daemon复用HTTP/STDIO连接，其生命周期不等于每次shell的会话PID。停止所属shell调用不证明daemon、长期服务子进程和远端动作同时取消；全局挂载或会话开关也不证明统一执行许可。超时层次、TTL、自动重试及配置秘密见[MCP集成](ios-mcp-integrations.md#超时重试与取消边界)，不能把本文会话停止要求当作该路径已经全面实现的证据。
 
----
+## 超时、停止与结果
 
-## 2. iOS Integration Layer
+- 未指定时，shell 默认超时为 300 秒。
+- 超时会终止整个进程组，而不只是根 PID，并主动完成超时 context 清理；结果以退出码 `-1` 和明确超时文本返回。
+- 用户停止某会话时，应终止该会话记录的所有 live PID；紧急全局停止可以终止所有会话的命令。
+- 非隔离的 PID 快照停止路径用于 actor 本身被阻塞时仍能发出 kill；调用方应根据返回的 PID 数记录实际发出了多少次停止信号。
+- 停止/超时只证明发送了终止和清理动作，不自动证明外部副作用被回滚。已写文件、已提交系统事件或已发出的网络请求可能保留。
+- 输出必须保留 stdout/stderr 对问题定位有用的内容，并对超长结果采用资源开销规范中的截断/offload 机制；本文不规定一个未经源码确认的固定 100 KB 上限。
 
-### 2.1 ISHKernel (`src/ios/iSH/ISHKernel.m`)
+## Native offload
 
-Objective-C singleton wrapping the C iSH kernel. Handles:
+iSH kernel 在 `execve` 阶段按注册名拦截部分命令，把它们交给 iOS 原生 handler，再通过进程 I/O 返回结果。当前注册清单以 [ISHKernel.m](../../src/ios/iSH/ISHKernel.m) 的启动代码为准，覆盖媒体、日历、位置、照片、健康、Home、提醒事项、浏览器、会话、配置、调试等能力。
 
-- **Boot sequence**: mount rootfs → init PID 1 → create device nodes → mount procfs/devpts → configure DNS → register TTY driver → register native offload handlers
-- **Command execution**: `executeCommand(_:)` (interactive shell with PTY), `executeCommandAndWait(_:timeout:completion:)` (run-to-completion)
-- **I/O**: `sendInput(_:)`, `sendInputString(_:)`, real-time `outputCallback`
-- **Terminal control**: `setTerminalSize(columns:rows:)`
-- **Mounts**: `bindMountPath(_:toHostPath:)`, `bindUnmountPath(_:)`
-- **DNS**: `refreshDns()` — reads iOS resolver and writes `/etc/resolv.conf`
+约束：
 
-### 2.2 RootfsManager (`src/ios/iSH/RootfsManager.swift`)
+- 不在本文维护固定“共 N 个 handler”；新增/移除注册项时应更新对应能力 Spec 和命令帮助。
+- 原生 offload 仍是 shell 命令的一部分，必须遵守 iOS 系统授权、App 工具许可和操作级确认，详见[工具权限规范](ios-tool-permissions-and-side-effects.md)。
+- `minis-debug logs` 当前可在每个构建注册；依赖 RPC 的调试子命令仍由 handler 在 Release 中拒绝。不得从“命令存在”推断所有子命令可用。
+- offload 已开始执行后，shell 停止不保证系统 API 已提交的副作用回滚。
 
-Manages the Alpine Linux rootfs lifecycle:
+## 安全与资源边界
 
-- Extracts bundled rootfs to `~/Documents/alpine-rootfs/`
-- Architecture tag tracking and mismatch handling
-- Rootfs reset with optional user data backup
-- Pre-creates `/var/minis/` subdirectories
-- Registers metadata in fakefs `meta.db` for bind-mount visibility
-- Default environment: `TERM=xterm-256color`, standard `PATH`
+- iSH 是 App 进程内的 Linux 兼容运行环境，不是独立设备或硬件虚拟机。不得把它描述为对 App 数据的绝对安全边界。
+- 会话隔离依赖正确传播 `fs_context` 和所有旁路文件解析器遵守同一规则；Host 侧直接访问仍需单独审查。
+- 网络命令使用 App 可用的网络能力；是否允许访问特定地址、局域网或远端服务由 iOS 权限、网络环境和上层产品策略共同决定。
+- JIT/解释器内部故障处理、宿主崩溃隔离和长时间内存稳定性未由本 Spec 证明。
+- 并发数、输出规模、图片数量和上下文 offload 继续遵守[资源开销规范](resource-efficiency.md)，不得因为底层支持并发就无界 fan-out。
 
-### 2.3 ISHShellExecutor (`src/ios/iSH/ISHShellExecutor.m`)
+## 场景与验收
 
-Process-level execution wrapper:
+### 场景 A：同会话并发命令
 
-- Line-by-line output capture callbacks
-- Exit code and duration tracking
-- Timeout and process signal support (SIGKILL)
-- Synchronous and asynchronous modes
-- Custom environment variable injection
+前提：kernel 已启动，会话 S 同时发起两个互不冲突的命令。
 
-### 2.4 ISHExecutionCoordinator (`src/ios/Agent/ISHExecutionCoordinator.swift`)
+可观察验收：两者获得不同 PID 和 pipe，可以重叠运行；各自输出和退出码不串线；停止 S 时所有 live PID 都被纳入停止范围。
 
-Serialized, session-aware command dispatcher:
+### 场景 B：跨会话同名文件
 
-- **One command at a time** across all sessions (FIFO queue)
-- Automatic session-based mount/remount of `/var/minis/` directories
-- Prompt detection (regex-based: `$ `, `# `, `user@host:path$ `, etc.)
-- Preemption if command exceeds 10 minutes with waiters
-- Buffer limit: 100KB max output without prompt
-- Echo removal and whitespace trimming
+前提：A、B 同时写 `/var/minis/workspace/result.txt`。
 
----
+可观察验收：Host 分别落到 A、B 目录，内容不互相覆盖；重新读取时仍按各自 session context 返回。
 
-## 3. Mount System
+### 场景 C：命令超时并带子进程
 
-### 3.1 Bind Mount Mechanism
+前提：命令派生子进程并超过默认或指定 timeout。
 
-Uses `fakefs_bind_mount(linux_path, host_path)` — creates a symlink in fakefs `data/` pointing to host persistent storage. Parent directories must exist in `meta.db` (`ensureFakefsMetadata` + `ensureParentDirsInMetaDB`).
+可观察验收：整个进程组收到终止，调用完成为超时而非永久挂起；后续命令仍能执行。是否存在残留线程/子进程需要运行期或设备级验证，不能由静态阅读替代。
 
-### 3.2 Per-Session Mounts (`/var/minis/`)
+### 场景 D：外部只读挂载
 
-Each agent session mounts its own persistent directories:
+可观察验收：读取在授权有效时成功；写入明确失败；远端不可达不会把路径解析到内部目录；停止 shell 不伪造“已回滚”结果。
 
-| Guest Path | Host Path | Purpose |
-|---|---|---|
-| `/var/minis/attachments/` | `Library/MinisChat/minis/{sessionId}/attachments/` | Input files for commands |
-| `/var/minis/offloads/` | `Library/MinisChat/minis/{sessionId}/offloads/` | Output from native offloads |
-| `/var/minis/workspace/` | `Library/MinisChat/minis/{sessionId}/workspace/` | Session working directory |
-| `/var/minis/browser/` | `Library/MinisChat/minis/{sessionId}/browser/` | Web browsing files |
+### 场景 E：offload 权限分层
 
-### 3.3 Global Mounts
+可观察验收：命令注册存在但系统权限拒绝时返回系统授权错误；App 设置为 Not Allowed 时在执行前拒绝；命令自身需要确认时仍不能由前两层授权替代。
 
-| Guest Path | Host Path | Purpose |
-|---|---|---|
-| `/var/minis/memory/` | `Library/MinisChat/minis/memory/` | Shared memory across sessions |
-| `/var/minis/skills/` | `Library/MinisChat/minis/skills/` | Stored skill definitions |
+## 已知限制与待验证事项
 
-### 3.4 DNS Mount
-
-| Guest Path | Host Path |
-|---|---|
-| `/etc/resolv.conf` | `Library/MinisChat/dns/resolv.conf` |
-
-Updated in real-time from iOS system resolver (falls back to `8.8.8.8`, `8.8.4.4`).
-
-### 3.5 Path Resolution
-
-- **Guest → Host**: Linux path `/foo/bar` → `~/Documents/alpine-rootfs/data/foo/bar`
-- **Host → Guest**: Bind mounts make host files appear at `/var/minis/...`
-- **minis:// URL scheme**: Resolved by `MinisImageProvider` to local images
-
----
-
-## 4. Native Offload System
-
-### 4.1 Architecture
-
-When a guest process calls `execve()` on a registered command path (e.g., `/usr/local/bin/apple-calendar`), the iSH kernel intercepts the call and routes it to a native iOS handler instead of executing the binary. Communication uses JSON envelopes over pipes, with real-time I/O redirection.
-
-```
-Guest process calls execve("/usr/local/bin/apple-calendar", args)
-  → iSH kernel intercepts (native_offload.c)
-    → Dispatches to registered Objective-C handler (CalendarOffload)
-      → iOS Framework API (EventKit)
-        → JSON result returned via pipe
-```
-
-### 4.2 Offload Handlers (22 total)
-
-#### Media & Audio
-
-| Handler | Guest Command | iOS Framework | Capabilities |
-|---|---|---|---|
-| FFmpegOffload | `ffmpeg` | FFmpeg.framework | Video/audio encode, transcode, network streams (HTTP/HLS/TLS) |
-| MediaOffload | `apple-media` | AVFoundation | Audio playback, recording |
-| SpeakOffload | `apple-speak` | AVSpeechSynthesizer | Text-to-speech |
-| SpeechOffload | `apple-speech` | SFSpeechRecognizer | Speech-to-text |
-| PlayerOffload | `apple-player` | AVFoundation | Advanced media playback |
-
-#### Apple Services
-
-| Handler | Guest Command | iOS Framework | Capabilities |
-|---|---|---|---|
-| CalendarOffload | `apple-calendar` | EventKit | Read/write calendar events |
-| ContactsOffload | `apple-contacts` | Contacts | Contact management |
-| MapsOffload | `apple-maps` | MapKit | Maps, directions, location search |
-| PhotosOffload | `apple-photos` | Photos | Photo/video library access |
-| HealthKitOffload | `apple-health` | HealthKit | Health data read/write |
-| HomeKitOffload | `apple-home` | HomeKit | Home automation control |
-
-#### System Access
-
-| Handler | Guest Command | iOS Framework | Capabilities |
-|---|---|---|---|
-| LocationOffload | `apple-location` | CoreLocation | GPS positioning |
-| DeviceOffload | `apple-device` | UIKit/various | Battery, model, system info |
-| ClipboardOffload | `apple-clipboard` | UIPasteboard | Copy/paste (text, images) |
-| WeatherOffload | `apple-weather` | WeatherKit | Local weather data |
-| NotificationOffload | `apple-notification` | UserNotifications | Schedule local notifications |
-| AlarmOffload | `apple-alarm` | EventKit (Reminders) | Alarms and reminders |
-
-#### Intelligence
-
-| Handler | Guest Command | iOS Framework | Capabilities |
-|---|---|---|---|
-| VisionOffload | `apple-vision` | Vision | Image recognition, OCR, text detection |
-| NLPOffload | `apple-nlp` | NaturalLanguage | Language detection, sentiment, tokenization |
-
-#### Utilities
-
-| Handler | Guest Command | iOS Framework | Capabilities |
-|---|---|---|---|
-| OpenOffload | `apple-open` | UIApplication | Open URLs, open in other apps |
-
-### 4.3 Shared Utilities (`NativeOffloadUtils`)
-
-- Argument parsing (named args, flags, positional args)
-- Date parsing (ISO 8601, relative dates, `--today`)
-- JSON envelope construction
-- Async dispatch to main thread
-- Guest stub creation
-- Host path resolution (`/var/minis/...` → host path)
-- stdin reading
-
----
-
-## 5. Agent Execution Flow
-
-```
-┌─────────────────────────────────────────────────────┐
-│  iOS App (SwiftUI)                                  │
-│  └─ AIChatViewModel                                 │
-│     └─ tool_use: execute_command("pip install ...")  │
-└──────────────────┬──────────────────────────────────┘
-                   ▼
-┌─────────────────────────────────────────────────────┐
-│  ISHExecutionCoordinator                            │
-│  ├─ Serialize (FIFO queue, one-at-a-time)           │
-│  ├─ Mount session dirs to /var/minis/               │
-│  └─ Inject env vars from EnvVarStore (Keychain)     │
-└──────────────────┬──────────────────────────────────┘
-                   ▼
-┌─────────────────────────────────────────────────────┐
-│  ISHKernel / ISHShellExecutor                       │
-│  ├─ Spawn /bin/sh with PTY                          │
-│  ├─ Capture output (line callbacks)                 │
-│  └─ Detect prompt → command complete                │
-└──────────────────┬──────────────────────────────────┘
-                   ▼
-┌─────────────────────────────────────────────────────┐
-│  iSH Kernel (C)                                     │
-│  ├─ Process mgmt (fork/exec/exit)                   │
-│  ├─ Fakefs (SQLite metadata, bind mounts)           │
-│  ├─ Networking (TCP/UDP via host stack)              │
-│  └─ Native offload interception (execve hook)       │
-└──────────────────┬──────────────────────────────────┘
-                   ▼
-┌─────────────────────────────────────────────────────┐
-│  Asbestos Engine (ARM64 JIT Interpreter)            │
-│  └─ Alpine Linux aarch64 guest userspace            │
-│     ├─ apk, python, pip, node, etc.                 │
-│     └─ /usr/local/bin/apple-* (offload stubs)       │
-└──────────────────┬──────────────────────────────────┘
-                   ▼ (if offload)
-┌─────────────────────────────────────────────────────┐
-│  Native Offload Handlers (Objective-C)              │
-│  └─ iOS Frameworks (EventKit, Photos, Vision, ...)  │
-└─────────────────────────────────────────────────────┘
-```
-
----
-
-## 6. Security & Isolation
-
-- iSH runs in its own pthread (background thread)
-- Kernel uses thread-local `current` task pointer for process isolation
-- Main thread communication via `dispatch_async`
-- JIT exception handler prevents guest crashes from crashing the app
-- Fakefs provides filesystem isolation from host (SQLite metadata layer)
-- Bind mounts are explicit and scoped to `/var/minis/`
-- Environment variables stored in Keychain (SecureEnclave)
-- Guest processes cannot access arbitrary host paths — only bind-mounted directories
-- 100KB output buffer limit prevents memory exhaustion
-- 10-minute command timeout with preemption
+- 已核实问题：旧 Spec 的 iOS 14+、全局 FIFO、固定 handler 数、原子切换工作副本等描述与当前源码不一致，本文已移除。
+- 当前源码中仍有少量 FIFO/单 shell 遗留注释，与实际并发路径冲突；它们是代码注释清理事项，不改变本文契约。
+- 待验证：高并发、超时进程树、外部 File Provider 阻塞、后台挂起和长时间内存表现。
+- 待维护者确认：产品层允许的最大 shell 并发和网络边界；在确认前只应用资源开销上限，不发明固定数值。

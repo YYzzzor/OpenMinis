@@ -1,342 +1,166 @@
-# Minis URL Scheme Specification
+---
+description: minis:// 资源地址与应用导航的双重契约，覆盖会话隔离、全局目录、外部挂载、渲染、深链和路径安全。
+---
 
-**Status:** Draft
-**Date:** 2026-02-16
+# Minis URL Contract
 
-## 1. Overview
+导航：[Spec 索引](index.md)；章节目录由[上下文工具](../harness/spec-context.md#受控阅读入口)从本文标题生成。
 
-`minis://` is a **session-scoped** unified resource locator for persistent, addressable resources within the Minis ecosystem. It bridges three layers — the AI agent, the iSH Linux shell, and the iOS host app — with a single URL that works in tool results, Markdown rendering, and inter-component references.
+状态：现行安全契约与当前实现并列记录。`minis://` 同时承载资源引用和应用导航，两类 URL 共享 scheme，但不得用同一解析规则处理。
 
-**`minis://` URLs are inherently session-bound.** Every resolution, read, write, and render operation is performed in the context of the current active session. There is no cross-session resource visibility — a `minis://attachments/photo.png` in Session A and the same URL in Session B refer to completely independent files. The agent, the shell, and the UI all see only the resources belonging to the active session.
+## 适用范围与来源
 
-### Design Principles
+适用于聊天渲染、工具结果、文件读写、iSH 路径映射、外部挂载、App 内深链及跨平台链接。主要源码来源：
 
-1. **Session-scoped**: All resource access is bound to the current session. `minis://` URLs are opaque identifiers — they carry no session ID, because they are always resolved against the active session's storage. Cross-session access is neither supported nor exposed.
-2. **Agent-first**: Every persistent resource produced by a tool MUST be returned to the model as a `minis://` URL so the agent can reference it in subsequent turns.
-3. **Render-ready**: The chat UI resolves `minis://` URLs inline — images, audio, video, and downloadable files render natively in Markdown.
-4. **Bidirectional**: Files written by the shell or the host app are both addressable via the same URL scheme.
-5. **Persistent within session**: Resources survive app restarts. Each session's files are isolated in persistent storage and mounted into `/var/minis/` on session load.
+- [MinisMediaViews.swift](../../src/ios/Views/Chat/MinisMediaViews.swift)：聊天资源解析和媒体类型。
+- [AIChatViewModel+FileTools.swift](../../src/ios/Agent/Chat/AIChatViewModel+FileTools.swift)：Agent 文件工具解析。
+- [AIChatViewModel+RequestBudget.swift](../../src/ios/Agent/Chat/AIChatViewModel+RequestBudget.swift)：请求预算中的 URL 内容解析及已知偏差。
+- [MinisFsRouter.swift](../../src/ios/Agent/ISH/MinisFsRouter.swift)：会话目录到 iSH 的路由。
+- [DeepLinkRouter.swift](../../src/ios/Shared/DeepLinkRouter.swift)：导航路由。
 
-## 2. URL Format
+本文不把“文件存在”当成“允许访问”，也不把当前某个解析器的宽松行为提升为规范。
 
-```
-minis://<namespace>/<path>
-```
+## 两类 URL
 
-| Component     | Description |
-|---------------|-------------|
-| `minis://`    | Scheme. Always lowercase. |
-| `<namespace>` | Top-level category (see §3). Mapped to URL host component. |
-| `<path>`      | Relative path within the namespace. May include subdirectories. Mapped to URL path component. |
+### 资源 URL
 
-### Examples
+形式为 `minis://<resource-host>/<relative-path>`，用于定位文件或内容。例如：
 
-```
-minis://attachments/screenshot.png
-minis://attachments/photos/vacation/img_001.jpg
+```text
+minis://attachments/photo.jpg
 minis://workspace/report.csv
-minis://workspace/project/src/main.py
-minis://offloads/shell_execute_1707000000_abc12345.txt
-minis://browser/snapshot_1707000000.jpg
+minis://skills/example/SKILL.md
+minis://mounts/MyDrive/folder/file.pdf
 ```
 
-## 3. Session Model
+资源解析需要明确的会话或全局上下文，结果是受约束的本地/挂载文件 URL。
 
-`minis://` is a **session-relative** addressing scheme. The same URL string in different sessions resolves to different physical files.
+### 导航 URL
 
-### 3.1 Why No Session ID in the URL
+形式仍是 `minis://<route-host>/<path>?<query>`，用于触发 App 导航或动作。例如：
 
-The URL deliberately omits the session ID:
-- The **agent** operates within a single session and has no concept of other sessions.
-- The **shell** (`/var/minis/`) only ever sees one session's files at a time.
-- The **chat UI** renders messages in the context of their owning session.
-- Embedding session IDs would leak an implementation detail and create a temptation for cross-session references, which are not supported.
-
-### 3.2 Resolution Context
-
-Every `minis://` URL is resolved with an implicit session context:
-
-| Layer | How session context is determined |
-|-------|-----------------------------------|
-| Agent (tool execution) | `AIChatViewModel.sessionId` — set when the session is loaded |
-| Shell (iSH filesystem) | `/var/minis/` is mounted from the active session's persistent storage |
-| Chat UI (Markdown render) | Messages belong to a session; the renderer resolves against the current session's files |
-| Persistent storage | `Library/MinisChat/minis/<sessionId>/` — each session has its own directory tree |
-
-### 3.3 Cross-Session Semantics
-
-- **No cross-session reads:** An agent cannot access files from another session. There is no `minis://other-session/...` syntax.
-- **No cross-session writes:** Writing to `/var/minis/` always targets the active session's storage.
-- **Session deletion:** When a session is deleted, its entire `Library/MinisChat/minis/<sessionId>/` tree is removed. All `minis://` URLs from that session become permanently unresolvable.
-- **History rendering:** When viewing chat history from a past session, `minis://` URLs resolve against that session's persisted files (loaded on session switch).
-
-## 4. Namespaces
-
-### 4.1 `attachments` — Media & Displayable Files
-
-**Purpose:** Images, audio, video, and other media intended for inline display in chat.
-
-| Property | Value |
-|----------|-------|
-| Linux path | `/var/minis/attachments/<path>` |
-| Persistent storage | `Library/MinisChat/minis/<sessionId>/attachments/<path>` |
-| Writable by | Agent (file_write, shell_execute), Host app (saveAttachment), User (input attachments) |
-| Inline rendering | Yes — images, audio, video auto-render in Markdown |
-
-**Supported inline media types:**
-- Images: `.png`, `.jpg`, `.jpeg`, `.gif`, `.webp`, `.bmp`, `.tiff`, `.svg`
-- Audio: `.mp3`, `.m4a`, `.wav`, `.aac`, `.ogg`, `.flac`
-- Video: `.mp4`, `.mov`, `.m4v`, `.avi`, `.mkv`, `.webm`
-
-**Markdown usage:**
-```markdown
-![description](minis://attachments/filename.png)
-![audio](minis://attachments/recording.mp3)
-![video](minis://attachments/demo.mp4)
+```text
+minis://sessions/SESSION_ID
+minis://settings/permissions
+minis://open_terminal?init_command=pwd
 ```
 
-### 4.2 `workspace` — General Working Files
+导航路由不得退化为文件解析；资源 host 也不得因为与某个页面同名而触发页面动作。
 
-**Purpose:** Scripts, data files, configuration, project files, and any non-media artifacts the agent creates or the user works with.
+## 资源作用域
 
-| Property | Value |
-|----------|-------|
-| Linux path | `/var/minis/workspace/<path>` |
-| Persistent storage | `Library/MinisChat/minis/<sessionId>/workspace/<path>` |
-| Writable by | Agent (file_write, shell_execute) |
-| Inline rendering | No (text link only) |
+### 会话资源
 
-**Markdown usage:**
-```markdown
-[report.csv](minis://workspace/report.csv)
+以下四个 host 绑定调用方/消息所属会话：
+
+| Host | iSH 路径 | 语义 |
+|---|---|---|
+| `attachments` | `/var/minis/attachments` | 输入附件和可展示媒体 |
+| `offloads` | `/var/minis/offloads` | 超长工具输出或原生 offload 文件 |
+| `workspace` | `/var/minis/workspace` | 会话工作文件 |
+| `browser` | `/var/minis/browser` | 浏览器截图、文本及相关产物 |
+
+同一个 URL 字符串在不同会话中可以指向不同文件。资源 URL 不携带 session id；解析方必须从执行上下文、活动会话或消息归属取得 session id。
+
+规范要求：会话资源只能在其所属会话目录内解析。找不到时返回不可解析，不得扫描其他会话并返回第一个同名文件。
+
+当前并非所有消费者已满足这一要求：[请求预算解析仍会跨会话扫描](#请求预算解析仍会跨会话扫描)记录已知违约路径。将资源加入模型请求或独立读取本小节时必须一并核对该偏差，不能把隔离要求当成实现已全面通过验证。
+
+### 全局资源
+
+`skills`、`memory`、`shared` 由当前实现映射到 App 的全局持久目录，可跨会话访问。它们不是会话目录的 fallback：只有 host 明确为这些值时才使用全局根目录。
+
+全局资源地址不表达Agent功能开关或删除传播：Skill启停与会话覆盖见[Skill生命周期](ios-skills-lifecycle.md#关闭不等于禁止文件访问)，Memory注入、专用工具与全局文件访问的区别见[Memory生命周期](ios-memory-lifecycle.md#默认值会话开关与生效时点)。不得从URL可解析推导正文已注入、已获得操作授权或删除已跨设备完成。
+
+### 用户挂载资源
+
+`minis://mounts/<mount-name>/<path>` 先通过挂载名解析用户授权的外部目录，再解析相对路径。读取依赖安全作用域授权和外部 Provider 可用性；写入还必须检查挂载是否只读。
+
+主线程聊天渲染当前可能为了避免 FileProvider 或网络挂载阻塞而返回一个尚未验证存在的候选 URL，随后由异步加载显示成功或占位失败。维护者不能据此把“已生成 URL”当成“文件已存在或可读”。
+
+## iSH 与 Host 路由
+
+会话目录通过 `MinisFsRouter` 的 `fs_context` 路由到：
+
+```text
+Library/MinisChat/minis/<session-id>/<bucket>/<relative-path>
 ```
 
-### 4.3 `offloads` — Truncated Tool Outputs
+每次 shell 执行带所属会话的 context；子进程继承该 context。`memory`、`skills`、`shared` 和外部挂载走静态挂载层，不属于四个会话 bucket。
 
-**Purpose:** Automatically saved when a tool result exceeds `maxToolResultLength` (20,000 chars). The agent receives the truncated output plus a reference to the full file.
+这不是“切换会话时清空并原子复制一份 `/var/minis` 工作副本”的契约。并发会话可通过各自 context 同时访问各自目录。
 
-| Property | Value |
-|----------|-------|
-| Linux path | `/var/minis/offloads/<filename>` |
-| Persistent storage | `Library/MinisChat/minis/<sessionId>/offloads/<filename>` |
-| Writable by | Host app (automatic offload) |
-| Inline rendering | No |
-| Filename pattern | `<toolName>_<timestamp>_<toolIdPrefix>.txt` |
+## 路径安全契约
 
-### 4.4 `browser` — Browser Snapshots (New)
+所有把 URL 路径转为文件系统路径的消费者必须：
 
-**Purpose:** Screenshots and readable-text extracts from `browser_use` tool actions, addressable for the agent to reference later.
+1. 解码出相对路径，拒绝空 host、绝对路径、NUL、非法组件和意图逃逸的 `..`；
+2. 标准化候选 URL（包括符号链接影响适用时）；
+3. 验证结果仍是授权根目录的后代，而不是只检查字符串前缀；
+4. 外部挂载写入前检查授权存续和只读状态；
+5. 失败时返回不可解析，不得尝试其他会话。
 
-| Property | Value |
-|----------|-------|
-| Linux path | `/var/minis/browser/<filename>` |
-| Persistent storage | `Library/MinisChat/minis/<sessionId>/browser/<filename>` |
-| Writable by | Host app (after browser_use actions) |
-| Inline rendering | Yes (images) |
+当前各解析器的完整路径穿越覆盖尚未通过统一测试证明；因此这是必须满足的安全要求，也是待补验证项，而不是对现状的无条件认证。
 
-## 5. Path Resolution
+## 工具结果与聊天渲染
 
-### 5.1 `minis://` → Linux Path
+- 工具产生需要后续引用的持久资源时，应返回可复制的 `minis://` URL；同时保留必要的人类可读说明。
+- UI 解析必须使用消息所属会话。只依赖全局“当前活动会话”时，历史消息异步渲染或会话切换可能产生竞态；新增调用点应显式携带 session id。
+- 当前聊天媒体分类中，位图图片为 `png/jpg/jpeg/gif/webp/bmp/tiff`；`svg` 走 HTML 内容类型，而不是原生图片类型。
+- 当前内联类型还包括常见音频、视频、文本、Markdown、HTML 和文档；未知扩展名应提供文件链接/通用图标，而不是猜测可执行或可预览。
+- 外部挂载或远端 Provider 加载失败时，应显示可观察的失败/占位状态，不能悄然显示另一个会话的同名文件。
 
-```
-minis://<namespace>/<path>  →  /var/minis/<namespace>/<path>
-```
+## 导航路由
 
-Extract `host` as namespace, concatenate with `path`:
-```swift
-let linuxPath = "/var/minis/\(url.host!)\(url.path)"
-```
+[DeepLinkRouter.swift](../../src/ios/Shared/DeepLinkRouter.swift) 是当前路由表来源。稳定的路由族为：
 
-### 5.2 Linux Path → Host Filesystem
+| Host | 行为 |
+|---|---|
+| `share` | 唤起待处理分享界面 |
+| `views/alarm` | 打开闹钟列表 |
+| `open_terminal` | 打开终端；可携带 `init_command` |
+| `open` | 处理 Web App launcher 返回参数 |
+| `session` / `sessions` | 按路径中的 id 打开会话；复数为规范写法，单数为兼容别名 |
+| `settings` | 打开设置或设置子页 |
 
-```
-/var/minis/<namespace>/<path>  →  <dataPath>/var/minis/<namespace>/<path>
-```
+未知顶层 host 当前会被记录并忽略；缺少会话 id 也会忽略。未知 settings 子路径当前回退到设置首页，以避免生成式链接把用户留在无响应状态。具体设置子路由与别名易变，调用方应以源码和目标版本验证，不应在本 Spec 复制完整清单。
 
-Where `dataPath` = `~/Documents/alpine-rootfs/data/`.
+## 已知实现偏差
 
-```swift
-func resolveHostPath(_ linuxPath: String) -> URL? {
-    guard linuxPath.hasPrefix("/"), !linuxPath.contains("..") else { return nil }
-    let relative = String(linuxPath.dropFirst())
-    return RootfsManager.shared.dataPath.appendingPathComponent(relative)
-}
-```
+### 请求预算解析仍会跨会话扫描
 
-### 5.3 Host Filesystem → Persistent Storage (Session Isolation)
+已核实：[AIChatViewModel+RequestBudget.swift](../../src/ios/Agent/Chat/AIChatViewModel+RequestBudget.swift) 的静态 `resolveMinisURL` 在活动会话和全局目录失败后，仍会扫描全部会话目录。
 
-```
-<dataPath>/var/minis/<namespace>/<path>  →  Library/MinisChat/minis/<sessionId>/<namespace>/<path>
-```
+这违反本 Spec 的会话隔离契约，属于实现缺陷，不是兼容行为。本文不修改代码；在修复并验证前：
 
-The iSH-visible directory (`/var/minis/`) is a **session-unaware working copy** — a transient mount point that always reflects exactly one session's files. The agent and the shell never see a session ID; they simply read and write `/var/minis/`. The host app is responsible for swapping the backing storage on session transitions.
+- 不得用该路径证明 `minis://` 已完整隔离；
+- 涉及把资源内容加入模型请求的改动必须审查是否经过此解析器；
+- 找不到活动会话资源时，正确结果应是不可解析，而不是借用其他会话同名文件。
 
-**Session switch lifecycle:**
-1. **Harvest** — copy any new/modified files from iSH data → outgoing session's persistent storage (captures shell-written files that haven't been persisted yet)
-2. **Clear** — remove all files from the iSH-visible `/var/minis/` directory
-3. **Mount** — copy all persistent files from the incoming session's storage → iSH-visible `/var/minis/`
-4. **Register** — ensure all mounted files exist in meta.db so the iSH kernel can access them
+## 场景与验收
 
-**Isolation guarantee:** At no point during this lifecycle are files from two different sessions simultaneously visible under `/var/minis/`. The clear-then-mount sequence is atomic from the agent's perspective (it only runs within a session).
+### 场景 A：两个会话有同名附件
 
-### 5.4 meta.db Registration
+前提：会话 A、B 都存在 `attachments/result.png`，内容不同。
 
-Every file written to the host filesystem (`dataPath/var/minis/...`) MUST be registered in iSH's `meta.db` for the Linux kernel to see it:
+可观察验收：在 A 渲染只得到 A 的文件，在 B 渲染只得到 B 的文件；任一会话删除自己的文件后显示找不到，绝不显示另一会话的版本。
 
-- `ensureFakefsMetadata(for: linuxPath, isDirectory: false)` — registers file inode
-- `ensureParentDirsInMetaDB(for: linuxPath)` — ensures all ancestor directories exist
+### 场景 B：全局 skill 在多个会话引用
 
-## 6. Tool Result Contract
+前提：`skills/example/SKILL.md` 存在。
 
-**Core rule:** When a tool action produces or modifies a persistent, addressable resource, the tool result MUST include the `minis://` URL so the model can reference it.
+可观察验收：A、B 都能解析同一全局文件；把 host 改成 `workspace` 后必须回到各自会话目录。
 
-### 6.1 `file_write` — Current Behavior & Enhancement
+### 场景 C：外部只读挂载
 
-**Current** tool result:
-```
-Wrote to /var/minis/attachments/chart.png (1234 bytes)
-```
+前提：用户授权一个只读挂载。
 
-**Enhanced** tool result for files under `/var/minis/`:
-```
-Wrote to /var/minis/attachments/chart.png (1234 bytes)
-minis_url: minis://attachments/chart.png
-```
+可观察验收：允许读取存在的文件；写入被明确拒绝；授权失效或远端不可用时显示失败，不阻塞主线程，也不 fallback 到内部同名路径。
 
-The `minis_url` field is appended only when the written path falls under `/var/minis/`. This gives the model an explicit, copy-paste-ready URL to embed in Markdown responses.
+### 场景 D：导航与资源不混淆
 
-**Implementation:** In `executeFileWrite`, after a successful write to any path under `/var/minis/`:
-```swift
-// After successful write
-var result = "\(action) to \(path) (\(bytesWritten) bytes)"
-if path.hasPrefix("/var/minis/") {
-    let minisPath = String(path.dropFirst("/var/minis/".count))
-    let namespace = minisPath.components(separatedBy: "/").first ?? ""
-    let rest = String(minisPath.dropFirst(namespace.count))
-    result += "\nminis_url: minis://\(namespace)\(rest)"
-}
-```
+可观察验收：`minis://settings/permissions` 打开设置权限页；`minis://attachments/settings/permissions` 只尝试解析会话文件，不触发导航。
 
-### 6.2 `shell_execute` — Post-Scan Enhancement
+### 场景 E：路径逃逸
 
-After a `shell_execute` completes, scan for new or modified files under `/var/minis/` and append their `minis://` URLs to the tool result.
-
-**Enhanced** tool result:
-```
-<normal stdout/stderr output>
-
-[minis] New files:
-  minis://attachments/output.png
-  minis://workspace/results.json
-```
-
-**Implementation:** Before and after execution, snapshot the set of files under each `/var/minis/` subdirectory. Diff to find new/modified files. Append their URLs.
-
-### 6.3 `browser_use` — Screenshot URLs
-
-When `browser_use` captures a screenshot, save it to `/var/minis/browser/` and include the URL in the tool result.
-
-**Enhanced** tool result:
-```
-Screenshot captured (1280x720)
-minis_url: minis://browser/screenshot_1707000000.jpg
-```
-
-### 6.4 Offload References
-
-Already implemented. When tool output exceeds the limit:
-```
-<truncated output>
-
-[OUTPUT TRUNCATED] Full output (50000 chars) saved to: /var/minis/offloads/shell_execute_1707000000_abc12345.txt
-Use file_read tool to read the complete output.
-```
-
-**Enhancement:** Add `minis://` URL for consistency:
-```
-minis_url: minis://offloads/shell_execute_1707000000_abc12345.txt
-```
-
-### 6.5 User Attachment URLs
-
-When the user attaches an image/file via the input bar and it's saved to `/var/minis/attachments/`, the `minis://` URL is included in the user message context so the agent knows the file path.
-
-Already implemented via `saveAttachment()` → returns `minis://attachments/<filename>`.
-
-## 7. System Prompt Update
-
-The agent system prompt should be updated to document the URL scheme and the tool result contract:
-
-```
-Shared directory /var/minis/ (bidirectional read/write between shell and app):
-  /var/minis/attachments/ — Media files (images, audio, video). Display inline with ![desc](minis://attachments/filename).
-  /var/minis/workspace/   — Working files (scripts, data, configs). Link with [name](minis://workspace/filename).
-  /var/minis/offloads/    — Auto-saved large outputs. Read with file_read.
-  /var/minis/browser/     — Browser screenshots and extracts.
-
-The minis:// URL scheme:
-  minis://attachments/file.png  →  /var/minis/attachments/file.png
-  minis://workspace/data.csv    →  /var/minis/workspace/data.csv
-
-When you write files to /var/minis/, the tool result includes a minis_url you can embed directly in Markdown.
-Supported inline types: images (.png/.jpg/.gif/.webp), audio (.mp3/.m4a/.wav), video (.mp4/.mov/.m4v).
-For non-media files, use Markdown links: [filename](minis://workspace/filename).
-```
-
-## 8. Chat UI Rendering
-
-### 8.1 MinisImageProvider (Existing)
-
-The `MinisImageProvider` in `AIChatView.swift` handles all `minis://` URLs in Markdown image syntax (`![](minis://...)`). It dispatches based on file extension:
-
-- **Image extensions** → `UIImage` with tap-to-fullscreen, retry-on-load (6 attempts, 500ms interval)
-- **Audio extensions** → `MinisAudioPlayerView` with play/pause, seek, duration
-- **Video extensions** → `MinisVideoPlayerView` with thumbnail + fullscreen player
-
-### 8.2 Link Rendering (Enhancement)
-
-Markdown links with `minis://` scheme (`[name](minis://...)`) should be rendered as tappable file chips that:
-- Show the filename and a file-type icon
-- On tap: open a preview (Quick Look) or share sheet for the file
-- Non-media files (`.csv`, `.txt`, `.py`, `.json`, etc.) get a document icon + filename pill
-
-### 8.3 Subdirectory Support
-
-The current `resolveMinisFileURL` already supports arbitrary path depth:
-```swift
-// minis://attachments/photos/img.jpg → /var/minis/attachments/photos/img.jpg
-let linuxPath = "/var/minis/\(host)\(url.path)"
-```
-
-No changes needed for resolution. The persistent storage and mount logic should be extended to handle nested subdirectories (currently only handles flat file lists in `mountMinisSubdir`).
-
-## 9. Implementation Checklist
-
-### Phase 1: Tool Result URLs
-- [ ] `file_write`: Append `minis_url:` when path is under `/var/minis/`
-- [ ] `shell_execute`: Scan for new/modified files under `/var/minis/` after execution, append URLs
-- [ ] `offloadToolOutput`: Append `minis_url:` to truncation notice
-- [ ] Update system prompt with full URL scheme documentation
-
-### Phase 2: Browser Namespace
-- [ ] Add `browser` namespace directories to session mount/persist logic
-- [ ] Save browser screenshots to `/var/minis/browser/` with `minis://` URL in tool result
-- [ ] Add `browser` directory to `mountMinisSubdir` calls
-
-### Phase 3: Enhanced Rendering
-- [ ] Implement tappable file chip for `minis://` links (non-image Markdown links)
-- [ ] Quick Look / share sheet integration for non-media files
-- [ ] Recursive subdirectory support in `mountMinisSubdir` (currently flat)
-
-### Phase 4: Workspace Awareness
-- [ ] `file_read`: When reading from `/var/minis/`, include `minis_url:` in result
-- [ ] Consider `minis://` URL auto-complete or suggestion in agent context
-
-## 10. Security Considerations
-
-- **Session isolation**: The agent and shell MUST only access the active session's resources. The mount/unmount lifecycle (§5.3) enforces this at the filesystem level. No API or filesystem path exposes another session's data.
-- **Path traversal**: `resolveHostPath` rejects paths containing `..`. Maintain this.
-- **Namespace validation**: Only known namespaces (`attachments`, `workspace`, `offloads`, `browser`) should be accepted. Reject unknown namespaces.
-- **No session ID in URLs**: Session IDs are never exposed in `minis://` URLs, tool results, or system prompts. This prevents the agent from attempting cross-session references.
-- **File size limits**: Large files in `/var/minis/attachments/` could consume device storage. Consider per-session quotas (future).
-- **meta.db integrity**: Always register files in meta.db atomically. Current implementation handles this correctly.
+可观察验收：编码或多重编码后的 `..`、绝对路径及符号链接逃逸均不能越过授权根目录；失败不触发跨会话搜索。当前需要新增定向测试后才能把这一项标为运行已验证。

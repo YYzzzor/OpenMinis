@@ -31,12 +31,13 @@ python3 scripts/harness/review.py prepare \
 
 ### 按小节提供 Spec
 
-先从 AGENTS.md 的简短索引选择文档，再在任务记录填写必读和参考清单。准备请求时，可用下列参数替代整篇 `--spec`：
+先从[生成的 Spec 索引](../specs/index.md)选择文档，按[受控阅读入口](spec-context.md#受控阅读入口)查看目录与正文，再在任务记录填写必读和参考清单。准备请求时，可用下列参数替代整篇 `--spec`：
 
 ```text
---spec-section 'docs/specs/minis-url-scheme.md::Minis URL Scheme Specification > 3. Session Model'
---spec-section 'docs/specs/minis-url-scheme.md::Minis URL Scheme Specification > 10. Security Considerations'
---spec-reference 'docs/specs/ios-sandbox-ish-summary.md::iOS Sandbox Environment: iSH Virtualization Summary > 3. Mount System'
+--spec-section 'docs/specs/minis-url-scheme.md::Minis URL Contract > 资源作用域 > 会话资源'
+--spec-section 'docs/specs/minis-url-scheme.md::Minis URL Contract > 已知实现偏差 > 请求预算解析仍会跨会话扫描'
+--spec-section 'docs/specs/minis-url-scheme.md::Minis URL Contract > 路径安全契约'
+--spec-reference 'docs/specs/ios-sandbox-ish-summary.md::iOS iSH Runtime and Isolation Contract > 文件系统作用域'
 ```
 
 这些是路径解析任务的示例，不是所有任务的默认输入。完整原文仍保存和绑定；必读小节进入 request.md，参考材料先只给定位。存在跨小节前提时加入对应必读条款，短文档或边界不明确时保留 `--spec` 全文读取。详见 [Spec 上下文](spec-context.md)。

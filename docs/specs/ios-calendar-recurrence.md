@@ -1,14 +1,34 @@
+---
+description: apple-calendar 重复事件创建、两套参数兼容、结束条件、回读验证以及年度周次的已知限制。
+---
+
 # MinisX 日历重复创建接口
 
-本文描述 apple-calendar create 的重复创建能力，不改变开发流程或审批规则。最低 iOS 26.0。
-2026-09-21 迁移基于官方 v1.13（7414c0d）；下述 `--recurrence` 保留既有 MinisX 接口，新增版本兼容说明记录上游 `--recur` 的原有行为。迁移后的运行证据另见当前迁移任务，不将旧分支测试结果视为新分支已验证。
-验证状态见任务 `tasks/archive/26-09-20 支持完整日历重复创建/verification.md`，不能将参数表等同于真机测试通过。
+导航：[Spec 索引](index.md)；章节目录由[上下文工具](../harness/spec-context.md#受控阅读入口)从本文标题生成，不另手写目录。
 
-## 当前验收限制
+状态：现行规范。本文描述 `apple-calendar create` 的重复创建契约、兼容参数和已接受限制；最低 iOS 26.0。参数表和示例说明调用约定，不等于当前分支、模拟器或真机已经运行验证。每次实现变更必须单独记录实际验证范围。
 
-全部公开参数已接入。用户已明确同意将年度周次及其组合列为本次个人使用交付的已知限制，暂缓修复、不阻塞其他功能交付；决定见任务 acceptance.md。原“所有接口均可用”的目标尚未全部实现：iOS 26.4 与 27.0 模拟器中，年度周次 `weeksOfTheYear` 能保存/回读规则，却只查询到首次发生。绕过 MinisX 的直接 EventKit 对照也复现；正周次、负周次、有无 count、额外月份/年度日期筛选均未解决。尚无真机证据，不能推断所有真实 iPhone 都失败。
+`--recur` 是 OpenMinis v1.13 的兼容参数族，`--recurrence` 是 MinisX 保留的高级参数族；两者的长期兼容关系见下文。本文不改变开发流程或审批规则。
 
-涉及年度周次的 create/list 返回 warnings，Agent 必须向用户说明并核查后续日期。不得把规则保存成功或存在 recurrenceRules 当作重复生效。测试保留此项失败断言；未跳过、未改成预期失败。按用户确认的范围，本次交付验收完成；该决定不等于年度周次已可用或整套测试全通过。
+## 年度周次的现行限制
+
+本节刻意区分需要继续遵守的产品约定、当前源码中可见的实现状态和历史运行证据。后两者不能自动提升为设备行为保证。
+
+### 现行约定
+
+- `--recurrence-weeks-of-year` 及其组合保留为可表达的年度规则，但不视为已经验证可用。维护者此前接受将它作为低频已知限制暂缓修复；这项范围取舍的原始依据保存在[验收记录](<../../tasks/archive/26-09-20 支持完整日历重复创建/acceptance.md>)，不代表以后可以普遍忽略低频缺陷。
+- create 或 list 返回年度周次 warning 时，Agent 必须向用户说明限制，并用 list 查询实际后续发生日期。规则保存成功、`recurrenceRules` 存在或字段能够回读，都不能单独证明重复已经生效。
+- 未取得新的运行证据前，不得宣称限制已经修复，也不得把相关失败断言跳过、改成预期失败或用 warning 检查替代日期断言。
+
+### 当前实现状态
+
+当前源码静态核对显示，[CalendarOffload.m](../../src/ios/NativeOffloads/CalendarOffload.m) 会保存和回读 `weeksOfTheYear`，并在 create/list 结果中附加已测模拟器无法展开后续日期、真机未验证的 warning。[CalendarRecurrenceTests.m](../../src/ios/CalendarTests/CalendarRecurrenceTests.m) 仍保留正周次、正负周次组合、setPositions 组合、直接 EventKit 对照和 warning 透传检查。本段只说明这些实现与测试入口当前存在；本轮文档整理没有运行测试，不能据此声称当前 `main` 的行为已经复测。
+
+### 历史验证证据
+
+[2026-09-20 验证记录](<../../tasks/archive/26-09-20 支持完整日历重复创建/verification.md>)记载：当时的 `feat/minisx-branding` 实现在 iOS 26.4 与 27.0 模拟器各完整运行 26 项测试，结果均为 22 项通过、4 个年度周次相关失败，整体退出码 65。年度周次规则可以保存和回读，但查询只得到首次发生；绕过 MinisX 的直接 EventKit 对照也复现。正周次、负周次、有无 count、额外月份或年度日期筛选均未消除问题。
+
+这些结果只适用于当时记录的代码、模拟器版本和测试环境。没有真实 iPhone、iCloud/Exchange/CalDAV 日历服务或当前 `main` 分支的新增运行证据，因此不能推断所有真实设备都会失败，也不能用旧结果证明当前实现通过或失败。
 
 ## 使用方式
 
@@ -34,7 +54,7 @@ create 要求结束时间晚于开始时间。指定 `--calendar` 后若找不�
 
 create/list 同时返回上游 `recurrence` 摘要和 MinisX `recurrence_rules` 完整规则；上游字段名称和基础星期写法保持不变。复杂规则应读取 `recurrence_rules`，它包含 ordinal、各日期筛选与结束条件；单次事件仍省略 `recurrence`，但有空的 `recurrence_rules` 数组。
 
-提醒事项继续使用上游 `--recur` 系列与 `--clear-recur`，并保留位置提醒；本次 `--recurrence` 高级参数只用于日历 create，没有扩展到提醒事项。`apple-reminders create/update` 及 `apple-calendar remind/update-reminder` 都会在保存或修改前拒绝这些选项并返回 invalid_args，不会静默创建单次提醒；标题、备注等文本取值中包含 `--recurrence` 字样仍作为原文处理。保存重复日历系列沿用 v1.13 的 `EKSpanFutureEvents`。
+提醒事项继续使用上游 `--recur` 系列与 `--clear-recur`，并保留位置提醒；`--recurrence` 高级参数只用于日历 create，没有扩展到提醒事项。`apple-reminders create/update` 及 `apple-calendar remind/update-reminder` 都会在保存或修改前拒绝这些选项并返回 invalid_args，不会静默创建单次提醒；标题、备注等文本取值中包含 `--recurrence` 字样仍作为原文处理。保存重复日历系列沿用 v1.13 的 `EKSpanFutureEvents`。
 
 ## Apple 公开接口覆盖
 
@@ -46,7 +66,7 @@ create/list 同时返回上游 `recurrence` 摘要和 MinisX `recurrence_rules` 
 | EKRecurrenceDayOfWeek weekNumber | 同上，如 `2TU,-1FR` | 月/年支持 ±1…±53；省略序号表示每个该星期；系统进一步校验周期适用性 |
 | daysOfTheMonth | `--recurrence-days-of-month` | ±1…±31；仅月规则 |
 | monthsOfTheYear | `--recurrence-months-of-year` | 1…12；仅年规则 |
-| weeksOfTheYear | `--recurrence-weeks-of-year` | ±1…±53；仅年规则；已知限制，本次暂缓 |
+| weeksOfTheYear | `--recurrence-weeks-of-year` | ±1…±53；仅年规则；接口保留但不视为已验证可用，见[现行限制](#年度周次的现行限制) |
 | daysOfTheYear | `--recurrence-days-of-year` | ±1…±366；仅年规则 |
 | setPositions | `--recurrence-set-positions` | ±1…±366；至少一个前述日期筛选参数 |
 | recurrenceEnd = nil | 不传 count/until | 无限重复 |
@@ -61,7 +81,7 @@ create/list 同时返回上游 `recurrence` 摘要和 MinisX `recurrence_rules` 
 
 Apple 没有公开设置 `firstDayOfTheWeek` 或 `calendarIdentifier` 的接口；两者仅回读。
 每两周等多周规则的周起点由系统处理。没有小时/分钟重复、任意 RRULE 字符串或多规则并集创建接口。
-本次接口用于日历事件创建。既有系列修改/删除继续使用 `--occurrence-date`、`--span`；不新增修改重复规则参数。
+`--recurrence` 高级接口用于日历事件创建。既有系列修改/删除继续使用 `--occurrence-date`、`--span`；不提供修改重复规则的参数。
 
 ## 复杂示例
 
@@ -75,7 +95,7 @@ Apple 没有公开设置 `firstDayOfTheWeek` 或 `calendarIdentifier` 的接口�
 | 每月第一天与最后一天 | `--recurrence monthly --recurrence-days-of-month 1,-1` |
 | 每月最后一个工作日 | `--recurrence monthly --recurrence-days-of-week MO,TU,WE,TH,FR --recurrence-set-positions -1` |
 | 每年 2 月、3 月的第二个周二 | `--recurrence yearly --recurrence-months-of-year 2,3 --recurrence-days-of-week 2TU` |
-| 每年第 2 周与倒数第 2 周的周三（已知限制，暂缓） | `--recurrence yearly --recurrence-weeks-of-year 2,-2 --recurrence-days-of-week WE` |
+| 每年第 2 周与倒数第 2 周的周三（限制场景，必须查询后续日期） | `--recurrence yearly --recurrence-weeks-of-year 2,-2 --recurrence-days-of-week WE` |
 | 每年第一天和最后一天 | `--recurrence yearly --recurrence-days-of-year 1,-1` |
 | 每天重复到指定日期 | `--recurrence daily --recurrence-until 2027-06-30` |
 
@@ -93,3 +113,13 @@ create 与 list 结果包含 `is_recurring`、`time_zone`、`recurrence_rules`�
 - [EKRecurrenceDayOfWeek](https://developer.apple.com/documentation/eventkit/ekrecurrencedayofweek)
 - [EKRecurrenceEnd](https://developer.apple.com/documentation/eventkit/ekrecurrenceend)
 - [单规则限制](https://developer.apple.com/documentation/eventkit/ekcalendaritem/recurrencerules)
+
+## 维护验收场景
+
+| 场景 | 验收条件与证据 |
+| --- | --- |
+| 创建每月第二个周二等复杂重复事件 | 按参数表创建后 list 查询后续发生日期；对象构造或规则回读不能代替发生日期验证。 |
+| 混用两套重复参数、参数越界或无效结束条件 | 按 v1.13 兼容及公开接口覆盖中的约定检查错误和无保存副作用。 |
+| 使用年度周次 | 保留[年度周次的现行限制](#年度周次的现行限制)与 warnings，核查后续日期；未取得新证据前不得宣称该限制已经修复。 |
+
+相关手机权限与能力边界见[能力清单](ios-device-data-capabilities.md)。维护时保留[年度周次的现行限制](#年度周次的现行限制)和[回读结果](#回读结果)作为必要上下文。

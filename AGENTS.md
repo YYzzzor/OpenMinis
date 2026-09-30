@@ -153,7 +153,6 @@ The user-facing guide is [项目技能使用说明](docs/harness/skills-guide.md
 
 ## Development Harness
 
-- Keep the compact Spec index below in project context; load Spec bodies only as needed, normally by complete section. Record mandatory sections and optional references in the task and pass them to delegates and reviewers. Retain scope, definitions, exceptions and dependent sections; use full text for short documents or when context is uncertain. See `docs/harness/spec-context.md` for section selection and version binding.
 - For complex or cross-session development, maintain a task record under `tasks/active/` using `docs/harness/record-formats.md`. Name task titles and record files/directories `YY-mm-dd Name` using the creation date; retain the name when archiving. Small self-contained edits do not require a task record.
 - Task records live at repository-root `tasks/`, separate from `docs/`. Keep planned, active, and blocked tasks in `tasks/active/`; after completion or cancellation, move the record and its attachments to `tasks/archive/` without changing its creation-date name. Record acceptance before archiving; do not infer completion from age or a clean worktree.
 - Default task discovery and recovery must inspect only `tasks/active/`. Do not recursively search, read, follow links into, or attach `tasks/archive/` as ambient context. Read a specific archived record only when the user asks for it or a current task has an identified need for that exact evidence; state the reason first and load only the necessary files. No active match is not a reason to fall back to the archive.
@@ -169,15 +168,11 @@ The user-facing guide is [项目技能使用说明](docs/harness/skills-guide.md
 - Automatically correct current task records after significant misalignment. Before changing rules, specifications or skills that affect future tasks, present the concrete change, reason, scope and validation plan for user approval. Pending proposals are not active instructions.
 - Shared skills and records must remain usable by Codex and Pi. Keep tool-specific execution and project-specific settings outside portable instructions where practical.
 
-## Spec Index
+## Spec Context
 
-| Document | Read when working on |
-| --- | --- |
-| `docs/specs/resource-efficiency.md` | All development stages and every review; mandatory resource bounds, lifecycle efficiency and performance evidence |
-| `docs/specs/debug-server-api.md` | Debug server connection/protocol, provider management, chat automation or browser/log debugging |
-| `docs/specs/ios-sandbox-ish-summary.md` | iSH integration, mounts, native offloads or Agent command execution |
-| `docs/specs/ios-device-data-capabilities.md` | Current iOS data read/write capabilities, Agent-facing commands, permissions and implementation limits |
-| `docs/specs/ios-calendar-recurrence.md` | Calendar recurring-event creation parameters, end conditions, compatibility and verification limits |
-| `docs/specs/minis-url-scheme.md` | `minis://` URLs, session path resolution, tool result references or chat attachment rendering |
+- Find applicable documents through the generated [Spec index](docs/specs/index.md); descriptions are maintained in each source Spec, not here.
+- For planning or resuming work, use the bounded route-and-body reader in [Spec context](docs/harness/spec-context.md). Select complete sections with their scope, prerequisites and exceptions; expansion labels describe only the current output.
+- [Resource efficiency](docs/specs/resource-efficiency.md) applies throughout development and every review. Pure documentation may be marked not applicable; tool resource costs still matter.
+- After implementation and validation, maintain affected Specs using [Spec authoring](docs/harness/spec-authoring.md), or record why no update is needed before task archival.
 
-These upstream documents mix descriptions, contracts and proposed enhancements. Check the selected section's status against current code; do not treat a planned feature or implementation description as an unconditional requirement. Update this index when adding or changing the scope of a Spec.
+Distinguish confirmed requirements, implementation descriptions and future plans. An upstream Draft or example is not automatically a current requirement or proof of working behavior.
