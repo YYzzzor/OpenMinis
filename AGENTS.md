@@ -2,7 +2,7 @@
 
 ## 项目
 
-- MinisX 基于 OpenMinis 1.13 二次开发，代码主要在 `src/ios`。App 与扩展的最低系统版本为 iOS 26.0；用更新版本的 iOS 模拟器或运行时测试时，不因此提高部署目标。
+- MinisX 基于 OpenMinis 1.13 二次开发，只做 iOS，代码在 `src/ios`；不修改、构建或记录 Android 相关内容（`src/android`、Android 脚本与配置），批量替换时也排除。App 与扩展的最低系统版本为 iOS 26.0；用更新版本的 iOS 模拟器或运行时测试时，不因此提高部署目标。
 - `main` 是 MinisX 开发基线，不是上游镜像。动手前核对分支与工作区，保留无关改动。
 - 构建与测试见 [BUILDING.md](BUILDING.md)。模拟器构建：`bash scripts/build_ios_simulator.sh --skip-deps`；测试优先只运行相关的测试类（`-only-testing:`）。
 
@@ -38,7 +38,7 @@
 
 ### Codex
 
-- **主会话**（`gpt-6-astra`）：需求、规划、协调、验收；文档和单文件小改动直接做。
+- **主会话**：需求、规划、协调、验收；文档和单文件小改动直接做。
 - **实现**（`gpt-6-luna` / `xhigh`，`fork_turns=none`）：多文件或较长的实现。不可用时报告，主会话不接手。
 - **审查**（`gpt-6.1-sol` / `high`，`task_name=review_*`，`fork_turns=none`）。
 - 委派参数错误时自行纠正重试。

@@ -12,7 +12,7 @@
 
 - **何时建记录：** 需要跨会话，或需要你确认验收的任务。一次会话能完成的小任务不建。
 - **位置与命名：** `tasks/active/YY-mm-dd 名称/task.md`；完成或取消后整个目录移到 `tasks/archive/`。
-- **内容（≤ 3KB）：** 状态、相关 Spec、目标、验收清单、决定（含否定方向与原因）、下一步；复杂任务可加实现计划。
+- **内容（≤ 5KB）：** 状态、相关 Spec、目标、验收清单、决定（含否定方向与原因）、下一步；复杂任务可加实现计划。
 - **验收清单：** 写“做成什么样”。有证据才打勾，并注明证据位置；用 Spec 规则编号引用，例如“满足 D2”。
 - **实现计划（可选）：** 写“怎么做”，分步列出，完成一步勾一步；不与验收清单重复。
 - **下一步：** 不设条数，写到下个会话读完就能直接开工；在会话结束且任务未完成时更新。会话内的临时步骤用工具自带的待办功能，不写入文件。
@@ -54,8 +54,8 @@
 
 | 层 | 内容 | 参考上限 | 何时加载 |
 | --- | --- | --- | --- |
-| L0 常驻 | `AGENTS.md`：项目事实、常用命令、硬约束、各入口位置；Spec 索引 | `AGENTS.md` ≤ 3KB | 每次会话 |
-| L1 任务 | 当前任务的 `task.md`；当前阶段的一个技能 | 各约 3KB | 做该任务时 |
+| L0 常驻 | `AGENTS.md`：项目事实、常用命令、硬约束、各入口位置；Spec 索引 | `AGENTS.md` ≤ 5KB | 每次会话 |
+| L1 任务 | 当前任务的 `task.md`；当前阶段的一个技能 | 各约 5KB | 做该任务时 |
 | L2 细节 | 相关 Spec 全文、源码、证据文件 | 按需 | 用到才读 |
 | 维护层 | 本契约、Harness 演进记录 | — | 只在维护 Harness 时读 |
 
@@ -93,7 +93,7 @@
 AGENTS.md                      L0
 docs/specs/index.md + *.md     L0 索引 / L2 正文
 .agents/skills/
-  plan-task/  resume-task/  review-task/  archive-task/  update-spec/   L1，每个约 3KB 以内
+  plan-task/  resume-task/  review-task/  archive-task/  update-spec/   L1，每个约 5KB 以内
 tasks/TEMPLATE.md              任务记录模板
 tasks/active/  tasks/archive/  L1 / 归档
 docs/harness/contract.md       维护层（本文）
