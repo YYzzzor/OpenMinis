@@ -1,0 +1,324 @@
+--- before/docs/harness/operations.md
++++ after/docs/harness/operations.md
+@@ -34,9 +34,10 @@
+ 先从[生成的 Spec 索引](../specs/index.md)选择文档，按[受控阅读入口](spec-context.md#受控阅读入口)查看目录与正文，再在任务记录填写必读和参考清单。准备请求时，可用下列参数替代整篇 `--spec`：
+ 
+ ```text
+---spec-section 'docs/specs/minis-url-scheme.md::Minis URL Scheme Specification > 3. Session Model'
+---spec-section 'docs/specs/minis-url-scheme.md::Minis URL Scheme Specification > 10. Security Considerations'
+---spec-reference 'docs/specs/ios-sandbox-ish-summary.md::iOS Sandbox Environment: iSH Virtualization Summary > 3. Mount System'
++--spec-section 'docs/specs/minis-url-scheme.md::Minis URL Contract > 资源作用域 > 会话资源'
++--spec-section 'docs/specs/minis-url-scheme.md::Minis URL Contract > 已知实现偏差 > 请求预算解析仍会跨会话扫描'
++--spec-section 'docs/specs/minis-url-scheme.md::Minis URL Contract > 路径安全契约'
++--spec-reference 'docs/specs/ios-sandbox-ish-summary.md::iOS iSH Runtime and Isolation Contract > 文件系统作用域'
+ ```
+ 
+ 这些是路径解析任务的示例，不是所有任务的默认输入。完整原文仍保存和绑定；必读小节进入 request.md，参考材料先只给定位。存在跨小节前提时加入对应必读条款，短文档或边界不明确时保留 `--spec` 全文读取。详见 [Spec 上下文](spec-context.md)。
+--- before/docs/harness/spec-context.md
++++ after/docs/harness/spec-context.md
+@@ -62,7 +62,7 @@
+ 
+ ```bash
+ python3 -B scripts/harness/spec_context.py list docs/specs/minis-url-scheme.md
+-python3 -B scripts/harness/spec_context.py read 'docs/specs/minis-url-scheme.md::Minis URL Scheme Specification > 3. Session Model'
++python3 -B scripts/harness/spec_context.py read 'docs/specs/minis-url-scheme.md::Minis URL Contract > 资源作用域 > 会话资源'
+ python3 -B scripts/harness/review.py prepare --help
+ ```
+ 
+--- before/docs/specs/debug-server-api.md
++++ after/docs/specs/debug-server-api.md
+@@ -41,7 +41,7 @@
+ 
+ ## HTTP 入口
+ 
+-当前路由如下；未知方法或路径应返回明确错误，不得悄然执行相近操作。
++客户端应使用下列明确入口。现行安全要求是未知 HTTP 方法或路径返回明确错误，不得悄然执行相近操作；当前 POST 路径检查尚未满足这一要求，见下表后的实现偏差。
+ 
+ | 入口 | 用途 | 是否需要 RPC 密文信封 |
+ |---|---|---|
+@@ -54,6 +54,10 @@
+ | `POST /rpc` | 执行 JSON-RPC 2.0 请求 | 认证开启时必须使用密文信封 |
+ 
+ 认证被显式关闭时，当前实现仍接受 `/rpc` 的普通 JSON-RPC 请求；这属于兼容路径，不是新客户端的默认接入方式。
++
++已核实的当前偏差：[DebugServer.swift](../../src/ios/Debug/DebugServer.swift) 只对 POST 的 `/pair` 做独立分支，其他 POST 路径会进入通用 RPC 处理，没有限定必须是 `/rpc`。例如发往未知路径的有效 RPC 仍可能执行。认证开启时仍检查信封，关闭时仍接受明文；此偏差不等于绕过认证，也不构成应依赖的路径别名。
++
++后续收窄路径的验收：使用无业务副作用的有效认证 RPC 向未知路径发送 POST，应得到路径错误且不进入业务分发；明确的 `/pair` 和 `/rpc` 保持各自协议。当前仅核对分派源码，尚未执行这一运行场景。
+ 
+ ## 配对、认证与消息保护
+ 
+@@ -142,5 +146,6 @@
+ ## 已知限制与待验证事项
+ 
+ - 已核实问题：历史 Spec 把服务写成仅 localhost、仅 POST，并手工维护大段方法表；三者都与当前实现不符，本文已移除。
++- 已核实实现偏差：未知 POST 路径仍进入通用 RPC，详见[HTTP 入口](#http-入口)；严格路径要求尚未完全落实。
+ - 待验证：真机在 Wi-Fi、USB 转发、VPN 和前后台切换下的实际可达性及配对 UI。
+ - 待维护者确认：长期是否应继续绑定所有 IPv4 接口，还是默认收窄到回环/显式启用 LAN。确认前不得把当前 `INADDR_ANY` 写成产品承诺。
+--- before/docs/specs/ios-agent-run-lifecycle.md
++++ after/docs/specs/ios-agent-run-lifecycle.md
+@@ -154,4 +154,4 @@
+ 
+ - 待验证：真机后台回收、并发工具 Stop、Provider 中途断流、iCloud reload 竞态、200 轮上限和多次 in-loop compact。
+ - 待维护者确认：排队 prompt 在 Stop 后继续还是全部取消的最终产品语义；当前实现包含继续排队的路径，不能仅凭代码视为已确认体验。
+-- Provider 路由、语音草稿和同步冲突的更细契约属于后续 P1/P2 Spec，不在本文扩展。
++- 相关现存规范：[Provider 与模型路由](ios-provider-model-routing.md)说明实例身份、fallback 和用量边界；[语音输入生命周期](ios-voice-input-lifecycle.md)说明采集与草稿编辑发送；[同步与冲突处理](ios-sync-and-conflict-resolution.md)说明队列、合并和删除传播。本文通过这些关联划分职责，不重复其细节。
+--- before/docs/specs/ios-backup-restore.md
++++ after/docs/specs/ios-backup-restore.md
+@@ -36,7 +36,7 @@
+ 
+ 当前 wire format 类别：
+ 
+-| 类别 | 当前新导出 | 兼容恢复 |
++| 类别 | 当前普通 UI 新导出 | 兼容恢复 |
+ |---|---|---|
+ | chats | 是 | 是 |
+ | shared_files | 是 | 是 |
+@@ -44,28 +44,45 @@
+ | memory | 是 | 是 |
+ | providers | 是 | 是 |
+ | mcp_servers | 是 | 是 |
+-| environment_variables | 是 | 是 |
+-| voice_corrections | 否 | 是，兼容旧包 |
++| environment_variables | 是，仅条目元数据；值另走凭证路径 | 是；值依赖 providers 凭证恢复或本地已有 Keychain 值 |
++| voice_corrections | 否；显式选择类别的调用仍可导出 | 是，兼容旧包及显式导出包 |
+ 
+ 所有可导出类别的 UI 默认选中是当前实现。文件型类别可以应用单文件上限；默认是不限，而不是静默丢弃大文件。无法下载的 iCloud placeholder、超限文件或快照竞态造成的缺失 blob 必须进入 manifest/index 和最终报告，不得把不完整导出显示成完整成功。
+ 
+-导出以 `snapshotAt` 固定数据截止时间；恢复续跑不能把截止时间推进到重试时刻，否则包内容会在多次尝试之间漂移。
++类别选择不等于其中的凭证已包含。环境变量、Provider 和 MCP OAuth 的依赖见[凭证与加密](#凭证与加密)；普通 UI 未提供 `voice_corrections`，但 exporter 保留显式选择该类别的路径，不能假设所有新包均无此类别。
++
++### 截止时间与快照范围
++
++当前导出续跑保留原 `snapshotAt`，不把时间字段推进到重试时刻；聊天导出用它筛选会话和消息。它不是所有类别的历史版本快照：[BackupExporter.swift](../../src/ios/Agent/Backup/BackupExporter.swift) 的 Memory 复制当前文件，Provider 和环境变量读取执行当时的 store，已完成类别在续跑时跳过，尚未完成类别则继续执行。
++
++因此，中断期间发生修改时，包中可能混合不同类别在不同时间取得的内容。调用方不得仅凭 manifest 的时间未变宣称跨类别一致快照，也不能把 activity lock 当作所有用户编辑均被冻结。是否需要统一的跨类别快照，以及其一致性范围，仍待维护者确认；本轮未做中断续跑运行验证。
+ 
+ ## 凭证与加密
+ 
+-- Provider 和环境变量等凭证只能在用户选择包含凭证且提供非空 passphrase 时导出。
+-- 用户不提供 passphrase 时，可以生成去除凭证的 share copy；exporter 必须拒绝“包含凭证但无密码”的组合。
++- 敏感凭证只能在用户选择包含凭证且提供非空 passphrase 时进入包。当前 exporter 的实际凭证条件是选择 `providers` 类别且 `includeCredentials = true`；这个组合没有密码时必须拒绝。单独设置 `includeCredentials` 或密码不保证包内有凭证。
++- 用户不提供 passphrase 时，可以关闭凭证生成 share copy；环境变量类别仍可含条目元数据，但不因此包含值。
+ - passphrase 不持久化。加密导出恢复执行时必须再次提供，不能因为存在 staging 就降级生成明文包。
+ - 内容文件加密后，integrity 记录包内实际字节的 SHA-256，即密文哈希，因而可在知道密码前发现截断或损坏。
+ - 加密包使用 verifier 区分错误密码，并使用 manifest MAC（优先校验 `manifest.mac` 原始字节 sidecar）认证 manifest。
+ - `manifest.json` 保持明文不代表凭证明文；敏感 payload 必须只出现在加密成员中。
++
++当前类别与凭证依赖：
++
++| 内容 | 导出前提 | 恢复前提 |
++|---|---|---|
++| 环境变量名称、备注等条目元数据 | 选择 `environment_variables`；写入 `env_vars.json`，不包含值 | 选择 `environment_variables`；已有条目保留，新条目从 Keychain 取值，缺值时为空 |
++| Provider 凭证、环境变量值、MCP OAuth | 选择 `providers`、包含凭证并提供密码；[BackupSecrets.swift](../../src/ios/Agent/Backup/BackupSecrets.swift) 收集当前可取得的值进入 secrets | 包含并选择 `providers`，完成密码验证和解密后由其 importer 应用 secrets；不是选择环境变量或 MCP 类别就会应用 |
++
++凭证集合目前归在 `providers`，会包含收集到的环境变量值和 MCP OAuth，即使对应元数据类别未选。要迁移环境变量条目和值，应同时选择 `environment_variables` 和含凭证的 `providers`；仅环境变量的加密包仍可能只有元数据。恢复完整包时只选环境变量也不会应用包内 secrets；本地已有值可能使结果看似完整，验收应使用目标设备没有这些值的样本。
++
++[BackupImporter.swift](../../src/ios/Agent/Backup/BackupImporter.swift) 把选中的 providers 排在环境变量前，避免创建新条目时读不到刚恢复的值；它不自动补选依赖类别。这是当前实现依赖，不是类别间可独立完整迁移的承诺；是否保留该耦合仍待维护者确认。
+ 
+ ## 导出完成与可恢复中断
+ 
+ - Export 与 restore 由进程级 activity lock 互斥；不能同时修改共享数据/staging。
+ - 新的无密码、非续跑导出当前可直接把 blob 流入包；加密或续跑仍可能使用 staging。这是实现策略，不是调用方可依赖的包格式差异。
+ - 干净完成后清理对应 journal/staging。取消、进程退出或可恢复中断应保留恢复所需的 staging，并由后续尝试按相同范围、限制和加密策略认领。
+-- 只有类别、范围、快照、限制、加密意图等关键选项匹配时才能续跑；不匹配的旧 staging 不得拼进新包。
++- 当前续跑匹配类别集合、单文件上限、包含凭证开关和加密意图，并沿用原 backup id 与 `snapshotAt`；不匹配的旧 staging 不得拼进新包。选项匹配只决定能否认领 staging，不保证尚未完成类别的源内容未变化，见[截止时间与快照范围](#截止时间与快照范围)。
+ - 最终结果必须报告包大小、完成类别、续跑类别以及 skipped file/byte/path；“归档文件已生成”不等于“所有源数据都已包含”。
+ 
+ ## 恢复顺序与事务边界
+@@ -80,6 +97,8 @@
+ 6. 对每个类别建立持久 rollback snapshot，按依赖顺序导入。
+ 7. 刷新相关 store，返回分类报告和 warning。
+ 
++步骤 6 的类别选择必须同时核对[凭证与加密](#凭证与加密)中的依赖。选择环境变量元数据不等于选择包内 secrets；成功类别数不能代替值完整性的核查。
++
+ 当前事务边界是“每个类别”：某类别失败时回滚该类别，已经成功的前序类别保留，然后继续/报告其他类别。UI 和调用方不得把部分成功显示成全有或全无。
+ 
+ rollback snapshot 必须位于非临时、不会随解包工作目录删除的位置；若 App 在恢复中被终止，下一次启动可根据 journal 调和孤儿 staging。结束标记不能先于数据真正稳定落盘。
+@@ -93,6 +112,8 @@
+ ## 场景与验收
+ 
+ ### 场景 A：包含凭证但未设置密码
++
++前提：选择 providers 且开启包含凭证。仅选择环境变量元数据不触发这一凭证组合，见[凭证与加密](#凭证与加密)。
+ 
+ 可观察验收：导出在写出可分享包前拒绝；界面说明设置密码或关闭凭证；磁盘上没有含明文凭证的残留包。
+ 
+@@ -112,11 +133,23 @@
+ 
+ ### 场景 E：格式兼容
+ 
+-可观察验收：未知 major 被拒绝；`minisbak/1` 的未知字段被忽略；缺少可选字段仍按默认值读取；旧包中的 `voice_corrections` 可以恢复但新包不再写入。
++可观察验收：未知 major 被拒绝；`minisbak/1` 的未知字段被忽略；缺少可选字段仍按默认值读取；普通 UI 新备份不提供 `voice_corrections`，旧包或显式选择该类别导出的包仍可恢复。
+ 
+ ### 场景 F：顺序和覆盖
+ 
+ 可观察验收：恢复后会话消息顺序与备份一致，compact marker 引用有效；已存在本地凭证保持不变并在报告中标记 kept。
++
++### 场景 G：只迁移环境变量
++
++前提：源设备有带值的变量，目标样本没有同名条目或 Keychain 值。
++
++可观察验收：仅导出/恢复环境变量时能看到条目，但不能报告值已迁移；同时导出环境变量与含凭证 providers 并在恢复时选择两者，才按实际恢复后的值核查完整性。给仅元数据包设置密码不会补出值；完整包仅选环境变量恢复也不会应用 secrets。既有目标条目和值仍保留，不用覆盖旧值来伪造成功。
++
++### 场景 H：中断期间修改未完成类别
++
++前提：使用可丢弃样本，导出中断后修改尚未完成的 Memory、Provider 或环境变量，再按兼容选项续跑。
++
++可观察验收：原 backup id 和 `snapshotAt` 保留；分别核查已完成类别和续跑类别的实际内容时间。不能仅检查 manifest 时间就判定统一快照通过；当前未保证跨类别一致，相关产品决定和运行证据另行记录。
+ 
+ ## 现有测试与待验证边界
+ 
+--- before/docs/specs/ios-browser-automation.md
++++ after/docs/specs/ios-browser-automation.md
+@@ -56,7 +56,9 @@
+ 
+ 原生 WKDownload 保存到 session 的 `/var/minis/workspace/` 对应目录，并向 Agent 报告 started/completed/failed/cancelled。Agent 看到“browser is handling download natively”后不得再用 curl/wget 重复下载；取消会移除部分文件，completed 才证明目标文件完整存在。
+ 
+-`fetch` 在当前页面 JavaScript 上下文执行，继承该网站的网络/Cookie条件；返回二进制后由 bridge 保存到 session workspace。跨域、认证、Content-Disposition 和 WebKit 限制都可能失败。`minis://` 只映射 MinisX 已允许的本地路径，不扩大 iOS 沙盒。
++`fetch` 在当前页面 JavaScript 上下文执行，继承该网站的网络/Cookie条件；CLI bridge 和 Agent 路径把返回二进制保存到 session 的 `/var/minis/browser/`，引用为 `minis://browser/<文件名>`。它与原生 WKDownload 的 workspace 落点不同。跨域、认证、Content-Disposition 和 WebKit 限制都可能失败。`minis://` 只映射 MinisX 已允许的本地路径，不扩大 iOS 沙盒。
++
++验收时分别检查 fetch 返回的路径/URL 与实际 browser 文件，以及原生下载 completed 的 workspace 文件；`fetched_bytes` 或返回了 URL 不等于写盘成功。写入失败和后续不可读必须保持可观察，本轮未执行下载或写盘验证。
+ 
+ ## 后台与资源证据
+ 
+--- before/docs/specs/ios-provider-model-routing.md
++++ after/docs/specs/ios-provider-model-routing.md
+@@ -57,15 +57,24 @@
+ - 成功打开 stream 后记录实际 entry，而不是仍归因给初始 entry；
+ - 不删除前面已提交的 assistant/tool 内容。
+ 
+-若用户在自动重试倒计时中改变模型，当前实现会重新读取 binding。最终统计无法可靠确认实际 entry 时必须保持“未知/上次有效”，不能猜一个身份。
++若用户在自动重试倒计时中改变模型，当前实现会重新读取 binding。当前上下文占用快照无法可靠确认实际 entry 时必须保持未知或符合身份条件的上次有效值，不能猜一个身份；历史实际消费不因当前身份变化而自动丢弃，见[配置变化和用量归因](#配置变化和用量归因)。
+ 
+ ## 配置变化和用量归因
+ 
+-每次请求打开 stream 时记录 entry id 和配置 revision。响应结束时只有 revision 仍匹配，才能把 token、成本或 Provider 特有用量归到该 entry；配置已改变或调用路径没有可靠 entry 身份时，应拒绝发布错误快照。
++这里区分当前上下文占用和历史消费；同一次响应的不同数值不能套用同一发布门禁。
++
++| 数值 | 当前实现与维护要求 |
++|---|---|
++| 当前上下文占用快照 | `recordContextUsage` 使用 `latestContextTokens`，核对请求、实际 stream entry、配置及当前身份；不匹配时不能覆盖当前模型快照。记录 stream 身份和 revision 的门禁适用于这一快照。 |
++| 会话 token 累计 | Agent loop 在响应结束后仍累计实际返回的 input/output/cache token；不共用上述快照门禁。配置改变不能成为抹掉已发生消费的理由。累计值不等于某个当前 entry 的上下文占用。 |
++| 会话费用估算 | 当前 [AIChatViewModel+Billing.swift](../../src/ios/Agent/Chat/AIChatViewModel+Billing.swift) 以 session/request id 记录已完成且有可估算用量的 DeepSeek 请求；不使用上下文快照的 revision 门禁。账本不是所有 Provider 已有统一 entry 归因的证明，也不是整个账号账单。 |
++| 账户余额 | 当前余额入口单独使用 Provider 实例、配置和鉴权 revision 判断账号身份；它是账号查询状态，不由会话 token 或费用累计推导。请求失败或身份无法确认时不能显示猜测余额。 |
++
++源码边界见 [AIChatViewModel.swift](../../src/ios/Agent/Chat/AIChatViewModel.swift) 的 `recordContextUsage` 与响应后的会话统计，以及上述 Billing 路径。请求配置变化后的快照发布、累计和费用记账需要分别验证；本轮未发送请求，不将静态分支视为正确归因的运行证据。
+ 
+ 模型组 fallback 成功后，UI 的当前模型、session binding、持久化 model id 和后续请求起点应一致。仅更新显示文字或只更新数据库其中一处都不合格。
+ 
+-同名模型跨实例的余额、费用、限流和错误不可合并为一个身份。具体账单接口若新增，应引用实际请求 entry/instance，而不是重新按 model id 猜 Provider。
++现行身份要求：同名模型跨实例的账号余额、限流和错误不能因 model id 相同而混为一个身份。会话可以汇总多个请求的消费，但汇总不能冒充某个账号余额。后续完善账本归因时，应使用请求当时捕获的实际 entry/instance；不能在响应结束时按当前 binding 猜旧请求身份，也不能把这一要求写成所有现有账本均已实现。
+ 
+ ## 同步冲突与删除
+ 
+@@ -91,7 +100,7 @@
+ 
+ ### 场景 E：请求期间修改配置
+ 
+-旧请求可以完成显示，但其迟到用量不得覆盖新配置的快照；下一轮按新 binding/凭证重新解析。
++旧请求可以完成显示，但迟到结果不得覆盖新配置的上下文占用快照；同时分别核查会话 token 和已完成、可估算请求的费用记录，没有仅因配置变化而被丢弃或记给当前新账号。下一轮按新 binding/凭证重新解析。余额只反映其捕获的账号身份，不能由这些累计数值计算。
+ 
+ ## 待验证与待确认
+ 
+--- before/docs/specs/ios-sync-and-conflict-resolution.md
++++ after/docs/specs/ios-sync-and-conflict-resolution.md
+@@ -19,7 +19,11 @@
+ 
+ ## 启停、离线与发送
+ 
+-本地写入先落业务数据库并立即标记 dirty；默认约 3 秒合并突发写入，再发送。Agent 流式运行、用户暂停、后台、蜂窝网络或限流可以延迟发送，但不能清除 dirty 事实。恢复运行后应继续排空上次遗留队列。
++本地业务写入与 dirty 入队是两步。当前 `ChatStore.markDirty` 只有在同步 zone 已初始化且 `UploadPolicy` 允许该记录类型时才入队；未初始化或类别关闭会直接返回，不能宣称每次本地写入都已留下待发送项。已入队的修改默认约 3 秒合并突发写入，再发送。
++
++Agent 流式运行、用户暂停发送、后台、蜂窝网络或限流可以延迟发送，但不应清除已有 dirty；恢复发送后应继续排空遗留队列。暂停发送与关闭类别不同：前者保留既有待发送事实，后者还会阻止符合该类别的新修改经上述路径入队。
++
++初始化前或类别关闭期间发生的修改，之后如何补扫、入队和传播必须另行核查；不能只用“队列排空”证明这些修改已经同步，也不能仅凭早退推断永久不补传。本轮未运行重开补齐场景，其覆盖范围保持待验证。
+ 
+ 同一 transport 不允许重叠发送。若未来注册多个真实 transport，每个 transport 接收相同 `PortableRecord` 流；不能假设其中一个成功等于所有 transport 成功。
+ 
+@@ -85,6 +89,8 @@
+ 
+ ### 场景 A：离线修改后恢复网络
+ 
++前提：同步 zone 已初始化，对应记录类别开启；否则先按[启停、离线与发送](#启停离线与发送)核查未入队期间的补齐。
++
+ 本地记录和 dirty 项先持久化；重启或恢复网络后队列继续发送；成功前 UI 不显示为完全同步；同一记录不会因重复调度并发覆盖。
+ 
+ ### 场景 B：两台设备修改同一记录
+@@ -97,7 +103,7 @@
+ 
+ ### 场景 D：用户关闭某同步类别
+ 
+-之后该类别既不上传也不应用入站变化；云端既有记录不被自动删除；重新开启后如何补拉应有可观察状态并用真实 iCloud 测试确认。
++之后该类别既不上传也不应用入站变化；云端既有记录不被自动删除。记录关闭期间的本地修改，以及它们是否经 `markDirty` 入队；重新开启后分别核查补拉和本地补扫/上传，不能只观察已有队列。具体补齐范围应有可观察状态并用真实 iCloud 测试确认，当前仍待验证。
+ 
+ ### 场景 E：full fetch 返回部分结果
+ 
+--- before/docs/specs/ios-system-entry-points.md
++++ after/docs/specs/ios-system-entry-points.md
+@@ -65,7 +65,7 @@
+ 
+ Privacy Mode 下不得展示消息内容、工具细节或 loop 等敏感运行元数据。完成态停止递增计时，显示静态耗时；软完成与 Activity 真正 end 要区分。
+ 
+-iOS 17+ 的朗读按钮通过 AppIntent/Darwin notification 请求主 App 切换 TTS；iOS 16.x 退化为只读图标。点击按钮成功只表示请求已发送，主 App 未运行、无已加载音频或系统限制时可能不产生播放变化。
++当前正式 target 最低 iOS 26.0，朗读按钮通过 AppIntent/Darwin notification 请求主 App 切换 TTS。源码保留的 iOS 17 availability 检查及更早系统只读图标分支属于历史兼容代码，不代表当前产品支持或需要验收 iOS 16.x。点击按钮成功只表示请求已发送，主 App 未运行、无已加载音频或系统限制时可能不产生播放变化。
+ 
+ ## 场景与验收
+ 
+@@ -87,7 +87,7 @@
+ 
+ ### 场景 E：锁屏 Privacy Mode
+ 
+-Live Activity 仍能显示是否运行/完成，但不显示消息、工具/loop 敏感细节；完成后 timer 停止。朗读按钮在不支持交互的系统版本只显示状态。
++前提：当前支持的 iOS 26+ 环境。Live Activity 仍能显示是否运行/完成，但不显示消息、工具/loop 敏感细节；完成后 timer 停止。朗读按钮的请求投递与实际播放变化分别核查，不以历史旧系统图标分支作为当前兼容验收。
+ 
+ ## 待验证与待确认
+ 
+--- before/docs/specs/ios-tool-permissions-and-side-effects.md
++++ after/docs/specs/ios-tool-permissions-and-side-effects.md
+@@ -37,6 +37,8 @@
+ 若调用没有有效 session id，当前实现使用 `offload-global` bucket。Ask Once 等待 30 秒后视为拒绝；会话 grant 可显式清除，App 重启也不应把内存 grant 当成持久授权。
+ 
+ 当前 UserDefaults 未写值时，枚举 raw value `0` 解析为 Bypass。因此“默认 Bypass”是当前实现事实。若未来改变默认值，需要迁移既有用户设置，并明确新旧用户策略。
++
++上述预检拒绝和会话 grant 只覆盖当前可识别命令；[命令匹配与已知缺口](#命令匹配与已知缺口)说明 shell 包装、脚本和子进程仍可能绕过 App 许可。独立读取级别说明不能据此判断所有间接调用已受 Not Allowed/Ask Once 保护。
+ 
+ ### 当前可配置范围
+ 
+--- before/docs/specs/ios-voice-input-lifecycle.md
++++ after/docs/specs/ios-voice-input-lifecycle.md
+@@ -32,7 +32,11 @@
+ 
+ ## Provider 解析与 failover
+ 
+-每次新 capture 开始前重新解析 ASR 选择。候选必须支持 audio input/ASR，所属实例启用且本设备有可用凭证。显式 System 选择使用系统引擎；无第三方候选时只有在系统入口真实可用的情况下才回退，不能把配置错误静默包装成系统识别。
++每次新 capture 开始前重新解析 ASR 选择。第三方候选必须支持 audio input/ASR，所属实例启用且本设备有可用凭证。现行要求是区分显式 System、第三方配置不可用和系统识别不可用；不能把配置错误静默包装成已成功的系统识别。
++
++已核实的当前偏差：[VoiceProviderResolver.swift](../../src/ios/Providers/Voice/VoiceProviderResolver.swift) 对显式 System 和第三方组不存在、成员全部过滤都可能返回空候选链；[VoiceInputPanel.swift](../../src/ios/Views/Chat/Voice/VoiceInputPanel.swift) 在无 active candidate 时选择 System，空链转写也直接调用系统引擎。当前结果未保留这两类空链的不同原因，因此不能宣称所有第三方配置错误均先得到独立提示。系统回退仍受 Speech 权限、语言和在线/离线可用性限制，走到该路径不证明识别成功。
++
++第三方配置失效时应报错、提示后回退还是自动回退，仍待维护者确认；本段记录现状，不把自动回退升级为最终交互约定。
+ 
+ fallback 组按成员顺序，load-balance 组在每次 capture 重新生成 seed 并旋转起始成员。一个片段内最多完整尝试候选链一次；某成员成功后，同一 capture 的后续片段优先从该 sticky 成员开始。只有当前成员失败才前进，不能并发向多个 ASR Provider 上传同一音频。
+ 
+@@ -83,8 +87,11 @@
+ 
+ 候选链只按顺序尝试可用成员，同一片段不并发上传；成功成员成为本次 capture 的 sticky 起点。全部失败时显示每类可理解原因并保留草稿/可重试音频。
+ 
++还应区分“有候选但逐个失败”和“过滤后为空”。空链场景按[Provider 解析与 failover](#provider-解析与-failover)记录当前 System 路径及系统权限/不可用结果，不能把默认回退当成用户已选 System，或提前判定成功；未决提示策略另行确认。
++
+ ## 待验证与待确认
+ 
+ - 待验证：iOS 26 真机的首次权限、系统在线/离线 ASR、耳机/电话中断、后台 15 秒收尾、5 分钟上限、长录音内存和各云 Provider failover。
+ - 待验证：现有 `VoiceComposerLifecycleTests` 只提供静态测试证据；本轮没有运行。波形视觉参数和实时文字体验也不能由这些测试替代。
+ - 待确认：流式失败后“未确认 partial”发送时是否需要额外确认；当前实现允许用户保留并编辑，但尚无独立产品决定记录。
++- 待验证与待确认：第三方配置失效后的空候选链、System 权限拒绝或不可用；最终降级及提示策略见[Provider 解析与 failover](#provider-解析与-failover)，没有因本轮文档修订升级为运行保证。
+--- before/docs/specs/minis-url-scheme.md
++++ after/docs/specs/minis-url-scheme.md
+@@ -63,6 +63,8 @@
+ 同一个 URL 字符串在不同会话中可以指向不同文件。资源 URL 不携带 session id；解析方必须从执行上下文、活动会话或消息归属取得 session id。
+ 
+ 规范要求：会话资源只能在其所属会话目录内解析。找不到时返回不可解析，不得扫描其他会话并返回第一个同名文件。
++
++当前并非所有消费者已满足这一要求：[请求预算解析仍会跨会话扫描](#请求预算解析仍会跨会话扫描)记录已知违约路径。将资源加入模型请求或独立读取本小节时必须一并核对该偏差，不能把隔离要求当成实现已全面通过验证。
+ 
+ ### 全局资源
+ 

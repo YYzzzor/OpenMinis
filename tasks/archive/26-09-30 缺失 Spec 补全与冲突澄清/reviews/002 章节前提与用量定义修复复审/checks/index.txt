@@ -1,0 +1,1 @@
+Spec index is current: docs/specs/index.md

@@ -1,0 +1,47 @@
+### Spec: docs/specs/ios-memory-lifecycle.md
+Description: MinisX iOS Memory 的全局与每日作用域、会话开关、上下文注入、读写检索、编辑撤销及同步删除限制；用于记忆功能与恢复变更。
+Source SHA-256: f64e23831a111dab3143523824bd081c994f00f012eb1c268ce373b1be2e633a
+Route (ATX headings; indentation shows parent sections):
+- MinisX iOS Memory 行为与生命周期 (lines 5-107; 本次部分展开)
+  - 范围、状态与来源 (lines 11-14; 本次未展开)
+  - 文件作用域与权威 (lines 15-25; 本次未展开)
+  - 默认值、会话开关与生效时点 (lines 26-41; 本次未展开)
+    - 开关反馈的已知冲突 (lines 38-41; 本次未展开)
+  - 自动注入与可观察范围 (lines 42-49; 本次未展开)
+  - 专用写入与GLOBAL维护权限 (lines 50-59; 本次未展开)
+    - GLOBAL维护权限 (lines 56-59; 本次未展开)
+  - 检索、排序与资源限制 (lines 60-67; 本次未展开)
+  - 用户编辑、撤销与跨设备删除 (lines 68-83; 本次已展开)
+    - 同步合并与防复活缺口 (lines 74-83; 本次已展开)
+  - 场景与验收 (lines 84-99; 本次未展开)
+  - 待维护者决定 (lines 100-107; 本次未展开)
+Returned body:
+Lines 1-10 (source text):
+> ---
+> description: MinisX iOS Memory 的全局与每日作用域、会话开关、上下文注入、读写检索、编辑撤销及同步删除限制；用于记忆功能与恢复变更。
+> ---
+> 
+> # MinisX iOS Memory 行为与生命周期
+> 
+> 导航：[Spec 索引](index.md)；文件地址见[全局资源](minis-url-scheme.md#全局资源)，传输规则见[同步与冲突处理](ios-sync-and-conflict-resolution.md)，包格式与事务见[备份恢复](ios-backup-restore.md)。
+> 
+> 本文区分2026-09-30当前工作区的静态实现、延续已有安全/证据规范的维护要求，以及尚待决定的产品语义。没有新增运行、真机或历史通过证据。Memory 是 App 内持久背景知识，不是当前开发会话的宿主记忆，也不是聊天历史压缩摘要；旧任务内容不能自行恢复为新用户指令。
+> 
+Lines 68-83 (source text):
+> ## 用户编辑、撤销与跨设备删除
+> 
+> MemoryManagementView支持编辑GLOBAL和日志，保存后对相应类型请求dirty并通知界面。未保存编辑存在时不自动覆盖编辑器；保存仍可能覆盖期间变化，需要实际竞态验收。删除列表跳过GLOBAL，并对其他文件执行本地删除，没有在该入口排队Memory云端delete。
+> 
+> MemoryWriteRevoker只搜索今天/昨天，按去除首尾空白后的content匹配第一个条目，连时间标记删除；它不以request/session/唯一条目id匹配。相同内容多次写入可能匹配另一条，超过两日返回未找到。成功仅表示本地文件改写；该函数没有直接dirty入队或变更通知，不能保证设置页或云端立即更新。
+> 
+> ### 同步合并与防复活缺口
+> 
+> GLOBAL以文件mtime做LWW；空或缺失文件builder返回nil，因此清空本地GLOBAL不等于上传一个空值。每日日志按时间标记做并集合并，同时间不同内容有保留双方的路径；删除某条不能通过“远端条目缺失”表达。
+> 
+> 出站buildMemoryDaily对可解析日期早于当前时刻向前30个日历日的cutoff返回nil；这只是上传过滤，不代表删除磁盘或云端旧日志，也不能套用于入站合并或备份。日志必须非空且parseMemoryEntries能够解析出非空的`<!-- 时间标记 -->`条目；首个标记之前的普通文字及无标记正文不进入同步记录。入站需要重写时只序列化已解析条目，不能保证保留未标记文字。设置页保存、dirty入队或本地内容存在均不证明这些文本已上传。
+> 
+> MemoryGlobalV2/MemoryDailyV2没有注册deletionApplier；当前通用fallback保持本地内容。撤销、删除整份日志、清空GLOBAL都不能承诺已传播或不会被旧副本重新带回。记录级删除、条目级删除、同步关闭与账号级遗忘是不同语义，需产品决定及代码支持，不能套用会话的tombstone保证。协议细节由[同步规范的Memory例外](ios-sync-and-conflict-resolution.md#memory合并与删除例外)维护。
+> 
+> 备份复制Memory目录中的Markdown，恢复按包内文件处理，并不等同于日志并集合并。历史备份可能含已删除内容；恢复不是“删除要求已永久生效”的证据，格式与回滚见[备份规范](ios-backup-restore.md)。
+> 
+

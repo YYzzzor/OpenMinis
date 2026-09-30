@@ -1,0 +1,37 @@
+### Spec: docs/specs/ios-usage-cost-and-balance.md
+Description: MinisX iOS 上下文占用、token累计、请求费用账本与账户余额的定义、身份归因、未知状态、持久化和资源边界；用于统计与费用展示变更。
+Source SHA-256: 8bfdb1efec7aaf760b9d6a8eeaed14bdf7e66f3f8a327d408d46a447bb7c0a06
+Route (ATX headings; indentation shows parent sections):
+- MinisX iOS 用量、费用与余额 (lines 5-91; 本次部分展开)
+  - 范围、状态与来源 (lines 11-14; 本次未展开)
+  - 四种数值不能互相推导 (lines 15-25; 本次未展开)
+  - 请求用量与上下文快照 (lines 26-33; 本次已展开)
+  - 会话账本与未知状态 (lines 34-43; 本次未展开)
+  - 价格快照与适用范围 (lines 44-51; 本次未展开)
+  - 账户余额、鉴权与缓存 (lines 52-59; 本次未展开)
+  - 展示与持久化边界 (lines 60-67; 本次未展开)
+  - 资源边界 (lines 68-71; 本次未展开)
+  - 场景与验收 (lines 72-86; 本次未展开)
+  - 测试入口与未决事项 (lines 87-91; 本次未展开)
+Returned body:
+Lines 1-10 (source text):
+> ---
+> description: MinisX iOS 上下文占用、token累计、请求费用账本与账户余额的定义、身份归因、未知状态、持久化和资源边界；用于统计与费用展示变更。
+> ---
+> 
+> # MinisX iOS 用量、费用与余额
+> 
+> 导航：[Spec 索引](index.md)；模型身份与切换见[Provider路由](ios-provider-model-routing.md)，停止/重试及消息持久化见[Agent生命周期](ios-agent-run-lifecycle.md)。
+> 
+> 本文记录2026-09-30当前工作区静态实现及延续现有证据、身份和资源规范的维护要求，没有本轮运行或账户查询证据。它不是Provider账单、当前官方价格表或未来费率保证。价格和时间适用性只以源码中版本化估算器说明；更新估算器前另行核实服务约定，不能由本Spec证明官方计费一致。
+> 
+Lines 26-33 (source text):
+> ## 请求用量与上下文快照
+> 
+> TokenUsage.add对流式累计input/output采用max，缓存字段取当前事件值，并更新latestContextTokens，避免将同一请求的每个累计SSE片段再次相加。Agent loop在每次请求返回后再累计会话统计。不能将max聚合器直接用于所有请求的总消费，也不能把最后一次上下文输入当整轮费用。
+> 
+> recordContextUsage核对session、history、请求revision、实际stream entry和配置身份后发布快照；身份不匹配时保持未知或符合身份条件的上次有效值。这里的门禁不意味着已发生的token/费用应被丢弃。缺失用量或非正常返回路径的会话总数可能不完整，不能将它称为Provider实际账单。
+> 
+> DeepSeekRequestUsage.parse要求官方支持的endpoint/model，并读取响应的总输入`prompt_tokens`（Responses为`input_tokens`）、输出及缓存命中数cached。它要求合法非负整数、cached不超过总输入；存在miss字段时核对`miss = 总输入 - cached`。解析后的`DeepSeekRequestUsage.inputTokens = 总输入 - cached`表示新输入，cacheReadTokens保存cached并单独计价，不能将原始总输入与缓存再相加收费。Responses使用input_tokens/output_tokens及对应details；缺失cache或字段不一致返回nil，保持未计价，不猜测零缓存。
+> 
+

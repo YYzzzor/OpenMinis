@@ -1,0 +1,65 @@
+### Spec: docs/specs/ios-backup-restore.md
+Description: iOS .minisbak 的格式兼容、备份范围、凭证加密、完整性、不完整结果、恢复事务与回滚契约。
+Source SHA-256: de449d14967cd857d3c48777b2c01720ebf5664bd623bdde1286a9ccf8d5899d
+Route (ATX headings; indentation shows parent sections):
+- iOS Backup and Restore (lines 5-168; 本次部分展开)
+  - 范围与来源 (lines 11-23; 本次未展开)
+  - 包格式与兼容 (lines 24-34; 本次未展开)
+  - 备份范围 (lines 35-59; 本次未展开)
+    - 截止时间与快照范围 (lines 54-59; 本次未展开)
+  - 凭证与加密 (lines 60-89; 本次部分展开)
+    - 内联MCP凭证与分享副本限制 (lines 80-85; 本次已展开)
+    - Skill、Memory与费用恢复范围 (lines 86-89; 本次未展开)
+  - 导出完成与可恢复中断 (lines 90-97; 本次未展开)
+  - 恢复顺序与事务边界 (lines 98-115; 本次未展开)
+  - 合并与冲突 (lines 116-121; 本次未展开)
+  - 场景与验收 (lines 122-163; 本次未展开)
+    - 场景 A：包含凭证但未设置密码 (lines 124-129; 本次未展开)
+    - 场景 B：加密包损坏或密码错误 (lines 130-133; 本次未展开)
+    - 场景 C：部分文件不可用 (lines 134-139; 本次未展开)
+    - 场景 D：恢复中途被终止 (lines 140-143; 本次未展开)
+    - 场景 E：格式兼容 (lines 144-147; 本次未展开)
+    - 场景 F：顺序和覆盖 (lines 148-151; 本次未展开)
+    - 场景 G：只迁移环境变量 (lines 152-157; 本次未展开)
+    - 场景 H：中断期间修改未完成类别 (lines 158-163; 本次未展开)
+  - 现有测试与待验证边界 (lines 164-168; 本次未展开)
+Returned body:
+Lines 1-10 (source text):
+> ---
+> description: iOS .minisbak 的格式兼容、备份范围、凭证加密、完整性、不完整结果、恢复事务与回滚契约。
+> ---
+> 
+> # iOS Backup and Restore
+> 
+> 导航：[Spec 索引](index.md)；章节目录由[上下文工具](../harness/spec-context.md#受控阅读入口)从本文标题生成。
+> 
+> 状态：现行格式和行为契约。本文补足源码曾引用但仓库缺失的 `backup-restore-design.md`；[backup-streaming-package-design.md](../backup-streaming-package-design.md) 是分阶段设计资料，只有已由当前源码确认的部分才构成现状。
+> 
+Lines 60-85 (source text):
+> ## 凭证与加密
+> 
+> - 敏感凭证只能在用户选择包含凭证且提供非空 passphrase 时进入包。当前 exporter 的实际凭证条件是选择 `providers` 类别且 `includeCredentials = true`；这个组合没有密码时必须拒绝。单独设置 `includeCredentials` 或密码不保证包内有凭证。
+> - 用户不提供 passphrase 时，可以关闭凭证生成 share copy；环境变量类别仍可含条目元数据，但不因此包含值。
+> - passphrase 不持久化。加密导出恢复执行时必须再次提供，不能因为存在 staging 就降级生成明文包。
+> - 内容文件加密后，integrity 记录包内实际字节的 SHA-256，即密文哈希，因而可在知道密码前发现截断或损坏。
+> - 加密包使用 verifier 区分错误密码，并使用 manifest MAC（优先校验 `manifest.mac` 原始字节 sidecar）认证 manifest。
+> - `manifest.json` 保持明文不代表凭证明文；敏感 payload 必须只出现在加密成员中。
+> 
+> 当前类别与凭证依赖：
+> 
+> | 内容 | 导出前提 | 恢复前提 |
+> |---|---|---|
+> | 环境变量名称、备注等条目元数据 | 选择 `environment_variables`；写入 `env_vars.json`，不包含值 | 选择 `environment_variables`；已有条目保留，新条目从 Keychain 取值，缺值时为空 |
+> | Provider 凭证、环境变量值、MCP OAuth | 选择 `providers`、包含凭证并提供密码；[BackupSecrets.swift](../../src/ios/Agent/Backup/BackupSecrets.swift) 收集当前可取得的值进入 secrets | 包含并选择 `providers`，完成密码验证和解密后由其 importer 应用 secrets；不是选择环境变量或 MCP 类别就会应用 |
+> 
+> 凭证集合目前归在 `providers`，会包含收集到的环境变量值和 MCP OAuth，即使对应元数据类别未选。要迁移环境变量条目和值，应同时选择 `environment_variables` 和含凭证的 `providers`；仅环境变量的加密包仍可能只有元数据。恢复完整包时只选环境变量也不会应用包内 secrets；本地已有值可能使结果看似完整，验收应使用目标设备没有这些值的样本。
+> 
+> [BackupImporter.swift](../../src/ios/Agent/Backup/BackupImporter.swift) 把选中的 providers 排在环境变量前，避免创建新条目时读不到刚恢复的值；它不自动补选依赖类别。这是当前实现依赖，不是类别间可独立完整迁移的承诺；是否保留该耦合仍待维护者确认。
+> 
+> ### 内联MCP凭证与分享副本限制
+> 
+> 上述密码与includeCredentials前提覆盖专用secrets导出路径，不是对所有类别内容的自动秘密检测或脱敏保证。[BackupExporter.exportMCPServers](../../src/ios/Agent/Backup/BackupExporter.swift)直接复制servers.json；headers/env/url里的内联token可能进入mcp_servers类别，即使未选择providers或关闭includeCredentials。未提供密码时该复制路径也不检查或移除这些值，故当前实现不全面满足“敏感凭证只进入加密成员”的安全要求。
+> 
+> MCP JSON分享导出同样保留原值。share copy只能解释为未包含专用secrets，不能称为完全无凭证或自动安全脱敏；其他任意文件中的敏感内容也不能由类别开关推导已清除。可观察验收使用占位测试值检查各成员，不输出真实秘密；内联凭证拒绝/脱敏/强制加密方案待维护者决定，产品缺口未在本轮修复。凭证和设备授权边界见[MCP集成](ios-mcp-integrations.md#内联凭证与同步备份例外)。
+> 
+

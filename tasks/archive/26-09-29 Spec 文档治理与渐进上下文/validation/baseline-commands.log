@@ -1,0 +1,44 @@
+COMMAND: python3 -B -m unittest discover -s scripts/harness -p 'test_spec_context.py' (pre-change)
+EXIT: 0
+....
+----------------------------------------------------------------------
+Ran 4 tests in 0.001s
+
+OK
+
+COMMAND: python3 -B scripts/harness/review.py prepare --help
+EXIT: 0
+usage: review.py prepare [-h] --repo REPO --base BASE --task TASK
+                         --output OUTPUT [--spec SPEC]
+                         [--spec-section SPEC_SECTION]
+                         [--spec-reference SPEC_REFERENCE] [--exclude EXCLUDE]
+                         [--include-archive]
+
+options:
+  -h, --help            show this help message and exit
+  --repo REPO
+  --base BASE
+  --task TASK
+  --output OUTPUT
+  --spec SPEC           Mandatory whole-file requirement
+  --spec-section SPEC_SECTION
+                        Required excerpt: path::Full heading > Subheading
+  --spec-reference SPEC_REFERENCE
+                        Optional reference: path::Full heading > Subheading
+  --exclude EXCLUDE     Exclude a relative file or directory; recorded as an
+                        unreviewed limitation
+  --include-archive     Allow explicitly selected archived requirements; does
+                        not load the whole archive
+
+COMMAND: python3 -B scripts/harness/review.py --help
+EXIT: 0
+usage: review.py [-h] {prepare,check,run,export} ...
+
+Prepare fixed review inputs, invoke a read-only Pi reviewer, and detect stale
+inputs.
+
+positional arguments:
+  {prepare,check,run,export}
+
+options:
+  -h, --help            show this help message and exit

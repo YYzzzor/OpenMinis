@@ -1,0 +1,138 @@
+--- original/docs/specs/ios-mcp-integrations.md
++++ corrected/docs/specs/ios-mcp-integrations.md
+@@ -6,9 +6,9 @@
+ 
+ 导航：[Spec 索引](index.md)；shell执行与停止见[iSH runtime](ios-sandbox-ish-summary.md)，授权与远端副作用见[工具权限](ios-tool-permissions-and-side-effects.md)，配置传播及恢复见[同步](ios-sync-and-conflict-resolution.md)与[备份](ios-backup-restore.md)。
+ 
++MCP集成由原生配置/授权UI与iSH内CLI/daemon协作。本文记录2026-09-30当前工作区静态状态及已有安全、资源和证据规范的维护要求，不证明外部MCP服务、OAuth、网络、iSH子进程或真机后台行为已成功；没有新增运行证据。仅覆盖iOS当前入口，不把同目录Android实现当iOS验收。
++
+ ## 范围、状态与来源
+-
+-MCP集成由原生配置/授权UI与iSH内CLI/daemon协作。本文记录2026-09-30当前工作区静态状态及已有安全、资源和证据规范的维护要求，不证明外部MCP服务、OAuth、网络、iSH子进程或真机后台行为已成功；没有新增运行证据。仅覆盖iOS当前入口，不把同目录Android实现当iOS验收。
+ 
+ 源码：[MCPStore](../../src/ios/Agent/Session/MCPStore.swift)、[MCPOAuthController](../../src/ios/Agent/Session/MCPOAuthController.swift)、[CLI main](../../src/ios/default_mount/usr/local/lib/minis-mcp-cli/main.py)、[daemon](../../src/ios/default_mount/usr/local/lib/minis-mcp-cli/daemon.py)、[配置](../../src/ios/default_mount/usr/local/lib/minis-mcp-cli/utils/config.py)、[HTTP transport](../../src/ios/default_mount/usr/local/lib/minis-mcp-cli/transport/http.py)。
+ 
+@@ -58,7 +58,7 @@
+ 
+ ## 超时、重试与取消边界
+ 
+-STDIO initialize的startupTimeoutSeconds缺省60秒，接受1—900整数；CLI支持兼容别名，primary字段优先，非法值回落默认并警告。原生仅保留字段，真正计时在daemon。RPC/HTTP当前300秒，loopback连接310秒，设置页外层120秒；多个层次的超时不是一个统一保证，更长startup值也可能先被外层切断。
++STDIO initialize的startupTimeoutSeconds缺省60秒，接受1—900整数及可转为整数的数值字符串；CLI支持兼容别名，primary字段优先。布尔值、一般非数值、非整数及越界值回落默认并警告，但非有限数值字符串NaN/Infinity可在int转换时抛出未捕获异常；不能保证任意畸形值都会回落或握手成功。原生仅保留字段，真正计时在daemon。RPC/HTTP当前300秒，loopback连接310秒，设置页外层120秒；多个层次的超时不是一个统一保证，更长startup值也可能先被外层切断。
+ 
+ daemon.call_with_retry对TIMEOUT/STDIO_CRASH驱逐并重试一次，且作用于tools/call；HTTP会话错误另有重新握手重试，OAuth有独立401重试。这些路径不检查远端工具是否幂等，可能在响应丢失后重放副作用，是与[安全重试要求](ios-tool-permissions-and-side-effects.md#拒绝超时和错误语义)不一致的现状；本轮仅披露，未修复代码。
+ 
+--- original/docs/specs/ios-memory-lifecycle.md
++++ corrected/docs/specs/ios-memory-lifecycle.md
+@@ -6,9 +6,9 @@
+ 
+ 导航：[Spec 索引](index.md)；文件地址见[全局资源](minis-url-scheme.md#全局资源)，传输规则见[同步与冲突处理](ios-sync-and-conflict-resolution.md)，包格式与事务见[备份恢复](ios-backup-restore.md)。
+ 
++本文区分2026-09-30当前工作区的静态实现、延续已有安全/证据规范的维护要求，以及尚待决定的产品语义。没有新增运行、真机或历史通过证据。Memory 是 App 内持久背景知识，不是当前开发会话的宿主记忆，也不是聊天历史压缩摘要；旧任务内容不能自行恢复为新用户指令。
++
+ ## 范围、状态与来源
+-
+-本文区分2026-09-30当前工作区的静态实现、延续已有安全/证据规范的维护要求，以及尚待决定的产品语义。没有新增运行、真机或历史通过证据。Memory 是 App 内持久背景知识，不是当前开发会话的宿主记忆，也不是聊天历史压缩摘要；旧任务内容不能自行恢复为新用户指令。
+ 
+ 主要入口：[AIChatViewModel+MemoryTools.swift](../../src/ios/Agent/Chat/AIChatViewModel+MemoryTools.swift)、[AIChatViewModel.swift](../../src/ios/Agent/Chat/AIChatViewModel.swift)、[ToolDefinitions](../../src/ios/Agent/Chat/AIChatViewModel+ToolDefinitions.swift)、[ChatStore](../../src/ios/Agent/Chat/ChatStore.swift)、[MemoryManagementView](../../src/ios/Views/Settings/MemoryManagementView.swift)、[MemoryWriteRevoker](../../src/ios/Views/Chat/MemoryWriteRevoker.swift)及[V2 hydrators](../../src/ios/Agent/Sync/V2/ChatStoreSyncHydrators.swift)。源码存在路径不证明模型使用正确或设备写入、同步成功。
+ 
+@@ -41,7 +41,7 @@
+ 
+ ## 自动注入与可观察范围
+ 
+-loadGlobalMemoryFragment读取非空GLOBAL全文；loadRecentDailyMemoryFragment最多回溯30个24小时偏移，选3份非空日志，每份前200行。天数、行数不是字符/token硬上限；GLOBAL没有同等行数限制，长行和大文件仍可能增加上下文及主线程读取成本。
++以下自动注入仅在当前会话memoryEnabled=true时组装；SOUL身份部分不受此开关控制。loadGlobalMemoryFragment读取非空GLOBAL全文；loadRecentDailyMemoryFragment最多回溯30个24小时偏移，选3份非空日志，每份前200行。天数、行数不是字符/token硬上限；GLOBAL没有同等行数限制，长行和大文件仍可能增加上下文及主线程读取成本。
+ 
+ 初始Agent loop和fallback重建都按memoryEnabled判断，最后附加Memory状态提示。写入或编辑之后，新组装prompt可读取新文件；不承诺每次工具写入都立即刷新当前请求的system prompt。
+ 
+@@ -49,7 +49,7 @@
+ 
+ ## 专用写入与GLOBAL维护权限
+ 
+-memory_write只要求字符串content，构造`<!-- yyyy-MM-dd HH:mm:ss -->`标记，前置到当天文件；失败返回错误。成功后登记fakefs metadata、请求MemoryDailyV2 dirty入队并广播memoryFilesDidChange。成功文案只证明本地函数完成，不等于云端发送、其他设备可见或后续模型已采用；入队仍受[同步启停前提](ios-sync-and-conflict-resolution.md#启停离线与发送)控制。
++当前会话必须memoryEnabled=true，memory_write才会注册且通过执行门禁；关闭时返回失败及重新启用入口。默认值和切换边界见[会话开关](#默认值会话开关与生效时点)。模型工具schema要求tool_title和content；执行函数通过门禁后解析字符串content，构造`<!-- yyyy-MM-dd HH:mm:ss -->`标记，前置到当天文件；失败返回错误。成功后登记fakefs metadata、请求MemoryDailyV2 dirty入队并广播memoryFilesDidChange。成功文案只证明本地函数完成，不等于云端发送、其他设备可见或后续模型已采用；入队仍受[同步启停前提](ios-sync-and-conflict-resolution.md#启停离线与发送)控制。
+ 
+ 当前系统提示鼓励主动记录偏好和可复用事实；GLOBAL更新则要求用户明确指示，先读取、去重再使用file_edit/file_write。记忆写入授权、覆盖和敏感内容处理沿用[权限与副作用规范](ios-tool-permissions-and-side-effects.md)，不得从“已启用Memory”推导任意删除或凭证保存授权。
+ 
+@@ -59,7 +59,7 @@
+ 
+ ## 检索、排序与资源限制
+ 
+-memory_get的scope默认all，包含GLOBAL及目录中的其他非隐藏`.md`文件；daily仅排除GLOBAL。当前代码没有严格把daily限定为日期命名文件，因此其他Markdown（包括SOUL）也可能参与工具检索；关闭自动SOUL例外不能据此推导检索结果范围。
++当前会话必须memoryEnabled=true，memory_get才会注册且通过执行门禁；关闭时返回失败及重新启用入口。该门禁不控制一般文件工具或SOUL身份注入，详见[会话开关](#默认值会话开关与生效时点)。通过门禁后，memory_get的scope默认all，包含GLOBAL及目录中的其他非隐藏`.md`文件；daily仅排除GLOBAL。当前代码没有严格把daily限定为日期命名文件，因此其他Markdown（包括SOUL）也可能参与工具检索；关闭自动SOUL例外不能据此推导检索结果范围。
+ 
+ 没有keywords时按文件顺序最多返回500行；有keywords时按时间标记拆分条目，以匹配词比例和时间新近程度各50%排序。当前允许部分关键词命中，不要求全部命中；ToolDefinitions的“all keywords/lines with context”表述与实际条目检索不一致。
+ 
+@@ -74,6 +74,8 @@
+ ### 同步合并与防复活缺口
+ 
+ GLOBAL以文件mtime做LWW；空或缺失文件builder返回nil，因此清空本地GLOBAL不等于上传一个空值。每日日志按时间标记做并集合并，同时间不同内容有保留双方的路径；删除某条不能通过“远端条目缺失”表达。
++
++出站buildMemoryDaily对可解析日期早于当前时刻向前30个日历日的cutoff返回nil；这只是上传过滤，不代表删除磁盘或云端旧日志，也不能套用于入站合并或备份。日志必须非空且parseMemoryEntries能够解析出非空的`<!-- 时间标记 -->`条目；首个标记之前的普通文字及无标记正文不进入同步记录。入站需要重写时只序列化已解析条目，不能保证保留未标记文字。设置页保存、dirty入队或本地内容存在均不证明这些文本已上传。
+ 
+ MemoryGlobalV2/MemoryDailyV2没有注册deletionApplier；当前通用fallback保持本地内容。撤销、删除整份日志、清空GLOBAL都不能承诺已传播或不会被旧副本重新带回。记录级删除、条目级删除、同步关闭与账号级遗忘是不同语义，需产品决定及代码支持，不能套用会话的tombstone保证。协议细节由[同步规范的Memory例外](ios-sync-and-conflict-resolution.md#memory合并与删除例外)维护。
+ 
+@@ -91,6 +93,7 @@
+ | 正常写入后启动下一Agent turn | 本地标记和内容正确，下一请求按注入限制读取；本地成功、dirty与远端成功分别观察。 |
+ | 搜索包含部分关键词、长条目和SOUL | 验证实际scope、条目排序、60项与软字节边界；截断提示不冒称全文或全部关键词匹配。 |
+ | 两次相同内容写入，跨两日后撤销 | 确认当前按内容和近两日的匹配限制；不存在唯一调用绑定保证；错误可见。 |
++| 编辑早于出站cutoff的日志、无标记正文或在首个标记前增加文字 | 本地保存与dirty不等于已构建记录；核对上传过滤和条目范围，备份字节范围另查；入站重写后的普通文字不保证保留。 |
+ | 设备A撤销条目、B保留旧日志再同步 | 检查并集能否重新引入旧项；未实现删除传播前明确保留已知缺口，不把本地删除当验收通过。 |
+ | 文件修改后查看“Auto-injected” | 将显示的当前文件与请求当时版本分别比较，不把界面列表当传输证据。 |
+ 
+--- original/docs/specs/ios-skills-lifecycle.md
++++ corrected/docs/specs/ios-skills-lifecycle.md
+@@ -6,9 +6,9 @@
+ 
+ 导航：[Spec 索引](index.md)；全局文件地址见[URL作用域](minis-url-scheme.md#全局资源)，副作用见[工具权限](ios-tool-permissions-and-side-effects.md)，同步与备份分别见[同步](ios-sync-and-conflict-resolution.md)和[备份恢复](ios-backup-restore.md)。
+ 
++Skill是App内可安装的`SKILL.md`及附件包，不是仓库`.agents/skills`开发协作技能，也不是已注册的原生工具。本文记录2026-09-30当前工作区静态状态、延续已有权限/证据规范的维护要求及未决语义，没有运行或真机验收。不能把“文件存在、已启用、描述已注入、正文已读取、模型执行正确”当成同一状态。
++
+ ## 范围、状态与来源
+-
+-Skill是App内可安装的`SKILL.md`及附件包，不是仓库`.agents/skills`开发协作技能，也不是已注册的原生工具。本文记录2026-09-30当前工作区静态状态、延续已有权限/证据规范的维护要求及未决语义，没有运行或真机验收。不能把“文件存在、已启用、描述已注入、正文已读取、模型执行正确”当成同一状态。
+ 
+ 主要入口：[SkillStore](../../src/ios/Agent/Session/SkillStore.swift)、[SkillsManagementView](../../src/ios/Views/Skills/SkillsManagementView.swift)、[SessionSkillsView](../../src/ios/Views/Chat/SessionSkillsView.swift)、[SlashCommands](../../src/ios/Agent/Chat/AIChatViewModel+SlashCommands.swift)、[ConcurrentTools](../../src/ios/Agent/Chat/AIChatViewModel+ConcurrentTools.swift)和[V2 hydrators](../../src/ios/Agent/Sync/V2/ChatStoreSyncHydrators.swift)。
+ 
+--- original/docs/specs/ios-usage-cost-and-balance.md
++++ corrected/docs/specs/ios-usage-cost-and-balance.md
+@@ -6,9 +6,9 @@
+ 
+ 导航：[Spec 索引](index.md)；模型身份与切换见[Provider路由](ios-provider-model-routing.md)，停止/重试及消息持久化见[Agent生命周期](ios-agent-run-lifecycle.md)。
+ 
++本文记录2026-09-30当前工作区静态实现及延续现有证据、身份和资源规范的维护要求，没有本轮运行或账户查询证据。它不是Provider账单、当前官方价格表或未来费率保证。价格和时间适用性只以源码中版本化估算器说明；更新估算器前另行核实服务约定，不能由本Spec证明官方计费一致。
++
+ ## 范围、状态与来源
+-
+-本文记录2026-09-30当前工作区静态实现及延续现有证据、身份和资源规范的维护要求，没有本轮运行或账户查询证据。它不是Provider账单、当前官方价格表或未来费率保证。价格和时间适用性只以源码中版本化估算器说明；更新估算器前另行核实服务约定，不能由本Spec证明官方计费一致。
+ 
+ 主要入口：[ChatModels.TokenUsage](../../src/ios/Agent/Chat/ChatModels.swift)、[AIChatViewModel](../../src/ios/Agent/Chat/AIChatViewModel.swift)、[SSEStream](../../src/ios/Agent/Chat/AIChatViewModel+SSEStream.swift)、[Billing](../../src/ios/Agent/Chat/AIChatViewModel+Billing.swift)、[DeepSeekRequestUsage](../../src/ios/Providers/OpenAI/DeepSeekRequestUsage.swift)、[DeepSeekBilling](../../src/ios/Providers/OpenAI/DeepSeekBilling.swift)、[SessionCostLedger](../../src/ios/Providers/OpenAI/SessionCostLedger.swift)、[BalanceClient](../../src/ios/Providers/OpenAI/DeepSeekBalanceClient.swift)、[UsageStatsView](../../src/ios/Views/Chat/UsageStatsView.swift)及[SessionBillingSection](../../src/ios/Views/Chat/AIChatView.swift)。
+ 
+@@ -21,7 +21,7 @@
+ | 会话费用估算 | 已登记聊天请求的本地费用账本，包含工具循环中的各次模型请求；当前只对支持的DeepSeek请求取得完整用量后计价。 |
+ | 账户余额 | 当前Provider实例对应账号的独立远端CNY余额查询；不等于会话费用、充值总额或从token计算出的余量。 |
+ 
+-维护要求：未知用量、缺失字段、未计价请求和不支持账号显示未知/不可用，不替换为零。只有新登记会话且尚无请求的明确账本零值，或服务明确返回的零余额，才可显示零。token统计、费用记录和余额要保留各自身份与时间依据，不能套用同一个发布门禁。
++维护要求：未知用量、缺失字段、未计价请求和不支持账号显示未知/不可用，不替换为零。已登记且全部请求完成计价的账本总额为零时（包括尚无请求或完整合法用量计算得到零），以及服务明确返回零余额时，可以显示零；未计价或缺失信息不得伪装为零。token统计、费用记录和余额要保留各自身份与时间依据，不能套用同一个发布门禁。
+ 
+ ## 请求用量与上下文快照
+ 
+@@ -29,7 +29,7 @@
+ 
+ recordContextUsage核对session、history、请求revision、实际stream entry和配置身份后发布快照；身份不匹配时保持未知或符合身份条件的上次有效值。这里的门禁不意味着已发生的token/费用应被丢弃。缺失用量或非正常返回路径的会话总数可能不完整，不能将它称为Provider实际账单。
+ 
+-DeepSeekRequestUsage要求官方支持的endpoint/model、合法非负整数input/output/cache及cache不超过input；有miss字段时还核对`miss = input - cached`。input表示新输入，cached单独计价，不能再把总prompt_tokens与cache相加收费。Responses用input_tokens/output_tokens及对应details；缺失cache或不一致字段返回nil，保持未计价，不猜测零缓存。
++DeepSeekRequestUsage.parse要求官方支持的endpoint/model，并读取响应的总输入`prompt_tokens`（Responses为`input_tokens`）、输出及缓存命中数cached。它要求合法非负整数、cached不超过总输入；存在miss字段时核对`miss = 总输入 - cached`。解析后的`DeepSeekRequestUsage.inputTokens = 总输入 - cached`表示新输入，cacheReadTokens保存cached并单独计价，不能将原始总输入与缓存再相加收费。Responses使用input_tokens/output_tokens及对应details；缺失cache或字段不一致返回nil，保持未计价，不猜测零缓存。
+ 
+ ## 会话账本与未知状态
+ 
+--- original/docs/specs/ios-sync-and-conflict-resolution.md
++++ corrected/docs/specs/ios-sync-and-conflict-resolution.md
+@@ -59,7 +59,7 @@
+ 
+ ### Memory合并与删除例外
+ 
+-当前[V2 hydrators](../../src/ios/Agent/Sync/V2/ChatStoreSyncHydrators.swift)对GLOBAL文件采用mtime LWW，对每日日志采用时间标记条目并集，同时间不同内容有保留双方的路径。日志不是通用整文件LWW；不能将远端缺少条目解释为删除。
++当前[V2 hydrators](../../src/ios/Agent/Sync/V2/ChatStoreSyncHydrators.swift)对GLOBAL文件采用mtime LWW，对每日日志采用时间标记条目并集，同时间不同内容有保留双方的路径。日志不是通用整文件LWW；不能将远端缺少条目解释为删除。出站每日日志受30个日历日前cutoff过滤，并仅传输可解析的非空时间标记条目；无标记文本不会随整文件上传，入站重写也不保证保留。具体过滤与格式例外见[Memory同步范围](ios-memory-lifecycle.md#同步合并与防复活缺口)。
+ 
+ MemoryGlobalV2和MemoryDailyV2当前未注册deletionApplier，[SyncCoreHydrators](../../src/ios/Agent/Sync/V2/SyncCoreHydrators.swift)的无处理器fallback保持本地内容。GLOBAL为空或缺失时builder返回nil；设置页删日志和撤销写入也没有完整的Memory删除传播路径。因此下文会话/单记录防复活机制不得自动套用于Memory；本地清空、撤销或删除不保证其他设备删除或旧内容不再回流。作用域、编辑与验收见[Memory生命周期](ios-memory-lifecycle.md#同步合并与防复活缺口)，条目删除、整文件删除与恢复旧备份的产品语义仍待决定。
+ 

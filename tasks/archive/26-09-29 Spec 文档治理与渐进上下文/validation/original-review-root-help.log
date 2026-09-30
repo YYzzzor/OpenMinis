@@ -1,0 +1,10 @@
+usage: review.py [-h] {prepare,check,run,export} ...
+
+Prepare fixed review inputs, invoke a read-only Pi reviewer, and detect stale
+inputs.
+
+positional arguments:
+  {prepare,check,run,export}
+
+options:
+  -h, --help            show this help message and exit

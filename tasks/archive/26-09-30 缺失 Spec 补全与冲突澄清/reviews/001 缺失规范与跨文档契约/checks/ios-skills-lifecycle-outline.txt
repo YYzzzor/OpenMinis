@@ -1,0 +1,16 @@
+### Spec: docs/specs/ios-skills-lifecycle.md
+Description: MinisX iOS App 内 Skill 的导入更新、元数据发现、会话启停覆盖、正文读取、文件变更与删除边界；用于技能功能和跨会话维护。
+Source SHA-256: 5e2b8f95bf804b74e3732600b5b4172a849b2d8e667569a811f5062281368aac
+Route (ATX headings; indentation shows parent sections):
+- MinisX iOS Skill 生命周期 (lines 5-87; 本次未展开)
+  - 范围、状态与来源 (lines 9-14; 本次未展开)
+  - 身份、文件与作用域 (lines 15-20; 本次未展开)
+  - 导入、更新与失败完成条件 (lines 21-30; 本次未展开)
+  - 全局启停与会话覆盖 (lines 31-42; 本次未展开)
+    - 关闭不等于禁止文件访问 (lines 39-42; 本次未展开)
+  - 发现、正文读取与斜杠入口 (lines 43-54; 本次未展开)
+  - 文件变更、同步和删除 (lines 55-64; 本次未展开)
+  - 资源与安全边界 (lines 65-68; 本次未展开)
+  - 场景与验收 (lines 69-82; 本次未展开)
+  - 待验证与待决定 (lines 83-87; 本次未展开)
+

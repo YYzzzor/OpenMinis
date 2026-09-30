@@ -1,0 +1,40 @@
+### Spec: docs/specs/ios-mcp-integrations.md
+Description: MinisX iOS MCP 的配置身份、HTTP与STDIO调用、发现启停、OAuth与凭证、重试取消及同步备份边界；用于外部工具集成维护。
+Source SHA-256: 39044b4ab8d876d0287727131b8fb608b63c46d02b3cbe42000beebc0552744d
+Route (ATX headings; indentation shows parent sections):
+- MinisX iOS MCP 集成 (lines 5-91; 本次部分展开)
+  - 范围、状态与来源 (lines 9-14; 本次未展开)
+  - 配置身份、导入与文件 (lines 15-22; 本次未展开)
+  - 发现、全局启停与会话覆盖 (lines 23-34; 本次已展开)
+    - 启停不是统一执行许可 (lines 29-34; 本次已展开)
+  - 握手、工具列表与调用 (lines 35-42; 本次未展开)
+  - 凭证、OAuth与分享 (lines 43-58; 本次未展开)
+    - 内联凭证与同步备份例外 (lines 53-58; 本次未展开)
+  - 超时、重试与取消边界 (lines 59-66; 本次未展开)
+  - 资源生命周期与同步 (lines 67-72; 本次未展开)
+  - 场景与验收 (lines 73-86; 本次未展开)
+  - 证据与待维护者决定 (lines 87-91; 本次未展开)
+Returned body:
+Lines 1-8 (source text):
+> ---
+> description: MinisX iOS MCP 的配置身份、HTTP与STDIO调用、发现启停、OAuth与凭证、重试取消及同步备份边界；用于外部工具集成维护。
+> ---
+> 
+> # MinisX iOS MCP 集成
+> 
+> 导航：[Spec 索引](index.md)；shell执行与停止见[iSH runtime](ios-sandbox-ish-summary.md)，授权与远端副作用见[工具权限](ios-tool-permissions-and-side-effects.md)，配置传播及恢复见[同步](ios-sync-and-conflict-resolution.md)与[备份](ios-backup-restore.md)。
+> 
+Lines 23-34 (source text):
+> ## 发现、全局启停与会话覆盖
+> 
+> isEnabledForSession以会话覆盖优先于全局enabled；与默认相同的覆盖被删除。systemPromptSnippet按有效启用状态选最新createdAt优先的20个server，note最多200字符，只提供server发现信息与CLI使用提示，不向模型注册每个远端MCP工具为原生Agent工具。
+> 
+> App斜杠菜单按同一有效启用值插入`/<name> `；它是输入辅助，实际调用仍需shell_execute运行minis-mcp-cli。初始Agent loop和fallback重建会生成发现片段；已发请求或已读工具清单不会因开关追溯删除。
+> 
+> ### 启停不是统一执行许可
+> 
+> CLI没有App会话覆盖id，daemon建立新session时只检查servers.json全局enabled。全局开启但某会话关闭仍可能通过显式CLI调用；全局关闭而会话开启可展示名称，但冷连接会得到DISABLED。已有warm session在pool.get中先复用，未重新检查全局enabled，所以切换全局开关不能承诺即时阻止缓存连接。
+> 
+> 设置页toggle/delete没有直接驱逐daemon缓存连接。此处披露实现缺口，不把它写成允许绕过用户拒绝的规范。需要强制拒绝所有调用的产品，必须定义执行门禁、生效时点与缓存失效并验证；现行[副作用原则](ios-tool-permissions-and-side-effects.md)仍适用。
+> 
+

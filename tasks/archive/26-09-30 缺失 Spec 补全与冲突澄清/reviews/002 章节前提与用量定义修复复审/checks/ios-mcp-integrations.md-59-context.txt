@@ -1,0 +1,38 @@
+### Spec: docs/specs/ios-mcp-integrations.md
+Description: MinisX iOS MCP 的配置身份、HTTP与STDIO调用、发现启停、OAuth与凭证、重试取消及同步备份边界；用于外部工具集成维护。
+Source SHA-256: 4dea670918324b83704b181a9de5dcbd664e8fda4a8ebbb0bdd6f26da197e214
+Route (ATX headings; indentation shows parent sections):
+- MinisX iOS MCP 集成 (lines 5-91; 本次部分展开)
+  - 范围、状态与来源 (lines 11-14; 本次未展开)
+  - 配置身份、导入与文件 (lines 15-22; 本次未展开)
+  - 发现、全局启停与会话覆盖 (lines 23-34; 本次未展开)
+    - 启停不是统一执行许可 (lines 29-34; 本次未展开)
+  - 握手、工具列表与调用 (lines 35-42; 本次未展开)
+  - 凭证、OAuth与分享 (lines 43-58; 本次未展开)
+    - 内联凭证与同步备份例外 (lines 53-58; 本次未展开)
+  - 超时、重试与取消边界 (lines 59-66; 本次已展开)
+  - 资源生命周期与同步 (lines 67-72; 本次未展开)
+  - 场景与验收 (lines 73-86; 本次未展开)
+  - 证据与待维护者决定 (lines 87-91; 本次未展开)
+Returned body:
+Lines 1-10 (source text):
+> ---
+> description: MinisX iOS MCP 的配置身份、HTTP与STDIO调用、发现启停、OAuth与凭证、重试取消及同步备份边界；用于外部工具集成维护。
+> ---
+> 
+> # MinisX iOS MCP 集成
+> 
+> 导航：[Spec 索引](index.md)；shell执行与停止见[iSH runtime](ios-sandbox-ish-summary.md)，授权与远端副作用见[工具权限](ios-tool-permissions-and-side-effects.md)，配置传播及恢复见[同步](ios-sync-and-conflict-resolution.md)与[备份](ios-backup-restore.md)。
+> 
+> MCP集成由原生配置/授权UI与iSH内CLI/daemon协作。本文记录2026-09-30当前工作区静态状态及已有安全、资源和证据规范的维护要求，不证明外部MCP服务、OAuth、网络、iSH子进程或真机后台行为已成功；没有新增运行证据。仅覆盖iOS当前入口，不把同目录Android实现当iOS验收。
+> 
+Lines 59-66 (source text):
+> ## 超时、重试与取消边界
+> 
+> STDIO initialize的startupTimeoutSeconds缺省60秒，接受1—900整数及可转为整数的数值字符串；CLI支持兼容别名，primary字段优先。布尔值、一般非数值、非整数及越界值回落默认并警告，但非有限数值字符串NaN/Infinity可在int转换时抛出未捕获异常；不能保证任意畸形值都会回落或握手成功。原生仅保留字段，真正计时在daemon。RPC/HTTP当前300秒，loopback连接310秒，设置页外层120秒；多个层次的超时不是一个统一保证，更长startup值也可能先被外层切断。
+> 
+> daemon.call_with_retry对TIMEOUT/STDIO_CRASH驱逐并重试一次，且作用于tools/call；HTTP会话错误另有重新握手重试，OAuth有独立401重试。这些路径不检查远端工具是否幂等，可能在响应丢失后重放副作用，是与[安全重试要求](ios-tool-permissions-and-side-effects.md#拒绝超时和错误语义)不一致的现状；本轮仅披露，未修复代码。
+> 
+> Stop/超时能够结束所属shell调用，不代表独立daemon、长期STDIO子进程或远端请求同时取消。调用失败/断开也不证明外部动作未执行；创建、发送、购买等必须区分失败与结果未知，不能盲目重试。何时驱逐共享连接不得从会话PID停止路径推导。
+> 
+

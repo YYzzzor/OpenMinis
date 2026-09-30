@@ -1,0 +1,593 @@
+{
+  "request": "missing-specs-2026-09-30-001",
+  "repo": "/Users/huyuanzhao/Coding/Projects/OpenMinis",
+  "head": "272da5d9bb8051c82075513df9a395344d4e7f6b",
+  "branch": "main",
+  "changed_documents": [
+    "docs/specs/index.md",
+    "docs/specs/ios-agent-run-lifecycle.md",
+    "docs/specs/ios-backup-restore.md",
+    "docs/specs/ios-mcp-integrations.md",
+    "docs/specs/ios-memory-lifecycle.md",
+    "docs/specs/ios-provider-model-routing.md",
+    "docs/specs/ios-sandbox-ish-summary.md",
+    "docs/specs/ios-skills-lifecycle.md",
+    "docs/specs/ios-sync-and-conflict-resolution.md",
+    "docs/specs/ios-tool-permissions-and-side-effects.md",
+    "docs/specs/ios-usage-cost-and-balance.md",
+    "docs/specs/minis-url-scheme.md"
+  ],
+  "files": [
+    {
+      "path": ".agents/skills/review-task/SKILL.md",
+      "sha256": "644bee8c1cedde696ce8367880bf3d0b3e93a49e572bf2d3c255c30c661035df",
+      "bytes": 5155,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "AGENTS.md",
+      "sha256": "8ad96504a89c1002b9708d6f37a09edbc4650cd51ee0eac233616af9625a8731",
+      "bytes": 5572,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "docs/backup-streaming-package-design.md",
+      "sha256": "80db02e77a84a7cdd3fd4206a273bbefca0b3899454491a478cbf1fd4ba6faa6",
+      "bytes": 9797,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "docs/harness/spec-authoring.md",
+      "sha256": "265db6098874e37633c2c8775765de2dbdbfebc27f7a74699f7ab5530508bb2d",
+      "bytes": 3946,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "docs/harness/spec-context.md",
+      "sha256": "7506444d0fc7d87d7a1a2eb976d98713a1441a9906c6de8f7fe8764b29a067a1",
+      "bytes": 7171,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "docs/specs/debug-server-api.md",
+      "sha256": "4587b70f57496948a394b86e27cd524184fb7b8289384784f473fd67c3bb37ab",
+      "bytes": 9507,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "docs/specs/index.md",
+      "sha256": "ef9da1cd6d6545122367c6dea5da70623448861475b61e1f392624beb2723ef3",
+      "bytes": 4579,
+      "role": "changed document"
+    },
+    {
+      "path": "docs/specs/ios-agent-run-lifecycle.md",
+      "sha256": "c43eebf040f3c797a70d0baf96a25d9f13e5ffabbf24f8e1b5b13812199788eb",
+      "bytes": 11084,
+      "role": "changed document"
+    },
+    {
+      "path": "docs/specs/ios-backup-restore.md",
+      "sha256": "de449d14967cd857d3c48777b2c01720ebf5664bd623bdde1286a9ccf8d5899d",
+      "bytes": 14118,
+      "role": "changed document"
+    },
+    {
+      "path": "docs/specs/ios-browser-automation.md",
+      "sha256": "02a68ab4665c2f2a8daf5b952d49d7a047266fda5ebdba7fe3a4e1c5ebee9985",
+      "bytes": 9999,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "docs/specs/ios-calendar-recurrence.md",
+      "sha256": "5f3a9fbe6b82bd27fc4e74377f527f072f1d7ebca2ea66118d646f4e1f8648e9",
+      "bytes": 11308,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "docs/specs/ios-device-data-capabilities.md",
+      "sha256": "a5cfe1e16c35bb8cf666b4f4d73f0adbd651fa396ea5198ff50f863b2621ad79",
+      "bytes": 9643,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "docs/specs/ios-mcp-integrations.md",
+      "sha256": "39044b4ab8d876d0287727131b8fb608b63c46d02b3cbe42000beebc0552744d",
+      "bytes": 10726,
+      "role": "changed document"
+    },
+    {
+      "path": "docs/specs/ios-memory-lifecycle.md",
+      "sha256": "d6eadd73c40b241574e167bea7f6960dda54b951e448a58c5b8f2497cc4ae9a3",
+      "bytes": 11420,
+      "role": "changed document"
+    },
+    {
+      "path": "docs/specs/ios-provider-model-routing.md",
+      "sha256": "a00c7caab19dc5b3a48c2211d0f08c7f0a9f98d432e07f2ef90cbb59f7c794d9",
+      "bytes": 10261,
+      "role": "changed document"
+    },
+    {
+      "path": "docs/specs/ios-sandbox-ish-summary.md",
+      "sha256": "d0c7a3c12befbb6e38ff1b677219db150640a051faa28b94dfcd0f04381b92fd",
+      "bytes": 8672,
+      "role": "changed document"
+    },
+    {
+      "path": "docs/specs/ios-skills-lifecycle.md",
+      "sha256": "5e2b8f95bf804b74e3732600b5b4172a849b2d8e667569a811f5062281368aac",
+      "bytes": 9611,
+      "role": "changed document"
+    },
+    {
+      "path": "docs/specs/ios-sync-and-conflict-resolution.md",
+      "sha256": "b5cb5867329351a80f964255ead170f3ed5bfd8c5379c9c27bdf82295c3f8f6e",
+      "bytes": 11337,
+      "role": "changed document"
+    },
+    {
+      "path": "docs/specs/ios-system-entry-points.md",
+      "sha256": "9ad37102c7345a938e7a71101a5f673ebfa6ac626700434b73aec79dd99a1ba3",
+      "bytes": 8880,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "docs/specs/ios-tool-permissions-and-side-effects.md",
+      "sha256": "fa29eed5ff6c8639db4965c0c9333d4dc1bafc02929a7871a7983b06fc586419",
+      "bytes": 8694,
+      "role": "changed document"
+    },
+    {
+      "path": "docs/specs/ios-usage-cost-and-balance.md",
+      "sha256": "101cfc460a367038779f1ad2ccfab2f078b58a3488ffcdd711b2db84a6e857da",
+      "bytes": 11089,
+      "role": "changed document"
+    },
+    {
+      "path": "docs/specs/ios-voice-input-lifecycle.md",
+      "sha256": "1e4d93c3ec4aca2f9fc8b123d85ffb0db54c530af19f318a66ef94f40424fc15",
+      "bytes": 9463,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "docs/specs/minis-url-scheme.md",
+      "sha256": "4ab1637f3bf64f5b8aa78efb769031d2260a1d08b7fc5e15ef53fbba112a435c",
+      "bytes": 9100,
+      "role": "changed document"
+    },
+    {
+      "path": "docs/specs/resource-efficiency.md",
+      "sha256": "63ac0c5ba934c17d061bafd625dfdafe7a2a4277e99a8fde5ef84346fabf7235",
+      "bytes": 5584,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Agent/Backup/BackupExporter.swift",
+      "sha256": "95659b326a915b724ddc391cd954e965927f3f8b3807a1c68b9e4be144216972",
+      "bytes": 66874,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Agent/Backup/BackupFormat.swift",
+      "sha256": "f05e3617a2a000055611bddd1183ba00a72fe25775cec0689a96801aa0662030",
+      "bytes": 20234,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Agent/Backup/BackupImporter+Categories.swift",
+      "sha256": "9fa9a2b5be81568ae89ddc12ad3cbcd4b7dfd932c1860e6cc1b28e7e9fbce868",
+      "bytes": 46006,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Agent/Backup/BackupImporter.swift",
+      "sha256": "985fe52a75d11d38db233cdda5f48751120eba13476508d923845385afdf38bb",
+      "bytes": 22272,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Agent/Backup/BackupRestoreJournal.swift",
+      "sha256": "fab3e614642c959c1a18895018b2ac661c56b56b57f6ef12f003c9161179d274",
+      "bytes": 9867,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Agent/Backup/BackupSecrets.swift",
+      "sha256": "8beab381def1c1f2c0ae61d1814a8e24a2247ff30fdac35677f08e422a084e3e",
+      "bytes": 7892,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Agent/Chat/AIChatViewModel+Billing.swift",
+      "sha256": "6af9588aeb7a4420c388a0bc09d7cd2f1a4265381b9ecdb5835edbf6278eef7d",
+      "bytes": 2534,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Agent/Chat/AIChatViewModel+Compaction.swift",
+      "sha256": "eda5e23a7c76d733bdf09b5cafda7704098fa537245a8fc3b80cec4f64389307",
+      "bytes": 63318,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Agent/Chat/AIChatViewModel+ConcurrentTools.swift",
+      "sha256": "026814e7899baeaa2686b7f36b0624321071e76b944a7b937cc8937ba2cab358",
+      "bytes": 54097,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Agent/Chat/AIChatViewModel+Fallback.swift",
+      "sha256": "448385c6ee7daac38ccfcbebad84b7cffa87e7c1b8367a23242abc66648ed049",
+      "bytes": 29249,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Agent/Chat/AIChatViewModel+FileTools.swift",
+      "sha256": "bb52f3a6eeba4e30f4984d1a44c2bb59984aa3697c31f0a38172833ad036cdf7",
+      "bytes": 42870,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Agent/Chat/AIChatViewModel+MemoryTools.swift",
+      "sha256": "6667feb50dd661ba9df7b61d8d1ae84b7a5cfa98f826fb40acb71e2a00556469",
+      "bytes": 17887,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Agent/Chat/AIChatViewModel+Persistence.swift",
+      "sha256": "31f31bfd30f04a9c8327c0ac9f7e6979c384ff0adab702ada744330a86b2f0ae",
+      "bytes": 121700,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Agent/Chat/AIChatViewModel+ProviderFactory.swift",
+      "sha256": "086cda5f7ac8e06c1883ec6289bb7726e13c90da46bb687641d44f22622ef9d2",
+      "bytes": 32208,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Agent/Chat/AIChatViewModel+RequestBudget.swift",
+      "sha256": "1aedc249fc4d5e462e5b6c20fbc5379982c8f0f2ba76d9505e00ecb06a1130fc",
+      "bytes": 18370,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Agent/Chat/AIChatViewModel+SSEStream.swift",
+      "sha256": "54e4e88c8a8e2948b719373413f4896d44c26cbbb6bf07da0e0134e69e5519c9",
+      "bytes": 77306,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Agent/Chat/AIChatViewModel+SlashCommands.swift",
+      "sha256": "5b1c6d07dbbd762cdccb37b30e6e62f7cac08bcc5e60c89b52c1e3d80cbd46a2",
+      "bytes": 20051,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Agent/Chat/AIChatViewModel+ToolDefinitions.swift",
+      "sha256": "4a78e5f074e4205bb66b26cf95d6aaf6e32c898f2a1d62db6ac8db392c7d7127",
+      "bytes": 25275,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Agent/Chat/AIChatViewModel.swift",
+      "sha256": "3d8a7b49ce4e4905a57bbf70784278285346361f354f6326655f62e71939e9bc",
+      "bytes": 403879,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Agent/Chat/ChatModels.swift",
+      "sha256": "be4b7ae3397fba8654dc1f1de1389b5cfedbc63a80cff6ed2caf46ebddbffade",
+      "bytes": 20955,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Agent/Chat/ChatStore.swift",
+      "sha256": "d740e3241c2aafa134d7901362cc12829bb333ae770a8cf56c6c18dc1c597df9",
+      "bytes": 382625,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Agent/Chat/ContextPolicy.swift",
+      "sha256": "b7de01e7a8781dd8341ca5687a2aa7bb9c1b575c9dc6a508b3d0414d33a85a25",
+      "bytes": 8222,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Agent/ISH/ISHExecutionCoordinator.swift",
+      "sha256": "2bcd01e802b9284a76c5a4907e5ac3d30804543f2649e86c0bdaa8d817f48aa3",
+      "bytes": 47537,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Agent/ISH/MinisFsRouter.swift",
+      "sha256": "8e0bc13bdea890f74fd411306ba07a861ebf82646dfc29cc1c4dddf88eecb5d3",
+      "bytes": 6807,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Agent/Offload/OffloadPermissionManager.swift",
+      "sha256": "315c2dff3b53dd88ffec06a5b2baee4a0ec5bff633e5b5954a0c595a9bcc2518",
+      "bytes": 14073,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Agent/Session/MCPOAuthController.swift",
+      "sha256": "e5b6caf9be47d365700e7f60334483897944db9ecabf5dc0b5f5b3af8eb8823a",
+      "bytes": 24800,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Agent/Session/MCPStore.swift",
+      "sha256": "bb84903f9be5c4fe0e484209fb1f4b0ff1fd4b39d8004a8fe892d3b52caf9729",
+      "bytes": 43664,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Agent/Session/SkillStore.swift",
+      "sha256": "a3f876efb37e4c21398b0e96350f9946613f9dfce56e098c7f4b4ced51db9053",
+      "bytes": 114901,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Agent/Sync/V2/ChatStoreSyncHydrators.swift",
+      "sha256": "ec7a0455ca82cb4ebde0feb259057683d82d39875594b92ca46f839ce8e67403",
+      "bytes": 94884,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Agent/Sync/V2/PortableRecord.swift",
+      "sha256": "395860a79b6f2555859eea9bb9d0a5b05dd7ba9d7409b0a8ee3045df671c3934",
+      "bytes": 7006,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Agent/Sync/V2/SyncCore.swift",
+      "sha256": "5a081961787cf9ef891a956f3256590ba71397cd0fd5d72bb65127765bcd9c0c",
+      "bytes": 42757,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Agent/Sync/V2/SyncCoreHydrators.swift",
+      "sha256": "e4d6d86a1ff83ea61481901aee7d83cebc89ecb9eba9179ca0d6fc9b1adf2345",
+      "bytes": 4452,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Agent/Sync/V2/TombstoneManager.swift",
+      "sha256": "f0c8caeb98939cc49e67b979444d7ced2a29fb401423d4e98273f9ca51134a1e",
+      "bytes": 3663,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Agent/Sync/V2/UploadPolicy.swift",
+      "sha256": "b6744cf0cc97e932ca9f820b03c38e33fc98f3096bd885127ee27307a26dd260",
+      "bytes": 6277,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/MinisTests/ContextUsageTests.swift",
+      "sha256": "28e1a28e6c810017b0a9151da94cb5622f984e2139770c55cd90742dcc9dd8a7",
+      "bytes": 23242,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/MinisTests/DeepSeekBalanceModelTests.swift",
+      "sha256": "42eba52b7161d2953c6f201bed5416a7ebde7ffb1001607c47ceed37e05a7bc8",
+      "bytes": 3961,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/MinisTests/DeepSeekBillingTests.swift",
+      "sha256": "f588597d84940776c851a2757aa8bc40fe46d0978048eb731dbb85f9dffe53e7",
+      "bytes": 8931,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/MinisTests/SessionCostLedgerTests.swift",
+      "sha256": "5212b3abe7d20225e6a267b7dca57569305b6b2d12551884af513daf4aa6806d",
+      "bytes": 8309,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/MinisTests/Standalone/SkillDescriptionStaleTests.swift",
+      "sha256": "562864ca6cab86a23b75648e43df7154304cf2062f6d9cf753a2c975a592fb67",
+      "bytes": 3161,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Providers/LLMTypes.swift",
+      "sha256": "75f0818d06e750b7343d998b77e81cf1cd1abbca27d746467f438d32d96c9b58",
+      "bytes": 44145,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Providers/ModelGroup.swift",
+      "sha256": "46ac696c85e68b39bf44a1d40f4951367523948d6e8426a43a44efb9257b8335",
+      "bytes": 5078,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Providers/ModelGroupRouter.swift",
+      "sha256": "0a4a4f8a8ed814e38c002307cf58d5c5a181487016724630c629c0faa5672c65",
+      "bytes": 6070,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Providers/OpenAI/DeepSeekBalanceClient.swift",
+      "sha256": "aa890ce948b59521055df4e91ac94903d4c79d5155c17fab8fb58be4a7e02301",
+      "bytes": 4266,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Providers/OpenAI/DeepSeekBilling.swift",
+      "sha256": "3091fda184715b5a2802b410395aacb67e231dca25d9f74fce60ae23ff954532",
+      "bytes": 12319,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Providers/OpenAI/DeepSeekRequestUsage.swift",
+      "sha256": "904ac287d5d88b2701f49a0a76c70e1041d5eabc373de61ba796db891150db55",
+      "bytes": 1637,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Providers/OpenAI/SessionCostLedger.swift",
+      "sha256": "ea9dd0fbe0e580e2d846f5e7118867d7cba13ebdafe7fef50a444597943efd48",
+      "bytes": 5757,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Providers/ProviderConfigStore.swift",
+      "sha256": "d6913f05fb6bcf1b95090ccc63cb69f70282e77d07d2f6977513d968867ed2bf",
+      "bytes": 185345,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Providers/ProviderInstance.swift",
+      "sha256": "4fa64c98113d586dd36343553eaa2f9596b8556e805893cdf186d678194040b2",
+      "bytes": 19931,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Shared/DeepLinkRouter.swift",
+      "sha256": "5e556d80ba0eeffeac8af590f488c19a4d003e0a9db5d507b7d10ccce7c98d0b",
+      "bytes": 13725,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Views/Chat/AIChatView.swift",
+      "sha256": "f60dabcfa2641f6f63c7ccbc711e29ef06fdfe90b16a437d30791b1df7f849a1",
+      "bytes": 332116,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Views/Chat/MemoryWriteRevoker.swift",
+      "sha256": "35bdeca439b3af1e7538dea9ae14a7e3278bac8097c455ecc1e05c4e2f8e6a21",
+      "bytes": 4469,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Views/Chat/MinisMediaViews.swift",
+      "sha256": "f95946009595fbe4bd28355707751f356a9f3b38cc6bb595e8c84ae72fe96191",
+      "bytes": 52409,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Views/Chat/SessionMemoryView.swift",
+      "sha256": "a9384b83bcc44d0c8eeb62237c34165761d21f3b299cd683de3dbdb8fe5234cb",
+      "bytes": 20829,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Views/Chat/SessionSkillsView.swift",
+      "sha256": "584ac1611d95c3b1b4d1da66d6d93688cffdc1d00db9cef2a713b02cf004469d",
+      "bytes": 10480,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Views/Chat/UsageStatsView.swift",
+      "sha256": "50e0f7ff91de5a42fef7bf67238020c7afb8fd36b1dbce0c7203dfdb91da0e30",
+      "bytes": 15278,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Views/MCP/MCPIntegrationsView.swift",
+      "sha256": "11c70d19e71c3f87552cb609217f078788729df45ff18dfd85fcb6be884fb30c",
+      "bytes": 9581,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Views/MCP/SessionMCPsView.swift",
+      "sha256": "f14ae6cab1c9c194fdcea5309fac9b132df221849ecd67154f3b153b369bdb7e",
+      "bytes": 6279,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Views/Settings/MemoryManagementView.swift",
+      "sha256": "d4b2e7274acc4dd31c394ba93d7130d746db5d1b9419d12f389408022060c6e3",
+      "bytes": 14501,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/Views/Skills/SkillsManagementView.swift",
+      "sha256": "be660c5f59b1bf79d09b235a8c411b221a4c8072c539f1d99469efea0b0b1aea",
+      "bytes": 49149,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/default_mount/usr/local/lib/minis-mcp-cli/daemon.py",
+      "sha256": "c9c083ffaffd3c4faf2d8b3b8447a1bcaf14c82feb9fdc7a7c4602a5bed494da",
+      "bytes": 21110,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/default_mount/usr/local/lib/minis-mcp-cli/main.py",
+      "sha256": "5f16cee36873ca0c9f12f744b14d8b0d12465c5e30bc7873bc03c67953da9797",
+      "bytes": 26460,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/default_mount/usr/local/lib/minis-mcp-cli/test_http_reinit.py",
+      "sha256": "5bd9aa5c4719775c0d6030c210118557f38a374a971b378eabe0119255ce12de",
+      "bytes": 12104,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/default_mount/usr/local/lib/minis-mcp-cli/test_startup_timeout.py",
+      "sha256": "8a774a00b67d2c3d38eb9037424ff14b10b1275bbf9b8b21bd881b8d496b5cbc",
+      "bytes": 8001,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/default_mount/usr/local/lib/minis-mcp-cli/transport/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/default_mount/usr/local/lib/minis-mcp-cli/transport/http.py",
+      "sha256": "a7ab0628db5ef6e4290147c2f4b008f90bf93b2f8deca828c0e104f65c64534b",
+      "bytes": 15724,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/default_mount/usr/local/lib/minis-mcp-cli/transport/stdio.py",
+      "sha256": "5cd5f22b88450d22ea31d57974438ada39c497c9dbfe189fe8d69830d465ba16",
+      "bytes": 5259,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/default_mount/usr/local/lib/minis-mcp-cli/utils/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/default_mount/usr/local/lib/minis-mcp-cli/utils/config.py",
+      "sha256": "580f4dcb04f44e63a37d3c44ef820d895868bf841cdbc4b2ef2bbeea70bc8cd9",
+      "bytes": 5853,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/default_mount/usr/local/lib/minis-mcp-cli/utils/deps.py",
+      "sha256": "6cf02fd11ae3d4cbd2e15f047597c420ce6a3c522b7e584e8a16090b9a339614",
+      "bytes": 2470,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "src/ios/iSH/ISHKernel.m",
+      "sha256": "612abb80bbd2f844205f19dcbcd284f272409570a7a585640249203a23d2e524",
+      "bytes": 85610,
+      "role": "source or requirement reference"
+    },
+    {
+      "path": "tasks/active/26-09-30 缺失 Spec 补全与冲突澄清/task.md",
+      "sha256": "0867786051bfc7e341f6e1fa8ea47fae2fbf3a6bde074664ec2b017c7ef82ca2",
+      "bytes": 5620,
+      "role": "source or requirement reference"
+    }
+  ],
+  "excluded": "all unrelated tasks, dirty worktree changes outside task-only patch, product runtime validation"
+}

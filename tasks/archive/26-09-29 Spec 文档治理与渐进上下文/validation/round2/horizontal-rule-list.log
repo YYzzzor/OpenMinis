@@ -1,0 +1,19 @@
+[
+  {
+    "heading_path": [
+      "Spec"
+    ],
+    "start_line": 2,
+    "end_line": 4
+  },
+  {
+    "heading_path": [
+      "Spec",
+      "A"
+    ],
+    "start_line": 3,
+    "end_line": 4
+  }
+]
+command: /usr/bin/python3 -B scripts/harness/spec_context.py list /tmp/minisx-spec-validation-round2/horizontal-rule.md
+exit status: 0

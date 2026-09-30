@@ -1,0 +1,27 @@
+### Spec: docs/specs/ios-agent-run-lifecycle.md
+Description: iOS Agent 从发送、流式响应和工具循环到停止、重试、恢复、持久化、上下文压缩及会话删除的生命周期契约。
+Source SHA-256: c43eebf040f3c797a70d0baf96a25d9f13e5ffabbf24f8e1b5b13812199788eb
+Route (ATX headings; indentation shows parent sections):
+- iOS Agent Run Lifecycle (lines 5-163; 本次未展开)
+  - 适用范围与来源 (lines 11-24; 本次未展开)
+  - 生命周期总览 (lines 25-38; 本次未展开)
+  - 发送前提 (lines 39-53; 本次未展开)
+  - 上下文检查与压缩 (lines 54-70; 本次未展开)
+  - 流式响应与工具循环 (lines 71-80; 本次未展开)
+  - 持久化与恢复重建 (lines 81-91; 本次未展开)
+  - Stop、Retry、Resume 与历史重跑 (lines 92-120; 本次未展开)
+    - Stop (lines 94-105; 本次未展开)
+    - Retry 当前失败轮次 (lines 106-109; 本次未展开)
+    - Resume 用户中断 (lines 110-116; 本次未展开)
+    - 从历史 user message 重跑 (lines 117-120; 本次未展开)
+  - 会话删除 (lines 121-126; 本次未展开)
+  - 场景与验收 (lines 127-152; 本次未展开)
+    - 场景 A：正常文本与工具 turn (lines 129-132; 本次未展开)
+    - 场景 B：工具运行中 Stop 后 Resume (lines 133-136; 本次未展开)
+    - 场景 C：错误后 Retry (lines 137-140; 本次未展开)
+    - 场景 D：从旧 user message 重跑 (lines 141-144; 本次未展开)
+    - 场景 E：上下文逼近上限 (lines 145-148; 本次未展开)
+    - 场景 F：App 在 user message 后被回收 (lines 149-152; 本次未展开)
+  - 发现信息与持久背景知识 (lines 153-158; 本次未展开)
+  - 待验证与待确认 (lines 159-163; 本次未展开)
+

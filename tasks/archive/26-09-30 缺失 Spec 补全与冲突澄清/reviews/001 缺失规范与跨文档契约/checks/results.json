@@ -1,0 +1,222 @@
+{
+  "changed_documents": [
+    "docs/specs/index.md",
+    "docs/specs/ios-agent-run-lifecycle.md",
+    "docs/specs/ios-backup-restore.md",
+    "docs/specs/ios-mcp-integrations.md",
+    "docs/specs/ios-memory-lifecycle.md",
+    "docs/specs/ios-provider-model-routing.md",
+    "docs/specs/ios-sandbox-ish-summary.md",
+    "docs/specs/ios-skills-lifecycle.md",
+    "docs/specs/ios-sync-and-conflict-resolution.md",
+    "docs/specs/ios-tool-permissions-and-side-effects.md",
+    "docs/specs/ios-usage-cost-and-balance.md",
+    "docs/specs/minis-url-scheme.md"
+  ],
+  "outlines": {
+    "docs/specs/ios-agent-run-lifecycle.md": 1153,
+    "docs/specs/ios-backup-restore.md": 1059,
+    "docs/specs/ios-mcp-integrations.md": 703,
+    "docs/specs/ios-memory-lifecycle.md": 750,
+    "docs/specs/ios-provider-model-routing.md": 920,
+    "docs/specs/ios-sandbox-ish-summary.md": 977,
+    "docs/specs/ios-skills-lifecycle.md": 663,
+    "docs/specs/ios-sync-and-conflict-resolution.md": 990,
+    "docs/specs/ios-tool-permissions-and-side-effects.md": 916,
+    "docs/specs/ios-usage-cost-and-balance.md": 658,
+    "docs/specs/minis-url-scheme.md": 1019
+  },
+  "complete_sections": [
+    {
+      "selector": "docs/specs/ios-agent-run-lifecycle.md::iOS Agent Run Lifecycle > 发现信息与持久背景知识",
+      "characters": 1945,
+      "sha256": "c43eebf040f3c797a70d0baf96a25d9f13e5ffabbf24f8e1b5b13812199788eb",
+      "start_line": 153,
+      "end_line": 158,
+      "complete_source_subtree": true
+    },
+    {
+      "selector": "docs/specs/ios-backup-restore.md::iOS Backup and Restore > 凭证与加密 > 内联MCP凭证与分享副本限制",
+      "characters": 3325,
+      "sha256": "de449d14967cd857d3c48777b2c01720ebf5664bd623bdde1286a9ccf8d5899d",
+      "start_line": 80,
+      "end_line": 85,
+      "complete_source_subtree": true
+    },
+    {
+      "selector": "docs/specs/ios-mcp-integrations.md::MinisX iOS MCP 集成 > 发现、全局启停与会话覆盖",
+      "characters": 1788,
+      "sha256": "39044b4ab8d876d0287727131b8fb608b63c46d02b3cbe42000beebc0552744d",
+      "start_line": 23,
+      "end_line": 34,
+      "complete_source_subtree": true
+    },
+    {
+      "selector": "docs/specs/ios-mcp-integrations.md::MinisX iOS MCP 集成 > 发现、全局启停与会话覆盖 > 启停不是统一执行许可",
+      "characters": 1788,
+      "sha256": "39044b4ab8d876d0287727131b8fb608b63c46d02b3cbe42000beebc0552744d",
+      "start_line": 29,
+      "end_line": 34,
+      "complete_source_subtree": true
+    },
+    {
+      "selector": "docs/specs/ios-memory-lifecycle.md::MinisX iOS Memory 行为与生命周期 > 专用写入与GLOBAL维护权限",
+      "characters": 1773,
+      "sha256": "d6eadd73c40b241574e167bea7f6960dda54b951e448a58c5b8f2497cc4ae9a3",
+      "start_line": 50,
+      "end_line": 59,
+      "complete_source_subtree": true
+    },
+    {
+      "selector": "docs/specs/ios-memory-lifecycle.md::MinisX iOS Memory 行为与生命周期 > 专用写入与GLOBAL维护权限 > GLOBAL维护权限",
+      "characters": 1773,
+      "sha256": "d6eadd73c40b241574e167bea7f6960dda54b951e448a58c5b8f2497cc4ae9a3",
+      "start_line": 56,
+      "end_line": 59,
+      "complete_source_subtree": true
+    },
+    {
+      "selector": "docs/specs/ios-memory-lifecycle.md::MinisX iOS Memory 行为与生命周期 > 检索、排序与资源限制",
+      "characters": 1575,
+      "sha256": "d6eadd73c40b241574e167bea7f6960dda54b951e448a58c5b8f2497cc4ae9a3",
+      "start_line": 60,
+      "end_line": 67,
+      "complete_source_subtree": true
+    },
+    {
+      "selector": "docs/specs/ios-sandbox-ish-summary.md::iOS iSH Runtime and Isolation Contract > 文件系统作用域 > MCP独立daemon的边界",
+      "characters": 1620,
+      "sha256": "d0c7a3c12befbb6e38ff1b677219db150640a051faa28b94dfcd0f04381b92fd",
+      "start_line": 68,
+      "end_line": 71,
+      "complete_source_subtree": true
+    },
+    {
+      "selector": "docs/specs/ios-skills-lifecycle.md::MinisX iOS Skill 生命周期 > 导入、更新与失败完成条件",
+      "characters": 1709,
+      "sha256": "5e2b8f95bf804b74e3732600b5b4172a849b2d8e667569a811f5062281368aac",
+      "start_line": 21,
+      "end_line": 30,
+      "complete_source_subtree": true
+    },
+    {
+      "selector": "docs/specs/ios-skills-lifecycle.md::MinisX iOS Skill 生命周期 > 全局启停与会话覆盖",
+      "characters": 1680,
+      "sha256": "5e2b8f95bf804b74e3732600b5b4172a849b2d8e667569a811f5062281368aac",
+      "start_line": 31,
+      "end_line": 42,
+      "complete_source_subtree": true
+    },
+    {
+      "selector": "docs/specs/ios-sync-and-conflict-resolution.md::MinisX iOS 同步与冲突处理 > 上传类别与范围 > Memory合并与删除例外",
+      "characters": 2770,
+      "sha256": "b5cb5867329351a80f964255ead170f3ed5bfd8c5379c9c27bdf82295c3f8f6e",
+      "start_line": 60,
+      "end_line": 65,
+      "complete_source_subtree": true
+    },
+    {
+      "selector": "docs/specs/ios-tool-permissions-and-side-effects.md::iOS Tool Permissions and Side Effects > Skill、Memory与MCP的开关例外",
+      "characters": 1955,
+      "sha256": "fa29eed5ff6c8639db4965c0c9333d4dc1bafc02929a7871a7983b06fc586419",
+      "start_line": 67,
+      "end_line": 74,
+      "complete_source_subtree": true
+    },
+    {
+      "selector": "docs/specs/ios-usage-cost-and-balance.md::MinisX iOS 用量、费用与余额 > 会话账本与未知状态",
+      "characters": 1734,
+      "sha256": "101cfc460a367038779f1ad2ccfab2f078b58a3488ffcdd711b2db84a6e857da",
+      "start_line": 34,
+      "end_line": 43,
+      "complete_source_subtree": true
+    },
+    {
+      "selector": "docs/specs/ios-usage-cost-and-balance.md::MinisX iOS 用量、费用与余额 > 账户余额、鉴权与缓存",
+      "characters": 1511,
+      "sha256": "101cfc460a367038779f1ad2ccfab2f078b58a3488ffcdd711b2db84a6e857da",
+      "start_line": 52,
+      "end_line": 59,
+      "complete_source_subtree": true
+    }
+  ],
+  "links": 188,
+  "whitespace": [
+    {
+      "file": "docs/specs/index.md",
+      "tracked": false,
+      "exit": 1,
+      "output_empty": true
+    },
+    {
+      "file": "docs/specs/ios-agent-run-lifecycle.md",
+      "tracked": false,
+      "exit": 1,
+      "output_empty": true
+    },
+    {
+      "file": "docs/specs/ios-backup-restore.md",
+      "tracked": false,
+      "exit": 1,
+      "output_empty": true
+    },
+    {
+      "file": "docs/specs/ios-mcp-integrations.md",
+      "tracked": false,
+      "exit": 1,
+      "output_empty": true
+    },
+    {
+      "file": "docs/specs/ios-memory-lifecycle.md",
+      "tracked": false,
+      "exit": 1,
+      "output_empty": true
+    },
+    {
+      "file": "docs/specs/ios-provider-model-routing.md",
+      "tracked": false,
+      "exit": 1,
+      "output_empty": true
+    },
+    {
+      "file": "docs/specs/ios-sandbox-ish-summary.md",
+      "tracked": true,
+      "exit": 0,
+      "output_empty": true
+    },
+    {
+      "file": "docs/specs/ios-skills-lifecycle.md",
+      "tracked": false,
+      "exit": 1,
+      "output_empty": true
+    },
+    {
+      "file": "docs/specs/ios-sync-and-conflict-resolution.md",
+      "tracked": false,
+      "exit": 1,
+      "output_empty": true
+    },
+    {
+      "file": "docs/specs/ios-tool-permissions-and-side-effects.md",
+      "tracked": false,
+      "exit": 1,
+      "output_empty": true
+    },
+    {
+      "file": "docs/specs/ios-usage-cost-and-balance.md",
+      "tracked": false,
+      "exit": 1,
+      "output_empty": true
+    },
+    {
+      "file": "docs/specs/minis-url-scheme.md",
+      "tracked": true,
+      "exit": 0,
+      "output_empty": true
+    }
+  ],
+  "protected_baseline_count": 43,
+  "protected_drift": [],
+  "old_index_rows_preserved": true,
+  "product_runtime_checks": "not run"
+}

@@ -1,0 +1,525 @@
+--- before/docs/specs/index.md
++++ after/docs/specs/index.md
+@@ -10,11 +10,15 @@
+ | [MinisX iOS 浏览器自动化](ios-browser-automation.md) | docs/specs/ios-browser-automation.md | MinisX iOS browser_use 的会话与标签页、导航和脚本、Cookie、下载、超时、资源回收、安全和验收边界。 |
+ | [MinisX 日历重复创建接口](ios-calendar-recurrence.md) | docs/specs/ios-calendar-recurrence.md | apple-calendar 重复事件创建、两套参数兼容、结束条件、回读验证以及年度周次的已知限制。 |
+ | [MinisX iOS 设备数据与原生能力](ios-device-data-capabilities.md) | docs/specs/ios-device-data-capabilities.md | MinisX iOS 原生设备数据、系统能力与命令入口的当前清单；用于判断能否读写、所需授权及验证边界。 |
++| [MinisX iOS MCP 集成](ios-mcp-integrations.md) | docs/specs/ios-mcp-integrations.md | MinisX iOS MCP 的配置身份、HTTP与STDIO调用、发现启停、OAuth与凭证、重试取消及同步备份边界；用于外部工具集成维护。 |
++| [MinisX iOS Memory 行为与生命周期](ios-memory-lifecycle.md) | docs/specs/ios-memory-lifecycle.md | MinisX iOS Memory 的全局与每日作用域、会话开关、上下文注入、读写检索、编辑撤销及同步删除限制；用于记忆功能与恢复变更。 |
+ | [MinisX iOS Provider 与模型路由](ios-provider-model-routing.md) | docs/specs/ios-provider-model-routing.md | MinisX iOS Provider 实例、模型条目、会话绑定、模型组路由、fallback、凭证与实际用量身份规范。 |
+ | [iOS iSH Runtime and Isolation Contract](ios-sandbox-ish-summary.md) | docs/specs/ios-sandbox-ish-summary.md | iOS 内嵌 iSH shell 的运行、并发、文件作用域、超时取消、原生 offload 与安全边界。 |
++| [MinisX iOS Skill 生命周期](ios-skills-lifecycle.md) | docs/specs/ios-skills-lifecycle.md | MinisX iOS App 内 Skill 的导入更新、元数据发现、会话启停覆盖、正文读取、文件变更与删除边界；用于技能功能和跨会话维护。 |
+ | [MinisX iOS 同步与冲突处理](ios-sync-and-conflict-resolution.md) | docs/specs/ios-sync-and-conflict-resolution.md | MinisX iOS 同步的启停、记录与文件生命周期、冲突合并、删除防复活、离线恢复和当前限制。 |
+ | [MinisX iOS 系统入口与扩展](ios-system-entry-points.md) | docs/specs/ios-system-entry-points.md | MinisX iOS App Intents、Shortcuts、分享扩展、文件提供器、通知和 Live Activity 等系统入口的契约与降级边界。 |
+ | [iOS Tool Permissions and Side Effects](ios-tool-permissions-and-side-effects.md) | docs/specs/ios-tool-permissions-and-side-effects.md | iOS Agent 工具的系统授权、App 许可、操作确认、副作用分级、拒绝语义及已知间接调用缺口。 |
++| [MinisX iOS 用量、费用与余额](ios-usage-cost-and-balance.md) | docs/specs/ios-usage-cost-and-balance.md | MinisX iOS 上下文占用、token累计、请求费用账本与账户余额的定义、身份归因、未知状态、持久化和资源边界；用于统计与费用展示变更。 |
+ | [MinisX iOS 语音输入生命周期](ios-voice-input-lifecycle.md) | docs/specs/ios-voice-input-lifecycle.md | MinisX iOS 聊天语音输入的权限、采集、流式或分段识别、草稿编辑、停止发送、失败恢复和资源边界。 |
+ | [Minis URL Contract](minis-url-scheme.md) | docs/specs/minis-url-scheme.md | minis:// 资源地址与应用导航的双重契约，覆盖会话隔离、全局目录、外部挂载、渲染、深链和路径安全。 |
+ | [资源开销与性能审查规范](resource-efficiency.md) | docs/specs/resource-efficiency.md | 开发各阶段与每轮审查的资源约束、生命周期、有界工作及性能证据；纯文档可说明不适用。 |
+--- before/docs/specs/ios-agent-run-lifecycle.md
++++ after/docs/specs/ios-agent-run-lifecycle.md
+@@ -150,6 +150,12 @@
+ 
+ 可观察验收：重载后识别“尾部 user 无 assistant”并提供恢复；恢复从该 user turn 请求，不插入伪造的部分 assistant 内容。
+ 
++## 发现信息与持久背景知识
++
++初始Agent loop和Provider fallback重建时组装Skill/MCP发现信息及按memoryEnabled控制的GLOBAL/近期日志。发现列表不代表正文已读取、MCP工具已执行或模型已正确遵守。Skill/MCP会话开关目前不是全面执行许可，Memory关闭不清除既有工具历史或阻止一般文件路径；SOUL身份部分不受该开关控制。
++
++具体范围及冲突由[Skill生命周期](ios-skills-lifecycle.md)、[MCP集成](ios-mcp-integrations.md)和[Memory生命周期](ios-memory-lifecycle.md)维护；本节不把开关切换、消息截断、清空会话或Retry解释为全局数据删除和撤销已发生的副作用。费用请求在消息展示之外单独记账，详见[用量与费用](ios-usage-cost-and-balance.md#会话账本与未知状态)。
++
+ ## 待验证与待确认
+ 
+ - 待验证：真机后台回收、并发工具 Stop、Provider 中途断流、iCloud reload 竞态、200 轮上限和多次 in-loop compact。
+--- before/docs/specs/ios-backup-restore.md
++++ after/docs/specs/ios-backup-restore.md
+@@ -76,6 +76,16 @@
+ 凭证集合目前归在 `providers`，会包含收集到的环境变量值和 MCP OAuth，即使对应元数据类别未选。要迁移环境变量条目和值，应同时选择 `environment_variables` 和含凭证的 `providers`；仅环境变量的加密包仍可能只有元数据。恢复完整包时只选环境变量也不会应用包内 secrets；本地已有值可能使结果看似完整，验收应使用目标设备没有这些值的样本。
+ 
+ [BackupImporter.swift](../../src/ios/Agent/Backup/BackupImporter.swift) 把选中的 providers 排在环境变量前，避免创建新条目时读不到刚恢复的值；它不自动补选依赖类别。这是当前实现依赖，不是类别间可独立完整迁移的承诺；是否保留该耦合仍待维护者确认。
++
++### 内联MCP凭证与分享副本限制
++
++上述密码与includeCredentials前提覆盖专用secrets导出路径，不是对所有类别内容的自动秘密检测或脱敏保证。[BackupExporter.exportMCPServers](../../src/ios/Agent/Backup/BackupExporter.swift)直接复制servers.json；headers/env/url里的内联token可能进入mcp_servers类别，即使未选择providers或关闭includeCredentials。未提供密码时该复制路径也不检查或移除这些值，故当前实现不全面满足“敏感凭证只进入加密成员”的安全要求。
++
++MCP JSON分享导出同样保留原值。share copy只能解释为未包含专用secrets，不能称为完全无凭证或自动安全脱敏；其他任意文件中的敏感内容也不能由类别开关推导已清除。可观察验收使用占位测试值检查各成员，不输出真实秘密；内联凭证拒绝/脱敏/强制加密方案待维护者决定，产品缺口未在本轮修复。凭证和设备授权边界见[MCP集成](ios-mcp-integrations.md#内联凭证与同步备份例外)。
++
++### Skill、Memory与费用恢复范围
++
++Skill元数据/附件恢复不代表session_skill_overrides或use_count已迁移；当前新格式SkillRecord没有这些字段。Memory恢复复制包中的Markdown文件，不采用日志同步的并集合并，也不能保证此前撤销的条目仍然缺失。会话费用专用账本未包含在当前新格式聊天记录中，恢复聊天不应显示为已恢复完整费用历史。分别见[Skill](ios-skills-lifecycle.md#全局启停与会话覆盖)、[Memory](ios-memory-lifecycle.md#用户编辑撤销与跨设备删除)与[费用](ios-usage-cost-and-balance.md#展示与持久化边界)。
+ 
+ ## 导出完成与可恢复中断
+ 
+--- before/docs/specs/ios-mcp-integrations.md
++++ after/docs/specs/ios-mcp-integrations.md
+@@ -0,0 +1,91 @@
++---
++description: MinisX iOS MCP 的配置身份、HTTP与STDIO调用、发现启停、OAuth与凭证、重试取消及同步备份边界；用于外部工具集成维护。
++---
++
++# MinisX iOS MCP 集成
++
++导航：[Spec 索引](index.md)；shell执行与停止见[iSH runtime](ios-sandbox-ish-summary.md)，授权与远端副作用见[工具权限](ios-tool-permissions-and-side-effects.md)，配置传播及恢复见[同步](ios-sync-and-conflict-resolution.md)与[备份](ios-backup-restore.md)。
++
++MCP集成由原生配置/授权UI与iSH内CLI/daemon协作。本文记录2026-09-30当前工作区静态状态及已有安全、资源和证据规范的维护要求，不证明外部MCP服务、OAuth、网络、iSH子进程或真机后台行为已成功；没有新增运行证据。仅覆盖iOS当前入口，不把同目录Android实现当iOS验收。
++
++## 范围、状态与来源
++
++源码：[MCPStore](../../src/ios/Agent/Session/MCPStore.swift)、[MCPOAuthController](../../src/ios/Agent/Session/MCPOAuthController.swift)、[CLI main](../../src/ios/default_mount/usr/local/lib/minis-mcp-cli/main.py)、[daemon](../../src/ios/default_mount/usr/local/lib/minis-mcp-cli/daemon.py)、[配置](../../src/ios/default_mount/usr/local/lib/minis-mcp-cli/utils/config.py)、[HTTP transport](../../src/ios/default_mount/usr/local/lib/minis-mcp-cli/transport/http.py)。
++
++## 配置身份、导入与文件
++
++`servers.json`采用`{"mcpServers":{"<name>":{...}}}`，server name既是配置id，也用于OAuth凭证和会话覆盖。HTTP配置url/headers，STDIO配置command/args/env，另有enabled、note、createdAt/updatedAt、oauth及startupTimeoutSeconds。当前daemon优先有command的STDIO，而列表/原生摘要优先url的HTTP；两种目标同时填写时解释不一致，配置验收应分别检查，统一优先级仍待决定。
++
++MCPStore.parseImport接受标准mcpServers、按名称对象及单条配置，disabled映射enabled=false；commitImport同名覆盖，保留既有createdAt。导入成功只代表配置解析/持久化，不代表依赖安装、握手或工具执行可用。配置更新不会自动证明已有daemon连接已使用新端点/凭证。
++
++配置位于隐藏MinisConfig持久目录，通过`/var/minis/mcp-servers`提供给guest，不能因共享挂载而声称可在iOS Files公开读取。普通JSON导出保留url/headers/env原值，包括内联token和占位符；它不是脱敏分享功能。
++
++## 发现、全局启停与会话覆盖
++
++isEnabledForSession以会话覆盖优先于全局enabled；与默认相同的覆盖被删除。systemPromptSnippet按有效启用状态选最新createdAt优先的20个server，note最多200字符，只提供server发现信息与CLI使用提示，不向模型注册每个远端MCP工具为原生Agent工具。
++
++App斜杠菜单按同一有效启用值插入`/<name> `；它是输入辅助，实际调用仍需shell_execute运行minis-mcp-cli。初始Agent loop和fallback重建会生成发现片段；已发请求或已读工具清单不会因开关追溯删除。
++
++### 启停不是统一执行许可
++
++CLI没有App会话覆盖id，daemon建立新session时只检查servers.json全局enabled。全局开启但某会话关闭仍可能通过显式CLI调用；全局关闭而会话开启可展示名称，但冷连接会得到DISABLED。已有warm session在pool.get中先复用，未重新检查全局enabled，所以切换全局开关不能承诺即时阻止缓存连接。
++
++设置页toggle/delete没有直接驱逐daemon缓存连接。此处披露实现缺口，不把它写成允许绕过用户拒绝的规范。需要强制拒绝所有调用的产品，必须定义执行门禁、生效时点与缓存失效并验证；现行[副作用原则](ios-tool-permissions-and-side-effects.md)仍适用。
++
++## 握手、工具列表与调用
++
++首次list/tools/ping/call通过loopback TCP与自启动daemon通信。STDIO为长期子进程stdin/stdout JSON-RPC；HTTP当前为POST initialize及后续请求，携带Mcp-Session-Id，可解析JSON或SSE文本。不能由支持这两种返回推导完整MCP协议版本、通知/流式能力或任意服务器兼容。
++
++`tools <server>`发现远端清单，`refresh`或`tools --refresh`驱逐该连接后重新握手；原生refreshTools要求iSH已启动并以mcp-settings执行，外层超时120秒。`call <server> <tool> --input ...`执行具体工具；server存在、ping成功、tools/list成功和tools/call业务成功是不同阶段。daemon的ok envelope不能取代远端结果/isError或实际副作用核对。
++
++STDIO缺命令、握手失败、服务不存在、全局关闭、工具不存在、HTTP失败、AUTH_REQUIRED及参数错误应保留可诊断类别，不伪报空工具列表为成功。当前config.load_config对缺失或畸形配置返回空对象；不能把这一兼容行为当无错误配置的证明。
++
++## 凭证、OAuth与分享
++
++维护要求延续现有秘密保护：Agent配置优先使用`$$NAME`引用App/进程环境变量，不在聊天/日志输出值。HTTP expand_env同时支持$VAR/${VAR}/$$VAR/$${VAR}，未设置变量当前展开为空；未检查有效鉴权前不能宣称占位符已解决。
++
++OAuth原生使用交互授权、PKCE和Keychain非同步存储，并生成guest可读取的oauth bridge文件，含access/refresh token及必要client secret，权限设置为600。guest可刷新并改写bridge；跨设备只同步oauth配置不代表另一设备已授权。CLI client secret临时种子文件与Keychain/bridge的同步由MCPOAuthController处理，不应在日志展示。
++
++原生authorize当前只检查endpoint scheme以http开头，错误文案却要求https；不能宣称已有严格HTTPS endpoint校验或统一重定向目标保护。通用安全要求与当前实现差异必须保留，是否限制HTTP开发端点仍待维护者决定。
++
++guest缺token返回AUTH_REQUIRED及App授权深链；到期/401有refresh路径，401最多进行一次额外OAuth重试。存在token只说明isAuthorized的本地判断，不证明有效期、服务器接受或revocation状态。signOut清tokens与bridge并保留client secret；purge额外清secret。缓存连接和并发refresh的失效/清理需验证，不能把本地文件删除当远端token已撤销。
++
++### 内联凭证与同步备份例外
++
++MCPServerItem包含原配置JSON，JSON导出和mcp_servers备份均保留headers/env/url内联值。OAuth Keychain/bridge不走普通MCP配置同步，但内联秘密可能随配置传播；这些路径并不是“所有凭证不离开本机”的保证。
++
++专用MCP OAuth secrets随含凭证的providers备份类别处理，另有密码前提；仅关闭includeCredentials不会清除mcp_servers内联值。无密码share copy也不能由此推导完全无秘密。详见[备份内联凭证缺口](ios-backup-restore.md#内联mcp凭证与分享副本限制)。
++
++## 超时、重试与取消边界
++
++STDIO initialize的startupTimeoutSeconds缺省60秒，接受1—900整数及可转为整数的数值字符串；CLI支持兼容别名，primary字段优先。布尔值、一般非数值、非整数及越界值回落默认并警告，但非有限数值字符串NaN/Infinity可在int转换时抛出未捕获异常；不能保证任意畸形值都会回落或握手成功。原生仅保留字段，真正计时在daemon。RPC/HTTP当前300秒，loopback连接310秒，设置页外层120秒；多个层次的超时不是一个统一保证，更长startup值也可能先被外层切断。
++
++daemon.call_with_retry对TIMEOUT/STDIO_CRASH驱逐并重试一次，且作用于tools/call；HTTP会话错误另有重新握手重试，OAuth有独立401重试。这些路径不检查远端工具是否幂等，可能在响应丢失后重放副作用，是与[安全重试要求](ios-tool-permissions-and-side-effects.md#拒绝超时和错误语义)不一致的现状；本轮仅披露，未修复代码。
++
++Stop/超时能够结束所属shell调用，不代表独立daemon、长期STDIO子进程或远端请求同时取消。调用失败/断开也不证明外部动作未执行；创建、发送、购买等必须区分失败与结果未知，不能盲目重试。何时驱逐共享连接不得从会话PID停止路径推导。
++
++## 资源生命周期与同步
++
++daemon按server复用连接，空闲TTL600秒，watchdog间隔30秒，池变空后有60秒退出宽限；新活动清除宽限。shutdown提供统一停止路径。计时器受iSH/App运行前提影响，不是后台持续执行保证，也没有从TTL推出池数量、线程或响应大小的硬上限。
++
++MCPStore.sync使用per-server记录及updatedAt LWW，扫描CLI外部修改并保留语义fingerprint抑制回声；本地删除请求delete，入站删除有单独处理。会话覆盖在本地SQLite，当前per-server同步与配置JSON备份不包含它。运行连接不随配置同步迁移；OAuth秘密恢复也不证明远端授权有效。协议/门禁见[同步规范](ios-sync-and-conflict-resolution.md)。
++
++## 场景与验收
++
++本次未执行下列场景；应以测试服务和可丢弃数据取得独立证据。
++
++| 场景与前提 | 可观察验收 |
++| --- | --- |
++| 导入同名server、分别配置HTTP或STDIO | 覆盖规则、字段保留和错误可见；另检查双目标优先级，不由配置存在推导连接成功。 |
++| 全局/会话相反启停，已有warm连接 | 比较发现、菜单、冷连接与warm调用，明确现有门禁缺口，不将UI隐藏当拒绝证据。 |
++| 远端新增工具后执行refresh | 重新握手后列表变化，原生外层120秒前提可见；列表存在不代替实际工具结果。 |
++| OAuth取消、过期、401及另一设备同步 | 取消不伪报授权；refresh有界；设备侧凭证单独取得；端点HTTPS校验缺口保持开放。 |
++| 有副作用工具提交后丢失响应 | 观察实际调用次数和远端结果，不能把自动重试当安全幂等；当前未满足项明确记录。 |
++| Stop、离开设置页、空闲TTL或shutdown | 区分shell PID、daemon、子进程和远端动作；检查资源释放，不承诺会话退出全部取消。 |
++| 配置含内联token或$$引用后导出/备份 | 使用占位测试值检查JSON字节是否保留；不输出真实秘密，不将share copy称为自动脱敏。 |
++
++## 证据与待维护者决定
++
++[test_startup_timeout.py](../../src/ios/default_mount/usr/local/lib/minis-mcp-cli/test_startup_timeout.py)和[test_http_reinit.py](../../src/ios/default_mount/usr/local/lib/minis-mcp-cli/test_http_reinit.py)提供超时和重连测试入口，本轮未运行；它们不能证明真实iSH/OAuth/后台或外部动作正确。
++
++待决定：启停是否为强制执行许可及warm缓存失效；HTTP开发端点与HTTPS策略；有副作用工具重试/幂等策略；删除/登出的并发refresh清理；内联秘密同步、导出和备份保护；共享连接的取消归属及数量/响应资源上限。新增Spec不意味着这些决定或缺陷已关闭。
+--- before/docs/specs/ios-memory-lifecycle.md
++++ after/docs/specs/ios-memory-lifecycle.md
+@@ -0,0 +1,107 @@
++---
++description: MinisX iOS Memory 的全局与每日作用域、会话开关、上下文注入、读写检索、编辑撤销及同步删除限制；用于记忆功能与恢复变更。
++---
++
++# MinisX iOS Memory 行为与生命周期
++
++导航：[Spec 索引](index.md)；文件地址见[全局资源](minis-url-scheme.md#全局资源)，传输规则见[同步与冲突处理](ios-sync-and-conflict-resolution.md)，包格式与事务见[备份恢复](ios-backup-restore.md)。
++
++本文区分2026-09-30当前工作区的静态实现、延续已有安全/证据规范的维护要求，以及尚待决定的产品语义。没有新增运行、真机或历史通过证据。Memory 是 App 内持久背景知识，不是当前开发会话的宿主记忆，也不是聊天历史压缩摘要；旧任务内容不能自行恢复为新用户指令。
++
++## 范围、状态与来源
++
++主要入口：[AIChatViewModel+MemoryTools.swift](../../src/ios/Agent/Chat/AIChatViewModel+MemoryTools.swift)、[AIChatViewModel.swift](../../src/ios/Agent/Chat/AIChatViewModel.swift)、[ToolDefinitions](../../src/ios/Agent/Chat/AIChatViewModel+ToolDefinitions.swift)、[ChatStore](../../src/ios/Agent/Chat/ChatStore.swift)、[MemoryManagementView](../../src/ios/Views/Settings/MemoryManagementView.swift)、[MemoryWriteRevoker](../../src/ios/Views/Chat/MemoryWriteRevoker.swift)及[V2 hydrators](../../src/ios/Agent/Sync/V2/ChatStoreSyncHydrators.swift)。源码存在路径不证明模型使用正确或设备写入、同步成功。
++
++## 文件作用域与权威
++
++| 内容 | 当前用途与边界 |
++| --- | --- |
++| `GLOBAL.md` | 跨会话背景知识；自动注入完整文件。当前系统提示允许用户明确要求时由Agent使用文件工具维护，专用memory_write不会写入它。授权措辞冲突见[GLOBAL维护权限](#global维护权限)。 |
++| `YYYY-MM-DD.md` | 跨会话每日记录；memory_write按本地日期和时间生成标记并前置条目，不按session id建立私有日志。 |
++| `SOUL.md` | 身份/人格资料，同目录保存，但由SystemPromptBuilder独立构建身份部分；Memory开关不控制其注入。本文只界定这一例外，不定义人格编辑产品。 |
++| 聊天中的memory工具block | 保存该次工具调用的输入/结果；它不是Memory文件的唯一副本，也不是全局记忆条目的所有权记录。 |
++
++持久目录通过`/var/minis/memory`与`minis://memory/...`访问，可以跨会话读取。会话删除或清空聊天不应被解释为已删除全局Memory；全局文件、历史工具结果和已发送给Provider的内容必须分别判断。背景知识的提示包装要求以最新用户范围为准，不能证明模型一定正确遵守。
++
++## 默认值、会话开关与生效时点
++
++当前`memory.global.enabled`默认true，只决定新建会话的数据库`memory_enabled`初值。已有会话读取自身值，不随全局默认变化一起更新。草稿首次持久化时由ensureSessionReturningId读回该值；loadSession同样读回。`/memory`修改当前ViewModel并在已有session时持久化；草稿尚无session时的临时开关与首次创建值如何衔接仍需专门验收，不承诺覆盖全局默认。
++
++关闭后，当前实现同时：
++
++- 不在Agent loop起始和Provider fallback重建时注入GLOBAL及近期日志；
++- 从makeAgentTools移除memory_get和memory_write；
++- 在两个执行函数中再次拒绝调用，返回失败和重新启用入口。
++
++它没有按Memory开关取消一般文件工具或移除全局挂载，也不会从已有聊天工具结果中追溯删除已读内容。它不是全面的记忆访问隔离或远端遗忘开关。正在运行的请求已组装的prompt何时变化，需要运行验证，不能承诺切换瞬间清除已发送内容。
++
++### 开关反馈的已知冲突
++
++[SlashCommands](../../src/ios/Agent/Chat/AIChatViewModel+SlashCommands.swift)仍显示“Memory writes disabled/enabled. Reads are unaffected.”，菜单副标题也只称Writes。该反馈与自动注入和专用读取的门禁不一致。本文披露现状，不把“读取不受影响”或“全面禁止访问”提升为产品保证。开关究竟控制写入、自动注入与专用工具，还是所有文件访问，见[待维护者决定](#待维护者决定)。
++
++## 自动注入与可观察范围
++
++以下自动注入仅在当前会话memoryEnabled=true时组装；SOUL身份部分不受此开关控制。loadGlobalMemoryFragment读取非空GLOBAL全文；loadRecentDailyMemoryFragment最多回溯30个24小时偏移，选3份非空日志，每份前200行。天数、行数不是字符/token硬上限；GLOBAL没有同等行数限制，长行和大文件仍可能增加上下文及主线程读取成本。
++
++初始Agent loop和fallback重建都按memoryEnabled判断，最后附加Memory状态提示。写入或编辑之后，新组装prompt可读取新文件；不承诺每次工具写入都立即刷新当前请求的system prompt。
++
++[SessionMemoryView](../../src/ios/Views/Chat/SessionMemoryView.swift)的“Auto-injected”列表根据当前磁盘内容重新计算，工具活动来自当前聊天block。它不是每次实际请求的注入收据；文件已变化、开关关闭或fallback发生时，不能仅凭列表存在证明该版本已发送或模型已读取。
++
++## 专用写入与GLOBAL维护权限
++
++当前会话必须memoryEnabled=true，memory_write才会注册且通过执行门禁；关闭时返回失败及重新启用入口。默认值和切换边界见[会话开关](#默认值会话开关与生效时点)。模型工具schema要求tool_title和content；执行函数通过门禁后解析字符串content，构造`<!-- yyyy-MM-dd HH:mm:ss -->`标记，前置到当天文件；失败返回错误。成功后登记fakefs metadata、请求MemoryDailyV2 dirty入队并广播memoryFilesDidChange。成功文案只证明本地函数完成，不等于云端发送、其他设备可见或后续模型已采用；入队仍受[同步启停前提](ios-sync-and-conflict-resolution.md#启停离线与发送)控制。
++
++当前系统提示鼓励主动记录偏好和可复用事实；GLOBAL更新则要求用户明确指示，先读取、去重再使用file_edit/file_write。记忆写入授权、覆盖和敏感内容处理沿用[权限与副作用规范](ios-tool-permissions-and-side-effects.md)，不得从“已启用Memory”推导任意删除或凭证保存授权。
++
++### GLOBAL维护权限
++
++ToolDefinitions和GLOBAL注入包装称GLOBAL为“read-only/user-maintained”，但baseSystemPrompt允许明确授权后的Agent文件编辑。这是提示语义冲突，不是操作系统只读保护。memory_write不更新GLOBAL，与一般文件工具能够修改GLOBAL应分别说明；是否限定为设置页维护或保留明确授权的Agent编辑，仍待维护者决定。
++
++## 检索、排序与资源限制
++
++当前会话必须memoryEnabled=true，memory_get才会注册且通过执行门禁；关闭时返回失败及重新启用入口。该门禁不控制一般文件工具或SOUL身份注入，详见[会话开关](#默认值会话开关与生效时点)。通过门禁后，memory_get的scope默认all，包含GLOBAL及目录中的其他非隐藏`.md`文件；daily仅排除GLOBAL。当前代码没有严格把daily限定为日期命名文件，因此其他Markdown（包括SOUL）也可能参与工具检索；关闭自动SOUL例外不能据此推导检索结果范围。
++
++没有keywords时按文件顺序最多返回500行；有keywords时按时间标记拆分条目，以匹配词比例和时间新近程度各50%排序。当前允许部分关键词命中，不要求全部命中；ToolDefinitions的“all keywords/lines with context”表述与实际条目检索不一致。
++
++有关键词结果最多60项，并在加入一整项后达到30,720 UTF-8字节阈值时停止。该阈值是软边界，一项很大时可以超过它；无关键词分支只有行数限制。输出限制不约束扫描、整文件读取与候选构造成本，不能宣称固定30 KB硬上限或有界全库内存。超限、无匹配、无文件和disabled需要分别显示。
++
++## 用户编辑、撤销与跨设备删除
++
++MemoryManagementView支持编辑GLOBAL和日志，保存后对相应类型请求dirty并通知界面。未保存编辑存在时不自动覆盖编辑器；保存仍可能覆盖期间变化，需要实际竞态验收。删除列表跳过GLOBAL，并对其他文件执行本地删除，没有在该入口排队Memory云端delete。
++
++MemoryWriteRevoker只搜索今天/昨天，按去除首尾空白后的content匹配第一个条目，连时间标记删除；它不以request/session/唯一条目id匹配。相同内容多次写入可能匹配另一条，超过两日返回未找到。成功仅表示本地文件改写；该函数没有直接dirty入队或变更通知，不能保证设置页或云端立即更新。
++
++### 同步合并与防复活缺口
++
++GLOBAL以文件mtime做LWW；空或缺失文件builder返回nil，因此清空本地GLOBAL不等于上传一个空值。每日日志按时间标记做并集合并，同时间不同内容有保留双方的路径；删除某条不能通过“远端条目缺失”表达。
++
++出站buildMemoryDaily对可解析日期早于当前时刻向前30个日历日的cutoff返回nil；这只是上传过滤，不代表删除磁盘或云端旧日志，也不能套用于入站合并或备份。日志必须非空且parseMemoryEntries能够解析出非空的`<!-- 时间标记 -->`条目；首个标记之前的普通文字及无标记正文不进入同步记录。入站需要重写时只序列化已解析条目，不能保证保留未标记文字。设置页保存、dirty入队或本地内容存在均不证明这些文本已上传。
++
++MemoryGlobalV2/MemoryDailyV2没有注册deletionApplier；当前通用fallback保持本地内容。撤销、删除整份日志、清空GLOBAL都不能承诺已传播或不会被旧副本重新带回。记录级删除、条目级删除、同步关闭与账号级遗忘是不同语义，需产品决定及代码支持，不能套用会话的tombstone保证。协议细节由[同步规范的Memory例外](ios-sync-and-conflict-resolution.md#memory合并与删除例外)维护。
++
++备份复制Memory目录中的Markdown，恢复按包内文件处理，并不等同于日志并集合并。历史备份可能含已删除内容；恢复不是“删除要求已永久生效”的证据，格式与回滚见[备份规范](ios-backup-restore.md)。
++
++## 场景与验收
++
++以下是需要执行时的验收条件，本次仅核对源码，均未运行。
++
++| 场景与前提 | 可观察验收 |
++| --- | --- |
++| 设置默认关闭；分别创建新会话与加载已有开启会话 | 新会话不注入GLOBAL/日志且无专用工具；已有会话保持其保存值；另检查草稿先切换再首次发送的值。 |
++| 关闭当前会话Memory并触发fallback | 初始及fallback请求不新增GLOBAL/日志，专用调用返回disabled；普通文件路径和已有工具历史的例外可区分。 |
++| 用户明确要求维护GLOBAL | 先读取并去重，只修改授权内容；保留提示措辞冲突，不能当作已实现只读文件。 |
++| 正常写入后启动下一Agent turn | 本地标记和内容正确，下一请求按注入限制读取；本地成功、dirty与远端成功分别观察。 |
++| 搜索包含部分关键词、长条目和SOUL | 验证实际scope、条目排序、60项与软字节边界；截断提示不冒称全文或全部关键词匹配。 |
++| 两次相同内容写入，跨两日后撤销 | 确认当前按内容和近两日的匹配限制；不存在唯一调用绑定保证；错误可见。 |
++| 编辑早于出站cutoff的日志、无标记正文或在首个标记前增加文字 | 本地保存与dirty不等于已构建记录；核对上传过滤和条目范围，备份字节范围另查；入站重写后的普通文字不保证保留。 |
++| 设备A撤销条目、B保留旧日志再同步 | 检查并集能否重新引入旧项；未实现删除传播前明确保留已知缺口，不把本地删除当验收通过。 |
++| 文件修改后查看“Auto-injected” | 将显示的当前文件与请求当时版本分别比较，不把界面列表当传输证据。 |
++
++## 待维护者决定
++
++- Memory关闭的最终范围，以及运行中切换的生效时点和已有上下文处理。
++- GLOBAL仅用户界面维护，还是允许明确授权的Agent文件编辑；主动日志保存是否维持当前提示策略。
++- 撤销的期限、唯一条目标识、跨设备传播和恢复旧备份后的删除语义。
++- daily检索是否应排除SOUL/其他文件，以及可接受的文件、输出和扫描资源上限。
++
++这些问题不因Spec新增自动成为已确认能力；当前没有真实iCloud、Provider或真机证据，也未运行记忆读写、关闭/fallback、竞态、撤销或性能测试。
+--- before/docs/specs/ios-provider-model-routing.md
++++ after/docs/specs/ios-provider-model-routing.md
+@@ -61,12 +61,12 @@
+ 
+ ## 配置变化和用量归因
+ 
+-这里区分当前上下文占用和历史消费；同一次响应的不同数值不能套用同一发布门禁。
++这里区分当前上下文占用和历史消费；同一次响应的不同数值不能套用同一发布门禁。[用量、费用与余额](ios-usage-cost-and-balance.md)独立维护字段完整性、请求账本、估算支持范围和账户查询，本节只规定路由身份关联。
+ 
+ | 数值 | 当前实现与维护要求 |
+ |---|---|
+ | 当前上下文占用快照 | `recordContextUsage` 使用 `latestContextTokens`，核对请求、实际 stream entry、配置及当前身份；不匹配时不能覆盖当前模型快照。记录 stream 身份和 revision 的门禁适用于这一快照。 |
+-| 会话 token 累计 | Agent loop 在响应结束后仍累计实际返回的 input/output/cache token；不共用上述快照门禁。配置改变不能成为抹掉已发生消费的理由。累计值不等于某个当前 entry 的上下文占用。 |
++| 会话 token 累计 | Agent loop 对每次正常返回的 streamResult 累计已观察的 input/output/cache token；异常或缺失用量不代表消费为零，也不是完整账单；不共用上述快照门禁。配置改变不能成为抹掉已发生消费的理由。累计值不等于某个当前 entry 的上下文占用。 |
+ | 会话费用估算 | 当前 [AIChatViewModel+Billing.swift](../../src/ios/Agent/Chat/AIChatViewModel+Billing.swift) 以 session/request id 记录已完成且有可估算用量的 DeepSeek 请求；不使用上下文快照的 revision 门禁。账本不是所有 Provider 已有统一 entry 归因的证明，也不是整个账号账单。 |
+ | 账户余额 | 当前余额入口单独使用 Provider 实例、配置和鉴权 revision 判断账号身份；它是账号查询状态，不由会话 token 或费用累计推导。请求失败或身份无法确认时不能显示猜测余额。 |
+ 
+--- before/docs/specs/ios-sandbox-ish-summary.md
++++ after/docs/specs/ios-sandbox-ish-summary.md
+@@ -65,6 +65,10 @@
+ 
+ “全局可见”不等于“可任意写入”。文件工具和 offload 仍需执行路径、只读、授权及操作级别检查。
+ 
++### MCP独立daemon的边界
++
++MCP CLI通过独立daemon复用HTTP/STDIO连接，其生命周期不等于每次shell的会话PID。停止所属shell调用不证明daemon、长期服务子进程和远端动作同时取消；全局挂载或会话开关也不证明统一执行许可。超时层次、TTL、自动重试及配置秘密见[MCP集成](ios-mcp-integrations.md#超时重试与取消边界)，不能把本文会话停止要求当作该路径已经全面实现的证据。
++
+ ## 超时、停止与结果
+ 
+ - 未指定时，shell 默认超时为 300 秒。
+--- before/docs/specs/ios-skills-lifecycle.md
++++ after/docs/specs/ios-skills-lifecycle.md
+@@ -0,0 +1,87 @@
++---
++description: MinisX iOS App 内 Skill 的导入更新、元数据发现、会话启停覆盖、正文读取、文件变更与删除边界；用于技能功能和跨会话维护。
++---
++
++# MinisX iOS Skill 生命周期
++
++导航：[Spec 索引](index.md)；全局文件地址见[URL作用域](minis-url-scheme.md#全局资源)，副作用见[工具权限](ios-tool-permissions-and-side-effects.md)，同步与备份分别见[同步](ios-sync-and-conflict-resolution.md)和[备份恢复](ios-backup-restore.md)。
++
++Skill是App内可安装的`SKILL.md`及附件包，不是仓库`.agents/skills`开发协作技能，也不是已注册的原生工具。本文记录2026-09-30当前工作区静态状态、延续已有权限/证据规范的维护要求及未决语义，没有运行或真机验收。不能把“文件存在、已启用、描述已注入、正文已读取、模型执行正确”当成同一状态。
++
++## 范围、状态与来源
++
++主要入口：[SkillStore](../../src/ios/Agent/Session/SkillStore.swift)、[SkillsManagementView](../../src/ios/Views/Skills/SkillsManagementView.swift)、[SessionSkillsView](../../src/ios/Views/Chat/SessionSkillsView.swift)、[SlashCommands](../../src/ios/Agent/Chat/AIChatViewModel+SlashCommands.swift)、[ConcurrentTools](../../src/ios/Agent/Chat/AIChatViewModel+ConcurrentTools.swift)和[V2 hydrators](../../src/ios/Agent/Sync/V2/ChatStoreSyncHydrators.swift)。
++
++## 身份、文件与作用域
++
++SkillStore将id、名称、描述、版本、来源、全局启用状态与时间保存于skills.db，正文和附件保存于全局技能目录。常规importSkill将名称slugify得到id，同id重导入更新内容并保留原启用状态/安装时间；这是覆盖身份规则，不是每次导入创建全新版本。
++
++shell新建目录通过reconcileOrphanSkill注册时保留目录名作为id，来源为session；这个来源标签不意味着会话私有技能。`/var/minis/skills/<id>/SKILL.md`与`minis://skills/...`为全局文件资源，可以被其他会话读取。rename更新名称不能据此推断目录id或既有链接同时改变。
++
++## 导入、更新与失败完成条件
++
++当前支持粘贴/文件、ZIP和GitHub URL。parse处理frontmatter及正文，缺失名称有fallback；不是完整Anthropic格式验证器，解析成功不保证脚本/依赖可运行。
++
++GitHub preflight只下载解析SKILL.md，commit先安装正文，再由独立后台Task递归下载同目录附件。导入返回成功时附件可能尚未完成，部分失败目前记录日志；手动Update from URL等待附件下载并可返回partialSuccess。离开导入界面不意味着该后台Task取消。维护者必须分别观察正文安装和附件完整性，不能只检查Skill行出现。
++
++ZIP入口需要根目录或单层父目录的SKILL.md，写入正文后再写入附件；错误可能发生在已部分写入之后，不能宣称所有导入原子回滚。GitHub覆盖确认在部分UI入口存在；importSkill自身同id覆盖，不是统一的每路径确认屏障。文件路径安全、外部依赖与凭证处理仍受[权限规范](ios-tool-permissions-and-side-effects.md)约束，不能因其来自Skill包而放宽。
++
++源码：SkillStore.importSkill/preflightGitHubImport/commitGitHubImport/updateFromURL/importFromArchive。未调用网络、导入ZIP或执行附件。
++
++## 全局启停与会话覆盖
++
++isEnabledForSession先读session_skill_overrides，有覆盖则优先，否则使用全局isEnabled。会话可以启用全局关闭的Skill，也可以禁用全局开启的Skill；全局关闭不是强制所有会话关闭。
++
++setSessionOverride在值等于当前全局默认时删除覆盖行，否则保存。它表达当前例外，不是永远固定一次选择；后续全局值变化时没有覆盖的会话会跟随。草稿第一次在SessionSkillsView切换时先创建真实session，再绑定覆盖，不能使用空session id。
++
++全局setEnabled请求Skill dirty；session override只写本地skills.db并更新UI版本计数。当前Skill同步和新格式SkillRecord备份没有携带会话覆盖和使用频率，不能把“Skill已同步/恢复”解释为每个会话选择和排序历史已复制。删除Skill会清理对应覆盖；会话删除后的残留覆盖清理不在此静态核查中承诺。
++
++### 关闭不等于禁止文件访问
++
++当前启停控制发现片段及斜杠菜单，未把技能目录撤载或为一般文件读写增加Skill开关门禁。已读正文和既有工具结果也不会被追溯清除。需要阻止读取或执行某个Skill时，不能只依赖发现开关；是否提升为执行许可是[待决定事项](#待验证与待决定)。
++
++## 发现、正文读取与斜杠入口
++
++skillPromptFragment只提供名称、截断至200字符的description和SKILL.md路径，提示使用前读取正文；它没有在App中自动执行技能、自动注入全部正文或强制模型遵循内容。
++
++启用数较少时按更新时间展示；较多时优先bundled、最近7天最多10项，再以use_count填充目标20项，并给出有限的未展示名称及目录搜索提示。该实现的bundled分支没有同等硬截断，因此20是当前选择目标，不能宣称对任意数据都严格20项。description限制也不是正文/附件读取预算。
++
++初始Agent loop及Provider fallback重建时生成片段。启停或文件修改对已组装请求的生效时点需要验收；正文读取通常作为工具结果进入历史，不等同于下一次描述更新。
++
++成功file_read且路径匹配SKILL.md时recordSkillUse记录使用次数；shell cat、其他资源读取或菜单展示不能据此推导同样计数。次数代表特定读取事件，不是技能任务成功率。
++
++斜杠菜单按会话有效启用值列出Skill；选中后只在输入框插入`/<名称> `及保留原文本。发送后仍依赖模型理解与工具读取，不是确定性的技能执行路由，也不保证跳过描述筛选后自动加载正确文件。
++
++## 文件变更、同步和删除
++
++file_write/file_edit成功写入SKILL.md会触发reload；磁盘发现、rescanFromDisk和rescanAndMarkChangedSkillsDirty负责不同的元数据刷新/dirty入队路径。普通reload不等于所有附件修改均已进入同步队列；fakefs事件、quiet窗口与mtime扫描需分别核查。
++
++当前rescanFromDisk对解析失败保留旧元数据，loadSkills对空/旧block标记description有专门刷新分支；不能由这些分支推出任何文件编辑都实时刷新全部元数据。新增或删除磁盘目录、Library/rootfs双副本、前台恢复分别需要验收。
++
++同步SkillV2包含全局启用值、正文及可选ZIP附件，普通删除请求远端delete，入站删除调用applyRemoteDeletion并避免回声。quietSeconds默认60、排除缓存/包管理目录和ZIP构造是当前资源策略，不是iCloud必然及时成功的证据。同步初始化/类别前提及冲突规则见[同步规范](ios-sync-and-conflict-resolution.md#启停离线与发送)。
++
++deleteSkill删除全局文件、数据库条目及覆盖，并请求云端删除；文件移除为best effort，故界面条目消失不证明每份文件副本已清理。另一设备的删除传播、后台下载尚未完成时的竞态和备份恢复后重建需要验证，不在本轮升级为保证。
++
++## 资源与安全边界
++
++Skill正文及附件可触发shell、网络和设备工具，但文字指令不授予新权限或操作确认。[资源规范](resource-efficiency.md)适用于导入递归、目录扫描、ZIP内存、主线程元数据加载、附件读取和取消。当前存在后台附件任务，不能声明页面关闭就释放全部资源，也没有从描述筛选推出完整包大小硬上限。
++
++## 场景与验收
++
++以下为待执行的可观察条件，本轮未运行。
++
++| 场景与前提 | 可观察验收 |
++| --- | --- |
++| 全局关闭Skill，A会话显式启用，B无覆盖 | A的描述和菜单可见，B不可见；普通文件访问例外单独观察，不宣称全局封禁。 |
++| 草稿尚未发送时改变Skill选择 | 创建真实会话并保存覆盖，首次发送/重载使用同一id，未写空id记录。 |
++| 同id重复导入与GitHub附件失败 | 全局启用/安装时间按当前规则保留；正文成功、附件未完成及partialSuccess分别可见，不把成功返回当完整包。 |
++| 输入框选择Skill后发送 | 原文本保留；实际请求只有发现信息，后续file_read读取正确正文；模型行为另行验证。 |
++| shell创建/编辑SKILL.md及附件 | id和链接稳定，元数据刷新与dirty入队分别观察；malformed正文不静默抹掉已知描述。 |
++| 删除Skill并让旧云记录回流 | 检查双目录、覆盖、delete和防复活；后台下载重建风险单独观察。 |
++| 备份恢复或另一设备同步 | 正文/附件和全局启用状态符合格式；会话覆盖与use_count不得伪报已迁移。 |
++
++## 待验证与待决定
++
++[SkillDescriptionStaleTests.swift](../../src/ios/MinisTests/Standalone/SkillDescriptionStaleTests.swift)只包含独立复制谓词的回归入口，不证明生产导入、数据库、iSH、同步或模型使用成功；本轮未执行它。
++
++待验证：多会话覆盖、草稿首次发送、GitHub/ZIP部分写入与取消、正文更新的prompt时点、磁盘双副本和iCloud删除竞态、资源峰值。待决定：禁用是否必须成为读取/执行禁止；同名冲突的各入口确认形式；是否同步/备份会话覆盖；技能更新是否保留可回滚版本。未决事项不自动变成现行产品保证。
+--- before/docs/specs/ios-sync-and-conflict-resolution.md
++++ after/docs/specs/ios-sync-and-conflict-resolution.md
+@@ -57,13 +57,23 @@
+ 
+ Provider V3 同步记录包含实例、模型条目、模型组和 thinking rule。凭证可用性是设备侧运行前提；元数据同步成功不保证另一台设备已有可用 Keychain/OAuth 状态。
+ 
++### Memory合并与删除例外
++
++当前[V2 hydrators](../../src/ios/Agent/Sync/V2/ChatStoreSyncHydrators.swift)对GLOBAL文件采用mtime LWW，对每日日志采用时间标记条目并集，同时间不同内容有保留双方的路径。日志不是通用整文件LWW；不能将远端缺少条目解释为删除。出站每日日志受30个日历日前cutoff过滤，并仅传输可解析的非空时间标记条目；无标记文本不会随整文件上传，入站重写也不保证保留。具体过滤与格式例外见[Memory同步范围](ios-memory-lifecycle.md#同步合并与防复活缺口)。
++
++MemoryGlobalV2和MemoryDailyV2当前未注册deletionApplier，[SyncCoreHydrators](../../src/ios/Agent/Sync/V2/SyncCoreHydrators.swift)的无处理器fallback保持本地内容。GLOBAL为空或缺失时builder返回nil；设置页删日志和撤销写入也没有完整的Memory删除传播路径。因此下文会话/单记录防复活机制不得自动套用于Memory；本地清空、撤销或删除不保证其他设备删除或旧内容不再回流。作用域、编辑与验收见[Memory生命周期](ios-memory-lifecycle.md#同步合并与防复活缺口)，条目删除、整文件删除与恢复旧备份的产品语义仍待决定。
++
++### Skill与MCP的配置范围
++
++SkillV2传输全局启用状态、正文及可选附件；MCPServerItem按server保存配置JSON，包含其中原样内联的headers/env/url值。OAuth Keychain秘密不在该普通记录中，不意味着任意MCP配置都没有秘密。两者会话覆盖仍在本地各自SQLite，当前业务同步记录没有传输这些覆盖；本机已启用、元数据已同步、另一设备已有凭证和运行连接必须分别判断。详见[Skill生命周期](ios-skills-lifecycle.md#全局启停与会话覆盖)和[MCP凭证例外](ios-mcp-integrations.md#内联凭证与同步备份例外)。
++
+ ## 删除与防复活
+ 
+ ### 本地删除
+ 
+ 本地删除会话时，当前实现先排队会话及子记录的云端 delete，再删除本地消息、compact marker、媒体等，并写入 30 天 recent-delete 标记。删除传播完成前若旧云记录回流，时间不新的记录应被拒绝，防止刚删除的内容复活。
+ 
+-单记录类型也有近期删除标记。恢复导入若要有意重新创建同 id，必须走恢复专用清理路径；不能普遍关闭防复活保护。
++部分单记录类型也有近期删除标记；其作用取决于该类型是否排队delete、执行防复活检查并注册删除处理器，不能由通用机制推导所有类别已覆盖。Memory例外见[上节](#memory合并与删除例外)。恢复导入若要有意重新创建同 id，必须走恢复专用清理路径；不能普遍关闭防复活保护。
+ 
+ ### 远端删除
+ 
+--- before/docs/specs/ios-tool-permissions-and-side-effects.md
++++ after/docs/specs/ios-tool-permissions-and-side-effects.md
+@@ -64,6 +64,14 @@
+ - 在检查迁移到 native offload dispatch 点并验证前，任何依赖该许可保护敏感能力的设计都必须记录此缺口；
+ - 命令预览只展示第一条命令的参数，不能视为对完整 shell 副作用的可靠解释。
+ 
++## Skill、Memory与MCP的开关例外
++
++App工具许可针对当前可识别原生offload，不能自动推导为所有普通文件、Skill脚本或远端MCP工具逐项许可。Skill/MCP会话启停主要控制发现信息；Memory开关控制自动背景注入与专用读写工具，不构成一般文件访问隔离。它们均不能替代本规范的操作级确认、目标检查和安全重试要求。
++
++已知MCP差异：[daemon](../../src/ios/default_mount/usr/local/lib/minis-mcp-cli/daemon.py)对TIMEOUT/STDIO_CRASH自动重试一次，作用于tools/call且不判断幂等；HTTP还有重连/401路径。外部工具若已提交副作用而响应丢失，可能被重放，不能声称当前所有工具都满足下文安全重试要求。会话关闭和全局关闭的warm连接检查同样存在缺口，详见[MCP执行门禁](ios-mcp-integrations.md#启停不是统一执行许可)和[超时重试](ios-mcp-integrations.md#超时重试与取消边界)。
++
++Memory提示中GLOBAL“只读”与明确授权文件编辑、/memory“读取不受影响”与专用读取门禁的冲突，见[Memory规范](ios-memory-lifecycle.md#默认值会话开关与生效时点)。本轮修正文档不会授予额外访问、替代维护者决定或修复上述代码缺口。
++
+ ## 副作用分级
+ 
+ 开发和审查新工具时至少按以下维度判断，不能只看命令名称：
+--- before/docs/specs/ios-usage-cost-and-balance.md
++++ after/docs/specs/ios-usage-cost-and-balance.md
+@@ -0,0 +1,91 @@
++---
++description: MinisX iOS 上下文占用、token累计、请求费用账本与账户余额的定义、身份归因、未知状态、持久化和资源边界；用于统计与费用展示变更。
++---
++
++# MinisX iOS 用量、费用与余额
++
++导航：[Spec 索引](index.md)；模型身份与切换见[Provider路由](ios-provider-model-routing.md)，停止/重试及消息持久化见[Agent生命周期](ios-agent-run-lifecycle.md)。
++
++本文记录2026-09-30当前工作区静态实现及延续现有证据、身份和资源规范的维护要求，没有本轮运行或账户查询证据。它不是Provider账单、当前官方价格表或未来费率保证。价格和时间适用性只以源码中版本化估算器说明；更新估算器前另行核实服务约定，不能由本Spec证明官方计费一致。
++
++## 范围、状态与来源
++
++主要入口：[ChatModels.TokenUsage](../../src/ios/Agent/Chat/ChatModels.swift)、[AIChatViewModel](../../src/ios/Agent/Chat/AIChatViewModel.swift)、[SSEStream](../../src/ios/Agent/Chat/AIChatViewModel+SSEStream.swift)、[Billing](../../src/ios/Agent/Chat/AIChatViewModel+Billing.swift)、[DeepSeekRequestUsage](../../src/ios/Providers/OpenAI/DeepSeekRequestUsage.swift)、[DeepSeekBilling](../../src/ios/Providers/OpenAI/DeepSeekBilling.swift)、[SessionCostLedger](../../src/ios/Providers/OpenAI/SessionCostLedger.swift)、[BalanceClient](../../src/ios/Providers/OpenAI/DeepSeekBalanceClient.swift)、[UsageStatsView](../../src/ios/Views/Chat/UsageStatsView.swift)及[SessionBillingSection](../../src/ios/Views/Chat/AIChatView.swift)。
++
++## 四种数值不能互相推导
++
++| 数值 | 定义与当前范围 |
++| --- | --- |
++| 当前上下文占用 | 最近请求的输入、缓存读取与缓存创建之和latestContextTokens，与当前模型窗口比较；不是累计消费或输出上限。 |
++| 会话token累计 | Agent loop对每次返回的streamResult计入input/output/cache；累计已观察到的响应，缺失/异常路径不代表真实计费为零。 |
++| 会话费用估算 | 已登记聊天请求的本地费用账本，包含工具循环中的各次模型请求；当前只对支持的DeepSeek请求取得完整用量后计价。 |
++| 账户余额 | 当前Provider实例对应账号的独立远端CNY余额查询；不等于会话费用、充值总额或从token计算出的余量。 |
++
++维护要求：未知用量、缺失字段、未计价请求和不支持账号显示未知/不可用，不替换为零。已登记且全部请求完成计价的账本总额为零时（包括尚无请求或完整合法用量计算得到零），以及服务明确返回零余额时，可以显示零；未计价或缺失信息不得伪装为零。token统计、费用记录和余额要保留各自身份与时间依据，不能套用同一个发布门禁。
++
++## 请求用量与上下文快照
++
++TokenUsage.add对流式累计input/output采用max，缓存字段取当前事件值，并更新latestContextTokens，避免将同一请求的每个累计SSE片段再次相加。Agent loop在每次请求返回后再累计会话统计。不能将max聚合器直接用于所有请求的总消费，也不能把最后一次上下文输入当整轮费用。
++
++recordContextUsage核对session、history、请求revision、实际stream entry和配置身份后发布快照；身份不匹配时保持未知或符合身份条件的上次有效值。这里的门禁不意味着已发生的token/费用应被丢弃。缺失用量或非正常返回路径的会话总数可能不完整，不能将它称为Provider实际账单。
++
++DeepSeekRequestUsage.parse要求官方支持的endpoint/model，并读取响应的总输入`prompt_tokens`（Responses为`input_tokens`）、输出及缓存命中数cached。它要求合法非负整数、cached不超过总输入；存在miss字段时核对`miss = 总输入 - cached`。解析后的`DeepSeekRequestUsage.inputTokens = 总输入 - cached`表示新输入，cacheReadTokens保存cached并单独计价，不能将原始总输入与缓存再相加收费。Responses使用input_tokens/output_tokens及对应details；缺失cache或字段不一致返回nil，保持未计价，不猜测零缓存。
++
++## 会话账本与未知状态
++
++SessionCostLedger只在本机新建会话时enroll；旧会话、云端导入或备份恢复的会话不因读取统计而自动登记。不用当前价格重新估算旧消息。每个请求用独立UUID绑定session：begin增加request_count与unpriced_count，finish在该请求首次成功保存record时更新总额并减少未计价计数；重复finish不能重复收费。
++
++SSEStream在开始处理请求时登记，保留最后一次billingUsage，只有没有stream错误且取得stopReason才尝试finish计价。取消、中断、无完整用量、日期/模型/价格不支持均保持未计价；重试创建新请求，不回滚前一次记录。已有费用不随消息编辑、截断或Retry撤销，因为消费与聊天展示生命周期不同；会话删除通过外键级联删除本地账本。
++
++estimatedAmountCNY只有unpricedCount为零时可用；存在任一未计价请求，已知部分合计不能冒充会话总费用。数据库写入失败由ChatStore的try?/false路径处理，尚无完整持久化失败UI保证；不能仅因界面没有错误而确认账本完整。
++
++当前记录保存request/model、金额、priceVersion、开始/结束时间、tokens、priceTier及start时间依据，没有独立instance/entry字段。会话可以跨实例累计；该账本不是账号分账或所有Provider统一归因已完成的证明。补齐请求当时身份及历史迁移策略仍待决定，参见[Provider用量身份要求](ios-provider-model-routing.md#配置变化和用量归因)。
++
++## 价格快照与适用范围
++
++DeepSeekPricing支持源码列出的flash/pro模型别名和HTTPS api.deepseek.com允许路径（根或/v1，可使用443端口），拒绝其他域名、代理、Azure或仅名字相似的兼容服务。实例还需启用、API key类型、OpenAI/OpenAI Responses路由且非azureMode，才能成为当前费用/余额展示账号。
++
++源码priceVersion为2026-09-29，按Asia/Shanghai和请求开始时刻选择峰闲档位，跨档请求保存start依据。估算只覆盖2026年及各模型价格生效后，未核实调休日期等返回nil；开始/结束年份或时间关系不满足条件同样不估算。它不是对未来年份、官方当前价格或服务跨档结算方式的承诺。
++
++金额以Decimal存储，已保存请求保留原金额和版本，不因后续费率变化重算。标题生成、compaction、浏览器/MCP及其他工具服务不在这个聊天请求账本中；不能宣称展示值包含账号全部消费。
++
++## 账户余额、鉴权与缓存
++
++DeepSeekAccountIdentity为providerID加configRevision/authRevision，Keychain读取再次确认当前身份。查询固定GET `https://api.deepseek.com/user/balance`，Bearer鉴权，拒绝重定向；ephemeral会话无cookie/url cache，request/resource超时为12/15秒，实际流式读取最多16,384字节。独立decode另有64 KB上限，不应将它冒称网络客户端的实际上限。
++
++只接受唯一合法CNY total_balance；没有CNY、重复CNY或畸形数值均失败。`is_available=false`不意味着余额为零；合法零值和负余额可以展示，不能从“不能推理”反推余额未知或为空。
++
++页面状态只缓存一个身份，非强制刷新60秒内复用，手动刷新重新请求。身份变化先清旧值，generation拒绝迟到响应；刷新失败清除旧余额，不继续当实时值。页面task负责取消，取消不应发布迟到结果或误报普通查询失败。没有后台轮询，不用会话消费倒扣缓存余额。
++
++## 展示与持久化边界
++
++当前费用界面受deepSeekAccountIdentity控制；当前身份不支持时即使会话账本已有旧估算，也显示“—”。已登记且当前身份支持的空会话可以显示零；旧会话无summary不冒称完整费用。正数低于0.0001 CNY显示`<¥0.0001`，其他金额格式化到2—4位小数，展示舍入不修改账本原Decimal。
++
++UsageStatsView区分有消息身份快照、旧记录按当前会话模型推测、模型已删除及会话未知等归因状态。按modelId聚合不是严格账号/实例分账；有快照不代表金额或远端账单已经核对。当前session token聚合、历史消息统计与费用账本可以因覆盖范围不同而不相等，不能为了让数字相等抹掉消费或填造身份。
++
++费用账本为本地专用表，当前新格式聊天备份/同步没有相应费用记录字段；恢复聊天不保证恢复费用完整性。保留与清除策略、旧会话追溯和跨设备费用合并仍待维护者决定，格式事务由[备份](ios-backup-restore.md)与[同步](ios-sync-and-conflict-resolution.md)维护。
++
++## 资源边界
++
++请求begin/finish各执行有界数据库写入，总额读取不随流式片段扫描全部账本；余额按页面和身份缓存，不逐token刷新或后台轮询。输出格式化、全局UsageStats聚合和消息重载仍需按[资源规范](resource-efficiency.md)定向验证；本轮没有性能实测。余额网络字节限制不代表其他Provider流式响应同样受限。
++
++## 场景与验收
++
++以下条件尚未在本轮运行，测试源码存在不等于已通过。
++
++| 场景与前提 | 可观察验收 |
++| --- | --- |
++| 新会话一次回答含两次工具后的三次模型请求 | 每请求仅登记一次，全部完整可估算才展示总额；最后上下文占用不等于三请求消费之和。 |
++| 同一请求多次累计SSE usage | 片段不重复相加；总prompt拆为fresh和cache，和miss一致，缺失字段保持未知。 |
++| 中断后Retry；重复finish；消息截断 | 中断请求保持未计价，新请求独立；已记金额不重复、不随消息回滚；会话总额未知提示正确。 |
++| 老会话或云端/备份导入会话 | 不凭读取建立完整账本，不按当前费率回算为已核实费用。 |
++| 请求期间切模型/实例/Key | 上下文快照符合当前身份；旧消费仍保留其原金额；余额旧响应不能覆盖新身份，账本instance归因缺口保留。 |
++| 代理服务同名DeepSeek模型、未支持年份/日期 | 显示不可估算/“—”，不套用源码快照生成官方账单。 |
++| 余额超时、取消、重复CNY及负数 | 失败清旧值、取消不发布；重复币种拒绝，合法负值不改为零。 |
++| 关闭费用页面再打开或刷新 | 无后台轮询，生命周期取消与60秒缓存/强制刷新按实际触发检查。 |
++
++## 测试入口与未决事项
++
++[DeepSeekBillingTests](../../src/ios/MinisTests/DeepSeekBillingTests.swift)、[SessionCostLedgerTests](../../src/ios/MinisTests/SessionCostLedgerTests.swift)、[DeepSeekBalanceModelTests](../../src/ios/MinisTests/DeepSeekBalanceModelTests.swift)和[ContextUsageTests](../../src/ios/MinisTests/ContextUsageTests.swift)提供价格、字段、数据库及身份门禁的测试入口。本轮未执行，没有新官方请求、真机或账单对照证据；不引用旧测试通过证明当前工作区。
++
++待决定：未计价请求长期显示方式、实例级分账、费用本地保留/同步/备份、旧会话追溯、价格更新及跨档服务依据。本文不因缺口而修改产品实现，也不将估算升级为扣费保证。
+--- before/docs/specs/minis-url-scheme.md
++++ after/docs/specs/minis-url-scheme.md
+@@ -69,6 +69,8 @@
+ ### 全局资源
+ 
+ `skills`、`memory`、`shared` 由当前实现映射到 App 的全局持久目录，可跨会话访问。它们不是会话目录的 fallback：只有 host 明确为这些值时才使用全局根目录。
++
++全局资源地址不表达Agent功能开关或删除传播：Skill启停与会话覆盖见[Skill生命周期](ios-skills-lifecycle.md#关闭不等于禁止文件访问)，Memory注入、专用工具与全局文件访问的区别见[Memory生命周期](ios-memory-lifecycle.md#默认值会话开关与生效时点)。不得从URL可解析推导正文已注入、已获得操作授权或删除已跨设备完成。
+ 
+ ### 用户挂载资源
+ 

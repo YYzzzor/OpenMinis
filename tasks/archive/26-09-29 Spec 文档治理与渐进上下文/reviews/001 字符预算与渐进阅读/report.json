@@ -1,0 +1,52 @@
+{
+  "snapshot_id": "6211386033d344f9002373457bd8d0a5cf76d51d50d376d766d01ca39d91a436",
+  "conclusion": "blocking",
+  "coverage": "已完整阅读指定 task、scope、resource-efficiency、spec-context 与 spec-authoring；审查固定快照中的 spec_context.py、test_spec_context.py、review.py 相关调用点、六份 Spec 的变更、生成索引及阅读/维护流程。对 AGENTS、四个任务技能及相关 Harness 文档使用指定实施前副本区分本轮修改。静态检查覆盖 Unicode 计数、包装与换行、最终预算校验、章节与祖先范围、父子状态、来源摘要、独立调用、歧义及围栏处理、索引链接。通过只读内存样本确认下列四项缺陷，未重跑完整测试套件。资源判断：没有新增服务、后台扫描、轮询、网络或模型调用；每个不同路径对应的文档在一次 context 调用内读取一次。解析内存随输入增长，候选章节会重复计算路由与预算，当前有限文档规模下未发现需要额外框架或性能工程的证据。",
+  "limitations": "仅审查指定固定材料，不读取实时产品源码，不修改文件。作者报告的全套测试、prepare/check、105 个链接检查及真实文档示例未重复执行；未测量大规模输入性能、设备资源、产品行为或原生 Hook。未发现预算溢出不代表所有可配置预算下的降级行为正确；以下已确认问题影响前提保留、路由降级、兼容性及选择顺序，建议处置后再完成对应验收。",
+  "findings": [
+    {
+      "id": "R1",
+      "severity": "P2",
+      "requirement": "A2、已确认设计第 8 项及 spec-context 的完整小节阅读语义要求保留文档与祖先引言；预算不足不能通过丢失前提换取正文。",
+      "location": "scripts/harness/spec_context.py:395-401",
+      "trigger": "所选父节及其带文档前言的引言无法容纳，但去掉文档前言后的某个子节可以容纳。",
+      "evidence": "_add_node 忽略 intro_ranges 添加失败的结果，随后递归子节时固定传入 include_preamble=False。只读样本使用 description: Test、1200 字符的 GLOBAL CONDITION 前言、Spec 引言、Small 小节和大型 Large 小节；context(['example.md::Spec'], 900, 900) 成功返回 348 字符，包含 Allowed body，并将 Small 标为本次已展开，但完全没有 GLOBAL CONDITION。前言既未返回，也没有对应未展开提示。",
+      "verification": "为父节无法连同文档前言容纳的情况增加定向回归；断言返回任何后代正文时仍包含文档前言，否则只保留路由和未展开状态。覆盖祖先引言添加失败后继续尝试子节的路径。",
+      "certainty": "confirmed",
+      "recommendation": "每个候选子节都应包含必需的文档前言，或仅在确认该前言已经进入 coverage 后才省略其添加；不要将前言是否已返回隐含在递归深度中。"
+    },
+    {
+      "id": "R2",
+      "severity": "P2",
+      "requirement": "A3 及 spec-context 的路由降级规则要求在目录过长时提供缩减路由；只有最小路由也无法容纳时才失败。",
+      "location": "scripts/harness/spec_context.py:334-346",
+      "trigger": "总预算小于 full 路由，但大于 minimal 路由；中间 roots 路由由于额外说明和命令比 full 更长。",
+      "evidence": "总预算缩减每次只考察下一档；当 full→roots 没有正节省时立即报错，不再尝试 minimal。只读样本为 example.md，正文 '# ' + 'A' * 100 + '\\nBody\\n'。outline 的 full、roots、minimal 实际长度分别为 319、395、282。context(['example.md'], 9400, 300, True) 报 Routes exceed total budget，虽然 282 字符的 minimal 路由满足两个预算。",
+      "verification": "增加 full > total_budget >= minimal 且 roots > full 的定向用例，断言成功返回 minimal 路由并保留 list 定位命令；也保留真正低于最小路由时的失败用例。",
+      "certainty": "confirmed",
+      "recommendation": "选择降级候选时考察后续所有可用模式，或继续跨过不节省字符的中间模式，再判断最小路由是否无法容纳。"
+    },
+    {
+      "id": "R3",
+      "severity": "P2",
+      "requirement": "任务明确要求保留旧 list/read 及 selector/extract/render 兼容接口，不破坏既有固定审查提取。",
+      "location": "scripts/harness/spec_context.py:117-118",
+      "trigger": "旧 read/extract 读取以 Markdown 水平分隔线开头的文档，或含有新 description 子集解析器不接受的头部格式。",
+      "evidence": "extract 由原先直接解析标题改成调用 parse_document，因此现在强制运行 _frontmatter_description。只读调用 extract(b'---\\n# Spec\\n## A\\nBody\\n', ['Spec', 'A']) 抛出 Unterminated YAML frontmatter；这是此前标题提取可接受的 Markdown，开头的 --- 可以是普通水平分隔线。review.py:213 也通过 extract 提取固定材料，因此该新增限制同时进入旧 read 和审查准备路径，尽管提取不需要 description。",
+      "verification": "将上述字节样本作为旧 extract/read 兼容回归，确认仍返回前言、祖先和选中小节；description 的严格校验应另由需要元数据的新接口验证。",
+      "certainty": "confirmed",
+      "recommendation": "将旧章节提取与新 description 校验解耦，保持旧接口原有的 Markdown 接受范围，无需为此引入完整 YAML 依赖。"
+    },
+    {
+      "id": "R4",
+      "severity": "P2",
+      "requirement": "spec-context 的受控阅读入口规定先保留路由，再按调用者选择顺序放入正文。",
+      "location": "scripts/harness/spec_context.py:446-466",
+      "trigger": "同次调用交错选择不同文档的小节，例如 A::First、B::Second、A::Later，且总预算不能容纳全部正文。",
+      "evidence": "_context_requests 按文档归并 selections，context 再逐文档处理全部选择，将实际优先级改成 A::First、A::Later、B::Second。只读样本：a.md 为 '# A\\n## First\\nFIRST\\n## Later\\n' + 'L'*300 + '\\n'；b.md 为 '# B\\n## Second\\n' + 'S'*300 + '\\n'。按上述交错顺序调用 context，per_doc_budget=9400、total_budget=1000，输出 895 字符，包含 Later 的全部 300 个 L，却不包含较早请求的 Second 正文。",
+      "verification": "增加交错多文档选择的预算竞争用例，断言 B::Second 在 A::Later 之前获得预算；同时验证同一文档仍只读取一次并共享来源摘要。",
+      "certainty": "confirmed",
+      "recommendation": "保留按文档缓存读取结果，但单独保存全局请求顺序，并按该顺序分配正文预算。"
+    }
+  ]
+}

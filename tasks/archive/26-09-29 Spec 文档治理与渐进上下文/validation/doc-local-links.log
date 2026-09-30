@@ -1,0 +1,5 @@
+COMMAND: inline Python local Markdown link check over changed task documents; fenced code examples skipped
+EXIT: 0
+Changed Markdown files checked: 16
+Local links checked (fenced examples ignored): 105
+Missing local targets: 0

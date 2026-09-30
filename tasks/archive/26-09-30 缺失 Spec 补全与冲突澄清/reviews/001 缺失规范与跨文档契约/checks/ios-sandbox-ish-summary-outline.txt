@@ -1,0 +1,24 @@
+### Spec: docs/specs/ios-sandbox-ish-summary.md
+Description: iOS 内嵌 iSH shell 的运行、并发、文件作用域、超时取消、原生 offload 与安全边界。
+Source SHA-256: d0c7a3c12befbb6e38ff1b677219db150640a051faa28b94dfcd0f04381b92fd
+Route (ATX headings; indentation shows parent sections):
+- iOS iSH Runtime and Isolation Contract (lines 5-133; 本次未展开)
+  - 范围与证据 (lines 11-23; 本次未展开)
+  - 执行前提 (lines 24-34; 本次未展开)
+  - 并发与进程模型 (lines 35-46; 本次未展开)
+    - 现行契约 (lines 37-46; 本次未展开)
+  - 文件系统作用域 (lines 47-71; 本次未展开)
+    - 会话目录 (lines 49-61; 本次未展开)
+    - 全局与外部目录 (lines 62-67; 本次未展开)
+    - MCP独立daemon的边界 (lines 68-71; 本次未展开)
+  - 超时、停止与结果 (lines 72-80; 本次未展开)
+  - Native offload (lines 81-91; 本次未展开)
+  - 安全与资源边界 (lines 92-99; 本次未展开)
+  - 场景与验收 (lines 100-127; 本次未展开)
+    - 场景 A：同会话并发命令 (lines 102-107; 本次未展开)
+    - 场景 B：跨会话同名文件 (lines 108-113; 本次未展开)
+    - 场景 C：命令超时并带子进程 (lines 114-119; 本次未展开)
+    - 场景 D：外部只读挂载 (lines 120-123; 本次未展开)
+    - 场景 E：offload 权限分层 (lines 124-127; 本次未展开)
+  - 已知限制与待验证事项 (lines 128-133; 本次未展开)
+

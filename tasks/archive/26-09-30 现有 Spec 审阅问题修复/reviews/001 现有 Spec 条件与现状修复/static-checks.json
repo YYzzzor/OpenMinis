@@ -1,0 +1,320 @@
+{
+  "index_current": true,
+  "outline_count": 10,
+  "sections": [
+    {
+      "check": "outline",
+      "path": "docs/specs/debug-server-api.md",
+      "chars": 942
+    },
+    {
+      "check": "outline",
+      "path": "docs/specs/ios-agent-run-lifecycle.md",
+      "chars": 1114
+    },
+    {
+      "check": "outline",
+      "path": "docs/specs/ios-backup-restore.md",
+      "chars": 970
+    },
+    {
+      "check": "outline",
+      "path": "docs/specs/ios-browser-automation.md",
+      "chars": 946
+    },
+    {
+      "check": "outline",
+      "path": "docs/specs/ios-provider-model-routing.md",
+      "chars": 920
+    },
+    {
+      "check": "outline",
+      "path": "docs/specs/ios-sync-and-conflict-resolution.md",
+      "chars": 903
+    },
+    {
+      "check": "outline",
+      "path": "docs/specs/ios-system-entry-points.md",
+      "chars": 948
+    },
+    {
+      "check": "outline",
+      "path": "docs/specs/ios-tool-permissions-and-side-effects.md",
+      "chars": 866
+    },
+    {
+      "check": "outline",
+      "path": "docs/specs/ios-voice-input-lifecycle.md",
+      "chars": 831
+    },
+    {
+      "check": "outline",
+      "path": "docs/specs/minis-url-scheme.md",
+      "chars": 1019
+    },
+    {
+      "check": "complete_section",
+      "selector": "docs/specs/ios-backup-restore.md::iOS Backup and Restore > 备份范围",
+      "chars": 2429,
+      "ranges": [
+        [
+          1,
+          10
+        ],
+        [
+          35,
+          59
+        ]
+      ]
+    },
+    {
+      "check": "complete_section",
+      "selector": "docs/specs/ios-backup-restore.md::iOS Backup and Restore > 备份范围 > 截止时间与快照范围",
+      "chars": 2429,
+      "ranges": [
+        [
+          1,
+          10
+        ],
+        [
+          35,
+          59
+        ]
+      ]
+    },
+    {
+      "check": "complete_section",
+      "selector": "docs/specs/ios-backup-restore.md::iOS Backup and Restore > 凭证与加密",
+      "chars": 2703,
+      "ranges": [
+        [
+          1,
+          10
+        ],
+        [
+          60,
+          79
+        ]
+      ]
+    },
+    {
+      "check": "complete_section",
+      "selector": "docs/specs/ios-backup-restore.md::iOS Backup and Restore > 导出完成与可恢复中断",
+      "chars": 1864,
+      "ranges": [
+        [
+          1,
+          10
+        ],
+        [
+          80,
+          87
+        ]
+      ]
+    },
+    {
+      "check": "complete_section",
+      "selector": "docs/specs/ios-backup-restore.md::iOS Backup and Restore > 恢复顺序与事务边界",
+      "chars": 1963,
+      "ranges": [
+        [
+          1,
+          10
+        ],
+        [
+          88,
+          105
+        ]
+      ]
+    },
+    {
+      "check": "complete_section",
+      "selector": "docs/specs/ios-backup-restore.md::iOS Backup and Restore > 场景与验收 > 场景 G：只迁移环境变量",
+      "chars": 1662,
+      "ranges": [
+        [
+          1,
+          10
+        ],
+        [
+          112,
+          113
+        ],
+        [
+          142,
+          147
+        ]
+      ]
+    },
+    {
+      "check": "complete_section",
+      "selector": "docs/specs/ios-backup-restore.md::iOS Backup and Restore > 场景与验收 > 场景 H：中断期间修改未完成类别",
+      "chars": 1651,
+      "ranges": [
+        [
+          1,
+          10
+        ],
+        [
+          112,
+          113
+        ],
+        [
+          148,
+          153
+        ]
+      ]
+    },
+    {
+      "check": "complete_section",
+      "selector": "docs/specs/debug-server-api.md::Debug Server API > HTTP 入口",
+      "chars": 2329,
+      "ranges": [
+        [
+          1,
+          10
+        ],
+        [
+          42,
+          61
+        ]
+      ]
+    },
+    {
+      "check": "complete_section",
+      "selector": "docs/specs/ios-provider-model-routing.md::MinisX iOS Provider 与模型路由 > 配置变化和用量归因",
+      "chars": 3027,
+      "ranges": [
+        [
+          1,
+          10
+        ],
+        [
+          62,
+          78
+        ]
+      ]
+    },
+    {
+      "check": "complete_section",
+      "selector": "docs/specs/ios-voice-input-lifecycle.md::MinisX iOS 语音输入生命周期 > Provider 解析与 failover",
+      "chars": 2594,
+      "ranges": [
+        [
+          1,
+          10
+        ],
+        [
+          33,
+          42
+        ]
+      ]
+    },
+    {
+      "check": "complete_section",
+      "selector": "docs/specs/ios-sync-and-conflict-resolution.md::MinisX iOS 同步与冲突处理 > 启停、离线与发送",
+      "chars": 2577,
+      "ranges": [
+        [
+          1,
+          10
+        ],
+        [
+          20,
+          40
+        ]
+      ]
+    },
+    {
+      "check": "complete_section",
+      "selector": "docs/specs/minis-url-scheme.md::Minis URL Contract > 资源作用域 > 会话资源",
+      "chars": 1952,
+      "ranges": [
+        [
+          1,
+          10
+        ],
+        [
+          50,
+          68
+        ]
+      ]
+    },
+    {
+      "check": "complete_section",
+      "selector": "docs/specs/minis-url-scheme.md::Minis URL Contract > 已知实现偏差 > 请求预算解析仍会跨会话扫描",
+      "chars": 1721,
+      "ranges": [
+        [
+          1,
+          10
+        ],
+        [
+          126,
+          137
+        ]
+      ]
+    },
+    {
+      "check": "complete_section",
+      "selector": "docs/specs/minis-url-scheme.md::Minis URL Contract > 路径安全契约",
+      "chars": 1638,
+      "ranges": [
+        [
+          1,
+          10
+        ],
+        [
+          91,
+          102
+        ]
+      ]
+    },
+    {
+      "check": "complete_section",
+      "selector": "docs/specs/ios-tool-permissions-and-side-effects.md::iOS Tool Permissions and Side Effects > App 工具许可 > 当前级别",
+      "chars": 1875,
+      "ranges": [
+        [
+          1,
+          10
+        ],
+        [
+          27,
+          42
+        ]
+      ]
+    },
+    {
+      "check": "complete_section",
+      "selector": "docs/specs/ios-sandbox-ish-summary.md::iOS iSH Runtime and Isolation Contract > 文件系统作用域",
+      "chars": 2040,
+      "ranges": [
+        [
+          1,
+          10
+        ],
+        [
+          47,
+          67
+        ]
+      ]
+    },
+    {
+      "check": "complete_section",
+      "selector": "docs/specs/ios-calendar-recurrence.md::MinisX 日历重复创建接口 > 年度周次的现行限制",
+      "chars": 2373,
+      "ranges": [
+        [
+          1,
+          32
+        ]
+      ]
+    }
+  ],
+  "link_count": 130,
+  "link_issues": [],
+  "tracked_whitespace_ok": true,
+  "untracked_whitespace_count": 8,
+  "unexpected_changes": []
+}

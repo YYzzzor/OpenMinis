@@ -1,0 +1,2 @@
+9c294073005dfb624c7ad039bcba74a59fd84838a0a6e2212e9cbb0446adf9d7  scripts/harness/spec_context.py
+edaab520a29789eac0ad585c8bb3e25f1941067fd963c78dac87e188de743fd5  scripts/harness/test_spec_context.py

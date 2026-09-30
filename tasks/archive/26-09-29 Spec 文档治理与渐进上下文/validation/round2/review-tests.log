@@ -1,0 +1,39 @@
+test_active_review_export_accepts_titles_and_preserves_evidence (test_review.ReviewTests) ... ok
+test_active_review_export_rejects_missing_title_before_writing (test_review.ReviewTests) ... ok
+test_archived_requirement_requires_opt_in_and_only_selected_file_is_read (test_review.ReviewTests) ... ok
+test_archiving_does_not_leak_deleted_task_bodies_into_patches (test_review.ReviewTests) ... ok
+test_default_does_not_read_or_export_unselected_task_records (test_review.ReviewTests) ... ok
+test_deleted_files_preserved_in_diff (test_review.ReviewTests) ... ok
+test_dirty_snapshot_captures_both_index_and_actual_code (test_review.ReviewTests) ... ok
+test_explicit_directory_exclusion_omits_contents (test_review.ReviewTests) ... ok
+test_explicit_submodule_exclusion_records_gitlink (test_review.ReviewTests) ... ok
+test_export_requires_freshness_and_preserves_original_report (test_review.ReviewTests) ... ok
+test_json_list_report_is_incomplete (test_review.ReviewTests) ... ok
+test_legacy_bundle_without_policy_keeps_original_archive_binding (test_review.ReviewTests) ... ok
+test_missing_executable_is_durable_failure (test_review.ReviewTests) ... ok
+test_missing_section_rejects_bundle_without_partial_output (test_review.ReviewTests) ... ok
+test_modified_or_truncated_reports_reject_check_and_export (test_review.ReviewTests) ... ok
+test_non_utf8_filename_roundtrip_and_staleness (test_review.ReviewTests) ... skipped 'Filesystem rejects non-UTF-8 filenames'
+test_numeric_export_outside_active_reviews_remains_compatible (test_review.ReviewTests) ... ok
+test_partial_failed_timeout_and_unable_are_not_success (test_review.ReviewTests) ... ok
+test_reject_inside_repo_and_ignored_requirement (test_review.ReviewTests) ... ok
+test_reject_submodule (test_review.ReviewTests) ... ok
+test_reject_symlink_and_unfinished_operation (test_review.ReviewTests) ... ok
+test_report_binding_and_completeness (test_review.ReviewTests) ... ok
+test_report_surrogate_is_preserved_and_rendered_as_escape (test_review.ReviewTests) ... ok
+test_run_cli_uses_flash_default_and_honors_explicit_override (test_review.ReviewTests) ... ok
+test_section_requirements_embed_only_required_context_and_bind_full_sources (test_review.ReviewTests) ... ok
+test_selected_active_task_only_includes_explicit_requirements (test_review.ReviewTests) ... ok
+test_staging_same_worktree_invalidates_git_binding (test_review.ReviewTests) ... ok
+test_stale_code_requirements_and_index_are_detected (test_review.ReviewTests) ... ok
+test_successful_review_retains_binding_and_readonly_flags (test_review.ReviewTests) ... ok
+test_tampering_detected (test_review.ReviewTests) ... ok
+test_unselected_archive_index_conflict_still_blocks_review (test_review.ReviewTests) ... ok
+test_whole_spec_remains_mandatory (test_review.ReviewTests) ... ok
+
+----------------------------------------------------------------------
+Ran 32 tests in 17.355s
+
+OK (skipped=1)
+command: /usr/bin/python3 -B -m unittest discover -s scripts/harness -p 'test_review.py' -v (require_escalated)
+exit status: 0

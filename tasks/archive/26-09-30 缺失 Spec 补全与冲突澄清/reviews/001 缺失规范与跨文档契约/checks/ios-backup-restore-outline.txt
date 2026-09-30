@@ -1,0 +1,26 @@
+### Spec: docs/specs/ios-backup-restore.md
+Description: iOS .minisbak 的格式兼容、备份范围、凭证加密、完整性、不完整结果、恢复事务与回滚契约。
+Source SHA-256: de449d14967cd857d3c48777b2c01720ebf5664bd623bdde1286a9ccf8d5899d
+Route (ATX headings; indentation shows parent sections):
+- iOS Backup and Restore (lines 5-168; 本次未展开)
+  - 范围与来源 (lines 11-23; 本次未展开)
+  - 包格式与兼容 (lines 24-34; 本次未展开)
+  - 备份范围 (lines 35-59; 本次未展开)
+    - 截止时间与快照范围 (lines 54-59; 本次未展开)
+  - 凭证与加密 (lines 60-89; 本次未展开)
+    - 内联MCP凭证与分享副本限制 (lines 80-85; 本次未展开)
+    - Skill、Memory与费用恢复范围 (lines 86-89; 本次未展开)
+  - 导出完成与可恢复中断 (lines 90-97; 本次未展开)
+  - 恢复顺序与事务边界 (lines 98-115; 本次未展开)
+  - 合并与冲突 (lines 116-121; 本次未展开)
+  - 场景与验收 (lines 122-163; 本次未展开)
+    - 场景 A：包含凭证但未设置密码 (lines 124-129; 本次未展开)
+    - 场景 B：加密包损坏或密码错误 (lines 130-133; 本次未展开)
+    - 场景 C：部分文件不可用 (lines 134-139; 本次未展开)
+    - 场景 D：恢复中途被终止 (lines 140-143; 本次未展开)
+    - 场景 E：格式兼容 (lines 144-147; 本次未展开)
+    - 场景 F：顺序和覆盖 (lines 148-151; 本次未展开)
+    - 场景 G：只迁移环境变量 (lines 152-157; 本次未展开)
+    - 场景 H：中断期间修改未完成类别 (lines 158-163; 本次未展开)
+  - 现有测试与待验证边界 (lines 164-168; 本次未展开)
+

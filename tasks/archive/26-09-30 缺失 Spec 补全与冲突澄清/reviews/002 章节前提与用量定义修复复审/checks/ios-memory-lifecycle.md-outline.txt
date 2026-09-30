@@ -1,0 +1,18 @@
+### Spec: docs/specs/ios-memory-lifecycle.md
+Description: MinisX iOS Memory 的全局与每日作用域、会话开关、上下文注入、读写检索、编辑撤销及同步删除限制；用于记忆功能与恢复变更。
+Source SHA-256: f64e23831a111dab3143523824bd081c994f00f012eb1c268ce373b1be2e633a
+Route (ATX headings; indentation shows parent sections):
+- MinisX iOS Memory 行为与生命周期 (lines 5-107; 本次未展开)
+  - 范围、状态与来源 (lines 11-14; 本次未展开)
+  - 文件作用域与权威 (lines 15-25; 本次未展开)
+  - 默认值、会话开关与生效时点 (lines 26-41; 本次未展开)
+    - 开关反馈的已知冲突 (lines 38-41; 本次未展开)
+  - 自动注入与可观察范围 (lines 42-49; 本次未展开)
+  - 专用写入与GLOBAL维护权限 (lines 50-59; 本次未展开)
+    - GLOBAL维护权限 (lines 56-59; 本次未展开)
+  - 检索、排序与资源限制 (lines 60-67; 本次未展开)
+  - 用户编辑、撤销与跨设备删除 (lines 68-83; 本次未展开)
+    - 同步合并与防复活缺口 (lines 74-83; 本次未展开)
+  - 场景与验收 (lines 84-99; 本次未展开)
+  - 待维护者决定 (lines 100-107; 本次未展开)
+

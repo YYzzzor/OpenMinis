@@ -1,0 +1,25 @@
+COMMAND: python3 -B -m unittest discover -s scripts/harness -p test_review.py
+EXIT: 1
+...............E................
+======================================================================
+ERROR: test_non_utf8_filename_roundtrip_and_staleness (test_review.ReviewTests.test_non_utf8_filename_roundtrip_and_staleness)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/huyuanzhao/Coding/Projects/OpenMinis/scripts/harness/test_review.py", line 246, in test_non_utf8_filename_roundtrip_and_staleness
+    self.write(name, 'original bytes')
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/huyuanzhao/Coding/Projects/OpenMinis/scripts/harness/test_review.py", line 36, in write
+    (self.repo / name).write_text(content)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/pathlib/__init__.py", line 809, in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/pathlib/__init__.py", line 771, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 1] Operation not permitted: '/var/folders/51/8g99qf710p31bt7bddly82sh0000gn/T/tmpluxy59_c/repo/bad\udcffname.py'
+
+----------------------------------------------------------------------
+Ran 32 tests in 17.402s
+
+FAILED (errors=1)

@@ -1,0 +1,21 @@
+test_child_retry_never_drops_required_document_preamble (test_spec_context.BoundedContextTests) ... ok
+test_exact_unicode_budgets_include_wrappers_and_multiple_documents (test_spec_context.BoundedContextTests) ... ok
+test_interleaved_document_selectors_keep_global_body_priority (test_spec_context.BoundedContextTests) ... ok
+test_large_outline_falls_back_to_discoverable_list_command_under_budget (test_spec_context.BoundedContextTests) ... ok
+test_mutation_between_calls_uses_one_new_source_version_per_call (test_spec_context.BoundedContextTests) ... ok
+test_outline_heading_titles_do_not_count_as_body_expansion (test_spec_context.BoundedContextTests) ... ok
+test_parent_can_be_partial_while_children_keep_exact_states (test_spec_context.BoundedContextTests) ... ok
+test_route_and_selected_body_have_independent_expansion_states (test_spec_context.BoundedContextTests) ... ok
+test_total_budget_can_skip_larger_roots_route_for_minimal (test_spec_context.BoundedContextTests) ... ok
+test_extract_keeps_accepting_markdown_horizontal_rule_frontmatter (test_spec_context.SectionTests) ... ok
+test_fenced_headings_do_not_terminate_sections (test_spec_context.SectionTests) ... ok
+test_full_paths_disambiguate_and_duplicate_paths_fail (test_spec_context.SectionTests) ... ok
+test_invalid_selectors_and_setext_not_silently_accepted (test_spec_context.SectionTests) ... ok
+test_nested_selection_preserves_conditions_without_unrelated_siblings (test_spec_context.SectionTests) ... ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 0.013s
+
+OK
+command: /usr/bin/python3 -B -m unittest discover -s scripts/harness -p test_spec_context.py -v
+exit status: 0

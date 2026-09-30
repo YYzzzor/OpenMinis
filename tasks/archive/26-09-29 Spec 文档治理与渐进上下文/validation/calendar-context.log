@@ -1,0 +1,38 @@
+COMMAND: python3 -B scripts/harness/spec_context.py context docs/specs/ios-calendar-recurrence.md::MinisX 日历重复创建接口 > 当前验收限制
+EXIT: 0
+### Spec: docs/specs/ios-calendar-recurrence.md
+Description: apple-calendar 重复事件创建、两套参数兼容、结束条件、回读验证以及年度周次的已知限制。
+Source SHA-256: 1158fd3589a1224f9d6ea248cdb8e06097b1941a27fcbd161398b2201ab200db
+Route (ATX headings; indentation shows parent sections):
+- MinisX 日历重复创建接口 (lines 5-113; 本次部分展开)
+  - 当前验收限制 (lines 15-20; 本次已展开)
+  - 使用方式 (lines 21-34; 本次未展开)
+  - v1.13 参数与结果兼容 (lines 35-46; 本次未展开)
+  - Apple 公开接口覆盖 (lines 47-73; 本次未展开)
+  - 复杂示例 (lines 74-89; 本次未展开)
+  - 回读结果 (lines 90-96; 本次未展开)
+  - 官方依据 (lines 97-104; 本次未展开)
+  - 维护验收场景 (lines 105-113; 本次未展开)
+Returned body:
+Lines 1-20 (source text):
+> ---
+> description: apple-calendar 重复事件创建、两套参数兼容、结束条件、回读验证以及年度周次的已知限制。
+> ---
+> 
+> # MinisX 日历重复创建接口
+> 
+> 导航：[Spec 索引](index.md)；章节目录由[上下文工具](../harness/spec-context.md#受控阅读入口)从本文标题生成，不另手写目录。
+> 
+> 本文的已接受限制继续有效；以下是维护相关行为时的验收入口，不表示本次重跑了日历测试。
+> 
+> 本文描述 apple-calendar create 的重复创建能力，不改变开发流程或审批规则。最低 iOS 26.0。
+> 2026-09-21 迁移基于官方 v1.13（7414c0d）；下述 `--recurrence` 保留既有 MinisX 接口，新增版本兼容说明记录上游 `--recur` 的原有行为。迁移后的运行证据另见当前迁移任务，不将旧分支测试结果视为新分支已验证。
+> 验证状态见任务 `tasks/archive/26-09-20 支持完整日历重复创建/verification.md`，不能将参数表等同于真机测试通过。
+> 
+> ## 当前验收限制
+> 
+> 全部公开参数已接入。用户已明确同意将年度周次及其组合列为本次个人使用交付的已知限制，暂缓修复、不阻塞其他功能交付；决定见任务 acceptance.md。原“所有接口均可用”的目标尚未全部实现：iOS 26.4 与 27.0 模拟器中，年度周次 `weeksOfTheYear` 能保存/回读规则，却只查询到首次发生。绕过 MinisX 的直接 EventKit 对照也复现；正周次、负周次、有无 count、额外月份/年度日期筛选均未解决。尚无真机证据，不能推断所有真实 iPhone 都失败。
+> 
+> 涉及年度周次的 create/list 返回 warnings，Agent 必须向用户说明并核查后续日期。不得把规则保存成功或存在 recurrenceRules 当作重复生效。测试保留此项失败断言；未跳过、未改成预期失败。按用户确认的范围，本次交付验收完成；该决定不等于年度周次已可用或整套测试全通过。
+> 
+

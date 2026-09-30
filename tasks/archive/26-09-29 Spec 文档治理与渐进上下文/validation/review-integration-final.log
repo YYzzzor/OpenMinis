@@ -1,0 +1,6 @@
+COMMAND: python3 -B scripts/harness/review.py prepare --repo /Users/huyuanzhao/Coding/Projects/OpenMinis --base HEAD --task 'tasks/active/26-09-29 Spec 文档治理与渐进上下文/task.md' --output /tmp/minisx-spec-validation/review-after --spec-section 'docs/specs/resource-efficiency.md::资源开销与性能审查规范 > 适用范围与原则' --exclude deps/ish --exclude deps/proot
+EXIT: 0
+OUTPUT: 1aa0460e60d0dde0e692699a120376b2cae6ea6533d5e67f6d2615611e2f1b89
+COMMAND: python3 -B scripts/harness/review.py check /tmp/minisx-spec-validation/review-after --repo /Users/huyuanzhao/Coding/Projects/OpenMinis
+EXIT: 0
+OUTPUT: 1aa0460e60d0dde0e692699a120376b2cae6ea6533d5e67f6d2615611e2f1b89

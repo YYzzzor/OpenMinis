@@ -1,0 +1,7 @@
+COMMAND: python3 -B -m unittest discover -s scripts/harness -p test_spec_context.py
+EXIT: 0
+..........
+----------------------------------------------------------------------
+Ran 10 tests in 0.007s
+
+OK

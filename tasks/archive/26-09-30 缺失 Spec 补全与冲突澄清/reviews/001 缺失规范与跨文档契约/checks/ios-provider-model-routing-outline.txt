@@ -1,0 +1,22 @@
+### Spec: docs/specs/ios-provider-model-routing.md
+Description: MinisX iOS Provider 实例、模型条目、会话绑定、模型组路由、fallback、凭证与实际用量身份规范。
+Source SHA-256: a00c7caab19dc5b3a48c2211d0f08c7f0a9f98d432e07f2ef90cbb59f7c794d9
+Route (ATX headings; indentation shows parent sections):
+- MinisX iOS Provider 与模型路由 (lines 5-109; 本次未展开)
+  - 身份模型 (lines 11-19; 本次未展开)
+  - 可用性与凭证 (lines 20-27; 本次未展开)
+  - 直接绑定和组绑定 (lines 28-33; 本次未展开)
+  - 初始路由 (lines 34-45; 本次未展开)
+    - Fallback 组 (lines 36-39; 本次未展开)
+    - Load-balance 组 (lines 40-45; 本次未展开)
+  - 错误重试与 fallback (lines 46-61; 本次未展开)
+  - 配置变化和用量归因 (lines 62-78; 本次未展开)
+  - 同步冲突与删除 (lines 79-82; 本次未展开)
+  - 场景与验收 (lines 83-104; 本次未展开)
+    - 场景 A：两个同名模型来自不同账号 (lines 85-88; 本次未展开)
+    - 场景 B：组首成员缺凭证 (lines 89-92; 本次未展开)
+    - 场景 C：limited 策略遇到网络错误 (lines 93-96; 本次未展开)
+    - 场景 D：always 策略遇到任意错误 (lines 97-100; 本次未展开)
+    - 场景 E：请求期间修改配置 (lines 101-104; 本次未展开)
+  - 待验证与待确认 (lines 105-109; 本次未展开)
+

@@ -1,0 +1,3 @@
+COMMAND: python3 -B scripts/harness/spec_context.py index --check
+EXIT: 0
+Spec index is current: docs/specs/index.md

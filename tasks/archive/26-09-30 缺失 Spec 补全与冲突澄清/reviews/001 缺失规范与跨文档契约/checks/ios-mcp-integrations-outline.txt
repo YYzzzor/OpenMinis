@@ -1,0 +1,17 @@
+### Spec: docs/specs/ios-mcp-integrations.md
+Description: MinisX iOS MCP 的配置身份、HTTP与STDIO调用、发现启停、OAuth与凭证、重试取消及同步备份边界；用于外部工具集成维护。
+Source SHA-256: 39044b4ab8d876d0287727131b8fb608b63c46d02b3cbe42000beebc0552744d
+Route (ATX headings; indentation shows parent sections):
+- MinisX iOS MCP 集成 (lines 5-91; 本次未展开)
+  - 范围、状态与来源 (lines 9-14; 本次未展开)
+  - 配置身份、导入与文件 (lines 15-22; 本次未展开)
+  - 发现、全局启停与会话覆盖 (lines 23-34; 本次未展开)
+    - 启停不是统一执行许可 (lines 29-34; 本次未展开)
+  - 握手、工具列表与调用 (lines 35-42; 本次未展开)
+  - 凭证、OAuth与分享 (lines 43-58; 本次未展开)
+    - 内联凭证与同步备份例外 (lines 53-58; 本次未展开)
+  - 超时、重试与取消边界 (lines 59-66; 本次未展开)
+  - 资源生命周期与同步 (lines 67-72; 本次未展开)
+  - 场景与验收 (lines 73-86; 本次未展开)
+  - 证据与待维护者决定 (lines 87-91; 本次未展开)
+

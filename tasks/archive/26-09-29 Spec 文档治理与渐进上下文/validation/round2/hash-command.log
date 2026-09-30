@@ -1,0 +1,2 @@
+command: /usr/bin/shasum -a 256 scripts/harness/spec_context.py scripts/harness/test_spec_context.py
+exit status: 0

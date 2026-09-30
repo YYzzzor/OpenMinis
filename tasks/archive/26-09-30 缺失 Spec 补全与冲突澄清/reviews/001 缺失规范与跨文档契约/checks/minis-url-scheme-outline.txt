@@ -1,0 +1,26 @@
+### Spec: docs/specs/minis-url-scheme.md
+Description: minis:// 资源地址与应用导航的双重契约，覆盖会话隔离、全局目录、外部挂载、渲染、深链和路径安全。
+Source SHA-256: 4ab1637f3bf64f5b8aa78efb769031d2260a1d08b7fc5e15ef53fbba112a435c
+Route (ATX headings; indentation shows parent sections):
+- Minis URL Contract (lines 5-166; 本次未展开)
+  - 适用范围与来源 (lines 11-22; 本次未展开)
+  - 两类 URL (lines 23-49; 本次未展开)
+    - 资源 URL (lines 25-37; 本次未展开)
+    - 导航 URL (lines 38-49; 本次未展开)
+  - 资源作用域 (lines 50-80; 本次未展开)
+    - 会话资源 (lines 52-68; 本次未展开)
+    - 全局资源 (lines 69-74; 本次未展开)
+    - 用户挂载资源 (lines 75-80; 本次未展开)
+  - iSH 与 Host 路由 (lines 81-92; 本次未展开)
+  - 路径安全契约 (lines 93-104; 本次未展开)
+  - 工具结果与聊天渲染 (lines 105-112; 本次未展开)
+  - 导航路由 (lines 113-127; 本次未展开)
+  - 已知实现偏差 (lines 128-139; 本次未展开)
+    - 请求预算解析仍会跨会话扫描 (lines 130-139; 本次未展开)
+  - 场景与验收 (lines 140-166; 本次未展开)
+    - 场景 A：两个会话有同名附件 (lines 142-147; 本次未展开)
+    - 场景 B：全局 skill 在多个会话引用 (lines 148-153; 本次未展开)
+    - 场景 C：外部只读挂载 (lines 154-159; 本次未展开)
+    - 场景 D：导航与资源不混淆 (lines 160-163; 本次未展开)
+    - 场景 E：路径逃逸 (lines 164-166; 本次未展开)
+

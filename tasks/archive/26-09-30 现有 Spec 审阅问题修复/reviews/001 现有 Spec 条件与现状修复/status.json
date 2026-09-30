@@ -1,0 +1,23 @@
+{
+  "request": "001 现有 Spec 条件与现状修复",
+  "status": "reviewed",
+  "conclusion": "no_findings",
+  "model": "gpt-6-astra",
+  "reasoning_effort": "medium",
+  "findings": [],
+  "resolved_ids": [
+    "S01",
+    "S02",
+    "S03",
+    "S04",
+    "S05",
+    "S06",
+    "S07",
+    "S08",
+    "S09",
+    "S10",
+    "H01",
+    "H02"
+  ],
+  "scope": "documents only; no product/runtime acceptance"
+}

@@ -1,0 +1,42 @@
+### Spec: docs/specs/ios-tool-permissions-and-side-effects.md
+Description: iOS Agent 工具的系统授权、App 许可、操作确认、副作用分级、拒绝语义及已知间接调用缺口。
+Source SHA-256: fa29eed5ff6c8639db4965c0c9333d4dc1bafc02929a7871a7983b06fc586419
+Route (ATX headings; indentation shows parent sections):
+- iOS Tool Permissions and Side Effects (lines 5-132; 本次部分展开)
+  - 核心原则：三层授权不可互相替代 (lines 11-26; 本次未展开)
+  - App 工具许可 (lines 27-48; 本次未展开)
+    - 当前级别 (lines 29-42; 本次未展开)
+    - 当前可配置范围 (lines 43-48; 本次未展开)
+  - 命令匹配与已知缺口 (lines 49-66; 本次未展开)
+  - Skill、Memory与MCP的开关例外 (lines 67-74; 本次已展开)
+  - 副作用分级 (lines 75-89; 本次未展开)
+  - 拒绝、超时和错误语义 (lines 90-97; 本次未展开)
+  - 场景与验收 (lines 98-129; 本次未展开)
+    - 场景 A：Ask Once 的会话范围 (lines 100-105; 本次未展开)
+    - 场景 B：Not Allowed 优先拒绝 (lines 106-111; 本次未展开)
+    - 场景 C：系统权限仍可拒绝 (lines 112-117; 本次未展开)
+    - 场景 D：间接调用缺口 (lines 118-123; 本次未展开)
+    - 场景 E：有副作用命令的重复响应 (lines 124-129; 本次未展开)
+  - 维护要求与证据边界 (lines 130-132; 本次未展开)
+Returned body:
+Lines 1-10 (source text):
+> ---
+> description: iOS Agent 工具的系统授权、App 许可、操作确认、副作用分级、拒绝语义及已知间接调用缺口。
+> ---
+> 
+> # iOS Tool Permissions and Side Effects
+> 
+> 导航：[Spec 索引](index.md)；章节目录由[上下文工具](../harness/spec-context.md#受控阅读入口)从本文标题生成。
+> 
+> 状态：现行安全规范与当前实现并列记录。本文适用于 shell/offload、文件、设备数据、系统动作、配置和外部服务工具；具体数据类型能力另见 [iOS 设备数据能力](ios-device-data-capabilities.md)。
+> 
+Lines 67-74 (source text):
+> ## Skill、Memory与MCP的开关例外
+> 
+> App工具许可针对当前可识别原生offload，不能自动推导为所有普通文件、Skill脚本或远端MCP工具逐项许可。Skill/MCP会话启停主要控制发现信息；Memory开关控制自动背景注入与专用读写工具，不构成一般文件访问隔离。它们均不能替代本规范的操作级确认、目标检查和安全重试要求。
+> 
+> 已知MCP差异：[daemon](../../src/ios/default_mount/usr/local/lib/minis-mcp-cli/daemon.py)对TIMEOUT/STDIO_CRASH自动重试一次，作用于tools/call且不判断幂等；HTTP还有重连/401路径。外部工具若已提交副作用而响应丢失，可能被重放，不能声称当前所有工具都满足下文安全重试要求。会话关闭和全局关闭的warm连接检查同样存在缺口，详见[MCP执行门禁](ios-mcp-integrations.md#启停不是统一执行许可)和[超时重试](ios-mcp-integrations.md#超时重试与取消边界)。
+> 
+> Memory提示中GLOBAL“只读”与明确授权文件编辑、/memory“读取不受影响”与专用读取门禁的冲突，见[Memory规范](ios-memory-lifecycle.md#默认值会话开关与生效时点)。本轮修正文档不会授予额外访问、替代维护者决定或修复上述代码缺口。
+> 
+

@@ -1,0 +1,19 @@
+Source: /tmp/minisx-spec-validation-round2/horizontal-rule.md
+Heading: Spec > A
+Source SHA-256: c6de3db0567902c1ad206d7851e6fff417d12de0f753d2444d06a2cd7560e2c3
+
+Lines 1-1 (preamble):
+
+> ---
+
+Lines 2-2 (ancestor introduction):
+
+> # Spec
+
+Lines 3-4 (selected subtree):
+
+> ## A
+> Body
+
+command: /usr/bin/python3 -B scripts/harness/spec_context.py read '/tmp/minisx-spec-validation-round2/horizontal-rule.md::Spec > A'
+exit status: 0

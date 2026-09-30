@@ -1,0 +1,51 @@
+### Spec: docs/specs/ios-sync-and-conflict-resolution.md
+Description: MinisX iOS 同步的启停、记录与文件生命周期、冲突合并、删除防复活、离线恢复和当前限制。
+Source SHA-256: b5cb5867329351a80f964255ead170f3ed5bfd8c5379c9c27bdf82295c3f8f6e
+Route (ATX headings; indentation shows parent sections):
+- MinisX iOS 同步与冲突处理 (lines 5-126; 本次部分展开)
+  - 范围和术语 (lines 11-19; 本次未展开)
+  - 启停、离线与发送 (lines 20-40; 本次未展开)
+  - 记录兼容与冲突规则 (lines 41-51; 本次未展开)
+  - 上传类别与范围 (lines 52-69; 本次部分展开)
+    - Memory合并与删除例外 (lines 60-65; 本次已展开)
+    - Skill与MCP的配置范围 (lines 66-69; 本次未展开)
+  - 删除与防复活 (lines 70-85; 本次未展开)
+    - 本地删除 (lines 72-77; 本次未展开)
+    - 远端删除 (lines 78-85; 本次未展开)
+  - 全量拉取和对账限制 (lines 86-91; 本次未展开)
+  - 用户可见状态与恢复 (lines 92-97; 本次未展开)
+  - 场景与验收 (lines 98-121; 本次未展开)
+    - 场景 A：离线修改后恢复网络 (lines 100-105; 本次未展开)
+    - 场景 B：两台设备修改同一记录 (lines 106-109; 本次未展开)
+    - 场景 C：设备 A 删除会话，设备 B 仍持有旧副本 (lines 110-113; 本次未展开)
+    - 场景 D：用户关闭某同步类别 (lines 114-117; 本次未展开)
+    - 场景 E：full fetch 返回部分结果 (lines 118-121; 本次未展开)
+  - 待验证与待确认 (lines 122-126; 本次未展开)
+Returned body:
+Lines 1-10 (source text):
+> ---
+> description: MinisX iOS 同步的启停、记录与文件生命周期、冲突合并、删除防复活、离线恢复和当前限制。
+> ---
+> 
+> # MinisX iOS 同步与冲突处理
+> 
+> 导航：[Spec 索引](index.md)；Provider 配置的业务语义见 [iOS Provider 与模型路由](ios-provider-model-routing.md)；备份恢复不属于同步，见 [iOS 备份与恢复](ios-backup-restore.md)。
+> 
+> 状态：现行数据安全约定与 2026-09-29 当前实现并列记录。源码核查覆盖 [SyncCore.swift](../../src/ios/Agent/Sync/V2/SyncCore.swift)、[PortableRecord.swift](../../src/ios/Agent/Sync/V2/PortableRecord.swift)、[UploadPolicy.swift](../../src/ios/Agent/Sync/V2/UploadPolicy.swift)、[ChatStoreSyncHydrators.swift](../../src/ios/Agent/Sync/V2/ChatStoreSyncHydrators.swift)、[TombstoneManager.swift](../../src/ios/Agent/Sync/V2/TombstoneManager.swift) 和 [ChatStore.swift](../../src/ios/Agent/Chat/ChatStore.swift)。本轮没有连接 iCloud 或运行多设备验证。
+> 
+Lines 52-65 (source text):
+> ## 上传类别与范围
+> 
+> 当前策略类别包括会话、会话文件、Skills、Provider、环境变量和 Memory，默认开启。已知类型在 [UploadPolicy.swift](../../src/ios/Agent/Sync/V2/UploadPolicy.swift) 映射到类别；入站 merger 和 deletion applier 使用同一 gate。
+> 
+> 当前实现对未知 record type 选择允许通过并记录警告。这是前向兼容取舍，不是已证明安全的默认：新增类型必须补充类别归属和测试，否则可能绕过用户预期的分类开关。单个同步文件当前默认上限为 1 MB；超过限制必须产生可观察跳过/错误，不能静默声称已同步。
+> 
+> Provider V3 同步记录包含实例、模型条目、模型组和 thinking rule。凭证可用性是设备侧运行前提；元数据同步成功不保证另一台设备已有可用 Keychain/OAuth 状态。
+> 
+> ### Memory合并与删除例外
+> 
+> 当前[V2 hydrators](../../src/ios/Agent/Sync/V2/ChatStoreSyncHydrators.swift)对GLOBAL文件采用mtime LWW，对每日日志采用时间标记条目并集，同时间不同内容有保留双方的路径。日志不是通用整文件LWW；不能将远端缺少条目解释为删除。
+> 
+> MemoryGlobalV2和MemoryDailyV2当前未注册deletionApplier，[SyncCoreHydrators](../../src/ios/Agent/Sync/V2/SyncCoreHydrators.swift)的无处理器fallback保持本地内容。GLOBAL为空或缺失时builder返回nil；设置页删日志和撤销写入也没有完整的Memory删除传播路径。因此下文会话/单记录防复活机制不得自动套用于Memory；本地清空、撤销或删除不保证其他设备删除或旧内容不再回流。作用域、编辑与验收见[Memory生命周期](ios-memory-lifecycle.md#同步合并与防复活缺口)，条目删除、整文件删除与恢复旧备份的产品语义仍待决定。
+> 
+

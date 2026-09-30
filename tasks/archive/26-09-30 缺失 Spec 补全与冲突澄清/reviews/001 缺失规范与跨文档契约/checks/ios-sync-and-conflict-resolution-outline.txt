@@ -1,0 +1,24 @@
+### Spec: docs/specs/ios-sync-and-conflict-resolution.md
+Description: MinisX iOS 同步的启停、记录与文件生命周期、冲突合并、删除防复活、离线恢复和当前限制。
+Source SHA-256: b5cb5867329351a80f964255ead170f3ed5bfd8c5379c9c27bdf82295c3f8f6e
+Route (ATX headings; indentation shows parent sections):
+- MinisX iOS 同步与冲突处理 (lines 5-126; 本次未展开)
+  - 范围和术语 (lines 11-19; 本次未展开)
+  - 启停、离线与发送 (lines 20-40; 本次未展开)
+  - 记录兼容与冲突规则 (lines 41-51; 本次未展开)
+  - 上传类别与范围 (lines 52-69; 本次未展开)
+    - Memory合并与删除例外 (lines 60-65; 本次未展开)
+    - Skill与MCP的配置范围 (lines 66-69; 本次未展开)
+  - 删除与防复活 (lines 70-85; 本次未展开)
+    - 本地删除 (lines 72-77; 本次未展开)
+    - 远端删除 (lines 78-85; 本次未展开)
+  - 全量拉取和对账限制 (lines 86-91; 本次未展开)
+  - 用户可见状态与恢复 (lines 92-97; 本次未展开)
+  - 场景与验收 (lines 98-121; 本次未展开)
+    - 场景 A：离线修改后恢复网络 (lines 100-105; 本次未展开)
+    - 场景 B：两台设备修改同一记录 (lines 106-109; 本次未展开)
+    - 场景 C：设备 A 删除会话，设备 B 仍持有旧副本 (lines 110-113; 本次未展开)
+    - 场景 D：用户关闭某同步类别 (lines 114-117; 本次未展开)
+    - 场景 E：full fetch 返回部分结果 (lines 118-121; 本次未展开)
+  - 待验证与待确认 (lines 122-126; 本次未展开)
+

@@ -1,0 +1,7 @@
+COMMAND: python3 -B -m unittest discover -s scripts/harness -p 'test_review.py' (require_escalated; isolated temporary repositories)
+EXIT: 0
+...............s................
+----------------------------------------------------------------------
+Ran 32 tests in 16.181s
+
+OK (skipped=1)

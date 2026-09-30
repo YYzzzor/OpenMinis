@@ -1,0 +1,22 @@
+{
+  "head": "272da5d9bb8051c82075513df9a395344d4e7f6b",
+  "branch": "main",
+  "documents": {
+    "docs/specs/index.md": "ef9da1cd6d6545122367c6dea5da70623448861475b61e1f392624beb2723ef3",
+    "docs/specs/ios-agent-run-lifecycle.md": "c43eebf040f3c797a70d0baf96a25d9f13e5ffabbf24f8e1b5b13812199788eb",
+    "docs/specs/ios-backup-restore.md": "de449d14967cd857d3c48777b2c01720ebf5664bd623bdde1286a9ccf8d5899d",
+    "docs/specs/ios-mcp-integrations.md": "4dea670918324b83704b181a9de5dcbd664e8fda4a8ebbb0bdd6f26da197e214",
+    "docs/specs/ios-memory-lifecycle.md": "f64e23831a111dab3143523824bd081c994f00f012eb1c268ce373b1be2e633a",
+    "docs/specs/ios-provider-model-routing.md": "a00c7caab19dc5b3a48c2211d0f08c7f0a9f98d432e07f2ef90cbb59f7c794d9",
+    "docs/specs/ios-sandbox-ish-summary.md": "d0c7a3c12befbb6e38ff1b677219db150640a051faa28b94dfcd0f04381b92fd",
+    "docs/specs/ios-skills-lifecycle.md": "487ca5e5bde064519f837d0a0fc6d3e9d015e7709a0b9b83568f92e5682160d6",
+    "docs/specs/ios-sync-and-conflict-resolution.md": "56c48e899e8c46f927c756eaa59c5b701e6c1cd35312286e2bde07284d538c81",
+    "docs/specs/ios-tool-permissions-and-side-effects.md": "fa29eed5ff6c8639db4965c0c9333d4dc1bafc02929a7871a7983b06fc586419",
+    "docs/specs/ios-usage-cost-and-balance.md": "8bfdb1efec7aaf760b9d6a8eeaed14bdf7e66f3f8a327d408d46a447bb7c0a06",
+    "docs/specs/minis-url-scheme.md": "4ab1637f3bf64f5b8aa78efb769031d2260a1d08b7fc5e15ef53fbba112a435c"
+  },
+  "fixed_documents_and_sources_match": 94,
+  "protected_file_bytes_match": 43,
+  "unrelated_status_entries_preserved": 190,
+  "unverified": "no product builds/tests/device/network/service/price verification"
+}

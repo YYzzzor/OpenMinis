@@ -1,0 +1,12 @@
+{
+  "request": "missing-specs-2026-09-30-002",
+  "review_status": "complete",
+  "R1": "resolved",
+  "R2": "resolved",
+  "R3": "resolved",
+  "R4": "resolved",
+  "R5": "resolved",
+  "new_findings": [],
+  "main_acceptance": "documentation acceptance complete; runtime and product decisions excluded",
+  "report_sha256": "ce26c290417350ef5011a77501e7f74824ebb0dc2c1d863c1fc8866ef1f0f937"
+}

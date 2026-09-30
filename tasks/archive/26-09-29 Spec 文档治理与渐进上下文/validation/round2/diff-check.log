@@ -1,0 +1,3 @@
+command: git diff --check -- scripts/harness/spec_context.py scripts/harness/test_spec_context.py
+output: empty
+exit status: 0

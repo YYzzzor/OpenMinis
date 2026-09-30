@@ -1,0 +1,16 @@
+### Spec: docs/specs/ios-usage-cost-and-balance.md
+Description: MinisX iOS 上下文占用、token累计、请求费用账本与账户余额的定义、身份归因、未知状态、持久化和资源边界；用于统计与费用展示变更。
+Source SHA-256: 101cfc460a367038779f1ad2ccfab2f078b58a3488ffcdd711b2db84a6e857da
+Route (ATX headings; indentation shows parent sections):
+- MinisX iOS 用量、费用与余额 (lines 5-91; 本次未展开)
+  - 范围、状态与来源 (lines 9-14; 本次未展开)
+  - 四种数值不能互相推导 (lines 15-25; 本次未展开)
+  - 请求用量与上下文快照 (lines 26-33; 本次未展开)
+  - 会话账本与未知状态 (lines 34-43; 本次未展开)
+  - 价格快照与适用范围 (lines 44-51; 本次未展开)
+  - 账户余额、鉴权与缓存 (lines 52-59; 本次未展开)
+  - 展示与持久化边界 (lines 60-67; 本次未展开)
+  - 资源边界 (lines 68-71; 本次未展开)
+  - 场景与验收 (lines 72-86; 本次未展开)
+  - 测试入口与未决事项 (lines 87-91; 本次未展开)
+

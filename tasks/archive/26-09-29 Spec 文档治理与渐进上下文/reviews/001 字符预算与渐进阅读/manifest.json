@@ -1,0 +1,527 @@
+{
+  "artifacts": {
+    "patches/base-to-worktree.patch": {
+      "executable": false,
+      "sha256": "e1b87570f6be6d6ad89c9ee2c241c2df775a82a1622a46a8d4586c9b1593447c"
+    },
+    "patches/staged.patch": {
+      "executable": false,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "patches/unstaged.patch": {
+      "executable": false,
+      "sha256": "e1b87570f6be6d6ad89c9ee2c241c2df775a82a1622a46a8d4586c9b1593447c"
+    },
+    "request.md": "2d0602f51f853f6393bfbf8505e1ccf31df8cd02a830ec615cb375f3ad1916f1",
+    "requirements/docs/harness/spec-authoring.md": {
+      "executable": false,
+      "sha256": "265db6098874e37633c2c8775765de2dbdbfebc27f7a74699f7ab5530508bb2d"
+    },
+    "requirements/docs/harness/spec-context.md": {
+      "executable": false,
+      "sha256": "b20d7b0dc0c642881e98b79504693ae20af402ddf9424863f3a208c0b514d0ce"
+    },
+    "requirements/docs/specs/resource-efficiency.md": {
+      "executable": false,
+      "sha256": "63ac0c5ba934c17d061bafd625dfdafe7a2a4277e99a8fde5ef84346fabf7235"
+    },
+    "requirements/tasks/active/26-09-29 Spec 文档治理与渐进上下文/reviews/001 字符预算与渐进阅读/scope.md": {
+      "executable": false,
+      "sha256": "cd2beba34059ce58c8acefef674adc3b29e6d2ea492dc206df712a90510f9443"
+    },
+    "requirements/tasks/active/26-09-29 Spec 文档治理与渐进上下文/task.md": {
+      "executable": false,
+      "sha256": "a41c50274c861e8d76cd10493bc80601c1b35dff517c088cef53a09f09ade221"
+    },
+    "snapshot/.agents/skills/archive-task/SKILL.md": {
+      "executable": false,
+      "sha256": "098dab66d23d73c6612cc72f24459ebc4eadb1f2218c1243ba82ac2eb9c62c20"
+    },
+    "snapshot/.agents/skills/plan-task/SKILL.md": {
+      "executable": false,
+      "sha256": "4e511f074c57eb7e13c5ac946b8da94a6764bf2f97fae813ae832a7523f4341b"
+    },
+    "snapshot/.agents/skills/resume-task/SKILL.md": {
+      "executable": false,
+      "sha256": "51920f315a10bdd7821ddea28c1857fa90365cc16015b049a42204020324476f"
+    },
+    "snapshot/.agents/skills/review-task/SKILL.md": {
+      "executable": false,
+      "sha256": "644bee8c1cedde696ce8367880bf3d0b3e93a49e572bf2d3c255c30c661035df"
+    },
+    "snapshot/.gitignore": {
+      "executable": false,
+      "sha256": "cfd384a62e87b135c98a92847ce2ceae07b3c26dd1fb4cf3712e1aa89f472775"
+    },
+    "snapshot/.gitmodules": {
+      "executable": false,
+      "sha256": "0a628ca38bb6aa52f8f97913f7e04359e3fe04ad5a63e82a04238a8c594a79f5"
+    },
+    "snapshot/.ignore": {
+      "executable": false,
+      "sha256": "05c5e9f1041b0b2c81a1afb0c26dac765fa560be35de96cc68c81979611ccbf9"
+    },
+    "snapshot/AGENTS.md": {
+      "executable": false,
+      "sha256": "38ec1deffeaf96314276f0d5ed511a1e38feeca4b562494c87f43934581a960d"
+    },
+    "snapshot/BUILDING.md": {
+      "executable": false,
+      "sha256": "ba84038deafbe82bfe1bf9c7397f2ff6438b56bf0212599a13f027923949fbb9"
+    },
+    "snapshot/CONTRIBUTING.md": {
+      "executable": false,
+      "sha256": "d9d52c8142fa5fd141ab971bdf360fc1380f749e0aecff8c3d24f47a736c13fc"
+    },
+    "snapshot/LICENSE": {
+      "executable": false,
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+    },
+    "snapshot/README.md": {
+      "executable": false,
+      "sha256": "52700d72f578ed77363b1ad8969357fd7e7d15dd7b2f062b540f3dc79728dc62"
+    },
+    "snapshot/THIRD_PARTY_LICENSES.md": {
+      "executable": false,
+      "sha256": "7998ec155c04ff96d87d4f2cd1f594f5c3bd7447c729351249c2471ccafdeae9"
+    },
+    "snapshot/docs/harness/code-guidance.md": {
+      "executable": false,
+      "sha256": "825c27fc0208901153631c3823bee44f0e0ca246c2a83b3aae2cd4ee0772ba41"
+    },
+    "snapshot/docs/harness/collaboration.md": {
+      "executable": false,
+      "sha256": "110d87927975d2b83cbe502c3c1f3c9c1bfd725d25daea7794d0d54020605878"
+    },
+    "snapshot/docs/harness/design.md": {
+      "executable": false,
+      "sha256": "7a522f4739889a2d2766bb0597d99a8f546095d514a3a032670d96f937346bda"
+    },
+    "snapshot/docs/harness/operations.md": {
+      "executable": false,
+      "sha256": "5e9e6d8b84cf5d9685c4d63e80718d710fe11abb611bc97f1c86ddaf636b9df9"
+    },
+    "snapshot/docs/harness/record-formats.md": {
+      "executable": false,
+      "sha256": "617bd7314eedff9357a0853bc72c087604106fa46c1e046dc3d9be44138eedcc"
+    },
+    "snapshot/docs/harness/skills-guide.md": {
+      "executable": false,
+      "sha256": "863d39bd10b3c5ba3e8517158d8cb00d29caaef200e94e48362d49f59b9f6425"
+    },
+    "snapshot/docs/harness/spec-authoring.md": {
+      "executable": false,
+      "sha256": "265db6098874e37633c2c8775765de2dbdbfebc27f7a74699f7ab5530508bb2d"
+    },
+    "snapshot/docs/harness/spec-context.md": {
+      "executable": false,
+      "sha256": "b20d7b0dc0c642881e98b79504693ae20af402ddf9424863f3a208c0b514d0ce"
+    },
+    "snapshot/docs/harness/validation.md": {
+      "executable": false,
+      "sha256": "d85e3b9ded6394326de94fd11b246e20ae2305f56a7a84154f8c561ee2b21ce5"
+    },
+    "snapshot/docs/specs/debug-server-api.md": {
+      "executable": false,
+      "sha256": "6b3ff8a7801a8524082e5b097c7506f2d483e57f02c477394bf1d2912cc0a426"
+    },
+    "snapshot/docs/specs/index.md": {
+      "executable": false,
+      "sha256": "548b0f3db0ea6feb13758541b572ba036e28dddbfeb6b4d0ddc69bb9beda151e"
+    },
+    "snapshot/docs/specs/ios-calendar-recurrence.md": {
+      "executable": false,
+      "sha256": "1158fd3589a1224f9d6ea248cdb8e06097b1941a27fcbd161398b2201ab200db"
+    },
+    "snapshot/docs/specs/ios-device-data-capabilities.md": {
+      "executable": false,
+      "sha256": "66ed3ce394162c710991598482f5b86bd5ea8655547301881a72563f89e6b76b"
+    },
+    "snapshot/docs/specs/ios-sandbox-ish-summary.md": {
+      "executable": false,
+      "sha256": "634377c003d02af126cf33ef70a9f4afe95cfee7d76e14d395daeaf84c00aa0b"
+    },
+    "snapshot/docs/specs/minis-url-scheme.md": {
+      "executable": false,
+      "sha256": "d9082c140e7947a8223800d2ec9b26b9e811b6fc57cc8a70ca19230460904ba1"
+    },
+    "snapshot/docs/specs/resource-efficiency.md": {
+      "executable": false,
+      "sha256": "63ac0c5ba934c17d061bafd625dfdafe7a2a4277e99a8fde5ef84346fabf7235"
+    },
+    "snapshot/scripts/add_locale.py": {
+      "executable": true,
+      "sha256": "a3a9bcf750eb0358871f5ff91376be694511fcfc99a03c7fae400c5f314f7140"
+    },
+    "snapshot/scripts/add_localization.py": {
+      "executable": true,
+      "sha256": "5ca4cbbaf38c348bda03042c65422675a439a1fd5de1d3eb16fa4d7fa4f211dd"
+    },
+    "snapshot/scripts/build_ios_simulator.sh": {
+      "executable": false,
+      "sha256": "f55166769b4c3fe1ae5ef22c027e27153189b8634abc7162508566f5d6b2eb5d"
+    },
+    "snapshot/scripts/check_locale_batch.py": {
+      "executable": true,
+      "sha256": "673e343a8a0b703e6818ca31da25224aaa571153a931468549c66a22d55c250a"
+    },
+    "snapshot/scripts/gen_debug_skill.sh": {
+      "executable": true,
+      "sha256": "789226795fecd9a068557a934303785f59e4c6c11ec325de7650c3862b3f4ddb"
+    },
+    "snapshot/scripts/gen_debug_skill_android.sh": {
+      "executable": true,
+      "sha256": "492822972e299184e28d6f21d707fa996f279f216874b00fcd3de7657137b0da"
+    },
+    "snapshot/scripts/harness/pre_tool_use_policy.py": {
+      "executable": false,
+      "sha256": "c976bf6dc4596ed711c4bfd59974314ddb6facf7786c5dfbfec2094f6fb490ab"
+    },
+    "snapshot/scripts/harness/review.py": {
+      "executable": false,
+      "sha256": "1be52d28dbdb9dd31f6e67edd5aaa3fe86a202fbe477b27f5c4767074c0175f9"
+    },
+    "snapshot/scripts/harness/spec_context.py": {
+      "executable": false,
+      "sha256": "f8d3efe9f8f96d58ed5b68019dcec0f26023869deac992e8dc5d783c1c2f14a6"
+    },
+    "snapshot/scripts/harness/task_state.py": {
+      "executable": false,
+      "sha256": "e6b27950311fcb119dc414fc5376b1ea6a6fa2c79dda6a4eb052a800abd79c48"
+    },
+    "snapshot/scripts/harness/test_pre_tool_use_policy.py": {
+      "executable": false,
+      "sha256": "0de73ab0d702f33fae6572fdd63e5a326f16fc58619f9d921fe1f0d78af08345"
+    },
+    "snapshot/scripts/harness/test_review.py": {
+      "executable": false,
+      "sha256": "9297f914f7505606348bb195031c2046e4fbfde869a9b50c33bf49c254fbd3fa"
+    },
+    "snapshot/scripts/harness/test_spec_context.py": {
+      "executable": false,
+      "sha256": "b69e964bdc10593697075339bb39900d0f7feaf9abab73ab6d6230e1d8384da5"
+    },
+    "snapshot/scripts/harness/test_task_state.py": {
+      "executable": false,
+      "sha256": "2fc110d1bb44945b3e6acfbdad4cba72aa90a938af213b57f8edce93cc3a1f79"
+    },
+    "snapshot/scripts/install_alpine.sh": {
+      "executable": true,
+      "sha256": "d3b4f9149ad934410a467efdd5c798b954f50f1795bd26772c6872492a68ffc9"
+    },
+    "snapshot/scripts/optimize_rootfs.sh": {
+      "executable": true,
+      "sha256": "6c27178347b715034645b75275437ce6351304cef68b91d886d951111e609872"
+    },
+    "snapshot/scripts/prepare_android_sandbox.sh": {
+      "executable": true,
+      "sha256": "03d23f865eff3d64ef51c972bb4592ef83bf1c61817660155b799135ec945b95"
+    },
+    "snapshot/scripts/prepare_rootfs.sh": {
+      "executable": true,
+      "sha256": "b894c88895705082d4a17826174ecb09d700b21bad4b116fefb81de2f30bb3a1"
+    },
+    "snapshot/scripts/register_locale.py": {
+      "executable": true,
+      "sha256": "a43a1ef2d1a9cb8b03f685d5bc40587e5e42836c15952897e815819a7e7b7a45"
+    },
+    "snapshot/scripts/symbolicate_hang.py": {
+      "executable": true,
+      "sha256": "3db8ac0e2ca154d228cf82bfad5507e5a2899585b4f1c5d1bbc2f0507b0231be"
+    },
+    "snapshot/scripts/test_compact_orphan_toolcall.swift": {
+      "executable": true,
+      "sha256": "8e4e738901c0dedb55508420249718a0967fdf78c68327d1d5ccf7b3b3520958"
+    },
+    "snapshot/scripts/test_ish_jit_fault_recovery.py": {
+      "executable": false,
+      "sha256": "44d4ace7cb531b4e5c992572a3521378ecd0dddc043be8c4dea581bad2768d26"
+    },
+    "snapshot/scripts/update_models_dev.sh": {
+      "executable": true,
+      "sha256": "7b1efd626eca2529f05b43ce4491ee4f108efff8e7ded16f71905cdecf02536f"
+    },
+    "snapshot/scripts/verify_models_dev_resolution.py": {
+      "executable": true,
+      "sha256": "3ae3237153794cd1cdb9e0e5644a604d5271eb796a0ce63703f93c6bc5ce6d4a"
+    },
+    "snapshot/tasks/active/26-09-29 Spec 文档治理与渐进上下文/reviews/001 字符预算与渐进阅读/scope.md": {
+      "executable": false,
+      "sha256": "cd2beba34059ce58c8acefef674adc3b29e6d2ea492dc206df712a90510f9443"
+    },
+    "snapshot/tasks/active/26-09-29 Spec 文档治理与渐进上下文/task.md": {
+      "executable": false,
+      "sha256": "a41c50274c861e8d76cd10493bc80601c1b35dff517c088cef53a09f09ade221"
+    }
+  },
+  "repo": "/Users/huyuanzhao/Coding/Projects/OpenMinis",
+  "schema": 1,
+  "snapshot_id": "6211386033d344f9002373457bd8d0a5cf76d51d50d376d766d01ca39d91a436",
+  "spec_selections": [],
+  "state": {
+    "base": "272da5d9bb8051c82075513df9a395344d4e7f6b",
+    "branch": "main",
+    "excluded_gitlinks": {
+      "deps/ish": {
+        "index_commit": "3f6384c70eefd1a370f121d3492a5f21f7767df9",
+        "status": "",
+        "worktree": "3f6384c70eefd1a370f121d3492a5f21f7767df9"
+      },
+      "deps/proot": {
+        "index_commit": "8cf13e997cdc9472997aae19df8050c073c9a86c",
+        "worktree": "uninitialized"
+      }
+    },
+    "exclusions": [
+      ".agents/skills/ios-ui-design",
+      ".agents/skills/minisx-logo-design",
+      ".codex",
+      ".github",
+      "assets",
+      "build",
+      "deps",
+      "docs/architecture",
+      "docs/backup-streaming-package-design.md",
+      "docs/harness/evidence",
+      "docs/harness/proposals",
+      "docs/ish-bg-cpu-governor-design.md",
+      "docs/minisx-release-status.md",
+      "docs/minisx-testflight-release-draft.md",
+      "src"
+    ],
+    "files": {
+      ".agents/skills/archive-task/SKILL.md": {
+        "executable": false,
+        "sha256": "098dab66d23d73c6612cc72f24459ebc4eadb1f2218c1243ba82ac2eb9c62c20"
+      },
+      ".agents/skills/plan-task/SKILL.md": {
+        "executable": false,
+        "sha256": "4e511f074c57eb7e13c5ac946b8da94a6764bf2f97fae813ae832a7523f4341b"
+      },
+      ".agents/skills/resume-task/SKILL.md": {
+        "executable": false,
+        "sha256": "51920f315a10bdd7821ddea28c1857fa90365cc16015b049a42204020324476f"
+      },
+      ".agents/skills/review-task/SKILL.md": {
+        "executable": false,
+        "sha256": "644bee8c1cedde696ce8367880bf3d0b3e93a49e572bf2d3c255c30c661035df"
+      },
+      ".gitignore": {
+        "executable": false,
+        "sha256": "cfd384a62e87b135c98a92847ce2ceae07b3c26dd1fb4cf3712e1aa89f472775"
+      },
+      ".gitmodules": {
+        "executable": false,
+        "sha256": "0a628ca38bb6aa52f8f97913f7e04359e3fe04ad5a63e82a04238a8c594a79f5"
+      },
+      ".ignore": {
+        "executable": false,
+        "sha256": "05c5e9f1041b0b2c81a1afb0c26dac765fa560be35de96cc68c81979611ccbf9"
+      },
+      "AGENTS.md": {
+        "executable": false,
+        "sha256": "38ec1deffeaf96314276f0d5ed511a1e38feeca4b562494c87f43934581a960d"
+      },
+      "BUILDING.md": {
+        "executable": false,
+        "sha256": "ba84038deafbe82bfe1bf9c7397f2ff6438b56bf0212599a13f027923949fbb9"
+      },
+      "CONTRIBUTING.md": {
+        "executable": false,
+        "sha256": "d9d52c8142fa5fd141ab971bdf360fc1380f749e0aecff8c3d24f47a736c13fc"
+      },
+      "LICENSE": {
+        "executable": false,
+        "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+      },
+      "README.md": {
+        "executable": false,
+        "sha256": "52700d72f578ed77363b1ad8969357fd7e7d15dd7b2f062b540f3dc79728dc62"
+      },
+      "THIRD_PARTY_LICENSES.md": {
+        "executable": false,
+        "sha256": "7998ec155c04ff96d87d4f2cd1f594f5c3bd7447c729351249c2471ccafdeae9"
+      },
+      "docs/harness/code-guidance.md": {
+        "executable": false,
+        "sha256": "825c27fc0208901153631c3823bee44f0e0ca246c2a83b3aae2cd4ee0772ba41"
+      },
+      "docs/harness/collaboration.md": {
+        "executable": false,
+        "sha256": "110d87927975d2b83cbe502c3c1f3c9c1bfd725d25daea7794d0d54020605878"
+      },
+      "docs/harness/design.md": {
+        "executable": false,
+        "sha256": "7a522f4739889a2d2766bb0597d99a8f546095d514a3a032670d96f937346bda"
+      },
+      "docs/harness/operations.md": {
+        "executable": false,
+        "sha256": "5e9e6d8b84cf5d9685c4d63e80718d710fe11abb611bc97f1c86ddaf636b9df9"
+      },
+      "docs/harness/record-formats.md": {
+        "executable": false,
+        "sha256": "617bd7314eedff9357a0853bc72c087604106fa46c1e046dc3d9be44138eedcc"
+      },
+      "docs/harness/skills-guide.md": {
+        "executable": false,
+        "sha256": "863d39bd10b3c5ba3e8517158d8cb00d29caaef200e94e48362d49f59b9f6425"
+      },
+      "docs/harness/spec-authoring.md": {
+        "executable": false,
+        "sha256": "265db6098874e37633c2c8775765de2dbdbfebc27f7a74699f7ab5530508bb2d"
+      },
+      "docs/harness/spec-context.md": {
+        "executable": false,
+        "sha256": "b20d7b0dc0c642881e98b79504693ae20af402ddf9424863f3a208c0b514d0ce"
+      },
+      "docs/harness/validation.md": {
+        "executable": false,
+        "sha256": "d85e3b9ded6394326de94fd11b246e20ae2305f56a7a84154f8c561ee2b21ce5"
+      },
+      "docs/specs/debug-server-api.md": {
+        "executable": false,
+        "sha256": "6b3ff8a7801a8524082e5b097c7506f2d483e57f02c477394bf1d2912cc0a426"
+      },
+      "docs/specs/index.md": {
+        "executable": false,
+        "sha256": "548b0f3db0ea6feb13758541b572ba036e28dddbfeb6b4d0ddc69bb9beda151e"
+      },
+      "docs/specs/ios-calendar-recurrence.md": {
+        "executable": false,
+        "sha256": "1158fd3589a1224f9d6ea248cdb8e06097b1941a27fcbd161398b2201ab200db"
+      },
+      "docs/specs/ios-device-data-capabilities.md": {
+        "executable": false,
+        "sha256": "66ed3ce394162c710991598482f5b86bd5ea8655547301881a72563f89e6b76b"
+      },
+      "docs/specs/ios-sandbox-ish-summary.md": {
+        "executable": false,
+        "sha256": "634377c003d02af126cf33ef70a9f4afe95cfee7d76e14d395daeaf84c00aa0b"
+      },
+      "docs/specs/minis-url-scheme.md": {
+        "executable": false,
+        "sha256": "d9082c140e7947a8223800d2ec9b26b9e811b6fc57cc8a70ca19230460904ba1"
+      },
+      "docs/specs/resource-efficiency.md": {
+        "executable": false,
+        "sha256": "63ac0c5ba934c17d061bafd625dfdafe7a2a4277e99a8fde5ef84346fabf7235"
+      },
+      "scripts/add_locale.py": {
+        "executable": true,
+        "sha256": "a3a9bcf750eb0358871f5ff91376be694511fcfc99a03c7fae400c5f314f7140"
+      },
+      "scripts/add_localization.py": {
+        "executable": true,
+        "sha256": "5ca4cbbaf38c348bda03042c65422675a439a1fd5de1d3eb16fa4d7fa4f211dd"
+      },
+      "scripts/build_ios_simulator.sh": {
+        "executable": false,
+        "sha256": "f55166769b4c3fe1ae5ef22c027e27153189b8634abc7162508566f5d6b2eb5d"
+      },
+      "scripts/check_locale_batch.py": {
+        "executable": true,
+        "sha256": "673e343a8a0b703e6818ca31da25224aaa571153a931468549c66a22d55c250a"
+      },
+      "scripts/gen_debug_skill.sh": {
+        "executable": true,
+        "sha256": "789226795fecd9a068557a934303785f59e4c6c11ec325de7650c3862b3f4ddb"
+      },
+      "scripts/gen_debug_skill_android.sh": {
+        "executable": true,
+        "sha256": "492822972e299184e28d6f21d707fa996f279f216874b00fcd3de7657137b0da"
+      },
+      "scripts/harness/pre_tool_use_policy.py": {
+        "executable": false,
+        "sha256": "c976bf6dc4596ed711c4bfd59974314ddb6facf7786c5dfbfec2094f6fb490ab"
+      },
+      "scripts/harness/review.py": {
+        "executable": false,
+        "sha256": "1be52d28dbdb9dd31f6e67edd5aaa3fe86a202fbe477b27f5c4767074c0175f9"
+      },
+      "scripts/harness/spec_context.py": {
+        "executable": false,
+        "sha256": "f8d3efe9f8f96d58ed5b68019dcec0f26023869deac992e8dc5d783c1c2f14a6"
+      },
+      "scripts/harness/task_state.py": {
+        "executable": false,
+        "sha256": "e6b27950311fcb119dc414fc5376b1ea6a6fa2c79dda6a4eb052a800abd79c48"
+      },
+      "scripts/harness/test_pre_tool_use_policy.py": {
+        "executable": false,
+        "sha256": "0de73ab0d702f33fae6572fdd63e5a326f16fc58619f9d921fe1f0d78af08345"
+      },
+      "scripts/harness/test_review.py": {
+        "executable": false,
+        "sha256": "9297f914f7505606348bb195031c2046e4fbfde869a9b50c33bf49c254fbd3fa"
+      },
+      "scripts/harness/test_spec_context.py": {
+        "executable": false,
+        "sha256": "b69e964bdc10593697075339bb39900d0f7feaf9abab73ab6d6230e1d8384da5"
+      },
+      "scripts/harness/test_task_state.py": {
+        "executable": false,
+        "sha256": "2fc110d1bb44945b3e6acfbdad4cba72aa90a938af213b57f8edce93cc3a1f79"
+      },
+      "scripts/install_alpine.sh": {
+        "executable": true,
+        "sha256": "d3b4f9149ad934410a467efdd5c798b954f50f1795bd26772c6872492a68ffc9"
+      },
+      "scripts/optimize_rootfs.sh": {
+        "executable": true,
+        "sha256": "6c27178347b715034645b75275437ce6351304cef68b91d886d951111e609872"
+      },
+      "scripts/prepare_android_sandbox.sh": {
+        "executable": true,
+        "sha256": "03d23f865eff3d64ef51c972bb4592ef83bf1c61817660155b799135ec945b95"
+      },
+      "scripts/prepare_rootfs.sh": {
+        "executable": true,
+        "sha256": "b894c88895705082d4a17826174ecb09d700b21bad4b116fefb81de2f30bb3a1"
+      },
+      "scripts/register_locale.py": {
+        "executable": true,
+        "sha256": "a43a1ef2d1a9cb8b03f685d5bc40587e5e42836c15952897e815819a7e7b7a45"
+      },
+      "scripts/symbolicate_hang.py": {
+        "executable": true,
+        "sha256": "3db8ac0e2ca154d228cf82bfad5507e5a2899585b4f1c5d1bbc2f0507b0231be"
+      },
+      "scripts/test_compact_orphan_toolcall.swift": {
+        "executable": true,
+        "sha256": "8e4e738901c0dedb55508420249718a0967fdf78c68327d1d5ccf7b3b3520958"
+      },
+      "scripts/test_ish_jit_fault_recovery.py": {
+        "executable": false,
+        "sha256": "44d4ace7cb531b4e5c992572a3521378ecd0dddc043be8c4dea581bad2768d26"
+      },
+      "scripts/update_models_dev.sh": {
+        "executable": true,
+        "sha256": "7b1efd626eca2529f05b43ce4491ee4f108efff8e7ded16f71905cdecf02536f"
+      },
+      "scripts/verify_models_dev_resolution.py": {
+        "executable": true,
+        "sha256": "3ae3237153794cd1cdb9e0e5644a604d5271eb796a0ce63703f93c6bc5ce6d4a"
+      },
+      "tasks/active/26-09-29 Spec 文档治理与渐进上下文/reviews/001 字符预算与渐进阅读/scope.md": {
+        "executable": false,
+        "sha256": "cd2beba34059ce58c8acefef674adc3b29e6d2ea492dc206df712a90510f9443"
+      },
+      "tasks/active/26-09-29 Spec 文档治理与渐进上下文/task.md": {
+        "executable": false,
+        "sha256": "a41c50274c861e8d76cd10493bc80601c1b35dff517c088cef53a09f09ade221"
+      }
+    },
+    "head": "272da5d9bb8051c82075513df9a395344d4e7f6b",
+    "index_sha256": "413b025c46f215fcc35355ed082d318525bd63627d3a4fa340b485fd3485ceee",
+    "requirements": {
+      "docs/harness/spec-authoring.md": "265db6098874e37633c2c8775765de2dbdbfebc27f7a74699f7ab5530508bb2d",
+      "docs/harness/spec-context.md": "b20d7b0dc0c642881e98b79504693ae20af402ddf9424863f3a208c0b514d0ce",
+      "docs/specs/resource-efficiency.md": "63ac0c5ba934c17d061bafd625dfdafe7a2a4277e99a8fde5ef84346fabf7235",
+      "tasks/active/26-09-29 Spec 文档治理与渐进上下文/reviews/001 字符预算与渐进阅读/scope.md": "cd2beba34059ce58c8acefef674adc3b29e6d2ea492dc206df712a90510f9443",
+      "tasks/active/26-09-29 Spec 文档治理与渐进上下文/task.md": "a41c50274c861e8d76cd10493bc80601c1b35dff517c088cef53a09f09ade221"
+    },
+    "status": " M .agents/skills/plan-task/SKILL.md\u0000 M .agents/skills/resume-task/SKILL.md\u0000 M .agents/skills/review-task/SKILL.md\u0000 M AGENTS.md\u0000 M docs/harness/design.md\u0000 M docs/harness/operations.md\u0000 M docs/harness/record-formats.md\u0000 M docs/harness/skills-guide.md\u0000 M docs/harness/spec-context.md\u0000 M docs/minisx-release-status.md\u0000 M docs/specs/debug-server-api.md\u0000 M docs/specs/ios-calendar-recurrence.md\u0000 M docs/specs/ios-device-data-capabilities.md\u0000 M docs/specs/ios-sandbox-ish-summary.md\u0000 M docs/specs/minis-url-scheme.md\u0000 M docs/specs/resource-efficiency.md\u0000 M scripts/harness/spec_context.py\u0000 M scripts/harness/test_spec_context.py\u0000 M src/ios/Agent/Chat/AIChatViewModel+Persistence.swift\u0000 M src/ios/Agent/Chat/AIChatViewModel+SSEStream.swift\u0000 M src/ios/Agent/Chat/AIChatViewModel.swift\u0000 M src/ios/Agent/Chat/ChatStore.swift\u0000 M src/ios/Localizable.xcstrings\u0000 M src/ios/Minis.xcodeproj/project.pbxproj\u0000 M src/ios/Providers/LLMTypes.swift\u0000 M src/ios/Providers/OpenAI/OpenAIAgentProvider.swift\u0000 M src/ios/Views/Chat/AIChatView.swift\u0000?? .agents/skills/archive-task/SKILL.md\u0000?? .codex/hooks.json\u0000?? docs/harness/code-guidance.md\u0000?? docs/harness/collaboration.md\u0000?? docs/harness/spec-authoring.md\u0000?? docs/specs/index.md\u0000?? scripts/harness/pre_tool_use_policy.py\u0000?? scripts/harness/test_pre_tool_use_policy.py\u0000?? src/ios/Agent/Chat/AIChatViewModel+Billing.swift\u0000?? src/ios/MinisTests/DeepSeekBalanceModelTests.swift\u0000?? src/ios/MinisTests/DeepSeekBillingTests.swift\u0000?? src/ios/MinisTests/SessionCostLedgerTests.swift\u0000?? src/ios/Providers/OpenAI/DeepSeekBalanceClient.swift\u0000?? src/ios/Providers/OpenAI/DeepSeekBilling.swift\u0000?? src/ios/Providers/OpenAI/DeepSeekRequestUsage.swift\u0000?? src/ios/Providers/OpenAI/SessionCostLedger.swift\u0000?? tasks/active/26-09-29 Spec 文档治理与渐进上下文/reviews/001 字符预算与渐进阅读/scope.md\u0000?? tasks/active/26-09-29 Spec 文档治理与渐进上下文/task.md\u0000",
+    "task_record_policy": "selected-only"
+  },
+  "task": "tasks/active/26-09-29 Spec 文档治理与渐进上下文/task.md"
+}

@@ -1,0 +1,86 @@
+{
+  "revalidated_documents": [
+    "ios-mcp-integrations.md",
+    "ios-memory-lifecycle.md",
+    "ios-skills-lifecycle.md",
+    "ios-usage-cost-and-balance.md",
+    "ios-sync-and-conflict-resolution.md"
+  ],
+  "selectors": [
+    {
+      "selector": "docs/specs/ios-mcp-integrations.md::MinisX iOS MCP 集成 > 超时、重试与取消边界",
+      "characters": 1909,
+      "sha256": "4dea670918324b83704b181a9de5dcbd664e8fda4a8ebbb0bdd6f26da197e214",
+      "complete_source_subtree": true,
+      "document_scope_preserved": true
+    },
+    {
+      "selector": "docs/specs/ios-memory-lifecycle.md::MinisX iOS Memory 行为与生命周期 > 专用写入与GLOBAL维护权限",
+      "characters": 2040,
+      "sha256": "f64e23831a111dab3143523824bd081c994f00f012eb1c268ce373b1be2e633a",
+      "complete_source_subtree": true,
+      "document_scope_preserved": true
+    },
+    {
+      "selector": "docs/specs/ios-memory-lifecycle.md::MinisX iOS Memory 行为与生命周期 > 专用写入与GLOBAL维护权限 > GLOBAL维护权限",
+      "characters": 2040,
+      "sha256": "f64e23831a111dab3143523824bd081c994f00f012eb1c268ce373b1be2e633a",
+      "complete_source_subtree": true,
+      "document_scope_preserved": true
+    },
+    {
+      "selector": "docs/specs/ios-memory-lifecycle.md::MinisX iOS Memory 行为与生命周期 > 检索、排序与资源限制",
+      "characters": 1834,
+      "sha256": "f64e23831a111dab3143523824bd081c994f00f012eb1c268ce373b1be2e633a",
+      "complete_source_subtree": true,
+      "document_scope_preserved": true
+    },
+    {
+      "selector": "docs/specs/ios-memory-lifecycle.md::MinisX iOS Memory 行为与生命周期 > 用户编辑、撤销与跨设备删除 > 同步合并与防复活缺口",
+      "characters": 2315,
+      "sha256": "f64e23831a111dab3143523824bd081c994f00f012eb1c268ce373b1be2e633a",
+      "complete_source_subtree": true,
+      "document_scope_preserved": true
+    },
+    {
+      "selector": "docs/specs/ios-skills-lifecycle.md::MinisX iOS Skill 生命周期 > 导入、更新与失败完成条件",
+      "characters": 1880,
+      "sha256": "487ca5e5bde064519f837d0a0fc6d3e9d015e7709a0b9b83568f92e5682160d6",
+      "complete_source_subtree": true,
+      "document_scope_preserved": true
+    },
+    {
+      "selector": "docs/specs/ios-usage-cost-and-balance.md::MinisX iOS 用量、费用与余额 > 四种数值不能互相推导",
+      "characters": 1671,
+      "sha256": "8bfdb1efec7aaf760b9d6a8eeaed14bdf7e66f3f8a327d408d46a447bb7c0a06",
+      "complete_source_subtree": true,
+      "document_scope_preserved": true
+    },
+    {
+      "selector": "docs/specs/ios-usage-cost-and-balance.md::MinisX iOS 用量、费用与余额 > 请求用量与上下文快照",
+      "characters": 1853,
+      "sha256": "8bfdb1efec7aaf760b9d6a8eeaed14bdf7e66f3f8a327d408d46a447bb7c0a06",
+      "complete_source_subtree": true,
+      "document_scope_preserved": true
+    },
+    {
+      "selector": "docs/specs/ios-sync-and-conflict-resolution.md::MinisX iOS 同步与冲突处理 > 上传类别与范围 > Memory合并与删除例外",
+      "characters": 2894,
+      "sha256": "56c48e899e8c46f927c756eaa59c5b701e6c1cd35312286e2bde07284d538c81",
+      "complete_source_subtree": true,
+      "document_scope_preserved": true
+    }
+  ],
+  "links_checked_all_task_documents": 191,
+  "link_errors": [],
+  "whitespace": "pass",
+  "index": "pass",
+  "hashes": {
+    "docs/specs/ios-mcp-integrations.md": "4dea670918324b83704b181a9de5dcbd664e8fda4a8ebbb0bdd6f26da197e214",
+    "docs/specs/ios-memory-lifecycle.md": "f64e23831a111dab3143523824bd081c994f00f012eb1c268ce373b1be2e633a",
+    "docs/specs/ios-skills-lifecycle.md": "487ca5e5bde064519f837d0a0fc6d3e9d015e7709a0b9b83568f92e5682160d6",
+    "docs/specs/ios-usage-cost-and-balance.md": "8bfdb1efec7aaf760b9d6a8eeaed14bdf7e66f3f8a327d408d46a447bb7c0a06",
+    "docs/specs/ios-sync-and-conflict-resolution.md": "56c48e899e8c46f927c756eaa59c5b701e6c1cd35312286e2bde07284d538c81"
+  },
+  "product_checks": "not run"
+}

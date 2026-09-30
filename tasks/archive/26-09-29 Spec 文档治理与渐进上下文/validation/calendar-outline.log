@@ -1,0 +1,16 @@
+COMMAND: python3 -B scripts/harness/spec_context.py context --outline docs/specs/ios-calendar-recurrence.md
+EXIT: 0
+### Spec: docs/specs/ios-calendar-recurrence.md
+Description: apple-calendar 重复事件创建、两套参数兼容、结束条件、回读验证以及年度周次的已知限制。
+Source SHA-256: 1158fd3589a1224f9d6ea248cdb8e06097b1941a27fcbd161398b2201ab200db
+Route (ATX headings; indentation shows parent sections):
+- MinisX 日历重复创建接口 (lines 5-113; 本次未展开)
+  - 当前验收限制 (lines 15-20; 本次未展开)
+  - 使用方式 (lines 21-34; 本次未展开)
+  - v1.13 参数与结果兼容 (lines 35-46; 本次未展开)
+  - Apple 公开接口覆盖 (lines 47-73; 本次未展开)
+  - 复杂示例 (lines 74-89; 本次未展开)
+  - 回读结果 (lines 90-96; 本次未展开)
+  - 官方依据 (lines 97-104; 本次未展开)
+  - 维护验收场景 (lines 105-113; 本次未展开)
+

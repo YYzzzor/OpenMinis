@@ -1,0 +1,39 @@
+### Spec: docs/specs/ios-skills-lifecycle.md
+Description: MinisX iOS App 内 Skill 的导入更新、元数据发现、会话启停覆盖、正文读取、文件变更与删除边界；用于技能功能和跨会话维护。
+Source SHA-256: 5e2b8f95bf804b74e3732600b5b4172a849b2d8e667569a811f5062281368aac
+Route (ATX headings; indentation shows parent sections):
+- MinisX iOS Skill 生命周期 (lines 5-87; 本次部分展开)
+  - 范围、状态与来源 (lines 9-14; 本次未展开)
+  - 身份、文件与作用域 (lines 15-20; 本次未展开)
+  - 导入、更新与失败完成条件 (lines 21-30; 本次未展开)
+  - 全局启停与会话覆盖 (lines 31-42; 本次已展开)
+    - 关闭不等于禁止文件访问 (lines 39-42; 本次已展开)
+  - 发现、正文读取与斜杠入口 (lines 43-54; 本次未展开)
+  - 文件变更、同步和删除 (lines 55-64; 本次未展开)
+  - 资源与安全边界 (lines 65-68; 本次未展开)
+  - 场景与验收 (lines 69-82; 本次未展开)
+  - 待验证与待决定 (lines 83-87; 本次未展开)
+Returned body:
+Lines 1-8 (source text):
+> ---
+> description: MinisX iOS App 内 Skill 的导入更新、元数据发现、会话启停覆盖、正文读取、文件变更与删除边界；用于技能功能和跨会话维护。
+> ---
+> 
+> # MinisX iOS Skill 生命周期
+> 
+> 导航：[Spec 索引](index.md)；全局文件地址见[URL作用域](minis-url-scheme.md#全局资源)，副作用见[工具权限](ios-tool-permissions-and-side-effects.md)，同步与备份分别见[同步](ios-sync-and-conflict-resolution.md)和[备份恢复](ios-backup-restore.md)。
+> 
+Lines 31-42 (source text):
+> ## 全局启停与会话覆盖
+> 
+> isEnabledForSession先读session_skill_overrides，有覆盖则优先，否则使用全局isEnabled。会话可以启用全局关闭的Skill，也可以禁用全局开启的Skill；全局关闭不是强制所有会话关闭。
+> 
+> setSessionOverride在值等于当前全局默认时删除覆盖行，否则保存。它表达当前例外，不是永远固定一次选择；后续全局值变化时没有覆盖的会话会跟随。草稿第一次在SessionSkillsView切换时先创建真实session，再绑定覆盖，不能使用空session id。
+> 
+> 全局setEnabled请求Skill dirty；session override只写本地skills.db并更新UI版本计数。当前Skill同步和新格式SkillRecord备份没有携带会话覆盖和使用频率，不能把“Skill已同步/恢复”解释为每个会话选择和排序历史已复制。删除Skill会清理对应覆盖；会话删除后的残留覆盖清理不在此静态核查中承诺。
+> 
+> ### 关闭不等于禁止文件访问
+> 
+> 当前启停控制发现片段及斜杠菜单，未把技能目录撤载或为一般文件读写增加Skill开关门禁。已读正文和既有工具结果也不会被追溯清除。需要阻止读取或执行某个Skill时，不能只依赖发现开关；是否提升为执行许可是[待决定事项](#待验证与待决定)。
+> 
+

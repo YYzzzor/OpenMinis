@@ -1,0 +1,37 @@
+### Spec: docs/specs/ios-skills-lifecycle.md
+Description: MinisX iOS App 内 Skill 的导入更新、元数据发现、会话启停覆盖、正文读取、文件变更与删除边界；用于技能功能和跨会话维护。
+Source SHA-256: 5e2b8f95bf804b74e3732600b5b4172a849b2d8e667569a811f5062281368aac
+Route (ATX headings; indentation shows parent sections):
+- MinisX iOS Skill 生命周期 (lines 5-87; 本次部分展开)
+  - 范围、状态与来源 (lines 9-14; 本次未展开)
+  - 身份、文件与作用域 (lines 15-20; 本次未展开)
+  - 导入、更新与失败完成条件 (lines 21-30; 本次已展开)
+  - 全局启停与会话覆盖 (lines 31-42; 本次未展开)
+    - 关闭不等于禁止文件访问 (lines 39-42; 本次未展开)
+  - 发现、正文读取与斜杠入口 (lines 43-54; 本次未展开)
+  - 文件变更、同步和删除 (lines 55-64; 本次未展开)
+  - 资源与安全边界 (lines 65-68; 本次未展开)
+  - 场景与验收 (lines 69-82; 本次未展开)
+  - 待验证与待决定 (lines 83-87; 本次未展开)
+Returned body:
+Lines 1-8 (source text):
+> ---
+> description: MinisX iOS App 内 Skill 的导入更新、元数据发现、会话启停覆盖、正文读取、文件变更与删除边界；用于技能功能和跨会话维护。
+> ---
+> 
+> # MinisX iOS Skill 生命周期
+> 
+> 导航：[Spec 索引](index.md)；全局文件地址见[URL作用域](minis-url-scheme.md#全局资源)，副作用见[工具权限](ios-tool-permissions-and-side-effects.md)，同步与备份分别见[同步](ios-sync-and-conflict-resolution.md)和[备份恢复](ios-backup-restore.md)。
+> 
+Lines 21-30 (source text):
+> ## 导入、更新与失败完成条件
+> 
+> 当前支持粘贴/文件、ZIP和GitHub URL。parse处理frontmatter及正文，缺失名称有fallback；不是完整Anthropic格式验证器，解析成功不保证脚本/依赖可运行。
+> 
+> GitHub preflight只下载解析SKILL.md，commit先安装正文，再由独立后台Task递归下载同目录附件。导入返回成功时附件可能尚未完成，部分失败目前记录日志；手动Update from URL等待附件下载并可返回partialSuccess。离开导入界面不意味着该后台Task取消。维护者必须分别观察正文安装和附件完整性，不能只检查Skill行出现。
+> 
+> ZIP入口需要根目录或单层父目录的SKILL.md，写入正文后再写入附件；错误可能发生在已部分写入之后，不能宣称所有导入原子回滚。GitHub覆盖确认在部分UI入口存在；importSkill自身同id覆盖，不是统一的每路径确认屏障。文件路径安全、外部依赖与凭证处理仍受[权限规范](ios-tool-permissions-and-side-effects.md)约束，不能因其来自Skill包而放宽。
+> 
+> 源码：SkillStore.importSkill/preflightGitHubImport/commitGitHubImport/updateFromURL/importFromArchive。未调用网络、导入ZIP或执行附件。
+> 
+

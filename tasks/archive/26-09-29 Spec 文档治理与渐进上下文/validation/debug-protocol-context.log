@@ -1,0 +1,96 @@
+COMMAND: python3 -B scripts/harness/spec_context.py context docs/specs/debug-server-api.md::Debug Server API > Protocol
+EXIT: 0
+### Spec: docs/specs/debug-server-api.md
+Description: DEBUG 调试服务的连接、JSON-RPC、视图与日志检查、Provider 管理、聊天自动化和浏览器调试接口。
+Source SHA-256: 6b3ff8a7801a8524082e5b097c7506f2d483e57f02c477394bf1d2912cc0a426
+Route (ATX headings; indentation shows parent sections):
+- Debug Server API (lines 5-1827; 本次部分展开)
+  - Connection (lines 13-16; 本次未展开)
+  - Protocol (lines 17-29; 本次已展开)
+  - Methods (lines 30-449; 本次未展开)
+    - `debug.viewTree` (lines 32-67; 本次未展开)
+    - `debug.search` (lines 68-105; 本次未展开)
+    - `debug.inspect` (lines 106-154; 本次未展开)
+    - `debug.highlight` (lines 155-186; 本次未展开)
+    - `debug.agentTrace` (lines 187-218; 本次未展开)
+    - `debug.ls` (lines 219-255; 本次未展开)
+    - `debug.readFile` (lines 256-292; 本次未展开)
+    - `debug.appInfo` (lines 293-327; 本次未展开)
+    - `debug.screenshot` (lines 328-367; 本次未展开)
+    - `debug.llmRequests` (lines 368-449; 本次未展开)
+  - Provider Management Methods (lines 450-837; 本次未展开)
+    - Implementation scope note (lines 454-464; 本次未展开)
+    - `provider.types` (lines 465-515; 本次未展开)
+    - `provider.instances.list` (lines 516-551; 本次未展开)
+    - `provider.instances.create` (lines 552-615; 本次未展开)
+    - `provider.instances.update` (lines 616-635; 本次未展开)
+    - `provider.instances.delete` (lines 636-660; 本次未展开)
+    - `provider.instances.test` (lines 661-687; 本次未展开)
+    - `provider.models.list` (lines 688-726; 本次未展开)
+    - `provider.models.add` (lines 727-750; 本次未展开)
+    - `provider.models.update` (lines 751-770; 本次未展开)
+    - `provider.models.delete` (lines 771-789; 本次未展开)
+    - `provider.models.refresh` (lines 790-816; 本次未展开)
+    - `provider.models.setAgentLoop` (lines 817-837; 本次未展开)
+  - Model Group Management Methods (lines 838-991; 本次未展开)
+    - `provider.groups.list` (lines 848-886; 本次未展开)
+    - `provider.groups.create` (lines 887-911; 本次未展开)
+    - `provider.groups.update` (lines 912-931; 本次未展开)
+    - `provider.groups.delete` (lines 932-952; 本次未展开)
+    - `provider.groups.setDefault` (lines 953-972; 本次未展开)
+    - `provider.groups.setAgentLoop` (lines 973-991; 本次未展开)
+  - Chat Automation Methods (lines 992-1438; 本次未展开)
+    - `chat.sessions.list` (lines 1003-1047; 本次未展开)
+    - `chat.sessions.get` (lines 1048-1079; 本次未展开)
+    - `chat.messages.list` (lines 1080-1137; 本次未展开)
+    - `chat.sessions.usage` (lines 1138-1178; 本次未展开)
+    - `chat.models.list` (lines 1179-1251; 本次未展开)
+    - `chat.prompt` (lines 1252-1312; 本次未展开)
+    - `chat.retry` (lines 1313-1361; 本次未展开)
+    - `chat.session.status` (lines 1362-1401; 本次未展开)
+    - `chat.session.cancel` (lines 1402-1419; 本次未展开)
+    - `chat.session.delete` (lines 1420-1438; 本次未展开)
+  - Log Methods (lines 1439-1555; 本次未展开)
+    - `debug.logs.list` (lines 1443-1474; 本次未展开)
+    - `debug.logs.read` (lines 1475-1519; 本次未展开)
+    - `debug.logs.setEnabled` (lines 1520-1555; 本次未展开)
+  - Browser Debug Methods (lines 1556-1760; 本次未展开)
+    - `debug.browser.listTabs` (lines 1560-1593; 本次未展开)
+    - `debug.browser.pageInfo` (lines 1594-1637; 本次未展开)
+    - `debug.browser.executeJS` (lines 1638-1668; 本次未展开)
+    - `debug.browser.getReadable` (lines 1669-1694; 本次未展开)
+    - `debug.browser.getText` (lines 1695-1721; 本次未展开)
+    - `debug.browser.screenshot` (lines 1722-1760; 本次未展开)
+  - Error Codes (lines 1761-1778; 本次未展开)
+    - Browser-Specific Errors (lines 1771-1778; 本次未展开)
+  - Quick Start (lines 1779-1818; 本次未展开)
+  - 维护验收场景 (lines 1819-1827; 本次未展开)
+Returned body:
+Lines 1-12 (source text):
+> ---
+> description: DEBUG 调试服务的连接、JSON-RPC、视图与日志检查、Provider 管理、聊天自动化和浏览器调试接口。
+> ---
+> 
+> # Debug Server API
+> 
+> 导航：[Spec 索引](index.md)；章节目录由[上下文工具](../harness/spec-context.md#受控阅读入口)从本文标题生成，不另手写目录。
+> 
+> 本文描述 DEBUG 调试接口；各小节的 implementation scope 与限制继续有效。本次治理只补充导航和维护验收入口，没有重新实测全部接口。
+> 
+> MinisApp includes a built-in JSON-RPC 2.0 debug server (DEBUG builds only) for runtime view inspection.
+> 
+Lines 17-29 (source text):
+> ## Protocol
+> 
+> All requests follow the [JSON-RPC 2.0](https://www.jsonrpc.org/specification) specification:
+> 
+> ```json
+> {
+>   "jsonrpc": "2.0",
+>   "id": 1,
+>   "method": "<method_name>",
+>   "params": { ... }
+> }
+> ```
+> 
+

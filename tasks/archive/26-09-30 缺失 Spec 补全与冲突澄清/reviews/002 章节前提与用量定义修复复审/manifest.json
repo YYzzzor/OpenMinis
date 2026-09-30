@@ -1,0 +1,92 @@
+{
+  "request": "missing-specs-2026-09-30-002",
+  "files": [
+    {
+      "path": "docs/specs/ios-mcp-integrations.md",
+      "sha256": "4dea670918324b83704b181a9de5dcbd664e8fda4a8ebbb0bdd6f26da197e214",
+      "bytes": 10942
+    },
+    {
+      "path": "docs/specs/ios-memory-lifecycle.md",
+      "sha256": "f64e23831a111dab3143523824bd081c994f00f012eb1c268ce373b1be2e633a",
+      "bytes": 12870
+    },
+    {
+      "path": "docs/specs/ios-skills-lifecycle.md",
+      "sha256": "487ca5e5bde064519f837d0a0fc6d3e9d015e7709a0b9b83568f92e5682160d6",
+      "bytes": 9611
+    },
+    {
+      "path": "docs/specs/ios-usage-cost-and-balance.md",
+      "sha256": "8bfdb1efec7aaf760b9d6a8eeaed14bdf7e66f3f8a327d408d46a447bb7c0a06",
+      "bytes": 11405
+    },
+    {
+      "path": "docs/specs/ios-sync-and-conflict-resolution.md",
+      "sha256": "56c48e899e8c46f927c756eaa59c5b701e6c1cd35312286e2bde07284d538c81",
+      "bytes": 11625
+    },
+    {
+      "path": "docs/specs/resource-efficiency.md",
+      "sha256": "63ac0c5ba934c17d061bafd625dfdafe7a2a4277e99a8fde5ef84346fabf7235",
+      "bytes": 5584
+    },
+    {
+      "path": "AGENTS.md",
+      "sha256": "8ad96504a89c1002b9708d6f37a09edbc4650cd51ee0eac233616af9625a8731",
+      "bytes": 5572
+    },
+    {
+      "path": "docs/harness/spec-authoring.md",
+      "sha256": "265db6098874e37633c2c8775765de2dbdbfebc27f7a74699f7ab5530508bb2d",
+      "bytes": 3946
+    },
+    {
+      "path": "docs/harness/spec-context.md",
+      "sha256": "7506444d0fc7d87d7a1a2eb976d98713a1441a9906c6de8f7fe8764b29a067a1",
+      "bytes": 7171
+    },
+    {
+      "path": "src/ios/Agent/Chat/AIChatViewModel+MemoryTools.swift",
+      "sha256": "6667feb50dd661ba9df7b61d8d1ae84b7a5cfa98f826fb40acb71e2a00556469",
+      "bytes": 17887
+    },
+    {
+      "path": "src/ios/Agent/Chat/AIChatViewModel+ToolDefinitions.swift",
+      "sha256": "4a78e5f074e4205bb66b26cf95d6aaf6e32c898f2a1d62db6ac8db392c7d7127",
+      "bytes": 25275
+    },
+    {
+      "path": "src/ios/Agent/Sync/V2/ChatStoreSyncHydrators.swift",
+      "sha256": "ec7a0455ca82cb4ebde0feb259057683d82d39875594b92ca46f839ce8e67403",
+      "bytes": 94884
+    },
+    {
+      "path": "src/ios/Providers/OpenAI/DeepSeekRequestUsage.swift",
+      "sha256": "904ac287d5d88b2701f49a0a76c70e1041d5eabc373de61ba796db891150db55",
+      "bytes": 1637
+    },
+    {
+      "path": "src/ios/Providers/OpenAI/DeepSeekBilling.swift",
+      "sha256": "3091fda184715b5a2802b410395aacb67e231dca25d9f74fce60ae23ff954532",
+      "bytes": 12319
+    },
+    {
+      "path": "src/ios/Providers/OpenAI/SessionCostLedger.swift",
+      "sha256": "ea9dd0fbe0e580e2d846f5e7118867d7cba13ebdafe7fef50a444597943efd48",
+      "bytes": 5757
+    },
+    {
+      "path": "src/ios/default_mount/usr/local/lib/minis-mcp-cli/utils/config.py",
+      "sha256": "580f4dcb04f44e63a37d3c44ef820d895868bf841cdbc4b2ef2bbeea70bc8cd9",
+      "bytes": 5853
+    },
+    {
+      "path": "src/ios/default_mount/usr/local/lib/minis-mcp-cli/daemon.py",
+      "sha256": "c9c083ffaffd3c4faf2d8b3b8447a1bcaf14c82feb9fdc7a7c4602a5bed494da",
+      "bytes": 21110
+    }
+  ],
+  "original_report_sha256": "132e569e5db0dc084ea35ff7e995f37c198cd9837f8203a76a984fca21f9c4e7",
+  "scope": "only R1-R5 and five corrected documents; no whole product audit"
+}

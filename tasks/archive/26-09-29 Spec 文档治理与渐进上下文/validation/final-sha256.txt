@@ -1,0 +1,3 @@
+f8d3efe9f8f96d58ed5b68019dcec0f26023869deac992e8dc5d783c1c2f14a6  scripts/harness/spec_context.py
+b69e964bdc10593697075339bb39900d0f7feaf9abab73ab6d6230e1d8384da5  scripts/harness/test_spec_context.py
+548b0f3db0ea6feb13758541b572ba036e28dddbfeb6b4d0ddc69bb9beda151e  docs/specs/index.md

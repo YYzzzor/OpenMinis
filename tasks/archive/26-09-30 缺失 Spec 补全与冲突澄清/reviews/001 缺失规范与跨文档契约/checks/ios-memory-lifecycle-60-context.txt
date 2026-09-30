@@ -1,0 +1,37 @@
+### Spec: docs/specs/ios-memory-lifecycle.md
+Description: MinisX iOS Memory 的全局与每日作用域、会话开关、上下文注入、读写检索、编辑撤销及同步删除限制；用于记忆功能与恢复变更。
+Source SHA-256: d6eadd73c40b241574e167bea7f6960dda54b951e448a58c5b8f2497cc4ae9a3
+Route (ATX headings; indentation shows parent sections):
+- MinisX iOS Memory 行为与生命周期 (lines 5-104; 本次部分展开)
+  - 范围、状态与来源 (lines 9-14; 本次未展开)
+  - 文件作用域与权威 (lines 15-25; 本次未展开)
+  - 默认值、会话开关与生效时点 (lines 26-41; 本次未展开)
+    - 开关反馈的已知冲突 (lines 38-41; 本次未展开)
+  - 自动注入与可观察范围 (lines 42-49; 本次未展开)
+  - 专用写入与GLOBAL维护权限 (lines 50-59; 本次未展开)
+    - GLOBAL维护权限 (lines 56-59; 本次未展开)
+  - 检索、排序与资源限制 (lines 60-67; 本次已展开)
+  - 用户编辑、撤销与跨设备删除 (lines 68-81; 本次未展开)
+    - 同步合并与防复活缺口 (lines 74-81; 本次未展开)
+  - 场景与验收 (lines 82-96; 本次未展开)
+  - 待维护者决定 (lines 97-104; 本次未展开)
+Returned body:
+Lines 1-8 (source text):
+> ---
+> description: MinisX iOS Memory 的全局与每日作用域、会话开关、上下文注入、读写检索、编辑撤销及同步删除限制；用于记忆功能与恢复变更。
+> ---
+> 
+> # MinisX iOS Memory 行为与生命周期
+> 
+> 导航：[Spec 索引](index.md)；文件地址见[全局资源](minis-url-scheme.md#全局资源)，传输规则见[同步与冲突处理](ios-sync-and-conflict-resolution.md)，包格式与事务见[备份恢复](ios-backup-restore.md)。
+> 
+Lines 60-67 (source text):
+> ## 检索、排序与资源限制
+> 
+> memory_get的scope默认all，包含GLOBAL及目录中的其他非隐藏`.md`文件；daily仅排除GLOBAL。当前代码没有严格把daily限定为日期命名文件，因此其他Markdown（包括SOUL）也可能参与工具检索；关闭自动SOUL例外不能据此推导检索结果范围。
+> 
+> 没有keywords时按文件顺序最多返回500行；有keywords时按时间标记拆分条目，以匹配词比例和时间新近程度各50%排序。当前允许部分关键词命中，不要求全部命中；ToolDefinitions的“all keywords/lines with context”表述与实际条目检索不一致。
+> 
+> 有关键词结果最多60项，并在加入一整项后达到30,720 UTF-8字节阈值时停止。该阈值是软边界，一项很大时可以超过它；无关键词分支只有行数限制。输出限制不约束扫描、整文件读取与候选构造成本，不能宣称固定30 KB硬上限或有界全库内存。超限、无匹配、无文件和disabled需要分别显示。
+> 
+

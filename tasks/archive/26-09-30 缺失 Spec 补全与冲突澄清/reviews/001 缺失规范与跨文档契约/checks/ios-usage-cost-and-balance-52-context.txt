@@ -1,0 +1,35 @@
+### Spec: docs/specs/ios-usage-cost-and-balance.md
+Description: MinisX iOS 上下文占用、token累计、请求费用账本与账户余额的定义、身份归因、未知状态、持久化和资源边界；用于统计与费用展示变更。
+Source SHA-256: 101cfc460a367038779f1ad2ccfab2f078b58a3488ffcdd711b2db84a6e857da
+Route (ATX headings; indentation shows parent sections):
+- MinisX iOS 用量、费用与余额 (lines 5-91; 本次部分展开)
+  - 范围、状态与来源 (lines 9-14; 本次未展开)
+  - 四种数值不能互相推导 (lines 15-25; 本次未展开)
+  - 请求用量与上下文快照 (lines 26-33; 本次未展开)
+  - 会话账本与未知状态 (lines 34-43; 本次未展开)
+  - 价格快照与适用范围 (lines 44-51; 本次未展开)
+  - 账户余额、鉴权与缓存 (lines 52-59; 本次已展开)
+  - 展示与持久化边界 (lines 60-67; 本次未展开)
+  - 资源边界 (lines 68-71; 本次未展开)
+  - 场景与验收 (lines 72-86; 本次未展开)
+  - 测试入口与未决事项 (lines 87-91; 本次未展开)
+Returned body:
+Lines 1-8 (source text):
+> ---
+> description: MinisX iOS 上下文占用、token累计、请求费用账本与账户余额的定义、身份归因、未知状态、持久化和资源边界；用于统计与费用展示变更。
+> ---
+> 
+> # MinisX iOS 用量、费用与余额
+> 
+> 导航：[Spec 索引](index.md)；模型身份与切换见[Provider路由](ios-provider-model-routing.md)，停止/重试及消息持久化见[Agent生命周期](ios-agent-run-lifecycle.md)。
+> 
+Lines 52-59 (source text):
+> ## 账户余额、鉴权与缓存
+> 
+> DeepSeekAccountIdentity为providerID加configRevision/authRevision，Keychain读取再次确认当前身份。查询固定GET `https://api.deepseek.com/user/balance`，Bearer鉴权，拒绝重定向；ephemeral会话无cookie/url cache，request/resource超时为12/15秒，实际流式读取最多16,384字节。独立decode另有64 KB上限，不应将它冒称网络客户端的实际上限。
+> 
+> 只接受唯一合法CNY total_balance；没有CNY、重复CNY或畸形数值均失败。`is_available=false`不意味着余额为零；合法零值和负余额可以展示，不能从“不能推理”反推余额未知或为空。
+> 
+> 页面状态只缓存一个身份，非强制刷新60秒内复用，手动刷新重新请求。身份变化先清旧值，generation拒绝迟到响应；刷新失败清除旧余额，不继续当实时值。页面task负责取消，取消不应发布迟到结果或误报普通查询失败。没有后台轮询，不用会话消费倒扣缓存余额。
+> 
+
