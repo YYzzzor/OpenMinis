@@ -235,6 +235,7 @@ extension AIChatViewModel {
         sessionOutputTokens = 0
         sessionCacheReadTokens = 0
         sessionCacheWriteTokens = 0
+        await refreshSessionCostSummary(sessionID: sessionId)
         guard !rawMessages.isEmpty else {
             logger.info("[SessionLoad] \(sessionId) — empty session, DB query took \(String(format: "%.1f", dbElapsed))ms")
             // Still mount minis even for empty sessions so /var/minis works in terminal
@@ -1022,6 +1023,7 @@ extension AIChatViewModel {
         let model = selectedModel
         let session = await ChatStore.shared.createSession(modelId: model.id, source: sessionSource)
         sessionId = session.id
+        await refreshSessionCostSummary(sessionID: session.id)
         Self.activeSessionId = session.id
         // [T-memory-enabled-new-session-bug] Sync the @Published memoryEnabled
         // to the value createSession just persisted from the global default.

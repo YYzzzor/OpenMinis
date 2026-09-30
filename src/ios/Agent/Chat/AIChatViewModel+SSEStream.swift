@@ -272,6 +272,8 @@ extension AIChatViewModel {
         provider: any AgentProvider
     ) async throws -> StreamResult {
         var result = StreamResult()
+        let costRequest = await beginSessionCostRequest()
+        var billingUsage: DeepSeekRequestUsage?
         var currentTextBlockIdx: Int? = nil
         var currentThinkingBlockIdx: Int? = nil
         let speakEnabled = await MainActor.run { self.speakEnabled }
@@ -960,6 +962,7 @@ extension AIChatViewModel {
                 result.reasoningEcho = echo
 
             case .usage(let u):
+                billingUsage = u.deepSeekUsage
                 result.turnUsage.add(u)
                 #if DEBUG
                 result.iterationUsage.add(u)
@@ -983,6 +986,7 @@ extension AIChatViewModel {
         // the caller never receives a half-parsed StreamResult.
         try Task.checkCancellation()
         } catch is CancellationError {
+            await finishSessionCostRequest(costRequest, usage: nil, completed: false)
             // Flush any throttled text to the block before propagating cancellation,
             // so handleUserCancelledCleanup sees the full streamed content.
             if let blockIdx = currentTextBlockIdx, !result.assistantText.isEmpty {
@@ -1003,6 +1007,7 @@ extension AIChatViewModel {
             result.isStreamInterrupted = true
             _streamError = error
         }
+        await finishSessionCostRequest(costRequest, usage: billingUsage, completed: _streamError == nil && result.stopReason != nil)
         if let err = _streamError { throw err }
         // Stream ended cleanly. First drain any un-extracted tail past
         // spokenTextOffset: the streaming look-ahead in extractSentencesStatic

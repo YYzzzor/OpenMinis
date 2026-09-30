@@ -1,6 +1,86 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Estimated Session Cost": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "会话累计估算费用"
+          }
+        }
+      }
+    },
+    "Account Balance": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "账户余额"
+          }
+        }
+      }
+    },
+    "Fees and Balance": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "费用与余额"
+          }
+        }
+      }
+    },
+    "Estimated in CNY from this session's recorded chat requests, including tool loops. Excludes title generation, compaction and other tool services. Unavailable when usage or pricing is incomplete.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "按本会话已记录的聊天请求以人民币估算，包含工具循环，不含标题生成、上下文压缩及其他工具服务。用量或价格不完整时显示“—”。"
+          }
+        }
+      }
+    },
+    "Fetching balance…": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在查询余额…"
+          }
+        }
+      }
+    },
+    "CNY balance unavailable": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暂未获取人民币余额"
+          }
+        }
+      }
+    },
+    "Balance updated": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "余额更新于"
+          }
+        }
+      }
+    },
+    "Refresh Balance": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "刷新余额"
+          }
+        }
+      }
+    },
     "" : {
 
     },

@@ -955,6 +955,7 @@ actor ChatStore {
         """)
         exec("CREATE INDEX IF NOT EXISTS idx_webapp_shortcuts_created ON webapp_shortcuts(created_at DESC)")
 
+        try? SessionCostLedger.install(db)
         purgeUnusableSessionRows()
     }
 
@@ -1072,6 +1073,8 @@ actor ChatStore {
             memDiagLogger.error("[MemDiag] createSession prepare FAILED sid=\(session.id.prefix(8))")
         }
         sqlite3_finalize(stmt)
+
+        try? SessionCostLedger.enroll(db, sessionID: session.id)
 
         // Deliberately NOT marking the Session dirty here. A freshly-created
         // session has no messages yet — it's a placeholder the user may never
@@ -4243,6 +4246,20 @@ actor ChatStore {
             lastCompactedMessageId: lcmId,
             version: version
         )
+    }
+
+    // MARK: - Local Session Costs
+
+    func sessionCostSummary(sessionID: String) -> SessionCostSummary? {
+        try? SessionCostLedger.summary(db, sessionID: sessionID)
+    }
+
+    func beginSessionCostRequest(_ request: SessionCostRequest) -> Bool {
+        (try? SessionCostLedger.begin(db, sessionID: request.sessionID, requestID: request.requestID)) ?? false
+    }
+
+    func finishSessionCostRequest(_ request: SessionCostRequest, record: DeepSeekCostRecord) {
+        try? SessionCostLedger.finish(db, sessionID: request.sessionID, record: record)
     }
 
     // MARK: - Usage Statistics

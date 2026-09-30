@@ -918,6 +918,7 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
     @Published var memoryEnabled = true
 
     // MARK: - Session Stats
+    @Published var sessionCostSummary: SessionCostSummary?
     /// 请求序号拒绝迟到结果；持久记录独立于页面缓存。
     private var contextUsageState = ContextUsageState()
     @Published private var loadedContextUsage: PersistedContextUsage?

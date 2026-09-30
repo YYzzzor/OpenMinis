@@ -1,0 +1,989 @@
+{
+  "artifacts": {
+    "patches/base-to-worktree.patch": {
+      "executable": false,
+      "sha256": "e6f61a512ad6a8df3ee9b89a0899703aa6c5cb8b6a2d202e4b80d064b194d242"
+    },
+    "patches/staged.patch": {
+      "executable": false,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "patches/unstaged.patch": {
+      "executable": false,
+      "sha256": "e6f61a512ad6a8df3ee9b89a0899703aa6c5cb8b6a2d202e4b80d064b194d242"
+    },
+    "request.md": "7c5e196edf671964c4f94702287aa553e563acc1e3b60ccbb56fef68d7d2f11b",
+    "requirements/docs/specs/resource-efficiency.md": {
+      "executable": false,
+      "sha256": "974c545f843aa78abfa031abdd855a6a54c5caceee1a05f896b78d58bb048503"
+    },
+    "requirements/tasks/active/26-09-29 DeepSeek 会话费用与账户余额/task.md": {
+      "executable": false,
+      "sha256": "e217cf1dab6257ae48523881e250695609cfd409964e47ba22101dbd350d7ff8"
+    },
+    "snapshot/AGENTS.md": {
+      "executable": false,
+      "sha256": "7b9d876352ee243dc766615e0740ae6f4935f37da6a3d734812c4833cdf16bf1"
+    },
+    "snapshot/docs/harness/operations.md": {
+      "executable": false,
+      "sha256": "d281a7b15d863f59d7b67d8664b7e40e7b938af0e2a6e90ae81a727ec67186d1"
+    },
+    "snapshot/docs/harness/record-formats.md": {
+      "executable": false,
+      "sha256": "c9976e712ab6cda971eed87d0bf5182ec335c204bb9643943718e7da127eb65e"
+    },
+    "snapshot/docs/specs/resource-efficiency.md": {
+      "executable": false,
+      "sha256": "974c545f843aa78abfa031abdd855a6a54c5caceee1a05f896b78d58bb048503"
+    },
+    "snapshot/src/ios/Agent/Chat/AIChatViewModel+Attachments.swift": {
+      "executable": false,
+      "sha256": "271c38c1de68d65086513db91e2c62ad80da028aaf0954533811bb5a71167ea0"
+    },
+    "snapshot/src/ios/Agent/Chat/AIChatViewModel+BackgroundTask.swift": {
+      "executable": false,
+      "sha256": "ffa68a334b08dd960c755f012d015478993679d15a90d63e6c7578531415de21"
+    },
+    "snapshot/src/ios/Agent/Chat/AIChatViewModel+Billing.swift": {
+      "executable": false,
+      "sha256": "a1e07074cc8f8b22a0b749beb50a0d622d44f2ca18187f065d952d2c9f47d366"
+    },
+    "snapshot/src/ios/Agent/Chat/AIChatViewModel+Compaction.swift": {
+      "executable": false,
+      "sha256": "eda5e23a7c76d733bdf09b5cafda7704098fa537245a8fc3b80cec4f64389307"
+    },
+    "snapshot/src/ios/Agent/Chat/AIChatViewModel+ConcurrentTools.swift": {
+      "executable": false,
+      "sha256": "026814e7899baeaa2686b7f36b0624321071e76b944a7b937cc8937ba2cab358"
+    },
+    "snapshot/src/ios/Agent/Chat/AIChatViewModel+Fallback.swift": {
+      "executable": false,
+      "sha256": "448385c6ee7daac38ccfcbebad84b7cffa87e7c1b8367a23242abc66648ed049"
+    },
+    "snapshot/src/ios/Agent/Chat/AIChatViewModel+FileTools.swift": {
+      "executable": false,
+      "sha256": "bb52f3a6eeba4e30f4984d1a44c2bb59984aa3697c31f0a38172833ad036cdf7"
+    },
+    "snapshot/src/ios/Agent/Chat/AIChatViewModel+ISHCommand.swift": {
+      "executable": false,
+      "sha256": "3364255cfab98922731a540a87e6298c724f078e5d77e746c40eec1b8be7397c"
+    },
+    "snapshot/src/ios/Agent/Chat/AIChatViewModel+MemoryTools.swift": {
+      "executable": false,
+      "sha256": "6667feb50dd661ba9df7b61d8d1ae84b7a5cfa98f826fb40acb71e2a00556469"
+    },
+    "snapshot/src/ios/Agent/Chat/AIChatViewModel+MentionMenu.swift": {
+      "executable": false,
+      "sha256": "e5276c1c0c236899d11cc56366ecc141ad07179de164983374b1036c04c50622"
+    },
+    "snapshot/src/ios/Agent/Chat/AIChatViewModel+Misc.swift": {
+      "executable": false,
+      "sha256": "01a4651ac0b6d60e6287a3c8c3361a5e7fa50a1b2b1a6e02c63fc2dce0d9daa7"
+    },
+    "snapshot/src/ios/Agent/Chat/AIChatViewModel+Offloading.swift": {
+      "executable": false,
+      "sha256": "080ece38023c6e7492345d5930656ff58e32aea95aeb09e42f6730ca5e4beb21"
+    },
+    "snapshot/src/ios/Agent/Chat/AIChatViewModel+Persistence.swift": {
+      "executable": false,
+      "sha256": "31f31bfd30f04a9c8327c0ac9f7e6979c384ff0adab702ada744330a86b2f0ae"
+    },
+    "snapshot/src/ios/Agent/Chat/AIChatViewModel+ProviderFactory.swift": {
+      "executable": false,
+      "sha256": "086cda5f7ac8e06c1883ec6289bb7726e13c90da46bb687641d44f22622ef9d2"
+    },
+    "snapshot/src/ios/Agent/Chat/AIChatViewModel+RequestBudget.swift": {
+      "executable": false,
+      "sha256": "1aedc249fc4d5e462e5b6c20fbc5379982c8f0f2ba76d9505e00ecb06a1130fc"
+    },
+    "snapshot/src/ios/Agent/Chat/AIChatViewModel+SSEStream.swift": {
+      "executable": false,
+      "sha256": "54e4e88c8a8e2948b719373413f4896d44c26cbbb6bf07da0e0134e69e5519c9"
+    },
+    "snapshot/src/ios/Agent/Chat/AIChatViewModel+SlashCommands.swift": {
+      "executable": false,
+      "sha256": "5b1c6d07dbbd762cdccb37b30e6e62f7cac08bcc5e60c89b52c1e3d80cbd46a2"
+    },
+    "snapshot/src/ios/Agent/Chat/AIChatViewModel+TitleGeneration.swift": {
+      "executable": false,
+      "sha256": "ca4e0fdffe55e07c17eb73c948d570eb889f7cf5198f60ef492f6d2550f92aff"
+    },
+    "snapshot/src/ios/Agent/Chat/AIChatViewModel+ToolDefinitions.swift": {
+      "executable": false,
+      "sha256": "4a78e5f074e4205bb66b26cf95d6aaf6e32c898f2a1d62db6ac8db392c7d7127"
+    },
+    "snapshot/src/ios/Agent/Chat/AIChatViewModel+ToolPreflight.swift": {
+      "executable": false,
+      "sha256": "6b6475f7a8260100791f365a78a1f985062df3625563019bf5c8c07361e39826"
+    },
+    "snapshot/src/ios/Agent/Chat/AIChatViewModel.swift": {
+      "executable": false,
+      "sha256": "3d8a7b49ce4e4905a57bbf70784278285346361f354f6326655f62e71939e9bc"
+    },
+    "snapshot/src/ios/Agent/Chat/ChatLifecycleSupport.swift": {
+      "executable": false,
+      "sha256": "14357f340e0fe5aee070e49052caaa76ec1819453cd210da5bcffe49624f374f"
+    },
+    "snapshot/src/ios/Agent/Chat/ChatModels.swift": {
+      "executable": false,
+      "sha256": "be4b7ae3397fba8654dc1f1de1389b5cfedbc63a80cff6ed2caf46ebddbffade"
+    },
+    "snapshot/src/ios/Agent/Chat/ChatStore.swift": {
+      "executable": false,
+      "sha256": "d740e3241c2aafa134d7901362cc12829bb333ae770a8cf56c6c18dc1c597df9"
+    },
+    "snapshot/src/ios/Agent/Chat/ChatURLBrokerage.swift": {
+      "executable": false,
+      "sha256": "21300eb626e63f5473ea2013ee0fd00714edd88a5cb7b8d0e9f7eb2521e3f5be"
+    },
+    "snapshot/src/ios/Agent/Chat/ContextPolicy.swift": {
+      "executable": false,
+      "sha256": "b7de01e7a8781dd8341ca5687a2aa7bb9c1b575c9dc6a508b3d0414d33a85a25"
+    },
+    "snapshot/src/ios/Agent/Chat/ContextUsagePersistence.swift": {
+      "executable": false,
+      "sha256": "48ccd15a99b0233d00bb940bbad451b315925bf28219339d19c634bbab4766eb"
+    },
+    "snapshot/src/ios/Agent/Chat/FileMentionIndex.swift": {
+      "executable": false,
+      "sha256": "e1dcb4cbc31934d4059df62e14780bb06f48846f4fef6b173d09441abd18f2d2"
+    },
+    "snapshot/src/ios/Agent/Chat/MinisURLPathDecoding.swift": {
+      "executable": false,
+      "sha256": "9445c0edda5531536e66ee7bf17643962c35bb35b6060f07ddfeefabcefc940b"
+    },
+    "snapshot/src/ios/Localizable.xcstrings": {
+      "executable": false,
+      "sha256": "67fc315a9b9dc9a903efc5d619f62037d3f04de007da1a1b4d907bcd76ee5d06"
+    },
+    "snapshot/src/ios/Minis.xcodeproj/project.pbxproj": {
+      "executable": false,
+      "sha256": "c25864c4775885e0c448e2e6d2b08f11ba0812cea3b2626b7f4a440025e2dfc8"
+    },
+    "snapshot/src/ios/MinisTests/DeepSeekBalanceModelTests.swift": {
+      "executable": false,
+      "sha256": "42eba52b7161d2953c6f201bed5416a7ebde7ffb1001607c47ceed37e05a7bc8"
+    },
+    "snapshot/src/ios/MinisTests/DeepSeekBillingTests.swift": {
+      "executable": false,
+      "sha256": "f588597d84940776c851a2757aa8bc40fe46d0978048eb731dbb85f9dffe53e7"
+    },
+    "snapshot/src/ios/MinisTests/SessionCostLedgerTests.swift": {
+      "executable": false,
+      "sha256": "3be0322c469e7ef9abfe418147838ea83a828dd897bada6c7832680bf8ec8698"
+    },
+    "snapshot/src/ios/Providers/AgentProvider.swift": {
+      "executable": false,
+      "sha256": "13b681988ec2f60c117c12eaba89d94d2f4da7c4f1c962cca2c6164d4ec80913"
+    },
+    "snapshot/src/ios/Providers/Anthropic/AnthropicAgentProvider.swift": {
+      "executable": false,
+      "sha256": "d6069863fa2663b2a65138d9970f2cab16f67117abb5e88d8e53bbb03bc93579"
+    },
+    "snapshot/src/ios/Providers/Anthropic/AnthropicModelsAPI.swift": {
+      "executable": false,
+      "sha256": "c4ee474e653ec91f8d5f33422357baf76722f9976c66c6aaa8ec65a5baa27960"
+    },
+    "snapshot/src/ios/Providers/Anthropic/AnthropicProvider.swift": {
+      "executable": false,
+      "sha256": "3f9dbc145123d30669c81b63dfddb874d28ad276f2a7c0e19aa2bbddc35b866a"
+    },
+    "snapshot/src/ios/Providers/Anthropic/OAuth/ClaudeOAuthManager.swift": {
+      "executable": false,
+      "sha256": "9166496117349a78afc1d092f95ac5e6b52cb805862e61ecaf11445c60fa4749"
+    },
+    "snapshot/src/ios/Providers/Anthropic/OAuth/ClaudeOAuthRefreshCoordinator.swift": {
+      "executable": false,
+      "sha256": "840892ea594c513d3a1ac18e77e33318d165584fe1c13ebb8b772b8c318f9c4e"
+    },
+    "snapshot/src/ios/Providers/Anthropic/OAuthHTTPClient.swift": {
+      "executable": false,
+      "sha256": "2a3d6d4a5d970176f30bf5b5d35a1dd5664a57489f6ef3daef9e50af4912f88e"
+    },
+    "snapshot/src/ios/Providers/Antigravity/AntigravityAgentProvider.swift": {
+      "executable": false,
+      "sha256": "e477ac58659f9612fa68b114bfb29b7c23862d2b59890f4bbf673dda7d470e28"
+    },
+    "snapshot/src/ios/Providers/Antigravity/AntigravityModelsAPI.swift": {
+      "executable": false,
+      "sha256": "8d64cbd2fbc6ebb1cd016c1cb90ca2eb5c67482192cd43b1466f8212d8275ffa"
+    },
+    "snapshot/src/ios/Providers/Antigravity/AntigravityProvider.swift": {
+      "executable": false,
+      "sha256": "69054b0bedc366e97e2fa6bb1840bd406b81b45988b45b6fce086f74865ffd4a"
+    },
+    "snapshot/src/ios/Providers/Antigravity/OAuth/AntigravityOAuthManager.swift": {
+      "executable": false,
+      "sha256": "2eba74232fcde754cf6bb8c376d3fdc5b9df42a010572b32ed7434417dfd8bb4"
+    },
+    "snapshot/src/ios/Providers/Gemini/GeminiAgentProvider.swift": {
+      "executable": false,
+      "sha256": "c65e62ea83d9fcb30d04c2ddf17af86fbc1a6d85b5554116ace34ed0593f26ab"
+    },
+    "snapshot/src/ios/Providers/Gemini/GeminiModelsAPI.swift": {
+      "executable": false,
+      "sha256": "3fb9502841d0239dd620529c700291f105535900a8da6867edd194ff82b30c4e"
+    },
+    "snapshot/src/ios/Providers/Gemini/GeminiProvider.swift": {
+      "executable": false,
+      "sha256": "1b8e2b0b45d2e10ff28bffc12042d2a39a6f9d39aa09564744905a38090f927d"
+    },
+    "snapshot/src/ios/Providers/Gemini/GeminiWireFormat.swift": {
+      "executable": false,
+      "sha256": "ebcae3cf454ec211972c953cb0cfbeb8a19c1bf278d997bb57c3e0f61f32a4ed"
+    },
+    "snapshot/src/ios/Providers/Gemini/OAuth/GeminiOAuthManager.swift": {
+      "executable": false,
+      "sha256": "4ab72796ceea0dacd28e3b1efc8fb0430562ff855bce3d4f0d25d579ca134119"
+    },
+    "snapshot/src/ios/Providers/Kimi/KimiModelsAPI.swift": {
+      "executable": false,
+      "sha256": "a5b64e8f7e90bc6afec514533c92dda61eefbcae91fb567cae539cfd16b80be5"
+    },
+    "snapshot/src/ios/Providers/Kimi/OAuth/KimiDeviceFlow.swift": {
+      "executable": false,
+      "sha256": "af88c5eb07429f765782a2ff6e23aef347be2a5e4c753904cb76db15f3585d42"
+    },
+    "snapshot/src/ios/Providers/Kimi/OAuth/KimiOAuthManager.swift": {
+      "executable": false,
+      "sha256": "2c2ccbf8c0a36945ea1639f2d573e14fb460b3c7a8c0d0ff504d4fd54a9f43a3"
+    },
+    "snapshot/src/ios/Providers/Kimi/OAuth/KimiOAuthRefreshCoordinator.swift": {
+      "executable": false,
+      "sha256": "e1cafed9bbd74b1ddc67f18f73b3d5245a1ed3c745163da44e7a28dcbffc13be"
+    },
+    "snapshot/src/ios/Providers/LLMError.swift": {
+      "executable": false,
+      "sha256": "ded70e7bb1b0e37b377336c923d448551507c58ae7d68a99982cdb82d41892b4"
+    },
+    "snapshot/src/ios/Providers/LLMProvider.swift": {
+      "executable": false,
+      "sha256": "b58645eaba486c77fcd4c1b0a7a1459d71d4fa8cb6f855de7445a9b9246f5c1c"
+    },
+    "snapshot/src/ios/Providers/LLMProviderFactory.swift": {
+      "executable": false,
+      "sha256": "3d3a2817848bbdf7e40766f15bd75008c1944d08d9ebda6c004872bc4d252ea9"
+    },
+    "snapshot/src/ios/Providers/LLMTypes.swift": {
+      "executable": false,
+      "sha256": "75f0818d06e750b7343d998b77e81cf1cd1abbca27d746467f438d32d96c9b58"
+    },
+    "snapshot/src/ios/Providers/ModelEntry.swift": {
+      "executable": false,
+      "sha256": "f277068c368308caa2231b41f60abddcac4cf142d16af3bf8635f1f0486792ef"
+    },
+    "snapshot/src/ios/Providers/ModelGroup.swift": {
+      "executable": false,
+      "sha256": "46ac696c85e68b39bf44a1d40f4951367523948d6e8426a43a44efb9257b8335"
+    },
+    "snapshot/src/ios/Providers/ModelGroupRouter.swift": {
+      "executable": false,
+      "sha256": "0a4a4f8a8ed814e38c002307cf58d5c5a181487016724630c629c0faa5672c65"
+    },
+    "snapshot/src/ios/Providers/ModelReleaseIndex.swift": {
+      "executable": false,
+      "sha256": "14d0c22b74bd11518768d771874f9b85898a9f13302bfa05c35facfc69fa8675"
+    },
+    "snapshot/src/ios/Providers/ModelsDevAPI.swift": {
+      "executable": false,
+      "sha256": "92c48837eb5467e75291c649e28a7f081f0a80b0076aef342247f81ffb111f38"
+    },
+    "snapshot/src/ios/Providers/OAuthRefreshCoordinator.swift": {
+      "executable": false,
+      "sha256": "69eef5ebd2f72404eaf6c0630a1e56820cf5edc283c8f19443562a2c48c46690"
+    },
+    "snapshot/src/ios/Providers/OAuthRefreshSingleFlight.swift": {
+      "executable": false,
+      "sha256": "16b08a079889301f9f2ac10faa06b6a0d529382ffa6953e28341319abbd17838"
+    },
+    "snapshot/src/ios/Providers/OpenAI/DeepSeekBalanceClient.swift": {
+      "executable": false,
+      "sha256": "aa890ce948b59521055df4e91ac94903d4c79d5155c17fab8fb58be4a7e02301"
+    },
+    "snapshot/src/ios/Providers/OpenAI/DeepSeekBilling.swift": {
+      "executable": false,
+      "sha256": "3091fda184715b5a2802b410395aacb67e231dca25d9f74fce60ae23ff954532"
+    },
+    "snapshot/src/ios/Providers/OpenAI/DeepSeekRequestUsage.swift": {
+      "executable": false,
+      "sha256": "904ac287d5d88b2701f49a0a76c70e1041d5eabc373de61ba796db891150db55"
+    },
+    "snapshot/src/ios/Providers/OpenAI/OAuth/CodexOAuthManager.swift": {
+      "executable": false,
+      "sha256": "287963f5fcd4cbc0ce163fe53a5c223157a824e73d3b714bf8cc7eab8427958e"
+    },
+    "snapshot/src/ios/Providers/OpenAI/OpenAIAgentProvider.swift": {
+      "executable": false,
+      "sha256": "d291215e11b78d20d2c7973a9d3c91bd81dc9c7543a7bbb4e2e265d889312682"
+    },
+    "snapshot/src/ios/Providers/OpenAI/OpenAIModelsAPI.swift": {
+      "executable": false,
+      "sha256": "c2038cfd4fce8a4ba4a0fffe4a68e82bb65cccb00b4e17e03ef6d2e19ff9e2da"
+    },
+    "snapshot/src/ios/Providers/OpenAI/OpenAIProvider.swift": {
+      "executable": false,
+      "sha256": "a8e4f429de3fd74c901059d16bab95a96a056f6c5c464de76c69e3b26d601840"
+    },
+    "snapshot/src/ios/Providers/OpenAI/SessionCostLedger.swift": {
+      "executable": false,
+      "sha256": "ea9dd0fbe0e580e2d846f5e7118867d7cba13ebdafe7fef50a444597943efd48"
+    },
+    "snapshot/src/ios/Providers/OpenRouter/OAuth/OpenRouterOAuthManager.swift": {
+      "executable": false,
+      "sha256": "dbaf6a42683365f13dee9cd0d8ad3ec2c635a13959d22ff9f2e4698671edb813"
+    },
+    "snapshot/src/ios/Providers/OpenRouter/OpenRouterModelsAPI.swift": {
+      "executable": false,
+      "sha256": "4ef73675ce81f50e51cac1f467524f47a8c6841a7542c18d9b4dca88b0e2356c"
+    },
+    "snapshot/src/ios/Providers/ProviderConfigDB.swift": {
+      "executable": false,
+      "sha256": "e2e13b091965d9e77a56f95b128ad901b15c78e92d03a820700a6749e41151c1"
+    },
+    "snapshot/src/ios/Providers/ProviderConfigStore.swift": {
+      "executable": false,
+      "sha256": "d6913f05fb6bcf1b95090ccc63cb69f70282e77d07d2f6977513d968867ed2bf"
+    },
+    "snapshot/src/ios/Providers/ProviderInstance.swift": {
+      "executable": false,
+      "sha256": "4fa64c98113d586dd36343553eaa2f9596b8556e805893cdf186d678194040b2"
+    },
+    "snapshot/src/ios/Providers/ProviderMigration.swift": {
+      "executable": false,
+      "sha256": "31e11a86f7d3a945a89840cdae91cb3b0bbc0fd884bc8473f2cc3c717a86672e"
+    },
+    "snapshot/src/ios/Providers/ProviderTypes.swift": {
+      "executable": false,
+      "sha256": "ba4000afa5f022e52bca322ad5c50c454dba8a6a197f0e86f2c3864f0b3ccd06"
+    },
+    "snapshot/src/ios/Providers/Thinking/ThinkingRule.swift": {
+      "executable": false,
+      "sha256": "09a21c62c0bb8510f6d57377a33d50c9259e76d6ec6c65b71f5755818fdbaf25"
+    },
+    "snapshot/src/ios/Providers/Thinking/ThinkingRuleCoding.swift": {
+      "executable": false,
+      "sha256": "9c3aaa70181b5e9e253d3ec0463c03a36db9793aa53216304cd44e1333890c61"
+    },
+    "snapshot/src/ios/Providers/Thinking/ThinkingRuleResolver.swift": {
+      "executable": false,
+      "sha256": "ad631089f1026226f19ec33b170e2becf4c203ab58176edd4ff00bf867263706"
+    },
+    "snapshot/src/ios/Providers/Thinking/ThinkingWireFormat.swift": {
+      "executable": false,
+      "sha256": "07eb7a2e4492d496eac844a69d27ea3c68e2e33f930bbcfcd76e976707f6d736"
+    },
+    "snapshot/src/ios/Providers/ThinkingLevelCatalog.swift": {
+      "executable": false,
+      "sha256": "20f0dfe64d7737f30e00b37bbee7d3b0caa1db5e5fb62b55740aa1b3fafc8e87"
+    },
+    "snapshot/src/ios/Providers/URLBuilding.swift": {
+      "executable": false,
+      "sha256": "7b14abf504bf1d5fcb5e04537946f308d94e959e1467bfe3ca8b551e44141e0d"
+    },
+    "snapshot/src/ios/Providers/VisionGroupResolver.swift": {
+      "executable": false,
+      "sha256": "9329bbc27bd6fbf9e20f5804d715de15340f8a3e912c1912fe3575663b7073b6"
+    },
+    "snapshot/src/ios/Providers/xAI/OAuth/XAIOAuthManager.swift": {
+      "executable": false,
+      "sha256": "f8b9e68538e5336ce41040a571166eb696fcf4781c7e1cd24057a833a063119c"
+    },
+    "snapshot/src/ios/Providers/xAI/OAuth/XAITokenStorage.swift": {
+      "executable": false,
+      "sha256": "6a62d4c39418785b29d89240cdf0fe7babc416ed816ca08dc917bf635e13b15b"
+    },
+    "snapshot/src/ios/Providers/xAI/xAIModelsAPI.swift": {
+      "executable": false,
+      "sha256": "ee4932a5096448a3e6dc684f9761bfa1c35d6c1382fe1643e2733400c4e4caa6"
+    },
+    "snapshot/src/ios/Views/Chat/AIChatView.swift": {
+      "executable": false,
+      "sha256": "f60dabcfa2641f6f63c7ccbc711e29ef06fdfe90b16a437d30791b1df7f849a1"
+    },
+    "snapshot/src/ios/Views/Chat/ChatInputBar.swift": {
+      "executable": false,
+      "sha256": "71f007f08732947f978fa4c5d1c971de85451dcf9efc19485908a11030e60a8b"
+    },
+    "snapshot/tasks/active/26-09-29 DeepSeek 会话费用与账户余额/task.md": {
+      "executable": false,
+      "sha256": "e217cf1dab6257ae48523881e250695609cfd409964e47ba22101dbd350d7ff8"
+    }
+  },
+  "repo": "/Users/huyuanzhao/Coding/Projects/OpenMinis",
+  "schema": 1,
+  "snapshot_id": "8323d6b8acc20a2c4f5f2447a19fa53e2ea4a2e157a2a363bb220cf2740631c2",
+  "spec_selections": [],
+  "state": {
+    "base": "272da5d9bb8051c82075513df9a395344d4e7f6b",
+    "branch": "main",
+    "excluded_gitlinks": {
+      "deps/ish": {
+        "index_commit": "3f6384c70eefd1a370f121d3492a5f21f7767df9",
+        "status": "",
+        "worktree": "3f6384c70eefd1a370f121d3492a5f21f7767df9"
+      },
+      "deps/proot": {
+        "index_commit": "8cf13e997cdc9472997aae19df8050c073c9a86c",
+        "worktree": "uninitialized"
+      }
+    },
+    "exclusions": [
+      ".agents",
+      ".github",
+      ".gitignore",
+      ".gitmodules",
+      ".ignore",
+      "BUILDING.md",
+      "CONTRIBUTING.md",
+      "LICENSE",
+      "README.md",
+      "THIRD_PARTY_LICENSES.md",
+      "assets",
+      "deps",
+      "docs/backup-streaming-package-design.md",
+      "docs/harness/design.md",
+      "docs/harness/evidence",
+      "docs/harness/proposals",
+      "docs/harness/skills-guide.md",
+      "docs/harness/spec-context.md",
+      "docs/harness/validation.md",
+      "docs/ish-bg-cpu-governor-design.md",
+      "docs/minisx-release-status.md",
+      "docs/minisx-testflight-release-draft.md",
+      "docs/specs/debug-server-api.md",
+      "docs/specs/ios-calendar-recurrence.md",
+      "docs/specs/ios-device-data-capabilities.md",
+      "docs/specs/ios-sandbox-ish-summary.md",
+      "docs/specs/minis-url-scheme.md",
+      "scripts",
+      "src/android",
+      "src/ios/Agent/Background",
+      "src/ios/Agent/Backup",
+      "src/ios/Agent/BrowserUse",
+      "src/ios/Agent/ISH",
+      "src/ios/Agent/Intents",
+      "src/ios/Agent/Markdown",
+      "src/ios/Agent/MessageList",
+      "src/ios/Agent/Offload",
+      "src/ios/Agent/Session",
+      "src/ios/Agent/Shell",
+      "src/ios/Agent/Speech",
+      "src/ios/Agent/Sync",
+      "src/ios/Agent/ToolLoopDetector.swift",
+      "src/ios/AgentWidget",
+      "src/ios/AppDelegate.swift",
+      "src/ios/Assets.xcassets",
+      "src/ios/CalendarTests",
+      "src/ios/Configs",
+      "src/ios/Debug",
+      "src/ios/Diagnostics",
+      "src/ios/FileProvider",
+      "src/ios/ISHCommandExecutionExample.swift",
+      "src/ios/Info.plist",
+      "src/ios/Launch Screen.storyboard",
+      "src/ios/Minis.entitlements",
+      "src/ios/Minis.xcodeproj/project.xcworkspace",
+      "src/ios/Minis.xcodeproj/xcshareddata",
+      "src/ios/MinisApp-Bridging-Header.h",
+      "src/ios/MinisApp.swift",
+      "src/ios/MinisTests/BackupCategoryCountTests.swift",
+      "src/ios/MinisTests/BackupCryptoTests.swift",
+      "src/ios/MinisTests/BackupFormatCompatibilityTests.swift",
+      "src/ios/MinisTests/BackupIncompletenessTests.swift",
+      "src/ios/MinisTests/BackupOrderPreservationTests.swift",
+      "src/ios/MinisTests/BackupPackagingTests.swift",
+      "src/ios/MinisTests/BackupThinkingRulesRoundTripTests.swift",
+      "src/ios/MinisTests/ClaudeOAuthRefreshRaceTests.swift",
+      "src/ios/MinisTests/ContextPolicyTests.swift",
+      "src/ios/MinisTests/ContextUsageTests.swift",
+      "src/ios/MinisTests/CorrectionAdmissionTests.swift",
+      "src/ios/MinisTests/GeminiWireFormatTests.swift",
+      "src/ios/MinisTests/ISHContinuationResumeRaceTests.swift",
+      "src/ios/MinisTests/KimiOAuthTests.swift",
+      "src/ios/MinisTests/ModelUseTransientRetryTests.swift",
+      "src/ios/MinisTests/OAuthRefreshErrorClassifierTests.swift",
+      "src/ios/MinisTests/OAuthRefreshRaceAllProvidersTests.swift",
+      "src/ios/MinisTests/OffloadPermissionBypassTests.swift",
+      "src/ios/MinisTests/PastableTextViewSelectionTests.swift",
+      "src/ios/MinisTests/SFTPAbsolutePathTests.swift",
+      "src/ios/MinisTests/SessionBadgeFreshnessTests.swift",
+      "src/ios/MinisTests/ShareBufferTargetingTests.swift",
+      "src/ios/MinisTests/Standalone",
+      "src/ios/MinisTests/TestSupport_AppLogger.swift",
+      "src/ios/MinisTests/TextSegmenterTests.swift",
+      "src/ios/MinisTests/ThinkingLevelTests.swift",
+      "src/ios/MinisTests/ThinkingRulePersistenceTests.swift",
+      "src/ios/MinisTests/ThinkingRulesRegressionTests.swift",
+      "src/ios/MinisTests/ThinkingWireGeminiAnthropicSnapshotTests.swift",
+      "src/ios/MinisTests/ThinkingWireGoldenSnapshotTests.swift",
+      "src/ios/MinisTests/ToolLoopDetectorTests.swift",
+      "src/ios/MinisTests/ToolPreflightTests.swift",
+      "src/ios/MinisTests/VoiceComposerLifecycleTests.swift",
+      "src/ios/MinisTests/VoiceCorrectionTests.swift",
+      "src/ios/MinisTests/VoiceInputCaptureTests.swift",
+      "src/ios/MinisTests/VoiceStreamingAudioPipeTests.swift",
+      "src/ios/MinisTests/VoiceTextSanitizerTests.swift",
+      "src/ios/MinisTests/VoiceWaveformTests.swift",
+      "src/ios/MinisUITests",
+      "src/ios/NativeOffloads",
+      "src/ios/Preview Content",
+      "src/ios/PrivacyInfo.xcprivacy",
+      "src/ios/Providers/Voice",
+      "src/ios/Resources",
+      "src/ios/ShareExtension",
+      "src/ios/Shared",
+      "src/ios/Vendor",
+      "src/ios/Views/Alarms",
+      "src/ios/Views/Backup",
+      "src/ios/Views/Chat/AssistantBlockView.swift",
+      "src/ios/Views/Chat/AudioWaveformView.swift",
+      "src/ios/Views/Chat/ChatAccessibilityAnnouncer.swift",
+      "src/ios/Views/Chat/ChatMessageViews.swift",
+      "src/ios/Views/Chat/ChatTurnScreenshot.swift",
+      "src/ios/Views/Chat/EquatableContextMenu.swift",
+      "src/ios/Views/Chat/MarkdownPrepRegex.swift",
+      "src/ios/Views/Chat/MarkdownRenderView.swift",
+      "src/ios/Views/Chat/Media",
+      "src/ios/Views/Chat/MemoryWriteRevoker.swift",
+      "src/ios/Views/Chat/MinisMediaViews.swift",
+      "src/ios/Views/Chat/MinisShareSheet.swift",
+      "src/ios/Views/Chat/OffloadPermissionDialog.swift",
+      "src/ios/Views/Chat/PaginatedMarkdownView.swift",
+      "src/ios/Views/Chat/PrintHelper.swift",
+      "src/ios/Views/Chat/SelectableMarkdownView.swift",
+      "src/ios/Views/Chat/SessionMemoryView.swift",
+      "src/ios/Views/Chat/SessionSkillsView.swift",
+      "src/ios/Views/Chat/TextFadeAnimator.swift",
+      "src/ios/Views/Chat/ToolLiveSheet.swift",
+      "src/ios/Views/Chat/UsageStatsView.swift",
+      "src/ios/Views/Chat/Voice",
+      "src/ios/Views/Chat/WebLoadError.swift",
+      "src/ios/Views/Chat/WebPreviewSheet.swift",
+      "src/ios/Views/ContentView.swift",
+      "src/ios/Views/MCP",
+      "src/ios/Views/Providers",
+      "src/ios/Views/Rootfs",
+      "src/ios/Views/Settings",
+      "src/ios/Views/Skills",
+      "src/ios/Views/Sync",
+      "src/ios/WebApp",
+      "src/ios/de.lproj",
+      "src/ios/default_mount",
+      "src/ios/en.lproj",
+      "src/ios/es.lproj",
+      "src/ios/fr.lproj",
+      "src/ios/iSH",
+      "src/ios/ja.lproj",
+      "src/ios/ko.lproj",
+      "src/ios/ru.lproj",
+      "src/ios/zh-Hans.lproj",
+      "src/ios/zh-Hant.lproj",
+      "src/shared",
+      "tasks/README.md",
+      "tasks/active/26-09-28 实时语音转录",
+      "tasks/active/26-09-28 语音输入 UI 正式接入",
+      "tasks/active/26-09-28 输入框默认两行高度",
+      "tasks/archive"
+    ],
+    "files": {
+      "AGENTS.md": {
+        "executable": false,
+        "sha256": "7b9d876352ee243dc766615e0740ae6f4935f37da6a3d734812c4833cdf16bf1"
+      },
+      "docs/harness/operations.md": {
+        "executable": false,
+        "sha256": "d281a7b15d863f59d7b67d8664b7e40e7b938af0e2a6e90ae81a727ec67186d1"
+      },
+      "docs/harness/record-formats.md": {
+        "executable": false,
+        "sha256": "c9976e712ab6cda971eed87d0bf5182ec335c204bb9643943718e7da127eb65e"
+      },
+      "docs/specs/resource-efficiency.md": {
+        "executable": false,
+        "sha256": "974c545f843aa78abfa031abdd855a6a54c5caceee1a05f896b78d58bb048503"
+      },
+      "src/ios/Agent/Chat/AIChatViewModel+Attachments.swift": {
+        "executable": false,
+        "sha256": "271c38c1de68d65086513db91e2c62ad80da028aaf0954533811bb5a71167ea0"
+      },
+      "src/ios/Agent/Chat/AIChatViewModel+BackgroundTask.swift": {
+        "executable": false,
+        "sha256": "ffa68a334b08dd960c755f012d015478993679d15a90d63e6c7578531415de21"
+      },
+      "src/ios/Agent/Chat/AIChatViewModel+Billing.swift": {
+        "executable": false,
+        "sha256": "a1e07074cc8f8b22a0b749beb50a0d622d44f2ca18187f065d952d2c9f47d366"
+      },
+      "src/ios/Agent/Chat/AIChatViewModel+Compaction.swift": {
+        "executable": false,
+        "sha256": "eda5e23a7c76d733bdf09b5cafda7704098fa537245a8fc3b80cec4f64389307"
+      },
+      "src/ios/Agent/Chat/AIChatViewModel+ConcurrentTools.swift": {
+        "executable": false,
+        "sha256": "026814e7899baeaa2686b7f36b0624321071e76b944a7b937cc8937ba2cab358"
+      },
+      "src/ios/Agent/Chat/AIChatViewModel+Fallback.swift": {
+        "executable": false,
+        "sha256": "448385c6ee7daac38ccfcbebad84b7cffa87e7c1b8367a23242abc66648ed049"
+      },
+      "src/ios/Agent/Chat/AIChatViewModel+FileTools.swift": {
+        "executable": false,
+        "sha256": "bb52f3a6eeba4e30f4984d1a44c2bb59984aa3697c31f0a38172833ad036cdf7"
+      },
+      "src/ios/Agent/Chat/AIChatViewModel+ISHCommand.swift": {
+        "executable": false,
+        "sha256": "3364255cfab98922731a540a87e6298c724f078e5d77e746c40eec1b8be7397c"
+      },
+      "src/ios/Agent/Chat/AIChatViewModel+MemoryTools.swift": {
+        "executable": false,
+        "sha256": "6667feb50dd661ba9df7b61d8d1ae84b7a5cfa98f826fb40acb71e2a00556469"
+      },
+      "src/ios/Agent/Chat/AIChatViewModel+MentionMenu.swift": {
+        "executable": false,
+        "sha256": "e5276c1c0c236899d11cc56366ecc141ad07179de164983374b1036c04c50622"
+      },
+      "src/ios/Agent/Chat/AIChatViewModel+Misc.swift": {
+        "executable": false,
+        "sha256": "01a4651ac0b6d60e6287a3c8c3361a5e7fa50a1b2b1a6e02c63fc2dce0d9daa7"
+      },
+      "src/ios/Agent/Chat/AIChatViewModel+Offloading.swift": {
+        "executable": false,
+        "sha256": "080ece38023c6e7492345d5930656ff58e32aea95aeb09e42f6730ca5e4beb21"
+      },
+      "src/ios/Agent/Chat/AIChatViewModel+Persistence.swift": {
+        "executable": false,
+        "sha256": "31f31bfd30f04a9c8327c0ac9f7e6979c384ff0adab702ada744330a86b2f0ae"
+      },
+      "src/ios/Agent/Chat/AIChatViewModel+ProviderFactory.swift": {
+        "executable": false,
+        "sha256": "086cda5f7ac8e06c1883ec6289bb7726e13c90da46bb687641d44f22622ef9d2"
+      },
+      "src/ios/Agent/Chat/AIChatViewModel+RequestBudget.swift": {
+        "executable": false,
+        "sha256": "1aedc249fc4d5e462e5b6c20fbc5379982c8f0f2ba76d9505e00ecb06a1130fc"
+      },
+      "src/ios/Agent/Chat/AIChatViewModel+SSEStream.swift": {
+        "executable": false,
+        "sha256": "54e4e88c8a8e2948b719373413f4896d44c26cbbb6bf07da0e0134e69e5519c9"
+      },
+      "src/ios/Agent/Chat/AIChatViewModel+SlashCommands.swift": {
+        "executable": false,
+        "sha256": "5b1c6d07dbbd762cdccb37b30e6e62f7cac08bcc5e60c89b52c1e3d80cbd46a2"
+      },
+      "src/ios/Agent/Chat/AIChatViewModel+TitleGeneration.swift": {
+        "executable": false,
+        "sha256": "ca4e0fdffe55e07c17eb73c948d570eb889f7cf5198f60ef492f6d2550f92aff"
+      },
+      "src/ios/Agent/Chat/AIChatViewModel+ToolDefinitions.swift": {
+        "executable": false,
+        "sha256": "4a78e5f074e4205bb66b26cf95d6aaf6e32c898f2a1d62db6ac8db392c7d7127"
+      },
+      "src/ios/Agent/Chat/AIChatViewModel+ToolPreflight.swift": {
+        "executable": false,
+        "sha256": "6b6475f7a8260100791f365a78a1f985062df3625563019bf5c8c07361e39826"
+      },
+      "src/ios/Agent/Chat/AIChatViewModel.swift": {
+        "executable": false,
+        "sha256": "3d8a7b49ce4e4905a57bbf70784278285346361f354f6326655f62e71939e9bc"
+      },
+      "src/ios/Agent/Chat/ChatLifecycleSupport.swift": {
+        "executable": false,
+        "sha256": "14357f340e0fe5aee070e49052caaa76ec1819453cd210da5bcffe49624f374f"
+      },
+      "src/ios/Agent/Chat/ChatModels.swift": {
+        "executable": false,
+        "sha256": "be4b7ae3397fba8654dc1f1de1389b5cfedbc63a80cff6ed2caf46ebddbffade"
+      },
+      "src/ios/Agent/Chat/ChatStore.swift": {
+        "executable": false,
+        "sha256": "d740e3241c2aafa134d7901362cc12829bb333ae770a8cf56c6c18dc1c597df9"
+      },
+      "src/ios/Agent/Chat/ChatURLBrokerage.swift": {
+        "executable": false,
+        "sha256": "21300eb626e63f5473ea2013ee0fd00714edd88a5cb7b8d0e9f7eb2521e3f5be"
+      },
+      "src/ios/Agent/Chat/ContextPolicy.swift": {
+        "executable": false,
+        "sha256": "b7de01e7a8781dd8341ca5687a2aa7bb9c1b575c9dc6a508b3d0414d33a85a25"
+      },
+      "src/ios/Agent/Chat/ContextUsagePersistence.swift": {
+        "executable": false,
+        "sha256": "48ccd15a99b0233d00bb940bbad451b315925bf28219339d19c634bbab4766eb"
+      },
+      "src/ios/Agent/Chat/FileMentionIndex.swift": {
+        "executable": false,
+        "sha256": "e1dcb4cbc31934d4059df62e14780bb06f48846f4fef6b173d09441abd18f2d2"
+      },
+      "src/ios/Agent/Chat/MinisURLPathDecoding.swift": {
+        "executable": false,
+        "sha256": "9445c0edda5531536e66ee7bf17643962c35bb35b6060f07ddfeefabcefc940b"
+      },
+      "src/ios/Localizable.xcstrings": {
+        "executable": false,
+        "sha256": "67fc315a9b9dc9a903efc5d619f62037d3f04de007da1a1b4d907bcd76ee5d06"
+      },
+      "src/ios/Minis.xcodeproj/project.pbxproj": {
+        "executable": false,
+        "sha256": "c25864c4775885e0c448e2e6d2b08f11ba0812cea3b2626b7f4a440025e2dfc8"
+      },
+      "src/ios/MinisTests/DeepSeekBalanceModelTests.swift": {
+        "executable": false,
+        "sha256": "42eba52b7161d2953c6f201bed5416a7ebde7ffb1001607c47ceed37e05a7bc8"
+      },
+      "src/ios/MinisTests/DeepSeekBillingTests.swift": {
+        "executable": false,
+        "sha256": "f588597d84940776c851a2757aa8bc40fe46d0978048eb731dbb85f9dffe53e7"
+      },
+      "src/ios/MinisTests/SessionCostLedgerTests.swift": {
+        "executable": false,
+        "sha256": "3be0322c469e7ef9abfe418147838ea83a828dd897bada6c7832680bf8ec8698"
+      },
+      "src/ios/Providers/AgentProvider.swift": {
+        "executable": false,
+        "sha256": "13b681988ec2f60c117c12eaba89d94d2f4da7c4f1c962cca2c6164d4ec80913"
+      },
+      "src/ios/Providers/Anthropic/AnthropicAgentProvider.swift": {
+        "executable": false,
+        "sha256": "d6069863fa2663b2a65138d9970f2cab16f67117abb5e88d8e53bbb03bc93579"
+      },
+      "src/ios/Providers/Anthropic/AnthropicModelsAPI.swift": {
+        "executable": false,
+        "sha256": "c4ee474e653ec91f8d5f33422357baf76722f9976c66c6aaa8ec65a5baa27960"
+      },
+      "src/ios/Providers/Anthropic/AnthropicProvider.swift": {
+        "executable": false,
+        "sha256": "3f9dbc145123d30669c81b63dfddb874d28ad276f2a7c0e19aa2bbddc35b866a"
+      },
+      "src/ios/Providers/Anthropic/OAuth/ClaudeOAuthManager.swift": {
+        "executable": false,
+        "sha256": "9166496117349a78afc1d092f95ac5e6b52cb805862e61ecaf11445c60fa4749"
+      },
+      "src/ios/Providers/Anthropic/OAuth/ClaudeOAuthRefreshCoordinator.swift": {
+        "executable": false,
+        "sha256": "840892ea594c513d3a1ac18e77e33318d165584fe1c13ebb8b772b8c318f9c4e"
+      },
+      "src/ios/Providers/Anthropic/OAuthHTTPClient.swift": {
+        "executable": false,
+        "sha256": "2a3d6d4a5d970176f30bf5b5d35a1dd5664a57489f6ef3daef9e50af4912f88e"
+      },
+      "src/ios/Providers/Antigravity/AntigravityAgentProvider.swift": {
+        "executable": false,
+        "sha256": "e477ac58659f9612fa68b114bfb29b7c23862d2b59890f4bbf673dda7d470e28"
+      },
+      "src/ios/Providers/Antigravity/AntigravityModelsAPI.swift": {
+        "executable": false,
+        "sha256": "8d64cbd2fbc6ebb1cd016c1cb90ca2eb5c67482192cd43b1466f8212d8275ffa"
+      },
+      "src/ios/Providers/Antigravity/AntigravityProvider.swift": {
+        "executable": false,
+        "sha256": "69054b0bedc366e97e2fa6bb1840bd406b81b45988b45b6fce086f74865ffd4a"
+      },
+      "src/ios/Providers/Antigravity/OAuth/AntigravityOAuthManager.swift": {
+        "executable": false,
+        "sha256": "2eba74232fcde754cf6bb8c376d3fdc5b9df42a010572b32ed7434417dfd8bb4"
+      },
+      "src/ios/Providers/Gemini/GeminiAgentProvider.swift": {
+        "executable": false,
+        "sha256": "c65e62ea83d9fcb30d04c2ddf17af86fbc1a6d85b5554116ace34ed0593f26ab"
+      },
+      "src/ios/Providers/Gemini/GeminiModelsAPI.swift": {
+        "executable": false,
+        "sha256": "3fb9502841d0239dd620529c700291f105535900a8da6867edd194ff82b30c4e"
+      },
+      "src/ios/Providers/Gemini/GeminiProvider.swift": {
+        "executable": false,
+        "sha256": "1b8e2b0b45d2e10ff28bffc12042d2a39a6f9d39aa09564744905a38090f927d"
+      },
+      "src/ios/Providers/Gemini/GeminiWireFormat.swift": {
+        "executable": false,
+        "sha256": "ebcae3cf454ec211972c953cb0cfbeb8a19c1bf278d997bb57c3e0f61f32a4ed"
+      },
+      "src/ios/Providers/Gemini/OAuth/GeminiOAuthManager.swift": {
+        "executable": false,
+        "sha256": "4ab72796ceea0dacd28e3b1efc8fb0430562ff855bce3d4f0d25d579ca134119"
+      },
+      "src/ios/Providers/Kimi/KimiModelsAPI.swift": {
+        "executable": false,
+        "sha256": "a5b64e8f7e90bc6afec514533c92dda61eefbcae91fb567cae539cfd16b80be5"
+      },
+      "src/ios/Providers/Kimi/OAuth/KimiDeviceFlow.swift": {
+        "executable": false,
+        "sha256": "af88c5eb07429f765782a2ff6e23aef347be2a5e4c753904cb76db15f3585d42"
+      },
+      "src/ios/Providers/Kimi/OAuth/KimiOAuthManager.swift": {
+        "executable": false,
+        "sha256": "2c2ccbf8c0a36945ea1639f2d573e14fb460b3c7a8c0d0ff504d4fd54a9f43a3"
+      },
+      "src/ios/Providers/Kimi/OAuth/KimiOAuthRefreshCoordinator.swift": {
+        "executable": false,
+        "sha256": "e1cafed9bbd74b1ddc67f18f73b3d5245a1ed3c745163da44e7a28dcbffc13be"
+      },
+      "src/ios/Providers/LLMError.swift": {
+        "executable": false,
+        "sha256": "ded70e7bb1b0e37b377336c923d448551507c58ae7d68a99982cdb82d41892b4"
+      },
+      "src/ios/Providers/LLMProvider.swift": {
+        "executable": false,
+        "sha256": "b58645eaba486c77fcd4c1b0a7a1459d71d4fa8cb6f855de7445a9b9246f5c1c"
+      },
+      "src/ios/Providers/LLMProviderFactory.swift": {
+        "executable": false,
+        "sha256": "3d3a2817848bbdf7e40766f15bd75008c1944d08d9ebda6c004872bc4d252ea9"
+      },
+      "src/ios/Providers/LLMTypes.swift": {
+        "executable": false,
+        "sha256": "75f0818d06e750b7343d998b77e81cf1cd1abbca27d746467f438d32d96c9b58"
+      },
+      "src/ios/Providers/ModelEntry.swift": {
+        "executable": false,
+        "sha256": "f277068c368308caa2231b41f60abddcac4cf142d16af3bf8635f1f0486792ef"
+      },
+      "src/ios/Providers/ModelGroup.swift": {
+        "executable": false,
+        "sha256": "46ac696c85e68b39bf44a1d40f4951367523948d6e8426a43a44efb9257b8335"
+      },
+      "src/ios/Providers/ModelGroupRouter.swift": {
+        "executable": false,
+        "sha256": "0a4a4f8a8ed814e38c002307cf58d5c5a181487016724630c629c0faa5672c65"
+      },
+      "src/ios/Providers/ModelReleaseIndex.swift": {
+        "executable": false,
+        "sha256": "14d0c22b74bd11518768d771874f9b85898a9f13302bfa05c35facfc69fa8675"
+      },
+      "src/ios/Providers/ModelsDevAPI.swift": {
+        "executable": false,
+        "sha256": "92c48837eb5467e75291c649e28a7f081f0a80b0076aef342247f81ffb111f38"
+      },
+      "src/ios/Providers/OAuthRefreshCoordinator.swift": {
+        "executable": false,
+        "sha256": "69eef5ebd2f72404eaf6c0630a1e56820cf5edc283c8f19443562a2c48c46690"
+      },
+      "src/ios/Providers/OAuthRefreshSingleFlight.swift": {
+        "executable": false,
+        "sha256": "16b08a079889301f9f2ac10faa06b6a0d529382ffa6953e28341319abbd17838"
+      },
+      "src/ios/Providers/OpenAI/DeepSeekBalanceClient.swift": {
+        "executable": false,
+        "sha256": "aa890ce948b59521055df4e91ac94903d4c79d5155c17fab8fb58be4a7e02301"
+      },
+      "src/ios/Providers/OpenAI/DeepSeekBilling.swift": {
+        "executable": false,
+        "sha256": "3091fda184715b5a2802b410395aacb67e231dca25d9f74fce60ae23ff954532"
+      },
+      "src/ios/Providers/OpenAI/DeepSeekRequestUsage.swift": {
+        "executable": false,
+        "sha256": "904ac287d5d88b2701f49a0a76c70e1041d5eabc373de61ba796db891150db55"
+      },
+      "src/ios/Providers/OpenAI/OAuth/CodexOAuthManager.swift": {
+        "executable": false,
+        "sha256": "287963f5fcd4cbc0ce163fe53a5c223157a824e73d3b714bf8cc7eab8427958e"
+      },
+      "src/ios/Providers/OpenAI/OpenAIAgentProvider.swift": {
+        "executable": false,
+        "sha256": "d291215e11b78d20d2c7973a9d3c91bd81dc9c7543a7bbb4e2e265d889312682"
+      },
+      "src/ios/Providers/OpenAI/OpenAIModelsAPI.swift": {
+        "executable": false,
+        "sha256": "c2038cfd4fce8a4ba4a0fffe4a68e82bb65cccb00b4e17e03ef6d2e19ff9e2da"
+      },
+      "src/ios/Providers/OpenAI/OpenAIProvider.swift": {
+        "executable": false,
+        "sha256": "a8e4f429de3fd74c901059d16bab95a96a056f6c5c464de76c69e3b26d601840"
+      },
+      "src/ios/Providers/OpenAI/SessionCostLedger.swift": {
+        "executable": false,
+        "sha256": "ea9dd0fbe0e580e2d846f5e7118867d7cba13ebdafe7fef50a444597943efd48"
+      },
+      "src/ios/Providers/OpenRouter/OAuth/OpenRouterOAuthManager.swift": {
+        "executable": false,
+        "sha256": "dbaf6a42683365f13dee9cd0d8ad3ec2c635a13959d22ff9f2e4698671edb813"
+      },
+      "src/ios/Providers/OpenRouter/OpenRouterModelsAPI.swift": {
+        "executable": false,
+        "sha256": "4ef73675ce81f50e51cac1f467524f47a8c6841a7542c18d9b4dca88b0e2356c"
+      },
+      "src/ios/Providers/ProviderConfigDB.swift": {
+        "executable": false,
+        "sha256": "e2e13b091965d9e77a56f95b128ad901b15c78e92d03a820700a6749e41151c1"
+      },
+      "src/ios/Providers/ProviderConfigStore.swift": {
+        "executable": false,
+        "sha256": "d6913f05fb6bcf1b95090ccc63cb69f70282e77d07d2f6977513d968867ed2bf"
+      },
+      "src/ios/Providers/ProviderInstance.swift": {
+        "executable": false,
+        "sha256": "4fa64c98113d586dd36343553eaa2f9596b8556e805893cdf186d678194040b2"
+      },
+      "src/ios/Providers/ProviderMigration.swift": {
+        "executable": false,
+        "sha256": "31e11a86f7d3a945a89840cdae91cb3b0bbc0fd884bc8473f2cc3c717a86672e"
+      },
+      "src/ios/Providers/ProviderTypes.swift": {
+        "executable": false,
+        "sha256": "ba4000afa5f022e52bca322ad5c50c454dba8a6a197f0e86f2c3864f0b3ccd06"
+      },
+      "src/ios/Providers/Thinking/ThinkingRule.swift": {
+        "executable": false,
+        "sha256": "09a21c62c0bb8510f6d57377a33d50c9259e76d6ec6c65b71f5755818fdbaf25"
+      },
+      "src/ios/Providers/Thinking/ThinkingRuleCoding.swift": {
+        "executable": false,
+        "sha256": "9c3aaa70181b5e9e253d3ec0463c03a36db9793aa53216304cd44e1333890c61"
+      },
+      "src/ios/Providers/Thinking/ThinkingRuleResolver.swift": {
+        "executable": false,
+        "sha256": "ad631089f1026226f19ec33b170e2becf4c203ab58176edd4ff00bf867263706"
+      },
+      "src/ios/Providers/Thinking/ThinkingWireFormat.swift": {
+        "executable": false,
+        "sha256": "07eb7a2e4492d496eac844a69d27ea3c68e2e33f930bbcfcd76e976707f6d736"
+      },
+      "src/ios/Providers/ThinkingLevelCatalog.swift": {
+        "executable": false,
+        "sha256": "20f0dfe64d7737f30e00b37bbee7d3b0caa1db5e5fb62b55740aa1b3fafc8e87"
+      },
+      "src/ios/Providers/URLBuilding.swift": {
+        "executable": false,
+        "sha256": "7b14abf504bf1d5fcb5e04537946f308d94e959e1467bfe3ca8b551e44141e0d"
+      },
+      "src/ios/Providers/VisionGroupResolver.swift": {
+        "executable": false,
+        "sha256": "9329bbc27bd6fbf9e20f5804d715de15340f8a3e912c1912fe3575663b7073b6"
+      },
+      "src/ios/Providers/xAI/OAuth/XAIOAuthManager.swift": {
+        "executable": false,
+        "sha256": "f8b9e68538e5336ce41040a571166eb696fcf4781c7e1cd24057a833a063119c"
+      },
+      "src/ios/Providers/xAI/OAuth/XAITokenStorage.swift": {
+        "executable": false,
+        "sha256": "6a62d4c39418785b29d89240cdf0fe7babc416ed816ca08dc917bf635e13b15b"
+      },
+      "src/ios/Providers/xAI/xAIModelsAPI.swift": {
+        "executable": false,
+        "sha256": "ee4932a5096448a3e6dc684f9761bfa1c35d6c1382fe1643e2733400c4e4caa6"
+      },
+      "src/ios/Views/Chat/AIChatView.swift": {
+        "executable": false,
+        "sha256": "f60dabcfa2641f6f63c7ccbc711e29ef06fdfe90b16a437d30791b1df7f849a1"
+      },
+      "src/ios/Views/Chat/ChatInputBar.swift": {
+        "executable": false,
+        "sha256": "71f007f08732947f978fa4c5d1c971de85451dcf9efc19485908a11030e60a8b"
+      },
+      "tasks/active/26-09-29 DeepSeek 会话费用与账户余额/task.md": {
+        "executable": false,
+        "sha256": "e217cf1dab6257ae48523881e250695609cfd409964e47ba22101dbd350d7ff8"
+      }
+    },
+    "head": "272da5d9bb8051c82075513df9a395344d4e7f6b",
+    "index_sha256": "413b025c46f215fcc35355ed082d318525bd63627d3a4fa340b485fd3485ceee",
+    "requirements": {
+      "docs/specs/resource-efficiency.md": "974c545f843aa78abfa031abdd855a6a54c5caceee1a05f896b78d58bb048503",
+      "tasks/active/26-09-29 DeepSeek 会话费用与账户余额/task.md": "e217cf1dab6257ae48523881e250695609cfd409964e47ba22101dbd350d7ff8"
+    },
+    "status": " M docs/minisx-release-status.md\u0000 M src/ios/Agent/Chat/AIChatViewModel+Persistence.swift\u0000 M src/ios/Agent/Chat/AIChatViewModel+SSEStream.swift\u0000 M src/ios/Agent/Chat/AIChatViewModel.swift\u0000 M src/ios/Agent/Chat/ChatStore.swift\u0000 M src/ios/Localizable.xcstrings\u0000 M src/ios/Minis.xcodeproj/project.pbxproj\u0000 M src/ios/Providers/LLMTypes.swift\u0000 M src/ios/Providers/OpenAI/OpenAIAgentProvider.swift\u0000 M src/ios/Views/Chat/AIChatView.swift\u0000?? src/ios/Agent/Chat/AIChatViewModel+Billing.swift\u0000?? src/ios/MinisTests/DeepSeekBalanceModelTests.swift\u0000?? src/ios/MinisTests/DeepSeekBillingTests.swift\u0000?? src/ios/MinisTests/SessionCostLedgerTests.swift\u0000?? src/ios/Providers/OpenAI/DeepSeekBalanceClient.swift\u0000?? src/ios/Providers/OpenAI/DeepSeekBilling.swift\u0000?? src/ios/Providers/OpenAI/DeepSeekRequestUsage.swift\u0000?? src/ios/Providers/OpenAI/SessionCostLedger.swift\u0000?? tasks/active/26-09-29 DeepSeek 会话费用与账户余额/task.md\u0000",
+    "task_record_policy": "selected-only"
+  },
+  "task": "tasks/active/26-09-29 DeepSeek 会话费用与账户余额/task.md"
+}

@@ -62,6 +62,7 @@ final class OpenAIAgentProvider: AgentProvider {
         maxTokens: Int,
         thinkingLevel: ThinkingLevel = .off
     ) async throws -> AsyncThrowingStream<AgentStreamEvent, Error> {
+        let billingStartedAt = Date()
         let openAIMessages = flattenChatCompletionsMessages(messages, thinkingLevel: thinkingLevel)
         let openAITools = convertToolsChatCompletions(tools)
 
@@ -264,6 +265,9 @@ final class OpenAIAgentProvider: AgentProvider {
                             // the cached tokens, inflating "Input (incl. cache)" by ~2x.
                             let freshInput = (cacheRead.map { promptTokens - $0 }).flatMap { $0 >= 0 ? $0 : nil } ?? promptTokens
                             let u = LLMUsage(
+                                deepSeekUsage: DeepSeekRequestUsage.parse(usage,
+                                    modelID: event["model"] as? String ?? model.id,
+                                    baseURL: provider.customBaseURL ?? "", startedAt: billingStartedAt),
                                 inputTokens: freshInput,
                                 outputTokens: usage["completion_tokens"] as? Int ?? 0,
                                 cacheCreationInputTokens: details?["cache_creation_input_tokens"] as? Int,
@@ -425,6 +429,7 @@ final class OpenAIAgentProvider: AgentProvider {
         maxTokens: Int,
         thinkingLevel: ThinkingLevel = .off
     ) async throws -> AsyncThrowingStream<AgentStreamEvent, Error> {
+        let billingStartedAt = Date()
         let inputMessages = convertMessagesResponsesAPI(messages)
         let responsesTools = convertToolsResponsesAPI(tools)
 
@@ -800,6 +805,9 @@ final class OpenAIAgentProvider: AgentProvider {
                                 let totalInput = usage["input_tokens"] as? Int ?? 0
                                 let freshInput = (cacheRead.map { totalInput - $0 }).flatMap { $0 >= 0 ? $0 : nil } ?? totalInput
                                 let u = LLMUsage(
+                                    deepSeekUsage: DeepSeekRequestUsage.parse(usage,
+                                        modelID: response?["model"] as? String ?? model.id,
+                                        baseURL: provider.customBaseURL ?? "", startedAt: billingStartedAt, responsesAPI: true),
                                     inputTokens: freshInput,
                                     outputTokens: usage["output_tokens"] as? Int ?? 0,
                                     cacheCreationInputTokens: nil,

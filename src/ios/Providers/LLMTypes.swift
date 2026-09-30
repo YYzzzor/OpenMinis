@@ -1006,6 +1006,7 @@ enum LLMStreamChunk: Sendable {
 }
 
 struct LLMUsage: Sendable {
+    var deepSeekUsage: DeepSeekRequestUsage? = nil
     let inputTokens: Int
     let outputTokens: Int
     let cacheCreationInputTokens: Int?

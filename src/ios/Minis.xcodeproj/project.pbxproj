@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0D71E772FF8EC0C1C07003C8 /* AIChatViewModel+Billing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 161F76C65ACF19E72D1C6E8D /* AIChatViewModel+Billing.swift */; };
 		21FED4B7BB6F6D9476C9992E /* VoiceProvider+System.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88993FC8E3F0199C6638F664 /* VoiceProvider+System.swift */; };
 		241D530017827D7F0EB604DE /* VoiceProviderFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2941B643B8A2F048A2B154E /* VoiceProviderFactory.swift */; };
 		2A4FD49F872431D703328384 /* VoiceOutputPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 424510790AF3FB2452D3CCE3 /* VoiceOutputPlayer.swift */; };
@@ -18,12 +19,14 @@
 		52535805A60BA4B26902EAFA /* VoiceInputModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 535D58AA5C4B7B563E4C8821 /* VoiceInputModels.swift */; };
 		52F76965817EDFB2E37E8220 /* InlineVoiceInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D1A2B7331C508B0D3E77D28 /* InlineVoiceInputView.swift */; };
 		57E63023C8A9A3C505DF411B /* VoiceActivityDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7E2CB0D0D63E6D6FDB45568 /* VoiceActivityDetector.swift */; };
+		5E96BCE7243CE0A22DE33858 /* DeepSeekRequestUsage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CD4993CB0EE7E3D375D96F5 /* DeepSeekRequestUsage.swift */; };
 		5EF8347C1EAA0066EFF631F8 /* GroupVoiceModelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ED149397BEA7E0408C92688 /* GroupVoiceModelsView.swift */; };
 		672782820B404BA8BF47393F /* VoiceComposerPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6501BBCA307141AFB8CA404D /* VoiceComposerPanel.swift */; };
 		77BB9741AB0EFC449FDBDFED /* VoiceWaveformView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16FF3462D09402F14B610CD6 /* VoiceWaveformView.swift */; };
 		7A49962E84F115865D41B933 /* AudioSessionCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE154CF628D8699BD99CF9CB /* AudioSessionCoordinator.swift */; };
 		891443CAA4679D09A6D32AE4 /* RealTimeCutVADLibrary in Frameworks */ = {isa = PBXBuildFile; productRef = C42120806C66A2C804F89620 /* RealTimeCutVADLibrary */; };
 		8B886DA8A270E8FB58A9A1FA /* SpeechPlayerControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A302B074A0BE0AFED8EC7E9 /* SpeechPlayerControl.swift */; };
+		95C2FD7F3A882FEF75997721 /* SessionCostLedger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 881B1F92081CD4DE3EB93BD7 /* SessionCostLedger.swift */; };
 		A11Y0001 /* ChatAccessibilityAnnouncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11Y0002 /* ChatAccessibilityAnnouncer.swift */; };
 		A1B2C3D4E5F60718293A4B5C /* SystemVoiceCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B5D /* SystemVoiceCatalog.swift */; };
 		AA0838A02F3B941A00049557 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0838A12F3B941A00049557 /* AboutView.swift */; };
@@ -64,6 +67,7 @@
 		BB1000100F700000000000AB /* ContextUsagePersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB1000110F700000000000AB /* ContextUsagePersistence.swift */; };
 		BB1000120F700000000000AA /* ContextPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB1000110F700000000000AA /* ContextPolicy.swift */; };
 		BB1000120F700000000000AB /* ContextUsagePersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB1000110F700000000000AB /* ContextUsagePersistence.swift */; };
+		BC089BD3A69DE71B60BEB570 /* DeepSeekBilling.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0AB7DB2B26934693BD0FF13 /* DeepSeekBilling.swift */; };
 		BKP000101 /* BackupFormat.swift in Sources */ = {isa = PBXBuildFile; fileRef = BKP000201 /* BackupFormat.swift */; };
 		BKP000102 /* BackupBlobStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = BKP000202 /* BackupBlobStore.swift */; };
 		BKP000103 /* BackupJSONLWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = BKP000203 /* BackupJSONLWriter.swift */; };
@@ -493,6 +497,7 @@
 		EXA000001 /* xAIModelsAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = EXA000011 /* xAIModelsAPI.swift */; };
 		EXA000002 /* XAITokenStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = EXA000012 /* XAITokenStorage.swift */; };
 		EXA000003 /* XAIOAuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EXA000013 /* XAIOAuthManager.swift */; };
+		F0F3573D9239DBDD1BF723A2 /* DeepSeekBalanceClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = C185F5F67EFE2894E2EEAD76 /* DeepSeekBalanceClient.swift */; };
 		F1A00020 /* MessageListInfrastructure.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A00021 /* MessageListInfrastructure.swift */; };
 		F1M00012 /* AudioPlayback.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1M00011 /* AudioPlayback.swift */; };
 		F1M00014 /* VideoPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1M00013 /* VideoPlayer.swift */; };
@@ -620,9 +625,11 @@
 /* Begin PBXFileReference section */
 		0ED149397BEA7E0408C92688 /* GroupVoiceModelsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GroupVoiceModelsView.swift; sourceTree = "<group>"; };
 		0F5379380323FA8C6477708C /* GroupSlotPicker.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GroupSlotPicker.swift; sourceTree = "<group>"; };
+		161F76C65ACF19E72D1C6E8D /* AIChatViewModel+Billing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AIChatViewModel+Billing.swift"; sourceTree = "<group>"; };
 		16FF3462D09402F14B610CD6 /* VoiceWaveformView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VoiceWaveformView.swift; sourceTree = "<group>"; };
 		28E23EA0E199D6D50EBC76F2 /* VoiceLog.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VoiceLog.swift; sourceTree = "<group>"; };
 		2BB45FC87D39AE9AB4495BE9 /* VoiceProvider+Vendors.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "VoiceProvider+Vendors.swift"; sourceTree = "<group>"; };
+		2CD4993CB0EE7E3D375D96F5 /* DeepSeekRequestUsage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepSeekRequestUsage.swift; sourceTree = "<group>"; };
 		424510790AF3FB2452D3CCE3 /* VoiceOutputPlayer.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VoiceOutputPlayer.swift; sourceTree = "<group>"; };
 		4D1A2B7331C508B0D3E77D28 /* InlineVoiceInputView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = InlineVoiceInputView.swift; sourceTree = "<group>"; };
 		535D58AA5C4B7B563E4C8821 /* VoiceInputModels.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VoiceInputModels.swift; sourceTree = "<group>"; };
@@ -631,7 +638,9 @@
 		7A302B074A0BE0AFED8EC7E9 /* SpeechPlayerControl.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SpeechPlayerControl.swift; sourceTree = "<group>"; };
 		84758F712C9B9178FA9D0EF2 /* VoiceProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VoiceProvider.swift; sourceTree = "<group>"; };
 		86DD7E40E65177AB39C55882 /* VoiceProviderResolver.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VoiceProviderResolver.swift; sourceTree = "<group>"; };
+		881B1F92081CD4DE3EB93BD7 /* SessionCostLedger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionCostLedger.swift; sourceTree = "<group>"; };
 		88993FC8E3F0199C6638F664 /* VoiceProvider+System.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "VoiceProvider+System.swift"; sourceTree = "<group>"; };
+		A0AB7DB2B26934693BD0FF13 /* DeepSeekBilling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepSeekBilling.swift; sourceTree = "<group>"; };
 		A11Y0002 /* ChatAccessibilityAnnouncer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatAccessibilityAnnouncer.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F60718293A4B5D /* SystemVoiceCatalog.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SystemVoiceCatalog.swift; sourceTree = "<group>"; };
 		AA0838A12F3B941A00049557 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
@@ -754,6 +763,7 @@
 		BKP000242 /* BackupZipWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupZipWriter.swift; sourceTree = "<group>"; };
 		BKP000243 /* BackupTransferStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupTransferStatus.swift; sourceTree = "<group>"; };
 		BKP000244 /* BackupSkippedFilesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupSkippedFilesView.swift; sourceTree = "<group>"; };
+		C185F5F67EFE2894E2EEAD76 /* DeepSeekBalanceClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepSeekBalanceClient.swift; sourceTree = "<group>"; };
 		C37B6D14D46F4A8EAE705802 /* ShortVoiceComposerPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortVoiceComposerPreview.swift; sourceTree = "<group>"; };
 		CA1E0002 /* CalendarTests/CalendarRecurrenceTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CalendarTests/CalendarRecurrenceTests.m; sourceTree = SOURCE_ROOT; };
 		CA1E0003 /* MinisCalendarTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MinisCalendarTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1724,6 +1734,10 @@
 		E5C000030 /* OpenAI */ = {
 			isa = PBXGroup;
 			children = (
+				C185F5F67EFE2894E2EEAD76 /* DeepSeekBalanceClient.swift */,
+				881B1F92081CD4DE3EB93BD7 /* SessionCostLedger.swift */,
+				2CD4993CB0EE7E3D375D96F5 /* DeepSeekRequestUsage.swift */,
+				A0AB7DB2B26934693BD0FF13 /* DeepSeekBilling.swift */,
 				E5C000011 /* OpenAIProvider.swift */,
 				E5C000012 /* OpenAIAgentProvider.swift */,
 				E5C000013 /* OpenAIModelsAPI.swift */,
@@ -2040,6 +2054,7 @@
 		F1A00010 /* Chat */ = {
 			isa = PBXGroup;
 			children = (
+				161F76C65ACF19E72D1C6E8D /* AIChatViewModel+Billing.swift */,
 				E53000011 /* AIChatViewModel.swift */,
 				E5VMA0011 /* AIChatViewModel+Attachments.swift */,
 				E5VMA0012 /* AIChatViewModel+SlashCommands.swift */,
@@ -2734,6 +2749,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0D71E772FF8EC0C1C07003C8 /* AIChatViewModel+Billing.swift in Sources */,
+				F0F3573D9239DBDD1BF723A2 /* DeepSeekBalanceClient.swift in Sources */,
+				95C2FD7F3A882FEF75997721 /* SessionCostLedger.swift in Sources */,
+				5E96BCE7243CE0A22DE33858 /* DeepSeekRequestUsage.swift in Sources */,
+				BC089BD3A69DE71B60BEB570 /* DeepSeekBilling.swift in Sources */,
 				AC0000202 /* ProviderCustomizationGenerated.swift in Sources */,
 				E54000AC1 /* DebugSkillGenerated.swift in Sources */,
 				E5FP00100 /* AppGroupChangeWatcher.swift in Sources */,

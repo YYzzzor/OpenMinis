@@ -6085,16 +6085,6 @@ private struct TokenUsageSheet: View {
                     Text("Based on the last valid request's input, including cache. Excludes your draft, the reply, and later tool results. Preserved when switching sessions or restarting the app. If model or context changes invalidate it, a new request must report usage.", comment: "Explains the context indicator's last-request measurement and unavailable state")
                 }
 
-                if let thinkingInfo = vm.currentModelThinkingInfo {
-                    Section("Thinking") {
-                        StatRow(label: "Thinking", value: thinkingInfo.enabled ? "On" : "Off", icon: "lightbulb", customIcon: Image("ThinkingIcon"))
-                        if thinkingInfo.enabled {
-                            StatRow(label: "Level", value: thinkingInfo.level, icon: "slider.horizontal.3")
-                        }
-                        StatRow(label: "Supported", value: thinkingInfo.supported ? "Yes" : "No", icon: "checkmark.circle")
-                    }
-                }
-
                 Section("Tokens (Session Total)") {
                     let inputTotal = s.input + s.cacheRead + s.cacheWrite
                     StatRow(label: "Input (incl. cache)", value: formatted(inputTotal), icon: "arrow.down.circle")
@@ -6115,9 +6105,23 @@ private struct TokenUsageSheet: View {
                     }
                 }
 
+                if vm.showsSessionBilling {
+                    SessionBillingSection(vm: vm)
+                }
+
                 Section("Speed") {
                     let speed = vm.sessionOutputTokensPerSecond
                     StatRow(label: "Output Speed", value: speed > 0 ? String(format: "%.1f tok/s", speed) : "—", icon: "speedometer")
+                }
+
+                if let thinkingInfo = vm.currentModelThinkingInfo {
+                    Section("Thinking") {
+                        StatRow(label: "Thinking", value: thinkingInfo.enabled ? "On" : "Off", icon: "lightbulb", customIcon: Image("ThinkingIcon"))
+                        if thinkingInfo.enabled {
+                            StatRow(label: "Level", value: thinkingInfo.level, icon: "slider.horizontal.3")
+                        }
+                        StatRow(label: "Supported", value: thinkingInfo.supported ? "Yes" : "No", icon: "checkmark.circle")
+                    }
                 }
 
                 Section("Agent Loop") {
@@ -6139,6 +6143,75 @@ private struct TokenUsageSheet: View {
         if n >= 1_000 { return String(format: "%.1fK", Double(n) / 1_000) }
         return "\(n)"
     }
+}
+
+/// 查询状态只刷新费用分区；凭据变化与页面退出由 task 生命周期取消旧请求。
+private struct SessionBillingSection: View {
+    @ObservedObject var vm: AIChatViewModel
+    @ObservedObject private var providers = ProviderConfigStore.shared
+    @StateObject private var balance = DeepSeekBalanceModel()
+    @State private var refreshRevision = 0
+
+    private struct QueryIdentity: Hashable {
+        let account: DeepSeekAccountIdentity?
+        let sessionID: String?
+        let refresh: Int
+    }
+
+    var body: some View {
+        let account = vm.deepSeekAccountIdentity
+        let query = QueryIdentity(account: account, sessionID: vm.sessionId, refresh: refreshRevision)
+        Section {
+            StatRow(label: "Estimated Session Cost", value: account == nil ? "—" : money(vm.sessionCostSummary?.estimatedAmountCNY), icon: "yensign.circle")
+            StatRow(label: "Account Balance", value: balance.isCurrent(account) ? money(balance.amountCNY) : "—", icon: "creditcard")
+        } header: {
+            Text("Fees and Balance")
+        } footer: {
+            if account != nil {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Estimated in CNY from this session's recorded chat requests, including tool loops. Excludes title generation, compaction and other tool services. Unavailable when usage or pricing is incomplete.")
+                    HStack {
+                        if balance.isCurrent(account) && balance.isLoading {
+                            Text("Fetching balance…")
+                        } else if balance.isCurrent(account) && balance.hasFailed {
+                            Text("CNY balance unavailable")
+                        } else if balance.isCurrent(account), let date = balance.updatedAt {
+                            Text("Balance updated")
+                            Text(date, style: .time)
+                        }
+                        Spacer()
+                        Button("Refresh Balance") { refreshRevision &+= 1 }
+                            .disabled(balance.isLoading)
+                    }
+                }
+            }
+        }
+        .task(id: query) {
+            // 读取 revisions 让修改 Key / Provider 的同页状态及时失效。
+            _ = providers.authRevision
+            _ = providers.configRevision
+            await balance.refresh(identity: account, force: refreshRevision > 0) {
+                vm.deepSeekBalanceKey(for: account)
+            }
+        }
+    }
+
+    private func money(_ amount: Decimal?) -> String {
+        guard let amount else { return "—" }
+        if amount > 0 && amount < Decimal(string: "0.0001")! { return "<¥0.0001" }
+        return Self.currencyFormatter.string(from: NSDecimalNumber(decimal: amount)) ?? "—"
+    }
+
+    private static let currencyFormatter: NumberFormatter = {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.locale = Locale(identifier: "zh_CN")
+        formatter.currencyCode = "CNY"
+        formatter.currencySymbol = "¥"
+        formatter.minimumFractionDigits = 2
+        formatter.maximumFractionDigits = 4
+        return formatter
+    }()
 }
 
 private struct StatRow: View {
