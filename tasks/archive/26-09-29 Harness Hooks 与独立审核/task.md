@@ -1,6 +1,8 @@
 # 26-09-29 Harness Hooks 与独立审核
-状态：active
+状态：取消（2026-09-30）
 更新：2026-09-30
+
+取消原因：用户在 Harness 调整中决定移除全部 Codex Hooks。委派参数检查无法拦截 collaboration.spawn_agent 路径，补丁角色检查的白名单维护成本高且已误拦新文件；约束改由 AGENTS.md 规则与已有检查节点承担，见 docs/harness/contract.md。本任务的验证与审查证据原样保留。
 
 ## 任务确认与执行边界
 确认状态：已确认
