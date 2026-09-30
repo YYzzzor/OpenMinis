@@ -11,7 +11,7 @@ set -eu
 
 SRCROOT="${SRCROOT:-$(cd "$(dirname "$0")/../src/ios" && pwd)}"
 REPO_ROOT="$(cd "$SRCROOT/../.." && pwd)"
-SKILL_DIR="$REPO_ROOT/.claude/skills/debug-server"
+SKILL_DIR="$REPO_ROOT/.agents/skills/debug-server"
 OUT="$SRCROOT/Generated/DebugSkillGenerated.swift"
 mkdir -p "$SRCROOT/Generated"
 
@@ -27,7 +27,7 @@ emit_const() { # <swift-name> <file>
 TMP="$OUT.tmp"
 {
   echo '// Generated at build time by scripts/gen_debug_skill.sh from'
-  echo '// .claude/skills/debug-server/. DO NOT EDIT, DO NOT COMMIT.'
+  echo '// .agents/skills/debug-server/. DO NOT EDIT, DO NOT COMMIT.'
   echo '// Values are base64; decode at use site.'
   echo '#if DEBUG'
   echo 'import Foundation'

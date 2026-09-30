@@ -85,7 +85,7 @@
 | Git 规则、构建命令、最低系统版本 | `AGENTS.md` 的项目规则部分 |
 | 发布记录 | `docs/` 下的项目文档 |
 | 讲解风格、注释规范 | 按需加载的项目指南 |
-| 领域技能（UI 设计、Logo） | `.agents/skills/`，与 Harness 技能并列，但不属于 Harness |
+| 领域技能（UI 设计、Logo、调试服务） | `.agents/skills/`，与 Harness 技能并列，但不属于 Harness；`.claude/skills` 是指向它的软链接 |
 
 ## 目标文件布局
 

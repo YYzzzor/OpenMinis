@@ -30,6 +30,7 @@
 | [archive-task](.agents/skills/archive-task/SKILL.md) | 任务收尾、判断能否归档 |
 | [update-spec](.agents/skills/update-spec/SKILL.md) | 新写、修改或改写 Spec |
 | [ios-ui-design](.agents/skills/ios-ui-design/SKILL.md) | 原生 iOS 界面设计 |
+| [debug-server](.agents/skills/debug-server/SKILL.md) | 在运行中的 DEBUG 构建上取证 |
 
 ## 模型分工
 

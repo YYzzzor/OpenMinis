@@ -73,9 +73,10 @@ Package.resolved
 fastlane/.env
 fastlane/appstore-keys/
 
-# Claude Code（仅跟踪项目共享的子代理定义）
+# Claude Code（仅跟踪项目共享的子代理定义，以及指向 .agents/skills 的软链接）
 .claude/*
 !.claude/agents/
+!.claude/skills
 
 # Temporary patches
 deps/*.patch

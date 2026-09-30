@@ -6,7 +6,7 @@ import UIKit
 /// Token + encrypted-envelope authentication for the debug server (protocol v1).
 ///
 /// Wire spec, rationale, and cross-language test vectors live in
-/// `.claude/skills/debug-server/SKILL.md`. Summary:
+/// `.agents/skills/debug-server/SKILL.md`. Summary:
 ///  - `/pair` grants a 32-byte token K after on-device user approval.
 ///    Mode B ("plain": true) returns K in the clear and is accepted only from
 ///    127.0.0.1 (USB/iproxy). Mode A wraps K via ephemeral X25519 for LAN use.
