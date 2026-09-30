@@ -52,7 +52,7 @@ suite; its known annual week-number failures must remain visible as documented
 in [calendar recurrence](docs/specs/ios-calendar-recurrence.md).
 
 Harness entry points and workflow are in [AGENTS.md](AGENTS.md) and the
-[skill guide](docs/harness/skills-guide.md). Historical task records remain
+[Harness contract](docs/harness/contract.md). Historical task records remain
 available under `tasks/archive/` and are excluded from default context discovery.
 
 ## Common setup
