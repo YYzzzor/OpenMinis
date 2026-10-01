@@ -203,8 +203,23 @@ enum SwiftMathRenderer {
     }
 
     /// Normalize LaTeX commands that SwiftMath doesn't support well.
+    /// 公式编号：SwiftMath 不认识 `\tag`，整条公式会报错并降级成系统字体的
+    /// Unicode 文本，编号也丢了括号、紧贴在公式后面。这里改写成公式后留空再跟
+    /// 编号文本：`\tag{1}` → `(1)`，`\tag*{1}` → `1`（不加括号），
+    /// `\notag` / `\nonumber` 直接去掉。编号不右对齐，只保证不重叠、可读。
+    private static func rewriteEquationTags(_ latex: String) -> String {
+        let range = NSRange(latex.startIndex..., in: latex)
+        var s = equationTagStarPattern.stringByReplacingMatches(in: latex, range: range, withTemplate: #"\\qquad\\text{$1}"#)
+        s = equationTagPattern.stringByReplacingMatches(in: s, range: NSRange(s.startIndex..., in: s), withTemplate: #"\\qquad\\text{($1)}"#)
+        return s.replacingOccurrences(of: "\\notag", with: "")
+            .replacingOccurrences(of: "\\nonumber", with: "")
+    }
+
+    private static let equationTagStarPattern = try! NSRegularExpression(pattern: #"\\tag\*\s*\{([^}]*)\}"#)
+    private static let equationTagPattern = try! NSRegularExpression(pattern: #"\\tag\s*\{([^}]*)\}"#)
+
     private static func preprocessLatex(_ latex: String) -> String {
-        var s = latex
+        var s = rewriteEquationTags(latex)
             .trimmingCharacters(in: .whitespacesAndNewlines)
 
         s = s.replacingOccurrences(of: "\\dots", with: "\\ldots")
@@ -352,7 +367,8 @@ enum SwiftMathRenderer {
     /// Convert common LaTeX to Unicode text. Not exhaustive — covers the
     /// operators, Greek letters, and \text{} that appear in everyday formulas.
     private static func latexToUnicode(_ latex: String) -> String {
-        var s = latex.trimmingCharacters(in: .whitespacesAndNewlines)
+        // 先改写编号，下面的 \text / \qquad 处理会把它变成 “  (1)”
+        var s = rewriteEquationTags(latex).trimmingCharacters(in: .whitespacesAndNewlines)
 
         // Strip \text{...} / \textbf{...} / \mathrm{...} / \operatorname{...} wrappers, keep content
         let textPattern = try! NSRegularExpression(pattern: #"\\(?:text|textbf|mathrm|operatorname|mathbf|bold)\{([^}]*)\}"#)
