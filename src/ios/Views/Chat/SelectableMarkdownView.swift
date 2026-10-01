@@ -323,10 +323,10 @@ struct SelectableMarkdownTheme {
     var accentColor: UIColor { .systemOrange }
     var linkColor: UIColor { .systemBlue }
     var codeBlockBackground: UIColor {
-        UIColor { $0.userInterfaceStyle == .dark ? UIColor(white: 0.15, alpha: 1) : .black }
+        UIColor ( red: 0x28 / 255.0, green: 0x2C / 255.0, blue: 0x34 / 255.0, alpha: 1 )
     }
     var codeBlockTextColor: UIColor {
-        UIColor { $0.userInterfaceStyle == .dark ? UIColor(red: 0.55, green: 0.95, blue: 0.55, alpha: 1) : .systemGreen }
+        UIColor ( red: 0xAB / 255.0, green: 0xB2 / 255.0, blue: 0xBF / 255.0, alpha: 1)
     }
     var inlineCodeBackground: UIColor { minisInlineCodeBackgroundColor }
     var inlineCodeColor: UIColor { .systemOrange }
