@@ -347,8 +347,15 @@ struct SelectableMarkdownTheme {
         return .systemFont(ofSize: size, weight: weight)
     }
 
-    var inlineCodeFont: UIFont {
-        let size = baseFontSize * 0.845
+    var inlineCodeFont: UIFont { inlineCodeFont(matching: nil) }
+
+    /// [T-md-inline-code-context-font] Inline code sized RELATIVE to the text
+    /// it sits in — 0.845× the CONTEXT font, the exact ratio body text has
+    /// always used (0.845 × baseFontSize), so paragraph rendering is
+    /// unchanged while a code span inside an H1/H2 scales with the heading
+    /// instead of rendering at body size and reading sunken/undersized.
+    func inlineCodeFont(matching contextFont: UIFont?) -> UIFont {
+        let size = (contextFont?.pointSize ?? baseFontSize) * 0.845
         if let menlo = UIFont(name: "Menlo", size: size) {
             let descriptor = menlo.fontDescriptor.addingAttributes([
                 .cascadeList: [UIFontDescriptor(fontAttributes: [.name: "PingFang SC"])]
@@ -1224,7 +1231,17 @@ fileprivate final class MarkdownNSRenderer {
 
         case .code(let code):
             var codeAttrs = attrs
-            codeAttrs[.font] = theme.inlineCodeFont
+            // [T-md-inline-code-context-font] Scale to the surrounding font
+            // (heading vs body) and center the code span's x-height on the
+            // context's x-height — Menlo's x-height ratio differs from SF's,
+            // so pure baseline alignment reads visually low in big headings.
+            let contextFont = attrs[.font] as? UIFont
+            let codeFont = theme.inlineCodeFont(matching: contextFont)
+            codeAttrs[.font] = codeFont
+            if let ctx = contextFont {
+                let offset = (ctx.xHeight - codeFont.xHeight) / 2
+                if abs(offset) > 0.25 { codeAttrs[.baselineOffset] = offset }
+            }
             codeAttrs[.foregroundColor] = theme.inlineCodeColor
             codeAttrs[.inlineCodeBackground] = true
             codeAttrs[.inlineCodeText] = code
@@ -1481,6 +1498,55 @@ final class CodeBlockAttachment: NSTextAttachment {
         return CGRect(x: 0, y: 0, width: width, height: height)
     }
 
+    /// [T-codeblock-hide-idle-scrollbars] Turn each scroll axis' indicator —
+    /// and its bounce — off when that axis has nothing to scroll.
+    ///
+    /// The scroll view is created with both indicators and both bounces on
+    /// unconditionally, so a 3-line snippet that fits entirely inside the box
+    /// still showed a vertical scrollbar and rubber-banded when dragged. Most
+    /// code blocks fit, so the common case was the wrong one.
+    ///
+    /// Compared against `scrollHeight`, NOT `bounds.height`: the frame is
+    /// `scrollHeight + bottomPadding` tall with a matching `contentInset.bottom`,
+    /// so the genuinely usable height is `scrollHeight`. Using the frame height
+    /// would count that padding as usable space and call a block scroll-free
+    /// when its last line is actually clipped.
+    ///
+    /// The 0.5pt tolerance absorbs sub-pixel noise from `sizeThatFits`, which
+    /// otherwise leaves a scrollbar on a block that fits exactly.
+    private static func syncScrollability(_ scrollView: UIScrollView,
+                                          contentSize: CGSize,
+                                          visibleWidth: CGFloat,
+                                          scrollHeight: CGFloat) {
+        let canScrollV = contentSize.height > scrollHeight + 0.5
+        let canScrollH = contentSize.width > visibleWidth + 0.5
+        scrollView.showsVerticalScrollIndicator = canScrollV
+        scrollView.showsHorizontalScrollIndicator = canScrollH
+        // Bouncing on an axis that cannot scroll reads as a glitch, and the
+        // rubber-band also competes with the enclosing message list's pan.
+        scrollView.alwaysBounceVertical = canScrollV
+        scrollView.alwaysBounceHorizontal = canScrollH
+        // When NEITHER axis can move, stop scrolling entirely rather than
+        // leaving an inert scroll view in the way. Its pan recognizer would
+        // still claim the touch and then do nothing with it, which is what
+        // makes dragging the message list over a code block feel like it
+        // catches — the list only starts moving after the finger leaves the
+        // block. `isScrollEnabled = false` removes the recognizer from
+        // arbitration, so the pan reaches the list immediately.
+        //
+        // Text selection inside the block is unaffected: that is the
+        // UITextView's own long-press/selection gestures, not this pan.
+        scrollView.isScrollEnabled = canScrollV || canScrollH
+        // [T-codeblock-offset-reset] A reused block (codeBlockViewCache /
+        // updateExistingView) can shrink to content that fits. Its old
+        // scroll position would then stay applied with scrolling switched
+        // off: the content shows clipped and cannot be scrolled back.
+        var offset = scrollView.contentOffset
+        if !canScrollH { offset.x = 0 }
+        if !canScrollV { offset.y = 0 }
+        if offset != scrollView.contentOffset { scrollView.contentOffset = offset }
+    }
+
     func makeView(width: CGFloat) -> UIView {
         let wrapper = UIView()
         wrapper.backgroundColor = .clear
@@ -1547,6 +1613,10 @@ final class CodeBlockAttachment: NSTextAttachment {
         scrollView.scrollIndicatorInsets = .zero
         scrollView.addSubview(codeTextView)
         scrollView.contentSize = CGSize(width: fittingWidth, height: contentHeight)
+        Self.syncScrollability(scrollView,
+                               contentSize: scrollView.contentSize,
+                               visibleWidth: contentWidth,
+                               scrollHeight: scrollHeight)
 
         // Auto-scroll to bottom during streaming
         let bottomY = scrollView.contentSize.height - scrollView.bounds.height
@@ -1654,6 +1724,14 @@ final class CodeBlockAttachment: NSTextAttachment {
         // desync the code frame from the text flow. Only the wrapper's visible
         // children (the rounded background container + its scroll view) animate
         // their height, so the box smoothly extends while layout stays exact.
+        // [T-codeblock-hide-idle-scrollbars] Re-evaluate on every update: a block
+        // that fitted a moment ago starts scrolling once streaming pushes it past
+        // maxCodeHeight, and a re-render with less content goes back to fitting.
+        Self.syncScrollability(scrollView,
+                               contentSize: fitting,
+                               visibleWidth: container.frame.width,
+                               scrollHeight: scrollHeight)
+
         let heightGrew = totalHeight > container.frame.size.height + 0.5
         wrapper.frame.size.height = totalHeight + Self.topMargin + Self.bottomMargin
         let applyChildFrames = {
@@ -2250,7 +2328,9 @@ final class TableAttachment: NSTextAttachment {
             return NSAttributedString(string: "\n", attributes: attrs)
         case .code(let code):
             var codeAttrs = attrs
-            codeAttrs[.font] = theme.inlineCodeFont
+            // [T-md-inline-code-context-font] Same context-relative rule as
+            // body inline code, keyed to the cell's font.
+            codeAttrs[.font] = theme.inlineCodeFont(matching: font)
             codeAttrs[.foregroundColor] = theme.inlineCodeColor
             // [T-ios-table-inline-code-rounded] Mark inline code with BOTH the
             // custom `.inlineCodeBackground` flag (drives the rounded painter)
@@ -4770,6 +4850,12 @@ final class MinisLayoutManager: NSLayoutManager {
     /// pill doesn't look clipped against its final character.
     private static let inlineCodeTrailingInset: CGFloat = 2
 
+    /// [T-ios-inline-code-wrap-gap] Corner radius of the inline-code pill.
+    /// Named because the multi-line joining below has to reason about it: a
+    /// radius applied to an interior edge is what makes two stacked pills read
+    /// as separate chips rather than one block.
+    private static let inlineCodeCornerRadius: CGFloat = 5
+
     override func fillBackgroundRectArray(_ rectArray: UnsafePointer<CGRect>, count rectCount: Int, forCharacterRange charRange: NSRange, color: UIColor) {
         // Check if this range has inline code background
         guard let textStorage = self.textStorage else {
@@ -4805,6 +4891,10 @@ final class MinisLayoutManager: NSLayoutManager {
             lineFragCount += 1
         }
 
+        // [T-ios-inline-code-wrap-gap] Accumulated across the loop so the
+        // joining pass can see every line's pill at once.
+        var pillRects: [CGRect] = []
+
         for i in 0..<rectCount {
             var rawRect = rectArray[i]
             guard rawRect.width > 2 else { continue }
@@ -4822,6 +4912,13 @@ final class MinisLayoutManager: NSLayoutManager {
             // glyph on this line. See the clamp below for why rawRect's own
             // width can't be trusted on a wrapped line.
             var visibleMaxX: CGFloat = .nan
+            // [T-ios-inline-code-list-indent] Leading edge of the first glyph
+            // on this line — the counterpart to visibleMaxX. TextKit reports
+            // the background rect of a WRAPPED line as starting at the text
+            // container's origin (x=0), ignoring the paragraph's headIndent,
+            // so inside a list the pill ran back to the bubble's left edge
+            // while the text it belongs to sat one indent level in.
+            var visibleMinX: CGFloat = .nan
             enumerateLineFragments(forGlyphRange: glyphRange) { lineFragRect, usedRect, _, lineGlyphRange, _ in
                 guard lineFragRect.midY >= rawRect.minY && lineFragRect.midY <= rawRect.maxY else { return }
                 let overlapStart = max(glyphRange.location, lineGlyphRange.location)
@@ -4855,6 +4952,10 @@ final class MinisLayoutManager: NSLayoutManager {
                                                        effectiveRange: nil) {
                             let box = self.boundingRect(forGlyphRange: visibleGlyphRange, in: tc)
                             visibleMaxX = visibleMaxX.isNaN ? box.maxX : max(visibleMaxX, box.maxX)
+                            // [T-ios-inline-code-list-indent] Same measurement,
+                            // other edge. boundingRect honours headIndent, which
+                            // is exactly what the rect TextKit handed us does not.
+                            visibleMinX = visibleMinX.isNaN ? box.minX : min(visibleMinX, box.minX)
                         }
                     }
 
@@ -4892,6 +4993,25 @@ final class MinisLayoutManager: NSLayoutManager {
             // this shrink-only: a line TextKit already measured tightly (a
             // single-line span, or the last line of a wrapped one, where
             // visibleMaxX == rawRect.maxX) keeps its original rect untouched.
+            // [T-ios-inline-code-list-indent] Pull the LEADING edge in to the
+            // first glyph before the trailing clamp runs, so the width below is
+            // computed from the corrected origin.
+            //
+            // On a wrapped line TextKit reports the background rect from the
+            // container origin, dropping the paragraph's headIndent — so in a
+            // list the pill started at the bubble's left edge while its text
+            // began one indent level in. boundingRect does honour the indent,
+            // so the glyph extent measured above is the truth.
+            //
+            // Shrink-only, exactly like the trailing clamp: a line TextKit
+            // already measured tightly has visibleMinX == rawRect.minX and is
+            // left untouched. Never move the edge LEFT — that would let a
+            // mis-measured span paint outside the rect TextKit reserved.
+            if !visibleMinX.isNaN, visibleMinX > rawRect.minX, visibleMinX < rawRect.maxX {
+                rawRect.size.width -= visibleMinX - rawRect.minX
+                rawRect.origin.x = visibleMinX
+            }
+
             if !visibleMaxX.isNaN, visibleMaxX > rawRect.minX {
                 let padded = visibleMaxX + Self.inlineCodeTrailingInset
                 if padded < rawRect.maxX {
@@ -4910,11 +5030,84 @@ final class MinisLayoutManager: NSLayoutManager {
             let bgHeight = min(fontLineHeight + bgPaddingV * 2, rawRect.height)
             let bgY = rawRect.midY - bgHeight / 2 - 0.5
             let rect = CGRect(x: rawRect.minX - 0.5, y: bgY, width: rawRect.width + 1, height: bgHeight)
-            let path = UIBezierPath(roundedRect: rect, cornerRadius: 5)
-            context.addPath(path.cgPath)
+            // [T-ios-inline-code-wrap-gap] Collected rather than filled here —
+            // the joining pass below needs to see the whole set to know which
+            // edges are interior. See `paintInlineCodeRects`.
+            pillRects.append(rect)
         }
+
+        Self.paintInlineCodeRects(pillRects, in: context)
         context.fillPath()
         context.restoreGState()
+    }
+
+    /// [T-ios-inline-code-wrap-gap] Draw the pills for ONE inline-code span,
+    /// joining them vertically when the span wrapped across lines.
+    ///
+    /// The bug: each line's pill is sized to the code font
+    /// (`fontLineHeight + padding`) and centred in its line box. That is right
+    /// for a single-line span — it stops a short chip from inheriting the full
+    /// leading of a line whose tallest glyph is body text. But across a wrapped
+    /// span it means consecutive pills are shorter than the line pitch, so a
+    /// horizontal band of background shows between every pair of lines. In the
+    /// report that reads as the highlight "breaking" in the middle, while the
+    /// first and last lines look correct.
+    ///
+    /// The fix has two halves, and both are needed:
+    ///
+    ///  * **Close the vertical gap.** Sort by y and stretch each adjacent pair
+    ///    to meet at their midpoint. Only ever GROWS a pill, and only toward a
+    ///    neighbour that already exists, so a single-line span (one rect, no
+    ///    pairs) is bit-identical to before.
+    ///
+    ///  * **Square the interior corners.** Once two pills touch, rounding the
+    ///    joined edges carves notches out of the seam — visually worse than the
+    ///    gap it replaced. The first pill keeps its top corners, the last keeps
+    ///    its bottom, and everything in between is a plain rectangle.
+    ///
+    /// Deliberately NOT done as one union path: the lines have different widths
+    /// (the last is usually short), so a union outline would need mitred joins
+    /// between differing edges — far more geometry for no visual gain, since
+    /// the fill colour is flat and opaque.
+    static func paintInlineCodeRects(_ rects: [CGRect], in context: CGContext) {
+        guard !rects.isEmpty else { return }
+        let radius = inlineCodeCornerRadius
+
+        guard rects.count > 1 else {
+            context.addPath(UIBezierPath(roundedRect: rects[0], cornerRadius: radius).cgPath)
+            return
+        }
+
+        // Top-to-bottom. TextKit hands rects in layout order already, but the
+        // pairing below is only correct if that holds, so make it explicit.
+        var ordered = rects.sorted { $0.minY < $1.minY }
+
+        // Grow each adjacent pair until they meet halfway. Guarded on a real
+        // gap so already-touching or overlapping rects are left alone.
+        for i in 0..<(ordered.count - 1) {
+            let gap = ordered[i + 1].minY - ordered[i].maxY
+            guard gap > 0 else { continue }
+            let meet = ordered[i].maxY + gap / 2
+            ordered[i].size.height = meet - ordered[i].minY
+            let nextBottom = ordered[i + 1].maxY
+            ordered[i + 1].origin.y = meet
+            ordered[i + 1].size.height = nextBottom - meet
+        }
+
+        for (i, rect) in ordered.enumerated() {
+            let corners: UIRectCorner
+            switch i {
+            case 0: corners = [.topLeft, .topRight]
+            case ordered.count - 1: corners = [.bottomLeft, .bottomRight]
+            default: corners = []
+            }
+            let path = corners.isEmpty
+                ? UIBezierPath(rect: rect)
+                : UIBezierPath(roundedRect: rect,
+                               byRoundingCorners: corners,
+                               cornerRadii: CGSize(width: radius, height: radius))
+            context.addPath(path.cgPath)
+        }
     }
 }
 
@@ -5549,11 +5742,27 @@ final class SelectableMarkdownTextView: UITextView, UIGestureRecognizerDelegate 
             // Check if touch is inside any code block UITextView subview
             for subview in attachmentViews {
                 if subview.frame.contains(location) {
-                    // Find the UITextView inside this attachment view
-                    if let codeTV = findCodeTextView(in: subview), codeTV.isScrollEnabled {
+                    // [T-codeblock-hide-idle-scrollbars] Ask the code block's
+                    // SCROLL VIEW what it can actually scroll.
+                    //
+                    // This used to look at `findCodeTextView(...).isScrollEnabled`,
+                    // but that inner UITextView is created with
+                    // `isScrollEnabled = false` on purpose ("scrollView handles
+                    // scrolling"), so the condition was never true and the whole
+                    // branch was dead — the outer view never yielded a pan.
+                    //
+                    // Yield only on the axis the block can really scroll, which
+                    // is what keeps a fitted (non-scrolling) block from stealing
+                    // the drag and making the message list feel stuck.
+                    if let codeScroll = findCodeScrollView(in: subview) {
                         let vel = self.panGestureRecognizer.velocity(in: self)
-                        // If primarily horizontal, let the inner code block handle it
-                        if abs(vel.x) > abs(vel.y) {
+                        let horizontal = abs(vel.x) > abs(vel.y)
+                        // Usable height excludes the bottom contentInset, the
+                        // same way syncScrollability measures it.
+                        let usableH = codeScroll.bounds.height - codeScroll.contentInset.bottom
+                        let canScrollH = codeScroll.contentSize.width > codeScroll.bounds.width + 0.5
+                        let canScrollV = codeScroll.contentSize.height > usableH + 0.5
+                        if (horizontal && canScrollH) || (!horizontal && canScrollV) {
                             return false
                         }
                     }
@@ -5624,10 +5833,14 @@ final class SelectableMarkdownTextView: UITextView, UIGestureRecognizerDelegate 
         return false
     }
 
-    private func findCodeTextView(in view: UIView) -> UITextView? {
+    /// [T-codeblock-hide-idle-scrollbars] The code block's own UIScrollView —
+    /// the view that actually scrolls (the UITextView inside it is created with
+    /// `isScrollEnabled = false`). Used by `gestureRecognizerShouldBegin` to
+    /// decide whether yielding the pan would accomplish anything.
+    private func findCodeScrollView(in view: UIView) -> UIScrollView? {
         for sub in view.subviews {
-            if let tv = sub as? UITextView { return tv }
-            if let found = findCodeTextView(in: sub) { return found }
+            if let sv = sub as? UIScrollView { return sv }
+            if let found = findCodeScrollView(in: sub) { return found }
         }
         return nil
     }
