@@ -7,7 +7,7 @@
 | 项目 | 状态 |
 | --- | --- |
 | 最新上传 | **1.13（7）**，2026-10-01 09:59 上传成功 |
-| 已确认安装使用 | 1.13（6）；Build 7 待维护者确认 |
+| 已确认安装使用 | **1.13（7）**，2026-10-01 维护者确认 |
 | 分发渠道 | TestFlight Internal，仅维护者本人 |
 | 发布身份 | Team `42486W5YRY`，Bundle ID `com.yyzzzor.minisx`，App Store Connect app ID `6816328476` |
 | 下一次可用 Build 号 | 8（上传前仍需确认后台未占用） |
@@ -16,8 +16,6 @@ README 中的 OpenMinis App Store / TestFlight 链接属于上游项目，与 Mi
 
 ## 待确认事项
 
-- Build 7：维护者手机是否已安装使用。
-- Build 7：带时刻的提醒到点是否弹出通知横幅（模拟器只能验证 `EKAlarm` 已写入）。
 - Build 4、5 上传时：8 项第三方框架缺少 dSYM（FFmpeg、RealTimeCutVADCXXLibrary 及 6 个 libav / libsw 库），第三方崩溃符号化可能不完整；Build 6、7 未单独核查。
 - 语音（Build 5–6）：真机首字延迟、长停顿、长语音、离线语言与耗电未做专项体验；最终 0.8 倍波形测试未复跑；阿里 / 讯飞原有 HTTP 接入与官方 WebSocket 协议不符，未修复。
 
@@ -34,6 +32,7 @@ README 中的 OpenMinis App Store / TestFlight 链接属于上游项目，与 Mi
   - [日历全天事件与提醒通知](<../tasks/archive/26-10-01 日历全天事件与提醒通知/task.md>)（`345acc5`、`a3a9352`、`adadbba`）：全天事件的创建与切换；全天提醒；带时刻的提醒自动到点通知，`--notify on|off` 可覆盖；日历名、清单名精确匹配，同名时报歧义并支持 `--calendar-id` / `--list-id`；事件命令拒绝提醒专用参数；全天事件只给开始时刻时默认 22:00 结束。
   - 不面向用户：DEBUG 调试服务的 skill（`2bd0876`）、运行 scheme 关闭 Metal API Validation（`272da5d`）、Harness 文档。
 - **证据**：主应用、MinisShare、MinisFileProvider、AgentWidgetExtension 均为 1.13（7），最低 iOS 26.0；归档位于 `~/Library/Developer/Xcode/Archives/2026-10-01/`。
+- **真机**：维护者 2026-10-01 确认已在手机安装，并实测创建全天日历事件、带时刻的提醒，均成功（据此关闭通知横幅的待确认项）。
 - **验证与边界**：日历改动有 `MinisCalendarTests`（iOS 27 共 50 项，只有 4 项已知的年度周次失败；iOS 26.4 在 Build 7 最后两次修复前跑过）以及 iPhone 18 Pro 模拟器 App 内实测。没有读取 App Store Connect 后台处理状态；未检查分发日志与 dSYM。
 
 ### 1.13（6）— 2026-09-28
