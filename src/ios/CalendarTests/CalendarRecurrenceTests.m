@@ -943,6 +943,38 @@
     XCTAssertEqualObjects(saved.endDate, [[calendar dateByAddingUnit:NSCalendarUnitDay value:1 toDate:day options:0] dateByAddingTimeInterval:-1]);
 }
 
+// M3：事件命令拒绝提醒专用参数，给出事件的正确写法，且不保存、不改动；同名文本作为取值时照常使用。
+- (void)testEventCommandsRejectReminderOptions {
+    NSDictionary *expectedHints = @{@"--notify": @"--alarm", @"--due": @"--alarm", @"--list": @"--calendar",
+                                    @"--priority": @"no priority", @"--lat": @"--location", @"--lng": @"--location",
+                                    @"--location-name": @"--location", @"--radius": @"--location", @"--proximity": @"--location"};
+    NSDictionary *values = @{@"--notify": @"on", @"--due": @"2027-07-01T09:00:00", @"--list": @"Work", @"--priority": @"1",
+                             @"--lat": @"22.6", @"--lng": @"114.0", @"--location-name": @"Office", @"--radius": @"200",
+                             @"--proximity": @"enter"};
+    NSUInteger before = [self eventCountInTestCalendar];
+    int status;
+    for (NSString *option in expectedHints) {
+        NSDictionary *json = [self invoke:@[@"--title", @"Rejected", @"--calendar", self.testCalendar.title,
+            @"--start", @"2027-07-01T09:00:00", @"--end", @"2027-07-01T10:00:00", option, values[option]] exit:&status];
+        XCTAssertEqual(status, NOFF_EXIT_INVALID_ARGS, @"%@ %@", option, json);
+        NSString *message = json[@"error"][@"message"];
+        XCTAssertTrue([message containsString:option], @"%@", message);
+        XCTAssertTrue([message containsString:expectedHints[option]], @"%@", message);
+    }
+    XCTAssertEqual([self eventCountInTestCalendar], before);
+
+    NSDictionary *created = [self createEvent:@[@"--start", @"2027-07-02T09:00:00", @"--end", @"2027-07-02T10:00:00",
+        @"--notes", @"--notify on"]];
+    NSString *identifier = created[@"data"][@"id"];
+    XCTAssertEqualObjects([self savedEvent:identifier].notes, @"--notify on");
+    XCTAssertEqual([self savedEvent:identifier].alarms.count, 0u);
+
+    NSDictionary *updated = [self invokeCommand:@"update" options:@[@"--id", identifier, @"--title", @"Changed",
+        @"--notify", @"on"] exit:&status];
+    XCTAssertEqual(status, NOFF_EXIT_INVALID_ARGS, @"%@", updated);
+    XCTAssertNotEqualObjects([self savedEvent:identifier].title, @"Changed");
+}
+
 - (NSArray<EKAlarm *> *)timeAlarms:(EKReminder *)reminder {
     NSMutableArray *alarms = [NSMutableArray array];
     for (EKAlarm *alarm in reminder.alarms) if (alarm.absoluteDate) [alarms addObject:alarm];

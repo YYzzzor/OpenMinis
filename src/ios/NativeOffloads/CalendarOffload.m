@@ -71,7 +71,9 @@ static NSString *const HELP_TEXT =
      "                       returns invalid_args listing the available calendars)\n"
      "  --location <loc>     Event location\n"
      "  --notes <text>       Event notes\n"
-     "  --alarm <minutes>    Alarm minutes before event\n"
+     "  --alarm <minutes>    Alert N minutes before the event. Add only when the user\n"
+     "                       asked to be alerted. Reminder options (--notify, --due,\n"
+     "                       --list, --priority, --lat/--lng/...) are rejected here.\n"
      "  --recur <freq>       Repeat: daily, weekly, monthly, or yearly.\n"
      "                       Omit for a one-off event (default).\n"
      "  --recur-interval <N> Repeat every N periods (default 1; 2 = every other week)\n"
@@ -139,7 +141,7 @@ static NSString *const HELP_TEXT =
      "  --calendar <name>    Move to a different calendar (exact name, case-insensitive)\n"
      "  --location <loc>     New location\n"
      "  --notes <text>       New notes\n"
-     "  --alarm <minutes>    New alarm (replaces existing)\n"
+     "  --alarm <minutes>    New alarm (replaces existing); reminder options are rejected\n"
      "  --occurrence-date <datetime>  For recurring events: the start of the specific\n"
      "                       occurrence to edit (from list 'occurrence_date'). Without it,\n"
      "                       the series master is edited. Falls back to --start if omitted.\n"
@@ -409,6 +411,32 @@ static BOOL reject_advanced_reminder_recurrence(int argc, char **argv, NSString 
     noff_emit_json(stdout_fd, noff_json_error(TOOL_NAME, action, NOFF_ERR_INVALID_ARGS,
         @"--recurrence options are supported by apple-calendar create only. Use --recur for reminders."), compact, quiet);
     return YES;
+}
+
+// 事件命令收到提醒专用参数时不能静默忽略：调用方会以为设好了通知或清单。
+// 返回 invalid_args，并给出事件对应的写法，让调用方改正后重试。
+static BOOL reject_reminder_only_event_options(int argc, char **argv, NSString *action,
+                                               int stdout_fd, BOOL compact, BOOL quiet) {
+    NSDictionary<NSString *, NSString *> *hints = @{
+        @"--notify": @"for an event alert use --alarm <minutes before start>, and only when the user asked to be alerted",
+        @"--due": @"events take --start/--end; for an alert use --alarm <minutes before start>",
+        @"--list": @"use --calendar <exact calendar name> for events",
+        @"--priority": @"events have no priority",
+        @"--lat": @"events have no location alerts; put the place text in --location",
+        @"--lng": @"events have no location alerts; put the place text in --location",
+        @"--location-name": @"events have no location alerts; put the place text in --location",
+        @"--radius": @"events have no location alerts; put the place text in --location",
+        @"--proximity": @"events have no location alerts; put the place text in --location",
+    };
+    for (NSString *option in @[@"--notify", @"--due", @"--list", @"--priority", @"--lat", @"--lng",
+                               @"--location-name", @"--radius", @"--proximity"]) {
+        if (calendar_option_index(argc, argv, option.UTF8String) < 0) continue;
+        noff_emit_json(stdout_fd, noff_json_error(TOOL_NAME, action, NOFF_ERR_INVALID_ARGS,
+            [NSString stringWithFormat:@"%@ is a reminder option and is not supported for events: %@. Nothing was saved.",
+             option, hints[option]]), compact, quiet);
+        return YES;
+    }
+    return NO;
 }
 
 static NSDate *recurrence_end_datetime(NSString *text) {
@@ -1153,6 +1181,9 @@ static int cmd_create(int argc, char **argv, int stdout_fd, int stderr_fd, BOOL 
         noff_emit_json(stdout_fd, err, compact, quiet);
         return NOFF_EXIT_INVALID_ARGS;
     }
+    if (reject_reminder_only_event_options(argc, argv, @"create", stdout_fd, compact, quiet)) {
+        return NOFF_EXIT_INVALID_ARGS;
+    }
 
     NSDate *startDate = noff_parse_date(startStr);
     NSDate *endDate = noff_parse_date(endStr);
@@ -1353,6 +1384,9 @@ static int cmd_update(int argc, char **argv, int stdout_fd, int stderr_fd, BOOL 
                                              NOFF_ERR_INVALID_ARGS,
                                              @"Required: --id <event_id>");
         noff_emit_json(stdout_fd, err, compact, quiet);
+        return NOFF_EXIT_INVALID_ARGS;
+    }
+    if (reject_reminder_only_event_options(argc, argv, @"update", stdout_fd, compact, quiet)) {
         return NOFF_EXIT_INVALID_ARGS;
     }
 

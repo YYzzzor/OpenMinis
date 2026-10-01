@@ -50,6 +50,7 @@ apple-reminders create --title "续签护照" --due 2026-10-20
 
 - **M1** 写入目标 `--calendar`（事件 create / update）和 `--list`（提醒 create / update）按名称完全一致匹配，忽略大小写。找不到时返回 `invalid_args`，错误信息列出所有候选名称；不写入默认日历或清单，也不保留旧的归属。名称有歧义时，由调用方从候选中选择后重试。
 - **M2** 事件的 create / update / delete 返回 `calendar_id`、`calendar_source`；提醒的 create / update / complete / delete 返回 `list_id`、`list_source`。
+- **M3** 事件的 create / update 收到提醒专用参数时返回 `invalid_args`，不保存，并在错误信息中给出事件对应的写法：`--notify`、`--due` → `--alarm <开始前分钟数>`；`--list` → `--calendar`；`--priority` → 事件没有优先级；`--lat`、`--lng`、`--location-name`、`--radius`、`--proximity` → 事件不支持位置提醒，地点文字用 `--location`。用户没有要求提醒时，Agent 不给事件加 `--alarm`。
 
 ## 不在范围内
 
@@ -70,6 +71,7 @@ apple-reminders create --title "续签护照" --due 2026-10-20
 | 提醒 update：改时刻、改成纯日期、`--notify off`；带位置提醒 | 通知随之移动或去掉，位置提醒保留，开始时间同步（R3–R5） |
 | `--calendar Work` 但只有 “Workout”；提醒 `--list` 找不到 | `invalid_args` 并列出候选，没有写入（M1） |
 | 结果字段 | 含 ID 与来源（M2） |
+| 事件命令带 `--notify`、`--list`、`--lat` 等提醒参数 | `invalid_args`，错误信息给出正确写法，不保存（M3） |
 
 ## 代码与依据
 
