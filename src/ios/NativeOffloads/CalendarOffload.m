@@ -68,12 +68,14 @@ static NSString *const HELP_TEXT =
      "                       --end are bare dates (YYYY-MM-DD). End day before start day\n"
      "                       or --time-zone is invalid_args; all-day has no time zone.\n"
      "  --calendar <name>    Calendar to add to (exact name, case-insensitive; a miss\n"
-     "                       returns invalid_args listing the available calendars)\n"
+     "                       returns invalid_args listing the available calendars;\n"
+     "                       same-name calendars are listed with source and id)\n"
+     "  --calendar-id <id>   Calendar by calendarIdentifier (not together with --calendar)\n"
      "  --location <loc>     Event location\n"
      "  --notes <text>       Event notes\n"
      "  --alarm <minutes>    Alert N minutes before the event. Add only when the user\n"
      "                       asked to be alerted. Reminder options (--notify, --due,\n"
-     "                       --list, --priority, --lat/--lng/...) are rejected here.\n"
+     "                       --list, --list-id, --priority, --lat/--lng/...) are rejected here.\n"
      "  --recur <freq>       Repeat: daily, weekly, monthly, or yearly.\n"
      "                       Omit for a one-off event (default).\n"
      "  --recur-interval <N> Repeat every N periods (default 1; 2 = every other week)\n"
@@ -118,7 +120,9 @@ static NSString *const HELP_TEXT =
      "  --notify <on|off>    Override the notification default. on requires --due.\n"
      "                       Independent of the geofence alerts below.\n"
      "  --list <name>        Reminder list name (exact, case-insensitive; a miss returns\n"
-     "                       invalid_args listing the available lists)\n"
+     "                       invalid_args listing the available lists; same-name lists\n"
+     "                       are listed with source and id)\n"
+     "  --list-id <id>       List by calendarIdentifier (not together with --list)\n"
      "  --priority <0-9>     Priority level\n"
      "  --notes <text>       Reminder notes\n"
      "  --lat <deg>          Geofence latitude (WGS-84). Requires --lng.\n"
@@ -137,8 +141,12 @@ static NSString *const HELP_TEXT =
      "  --end <datetime>     New end time\n"
      "  --all-day            Make it all-day (times ignored). Implied when the dates given\n"
      "                       are all bare (YYYY-MM-DD); a missing end uses the current one.\n"
-     "                       To make it timed again, pass --start/--end with a time.\n"
+     "                       To make it timed again, pass --start/--end with a time. An\n"
+     "                       all-day event given only a timed --start ends at 22:00 that\n"
+     "                       day (start + 1h if start is 22:00 or later); only --end, or\n"
+     "                       one timed and one bare date, is invalid_args.\n"
      "  --calendar <name>    Move to a different calendar (exact name, case-insensitive)\n"
+     "  --calendar-id <id>   Move to the calendar with this calendarIdentifier\n"
      "  --location <loc>     New location\n"
      "  --notes <text>       New notes\n"
      "  --alarm <minutes>    New alarm (replaces existing); reminder options are rejected\n"
@@ -162,6 +170,7 @@ static NSString *const HELP_TEXT =
      "  --notify <on|off>    Force the notification on or off (on needs a due date).\n"
      "                       Geofence alerts are untouched.\n"
      "  --list <name>        Move to a different list (exact name, case-insensitive)\n"
+     "  --list-id <id>       Move to the list with this calendarIdentifier\n"
      "  --priority <0-9>     New priority\n"
      "  --notes <text>       New notes\n"
      "  --lat/--lng/--location-name/--radius/--proximity\n"
@@ -207,27 +216,68 @@ static EKEventStore *eventStore(void) {
     return _eventStore;
 }
 
-// 写入目标日历/清单按名称完全一致（忽略大小写）匹配。子串匹配会把 "Work" 落到
-// "Workout"，找不到时也不能悄悄改用默认值。找不到返回 nil，并在 *errorOut 中给出
-// 列出全部候选名称的 invalid_args，由调用方选定后重试。list 查询的过滤仍按子串。
-static EKCalendar *noff_resolve_calendar_exact(NSString *name, EKEntityType entityType,
+// 候选项带来源和 ID：同名日历只能靠这两项区分。
+static NSString *noff_calendar_candidate(EKCalendar *cal) {
+    return [NSString stringWithFormat:@"'%@' (source: %@, id: %@)",
+            cal.title, cal.source.title ?: @"", cal.calendarIdentifier ?: @""];
+}
+
+static NSString *noff_calendar_candidates(NSArray<EKCalendar *> *cals) {
+    NSMutableArray<NSString *> *items = [NSMutableArray array];
+    for (EKCalendar *cal in cals) {
+        if (cal.title.length > 0) [items addObject:noff_calendar_candidate(cal)];
+    }
+    return items.count ? [items componentsJoinedByString:@"; "] : @"(none)";
+}
+
+// 写入目标日历/清单：按名称完全一致（忽略大小写）或按 calendarIdentifier 匹配。
+// 子串匹配会把 "Work" 落到 "Workout"，找不到或有歧义时也不能悄悄改用默认值。
+// 失败返回 nil，并在 *errorOut 中给出列出候选（名称、来源、ID）的 invalid_args，
+// 由调用方选定后重试。名称与 ID 不能同时给出。list 查询的过滤仍按子串。
+static EKCalendar *noff_resolve_calendar_exact(NSString *name, NSString *calendarId,
+                                               EKEntityType entityType,
                                                NSString *action, NSDictionary **errorOut) {
+    BOOL isList = entityType == EKEntityTypeReminder;
+    NSString *kind = isList ? @"reminder list" : @"calendar";
+    NSString *nameOption = isList ? @"--list" : @"--calendar";
+    NSString *idOption = isList ? @"--list-id" : @"--calendar-id";
+    NSString *message = nil;
+    EKCalendar *found = nil;
+
     // 外部刚创建的日历可能尚未进入缓存；先刷新来源再匹配。
     [eventStore() refreshSourcesIfNecessary];
     NSArray<EKCalendar *> *cals = [eventStore() calendarsForEntityType:entityType];
-    for (EKCalendar *cal in cals) {
-        if ([cal.title localizedCaseInsensitiveCompare:name] == NSOrderedSame) return cal;
+    if (name && calendarId) {
+        message = [NSString stringWithFormat:@"Pass either %@ or %@, not both.", nameOption, idOption];
+    } else if (calendarId) {
+        for (EKCalendar *cal in cals) {
+            if ([cal.calendarIdentifier isEqualToString:calendarId]) { found = cal; break; }
+        }
+        if (!found) {
+            message = [NSString stringWithFormat:@"No %@ with id '%@'. Available: %@",
+                       kind, calendarId, noff_calendar_candidates(cals)];
+        }
+    } else {
+        NSMutableArray<EKCalendar *> *matches = [NSMutableArray array];
+        for (EKCalendar *cal in cals) {
+            if ([cal.title localizedCaseInsensitiveCompare:name] == NSOrderedSame) [matches addObject:cal];
+        }
+        if (matches.count == 1) {
+            found = matches.firstObject;
+        } else if (matches.count > 1) {
+            message = [NSString stringWithFormat:
+                @"Multiple %@s are named '%@'. Retry with %@ <id>. Matches: %@",
+                kind, name, idOption, noff_calendar_candidates(matches)];
+        } else {
+            message = [NSString stringWithFormat:
+                @"No %@ named '%@' (exact match, case-insensitive). Available: %@",
+                kind, name, noff_calendar_candidates(cals)];
+        }
     }
-    NSMutableArray<NSString *> *titles = [NSMutableArray array];
-    for (EKCalendar *cal in cals) {
-        if (cal.title.length > 0) [titles addObject:[NSString stringWithFormat:@"'%@'", cal.title]];
+    if (!found && errorOut) {
+        *errorOut = noff_json_error(TOOL_NAME, action, NOFF_ERR_INVALID_ARGS, message);
     }
-    NSString *kind = entityType == EKEntityTypeReminder ? @"reminder list" : @"calendar";
-    NSString *message = [NSString stringWithFormat:
-        @"No %@ named '%@' (exact match, case-insensitive). Available: %@",
-        kind, name, titles.count ? [titles componentsJoinedByString:@", "] : @"(none)"];
-    if (errorOut) *errorOut = noff_json_error(TOOL_NAME, action, NOFF_ERR_INVALID_ARGS, message);
-    return nil;
+    return found;
 }
 
 // Serial queue to prevent concurrent authorization dialogs
@@ -376,7 +426,7 @@ static BOOL calendar_option_has_value(NSString *key) {
               @"--alarm", @"--time-zone", @"--id", @"--occurrence-date", @"--span",
               @"--days", @"--limit", @"--due", @"--list", @"--priority",
               @"--lat", @"--lng", @"--location-name", @"--radius", @"--proximity", @"--parent-id",
-              @"--notify"] containsObject:key];
+              @"--notify", @"--calendar-id", @"--list-id"] containsObject:key];
 }
 
 // 只在选项位置匹配；字符串取值可以合法包含另一个选项的名称。
@@ -421,6 +471,7 @@ static BOOL reject_reminder_only_event_options(int argc, char **argv, NSString *
         @"--notify": @"for an event alert use --alarm <minutes before start>, and only when the user asked to be alerted",
         @"--due": @"events take --start/--end; for an alert use --alarm <minutes before start>",
         @"--list": @"use --calendar <exact calendar name> for events",
+        @"--list-id": @"use --calendar-id <calendar id> for events",
         @"--priority": @"events have no priority",
         @"--lat": @"events have no location alerts; put the place text in --location",
         @"--lng": @"events have no location alerts; put the place text in --location",
@@ -428,7 +479,7 @@ static BOOL reject_reminder_only_event_options(int argc, char **argv, NSString *
         @"--radius": @"events have no location alerts; put the place text in --location",
         @"--proximity": @"events have no location alerts; put the place text in --location",
     };
-    for (NSString *option in @[@"--notify", @"--due", @"--list", @"--priority", @"--lat", @"--lng",
+    for (NSString *option in @[@"--notify", @"--due", @"--list", @"--list-id", @"--priority", @"--lat", @"--lng",
                                @"--location-name", @"--radius", @"--proximity"]) {
         if (calendar_option_index(argc, argv, option.UTF8String) < 0) continue;
         noff_emit_json(stdout_fd, noff_json_error(TOOL_NAME, action, NOFF_ERR_INVALID_ARGS,
@@ -1269,9 +1320,10 @@ static int cmd_create(int argc, char **argv, int stdout_fd, int stderr_fd, BOOL 
 
     // 找不到时返回候选名称，不能写到默认日历。
     NSString *calName = calendar_option_value(argc, argv, "--calendar");
-    if (calName) {
+    NSString *calId = calendar_option_value(argc, argv, "--calendar-id");
+    if (calName || calId) {
         NSDictionary *matchError = nil;
-        event.calendar = noff_resolve_calendar_exact(calName, EKEntityTypeEvent, @"create", &matchError);
+        event.calendar = noff_resolve_calendar_exact(calName, calId, EKEntityTypeEvent, @"create", &matchError);
         if (!event.calendar) {
             noff_emit_json(stdout_fd, matchError, compact, quiet);
             return NOFF_EXIT_INVALID_ARGS;
@@ -1402,9 +1454,10 @@ static int cmd_update(int argc, char **argv, int stdout_fd, int stderr_fd, BOOL 
     // 写入前先完成全部校验：失败时不能留下未保存的改动。
     EKCalendar *targetCalendar = nil;
     NSString *calName = noff_find_arg(argc, argv, "--calendar");
-    if (calName) {
+    NSString *calId = noff_find_arg(argc, argv, "--calendar-id");
+    if (calName || calId) {
         NSDictionary *matchError = nil;
-        targetCalendar = noff_resolve_calendar_exact(calName, EKEntityTypeEvent, @"update", &matchError);
+        targetCalendar = noff_resolve_calendar_exact(calName, calId, EKEntityTypeEvent, @"update", &matchError);
         if (!targetCalendar) {
             noff_emit_json(stdout_fd, matchError, compact, quiet);
             return NOFF_EXIT_INVALID_ARGS;
@@ -1439,6 +1492,26 @@ static int cmd_update(int argc, char **argv, int stdout_fd, int stderr_fd, BOOL 
             return NOFF_EXIT_INVALID_ARGS;
         }
         if (s && e) noff_all_day_bounds(s, e, &allDayStart, &allDayEnd);
+    }
+
+    // D8：全天事件转为定时。两端都带时刻时照常写入；只给带时刻的 --start 时补出结束；
+    // 只给 --end，或一端带时刻另一端是纯日期，无从推断，直接报错。须在改动字段前完成。
+    if (event.isAllDay && !toAllDay && sawDateArg) {
+        BOOL mixed = startStr && endStr
+            && noff_is_date_only_string(startStr) != noff_is_date_only_string(endStr);
+        if (mixed || (!startStr && endStr)) {
+            noff_emit_json(stdout_fd, noff_json_error(TOOL_NAME, @"update", NOFF_ERR_INVALID_ARGS,
+                @"Converting an all-day event to timed needs --start with a time, or both --start and --end with times."),
+                compact, quiet);
+            return NOFF_EXIT_INVALID_ARGS;
+        }
+        if (newStart && !newEnd) {
+            // 默认当天 22:00 结束；开始已晚于该时刻时取开始后 1 小时。
+            NSDate *dayEnd = [[NSCalendar currentCalendar] dateBySettingHour:22 minute:0 second:0
+                                                                      ofDate:newStart options:0];
+            newEnd = [newStart compare:dayEnd] == NSOrderedAscending
+                ? dayEnd : [newStart dateByAddingTimeInterval:3600];
+        }
     }
 
     NSString *title = noff_find_arg(argc, argv, "--title");
@@ -1939,9 +2012,10 @@ int calendar_cmd_remind(int argc, char **argv, int stdout_fd, int stderr_fd, BOO
 
     // Find reminder list by name
     NSString *listName = noff_find_arg(argc, argv, "--list");
-    if (listName) {
+    NSString *listId = noff_find_arg(argc, argv, "--list-id");
+    if (listName || listId) {
         NSDictionary *matchError = nil;
-        reminder.calendar = noff_resolve_calendar_exact(listName, EKEntityTypeReminder, @"remind", &matchError);
+        reminder.calendar = noff_resolve_calendar_exact(listName, listId, EKEntityTypeReminder, @"remind", &matchError);
         if (!reminder.calendar) {
             noff_emit_json(stdout_fd, matchError, compact, quiet);
             return NOFF_EXIT_INVALID_ARGS;
@@ -2060,9 +2134,10 @@ int calendar_cmd_update_reminder(int argc, char **argv, int stdout_fd, BOOL comp
     // 先校验目标清单和 --notify，失败时不改动提醒对象。
     EKCalendar *targetList = nil;
     NSString *listName = noff_find_arg(argc, argv, "--list");
-    if (listName) {
+    NSString *listId = noff_find_arg(argc, argv, "--list-id");
+    if (listName || listId) {
         NSDictionary *matchError = nil;
-        targetList = noff_resolve_calendar_exact(listName, EKEntityTypeReminder, @"update", &matchError);
+        targetList = noff_resolve_calendar_exact(listName, listId, EKEntityTypeReminder, @"update", &matchError);
         if (!targetList) {
             noff_emit_json(stdout_fd, matchError, compact, quiet);
             return NOFF_EXIT_INVALID_ARGS;

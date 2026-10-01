@@ -26,10 +26,13 @@ apple-reminders create --title "续签护照" --due 2026-10-20
 - **D5** 全天事件可以跟任一套重复参数组合；[F2](ios-calendar-recurrence.md#两套参数) 的“不能混用”仍然适用。
 - **D6** update 的全天切换：
   - 转为全天：传了 `--all-day`，或者传入的起止参数全是纯日期；按日期取整，没传的一端用事件原来的日期；
-  - 转为定时：传了带时刻的 `--start` 或 `--end`，且没有 `--all-day`；回读的起止时间等于传入的时刻；
+  - 转为定时：传了带时刻的 `--start` 或 `--end`，且没有 `--all-day`；回读的起止时间等于传入的时刻，只传一端时按 D8 处理；
   - 只改其他字段时，全天状态不变；
   - `--start` 或 `--end` 无法解析（包括不存在的日期）时返回 `invalid_args`，事件保持不变。
 - **D7** 事件的 create、update、list 返回 `is_all_day`，取自保存后的事件。
+- **D8** 全天事件 update 为定时、只给了一端时：
+  - 只给带时刻的 `--start`：结束为开始当天 22:00（当地）；开始时刻在 22:00 或之后时，结束为开始后 1 小时；
+  - 只给带时刻的 `--end`，或一端带时刻、另一端是纯日期：返回 `invalid_args`，事件不变。
 
 ## 全天提醒与到点通知
 
@@ -51,6 +54,7 @@ apple-reminders create --title "续签护照" --due 2026-10-20
 - **M1** 写入目标 `--calendar`（事件 create / update）和 `--list`（提醒 create / update）按名称完全一致匹配，忽略大小写。找不到时返回 `invalid_args`，错误信息列出所有候选名称；不写入默认日历或清单，也不保留旧的归属。名称有歧义时，由调用方从候选中选择后重试。
 - **M2** 事件的 create / update / delete 返回 `calendar_id`、`calendar_source`；提醒的 create / update / complete / delete 返回 `list_id`、`list_source`。
 - **M3** 事件的 create / update 收到提醒专用参数时返回 `invalid_args`，不保存，并在错误信息中给出事件对应的写法：`--notify`、`--due` → `--alarm <开始前分钟数>`；`--list` → `--calendar`；`--priority` → 事件没有优先级；`--lat`、`--lng`、`--location-name`、`--radius`、`--proximity` → 事件不支持位置提醒，地点文字用 `--location`。用户没有要求提醒时，Agent 不给事件加 `--alarm`。
+- **M4** 名称完全一致（忽略大小写）的日历或清单有多个时，返回 `invalid_args`，列出每一项的名称、来源和 ID，不取第一个。事件的 create / update 可用 `--calendar-id`、提醒的 create / update 可用 `--list-id` 按 ID 指定；名称与 ID 不能同时给出；ID 不存在时返回 `invalid_args` 并列出候选。M1 与本条的候选都带来源和 ID。
 
 ## 不在范围内
 
@@ -72,6 +76,8 @@ apple-reminders create --title "续签护照" --due 2026-10-20
 | `--calendar Work` 但只有 “Workout”；提醒 `--list` 找不到 | `invalid_args` 并列出候选，没有写入（M1） |
 | 结果字段 | 含 ID 与来源（M2） |
 | 事件命令带 `--notify`、`--list`、`--lat` 等提醒参数 | `invalid_args`，错误信息给出正确写法，不保存（M3） |
+| 两个同名 “Work”；`--calendar-id` / `--list-id` 指定其一 | 按名称时 `invalid_args` 并列出来源和 ID；按 ID 写入正确的那个（M4） |
+| 全天事件只给 `--start …T14:00` / `…T22:30`；只给 `--end …T15:00` | 结束 22:00 / 23:30；`invalid_args`（D8） |
 
 ## 代码与依据
 
