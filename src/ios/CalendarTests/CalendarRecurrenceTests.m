@@ -1,5 +1,6 @@
 #import <XCTest/XCTest.h>
 #import <EventKit/EventKit.h>
+#import <CoreLocation/CoreLocation.h>
 #import "CalendarOffload.h"
 #import "NativeOffloadUtils.h"
 
@@ -444,6 +445,7 @@
     [self check:@"2027-01-13" options:@[@"--recurrence", @"yearly", @"--recurrence-weeks-of-year", @"2", @"--recurrence-days-of-week", @"WE", @"--recurrence-count", @"3"] through:@"2030-01-01T00:00:00Z" expected:@[@"2027-01-13", @"2028-01-12", @"2029-01-10"]];
 }
 
+// M1：找不到的日历不回退默认日历，错误信息列出候选名称，且不保存。
 - (void)testUnknownCalendarDoesNotFallBack {
     NSArray *options = @[@"--title", @"Must not save", @"--calendar", NSUUID.UUID.UUIDString,
         @"--start", @"2027-01-01T09:00:00Z", @"--end", @"2027-01-01T10:00:00Z",
@@ -452,6 +454,8 @@
     NSDictionary *json = [self invoke:options exit:&status];
     XCTAssertEqual(status, NOFF_EXIT_INVALID_ARGS);
     XCTAssertEqualObjects(json[@"error"][@"code"], @"invalid_args");
+    XCTAssertTrue([json[@"error"][@"message"] containsString:self.testCalendar.title], @"%@", json);
+    XCTAssertEqual([self eventsFrom:@"2027-01-01T00:00:00Z" to:@"2028-01-01T00:00:00Z"].count, 0u);
 }
 
 - (void)testDefaultTimeZoneCompatibility {
@@ -734,5 +738,475 @@
         XCTAssertEqualObjects(json[@"error"][@"code"], @"invalid_args");
     }
     XCTAssertEqual([self eventsFrom:@"2027-01-01T00:00:00Z" to:@"2028-01-01T00:00:00Z"].count, 0u);
+}
+
+#pragma mark - 全天事件、提醒通知、名称匹配与归属
+
+- (NSDate *)localDay:(NSString *)day {
+    return noff_parse_date(day);
+}
+
+// 结束日 23:59:59（当地）。
+- (NSDate *)localEndOfDay:(NSString *)day {
+    NSDate *next = [NSCalendar.currentCalendar dateByAddingUnit:NSCalendarUnitDay value:1 toDate:[self localDay:day] options:0];
+    return [next dateByAddingTimeInterval:-1];
+}
+
+- (EKEvent *)savedEvent:(NSString *)identifier {
+    [self.store reset];
+    EKEvent *event = [self.store eventWithIdentifier:identifier];
+    XCTAssertNotNil(event);
+    return event;
+}
+
+- (NSDictionary *)createEvent:(NSArray *)options {
+    int status;
+    NSDictionary *json = [self invoke:[@[@"--title", NSUUID.UUID.UUIDString, @"--calendar", self.testCalendar.title]
+        arrayByAddingObjectsFromArray:options] exit:&status];
+    XCTAssertEqual(status, NOFF_EXIT_SUCCESS, @"%@", json);
+    return json;
+}
+
+- (NSUInteger)eventCountInTestCalendar {
+    return [self eventsFrom:@"2027-01-01T00:00:00" to:@"2029-01-01T00:00:00"].count;
+}
+
+// D1、D2、D7：--all-day 单天忽略时刻；纯日期跨 3 天包含结束日；create 与 list 都返回 is_all_day。
+- (void)testAllDayCreateSingleAndMultiDay {
+    NSDictionary *single = [self createEvent:@[@"--start", @"2027-03-10T14:30:00", @"--end", @"2027-03-10T15:30:00", @"--all-day"]];
+    XCTAssertEqualObjects(single[@"data"][@"is_all_day"], @YES);
+    XCTAssertEqualObjects(single[@"data"][@"time_zone"], NSNull.null);
+    EKEvent *saved = [self savedEvent:single[@"data"][@"id"]];
+    XCTAssertTrue(saved.isAllDay);
+    XCTAssertEqualObjects(saved.startDate, [self localDay:@"2027-03-10"]);
+    XCTAssertEqualObjects(saved.endDate, [self localEndOfDay:@"2027-03-10"]);
+
+    NSDictionary *multi = [self createEvent:@[@"--start", @"2027-12-01", @"--end", @"2027-12-03"]];
+    XCTAssertEqualObjects(multi[@"data"][@"is_all_day"], @YES);
+    saved = [self savedEvent:multi[@"data"][@"id"]];
+    XCTAssertTrue(saved.isAllDay);
+    XCTAssertEqualObjects(saved.startDate, [self localDay:@"2027-12-01"]);
+    XCTAssertEqualObjects(saved.endDate, [self localEndOfDay:@"2027-12-03"]);
+
+    // 单天：起止写同一天的纯日期。
+    NSDictionary *sameDay = [self createEvent:@[@"--start", @"2027-12-05", @"--end", @"2027-12-05"]];
+    saved = [self savedEvent:sameDay[@"data"][@"id"]];
+    XCTAssertTrue(saved.isAllDay);
+    XCTAssertEqualObjects(saved.endDate, [self localEndOfDay:@"2027-12-05"]);
+
+    // 只有一端是纯日期且没有 --all-day 时仍是定时事件。
+    NSDictionary *timed = [self createEvent:@[@"--start", @"2027-12-07", @"--end", @"2027-12-08T10:00:00"]];
+    XCTAssertEqualObjects(timed[@"data"][@"is_all_day"], @NO);
+
+    int status;
+    NSDictionary *listed = [self invokeCommand:@"list" options:@[@"--calendar", self.testCalendar.title,
+        @"--start", @"2027-12-01", @"--end", @"2027-12-04"] exit:&status];
+    XCTAssertEqual(status, NOFF_EXIT_SUCCESS, @"%@", listed);
+    NSArray *events = listed[@"data"][@"events"];
+    XCTAssertEqual(events.count, 1u);
+    XCTAssertEqualObjects(events.firstObject[@"is_all_day"], @YES);
+    XCTAssertEqualObjects(events.firstObject[@"id"], multi[@"data"][@"id"]);
+}
+
+// D3、D4：结束日早于开始日、全天加 --time-zone 都是 invalid_args，且不保存。
+- (void)testAllDayInvalidCombinationsDoNotSave {
+    NSArray *cases = @[
+        @[@"--start", @"2027-12-03", @"--end", @"2027-12-01"],
+        @[@"--start", @"2027-12-03T10:00:00", @"--end", @"2027-12-01T10:00:00", @"--all-day"],
+        @[@"--start", @"2027-12-01", @"--end", @"2027-12-03", @"--time-zone", @"Etc/UTC"],
+        @[@"--start", @"2027-12-01T09:00:00", @"--end", @"2027-12-01T10:00:00", @"--all-day", @"--time-zone", @"Asia/Shanghai"],
+    ];
+    for (NSArray *options in cases) {
+        int status;
+        NSDictionary *json = [self invoke:[@[@"--title", @"Must not save", @"--calendar", self.testCalendar.title]
+            arrayByAddingObjectsFromArray:options] exit:&status];
+        XCTAssertEqual(status, NOFF_EXIT_INVALID_ARGS, @"%@ returned %@", options, json);
+        XCTAssertEqualObjects(json[@"error"][@"code"], @"invalid_args");
+    }
+    XCTAssertEqual([self eventCountInTestCalendar], 0u);
+}
+
+// D5：全天事件可与两套重复参数组合；--recurrence-until 取当地整天。
+- (void)testAllDayRecurringEvents {
+    NSArray *families = @[
+        @[@"--recurrence", @"weekly", @"--recurrence-count", @"3"],
+        @[@"--recur", @"weekly", @"--recur-count", @"3"],
+        @[@"--recurrence", @"weekly", @"--recurrence-until", @"2027-03-24"],
+    ];
+    for (NSArray *family in families) {
+        NSDictionary *json = [self createEvent:[@[@"--start", @"2027-03-10", @"--end", @"2027-03-10"] arrayByAddingObjectsFromArray:family]];
+        XCTAssertEqualObjects(json[@"data"][@"is_all_day"], @YES);
+        XCTAssertEqualObjects(json[@"data"][@"is_recurring"], @YES);
+        int status;
+        NSDictionary *listed = [self invokeCommand:@"list" options:@[@"--calendar", self.testCalendar.title,
+            @"--start", @"2027-03-01", @"--end", @"2027-04-30"] exit:&status];
+        XCTAssertEqual(status, NOFF_EXIT_SUCCESS, @"%@", listed);
+        NSMutableArray *starts = [NSMutableArray array];
+        for (NSDictionary *event in listed[@"data"][@"events"]) {
+            if (![event[@"id"] isEqualToString:json[@"data"][@"id"]]) continue;
+            XCTAssertEqualObjects(event[@"is_all_day"], @YES);
+            [starts addObject:event[@"start"]];
+        }
+        NSArray *expected = @[noff_format_date([self localDay:@"2027-03-10"]), noff_format_date([self localDay:@"2027-03-17"]),
+                              noff_format_date([self localDay:@"2027-03-24"])];
+        XCTAssertEqualObjects(starts, expected, @"%@", family);
+        // 清理本轮创建的系列，避免下一轮的列表混入。
+        [self.store reset];
+        NSError *error = nil;
+        EKEvent *master = [self.store eventWithIdentifier:json[@"data"][@"id"]];
+        XCTAssertTrue([self.store removeEvent:master span:EKSpanFutureEvents commit:YES error:&error], @"%@", error);
+    }
+}
+
+// D6：定时 -> 全天、全天 -> 全天、全天 -> 定时；只改标题不改变全天状态。
+- (void)testAllDayUpdateSwitching {
+    NSDictionary *created = [self createEvent:@[@"--start", @"2027-05-03T09:00:00", @"--end", @"2027-05-03T10:00:00"]];
+    NSString *identifier = created[@"data"][@"id"];
+    int status;
+
+    // 定时 -> 全天（纯日期）；只传开始日，结束日沿用原来的日期（同一天）。
+    NSDictionary *updated = [self invokeCommand:@"update" options:@[@"--id", identifier, @"--start", @"2027-05-03"] exit:&status];
+    XCTAssertEqual(status, NOFF_EXIT_SUCCESS, @"%@", updated);
+    XCTAssertEqualObjects(updated[@"data"][@"is_all_day"], @YES);
+    EKEvent *saved = [self savedEvent:identifier];
+    XCTAssertTrue(saved.isAllDay);
+    XCTAssertEqualObjects(saved.startDate, [self localDay:@"2027-05-03"]);
+    XCTAssertEqualObjects(saved.endDate, [self localEndOfDay:@"2027-05-03"]);
+
+    // 只改标题：全天状态与日期不变。
+    updated = [self invokeCommand:@"update" options:@[@"--id", identifier, @"--title", @"Renamed"] exit:&status];
+    XCTAssertEqual(status, NOFF_EXIT_SUCCESS, @"%@", updated);
+    XCTAssertEqualObjects(updated[@"data"][@"is_all_day"], @YES);
+    saved = [self savedEvent:identifier];
+    XCTAssertTrue(saved.isAllDay);
+    XCTAssertEqualObjects(saved.title, @"Renamed");
+    XCTAssertEqualObjects(saved.startDate, [self localDay:@"2027-05-03"]);
+
+    // 全天 -> 全天：换成新的日期范围。
+    updated = [self invokeCommand:@"update" options:@[@"--id", identifier, @"--start", @"2027-05-10", @"--end", @"2027-05-12"] exit:&status];
+    XCTAssertEqual(status, NOFF_EXIT_SUCCESS, @"%@", updated);
+    saved = [self savedEvent:identifier];
+    XCTAssertTrue(saved.isAllDay);
+    XCTAssertEqualObjects(saved.startDate, [self localDay:@"2027-05-10"]);
+    XCTAssertEqualObjects(saved.endDate, [self localEndOfDay:@"2027-05-12"]);
+
+    // 结束日早于开始日：invalid_args，事件不变。
+    updated = [self invokeCommand:@"update" options:@[@"--id", identifier, @"--title", @"Bad", @"--end", @"2027-05-01"] exit:&status];
+    XCTAssertEqual(status, NOFF_EXIT_INVALID_ARGS, @"%@", updated);
+    saved = [self savedEvent:identifier];
+    XCTAssertEqualObjects(saved.title, @"Renamed");
+    XCTAssertEqualObjects(saved.endDate, [self localEndOfDay:@"2027-05-12"]);
+
+    // 无法解析的日期（含不存在的日期）：invalid_args，事件保持全天且不变。
+    for (NSString *badDate in @[@"foo", @"2027-02-30"]) {
+        updated = [self invokeCommand:@"update" options:@[@"--id", identifier, @"--start", badDate] exit:&status];
+        XCTAssertEqual(status, NOFF_EXIT_INVALID_ARGS, @"%@ %@", badDate, updated);
+        saved = [self savedEvent:identifier];
+        XCTAssertTrue(saved.isAllDay, @"%@", badDate);
+        XCTAssertEqualObjects(saved.startDate, [self localDay:@"2027-05-10"], @"%@", badDate);
+    }
+
+    // 全天 -> 定时：回读的起止等于传入的时刻。
+    updated = [self invokeCommand:@"update" options:@[@"--id", identifier,
+        @"--start", @"2027-05-10T14:00:00", @"--end", @"2027-05-10T15:00:00"] exit:&status];
+    XCTAssertEqual(status, NOFF_EXIT_SUCCESS, @"%@", updated);
+    XCTAssertEqualObjects(updated[@"data"][@"is_all_day"], @NO);
+    saved = [self savedEvent:identifier];
+    XCTAssertFalse(saved.isAllDay);
+    XCTAssertEqualObjects(saved.startDate, noff_parse_date(@"2027-05-10T14:00:00"));
+    XCTAssertEqualObjects(saved.endDate, noff_parse_date(@"2027-05-10T15:00:00"));
+
+    // 单独的 --all-day：按现有起止取整为全天。
+    updated = [self invokeCommand:@"update" options:@[@"--id", identifier, @"--all-day"] exit:&status];
+    XCTAssertEqual(status, NOFF_EXIT_SUCCESS, @"%@", updated);
+    saved = [self savedEvent:identifier];
+    XCTAssertTrue(saved.isAllDay);
+    XCTAssertEqualObjects(saved.startDate, [self localDay:@"2027-05-10"]);
+    XCTAssertEqualObjects(saved.endDate, [self localEndOfDay:@"2027-05-10"]);
+}
+
+// D4、D6：绑定了其他时区的定时重复系列转为全天后，仍是当地的同一天，且不再带时区。
+// 回归：曾按原时区解释整天范围，东京时区的事件转全天后多跨一天。
+- (void)testAllDayUpdateClearsEventTimeZone {
+    NSDictionary *created = [self createEvent:@[@"--start", @"2027-06-07T10:00:00+09:00", @"--end", @"2027-06-07T11:00:00+09:00",
+        @"--time-zone", @"Asia/Tokyo", @"--recurrence", @"weekly", @"--recurrence-count", @"3"]];
+    NSString *identifier = created[@"data"][@"id"];
+    int status;
+    NSDictionary *updated = [self invokeCommand:@"update" options:@[@"--id", identifier, @"--all-day", @"--span", @"all"] exit:&status];
+    XCTAssertEqual(status, NOFF_EXIT_SUCCESS, @"%@", updated);
+    EKEvent *saved = [self savedEvent:identifier];
+    NSCalendar *calendar = NSCalendar.currentCalendar;
+    NSDate *day = [calendar startOfDayForDate:noff_parse_date(@"2027-06-07T10:00:00+09:00")];
+    XCTAssertTrue(saved.isAllDay);
+    XCTAssertNil(saved.timeZone);
+    XCTAssertEqualObjects(saved.startDate, day);
+    XCTAssertEqualObjects(saved.endDate, [[calendar dateByAddingUnit:NSCalendarUnitDay value:1 toDate:day options:0] dateByAddingTimeInterval:-1]);
+}
+
+- (NSArray<EKAlarm *> *)timeAlarms:(EKReminder *)reminder {
+    NSMutableArray *alarms = [NSMutableArray array];
+    for (EKAlarm *alarm in reminder.alarms) if (alarm.absoluteDate) [alarms addObject:alarm];
+    return alarms;
+}
+
+- (EKReminder *)savedReminder:(NSString *)identifier {
+    [self.store reset];
+    EKReminder *reminder = (EKReminder *)[self.store calendarItemWithIdentifier:identifier];
+    XCTAssertNotNil(reminder);
+    return reminder;
+}
+
+- (NSDictionary *)createReminder:(NSString *)list options:(NSArray *)options exit:(int *)status {
+    return [self invokeCommand:@"remind" options:[@[@"--title", NSUUID.UUID.UUIDString, @"--list", list]
+        arrayByAddingObjectsFromArray:options] exit:status];
+}
+
+// R1、R2、R6、R7、R5：纯日期是全天无通知；带时刻和相对时间有通知；--notify 覆盖默认。
+- (void)testReminderAllDayAndDefaultNotification {
+    NSString *list = [self createReminderTestList];
+    int status;
+    NSDictionary *dateOnly = [self createReminder:list options:@[@"--due", @"2027-02-03"] exit:&status];
+    XCTAssertEqual(status, NOFF_EXIT_SUCCESS, @"%@", dateOnly);
+    XCTAssertEqualObjects(dateOnly[@"data"][@"is_all_day"], @YES);
+    XCTAssertEqualObjects(dateOnly[@"data"][@"due"], @"2027-02-03");
+    XCTAssertEqualObjects(dateOnly[@"data"][@"notify"], @NO);
+    XCTAssertNil(dateOnly[@"data"][@"notify_at"]);
+    EKReminder *saved = [self savedReminder:dateOnly[@"data"][@"id"]];
+    XCTAssertEqual(saved.dueDateComponents.hour, NSDateComponentUndefined);
+    XCTAssertEqual(saved.dueDateComponents.day, 3);
+    XCTAssertEqual([self timeAlarms:saved].count, 0u);
+    XCTAssertEqual(saved.startDateComponents.day, 3);
+
+    NSDictionary *timed = [self createReminder:list options:@[@"--due", @"2027-02-03T18:00:00"] exit:&status];
+    XCTAssertEqual(status, NOFF_EXIT_SUCCESS, @"%@", timed);
+    XCTAssertEqualObjects(timed[@"data"][@"is_all_day"], @NO);
+    XCTAssertEqualObjects(timed[@"data"][@"notify"], @YES);
+    XCTAssertEqualObjects(timed[@"data"][@"notify_at"], noff_format_date(noff_parse_date(@"2027-02-03T18:00:00")));
+    saved = [self savedReminder:timed[@"data"][@"id"]];
+    XCTAssertEqual(saved.dueDateComponents.hour, 18);
+    XCTAssertEqual(saved.startDateComponents.hour, 18);
+    XCTAssertEqual([self timeAlarms:saved].count, 1u);
+    XCTAssertEqualObjects([self timeAlarms:saved].firstObject.absoluteDate, noff_parse_date(@"2027-02-03T18:00:00"));
+
+    NSDictionary *relative = [self createReminder:list options:@[@"--due", @"-2h"] exit:&status];
+    XCTAssertEqual(status, NOFF_EXIT_SUCCESS, @"%@", relative);
+    XCTAssertEqualObjects(relative[@"data"][@"notify"], @YES);
+    XCTAssertEqual([self timeAlarms:[self savedReminder:relative[@"data"][@"id"]]].count, 1u);
+
+    NSDictionary *off = [self createReminder:list options:@[@"--due", @"2027-02-03T18:00:00", @"--notify", @"off"] exit:&status];
+    XCTAssertEqual(status, NOFF_EXIT_SUCCESS, @"%@", off);
+    XCTAssertEqualObjects(off[@"data"][@"notify"], @NO);
+    XCTAssertEqual([self timeAlarms:[self savedReminder:off[@"data"][@"id"]]].count, 0u);
+
+    NSDictionary *on = [self createReminder:list options:@[@"--due", @"2027-02-03", @"--notify", @"on"] exit:&status];
+    XCTAssertEqual(status, NOFF_EXIT_SUCCESS, @"%@", on);
+    XCTAssertEqualObjects(on[@"data"][@"notify"], @YES);
+    XCTAssertEqualObjects(on[@"data"][@"is_all_day"], @YES);
+
+    // 经 apple-reminders 共用入口创建，行为一致。
+    NSDictionary *shared = [self invokeReminderCommand:@"create" options:@[@"--title", @"Shared entry", @"--list", list,
+        @"--due", @"2027-02-04T09:00:00"] exit:&status];
+    XCTAssertEqual(status, NOFF_EXIT_SUCCESS, @"%@", shared);
+    XCTAssertEqualObjects(shared[@"data"][@"notify"], @YES);
+
+    // list 返回 is_all_day，全天的 due 是 YYYY-MM-DD。
+    NSDictionary *listed = [self invokeCommand:@"reminders" options:@[@"--list", list] exit:&status];
+    XCTAssertEqual(status, NOFF_EXIT_SUCCESS, @"%@", listed);
+    for (NSDictionary *item in listed[@"data"][@"reminders"]) {
+        if ([item[@"id"] isEqualToString:dateOnly[@"data"][@"id"]]) {
+            XCTAssertEqualObjects(item[@"is_all_day"], @YES);
+            XCTAssertEqualObjects(item[@"due"], @"2027-02-03");
+        }
+        if ([item[@"id"] isEqualToString:timed[@"data"][@"id"]]) {
+            XCTAssertEqualObjects(item[@"is_all_day"], @NO);
+            XCTAssertEqualObjects(item[@"due"], noff_format_date(noff_parse_date(@"2027-02-03T18:00:00")));
+        }
+    }
+    XCTAssertEqual([self remindersInTestList].count, 6u);
+}
+
+// R2：--notify on 缺少截止时间、取值无效都是 invalid_args，且不保存。
+- (void)testReminderInvalidNotifyDoesNotSave {
+    NSString *list = [self createReminderTestList];
+    NSArray *cases = @[@[@"--notify", @"on"], @[@"--notify", @"maybe"],
+                       @[@"--due", @"2027-02-03T18:00:00", @"--notify", @"maybe"], @[@"--due", @"2027-02-03", @"--notify"]];
+    for (NSArray *options in cases) {
+        int status;
+        NSDictionary *json = [self createReminder:list options:options exit:&status];
+        XCTAssertEqual(status, NOFF_EXIT_INVALID_ARGS, @"%@ returned %@", options, json);
+        XCTAssertEqualObjects(json[@"error"][@"code"], @"invalid_args");
+    }
+    XCTAssertEqual([self remindersInTestList].count, 0u);
+}
+
+// R3、R4、R5：update 中通知随截止移动或移除；位置提醒保留；开始时间同步。
+- (void)testReminderUpdateMovesAndRemovesNotification {
+    NSString *list = [self createReminderTestList];
+    int status;
+    NSDictionary *created = [self createReminder:list options:@[@"--due", @"2027-02-03T18:00:00"] exit:&status];
+    XCTAssertEqual(status, NOFF_EXIT_SUCCESS, @"%@", created);
+    NSString *identifier = created[@"data"][@"id"];
+
+    // 用 EventKit 直接补一个位置提醒，验证通知规则不会动它。
+    EKReminder *seed = [self savedReminder:identifier];
+    EKStructuredLocation *place = [EKStructuredLocation locationWithTitle:@"Test place"];
+    place.geoLocation = [[CLLocation alloc] initWithLatitude:22.5 longitude:114.0];
+    place.radius = 200;
+    EKAlarm *geofence = [[EKAlarm alloc] init];
+    geofence.structuredLocation = place;
+    geofence.proximity = EKAlarmProximityEnter;
+    [seed addAlarm:geofence];
+    NSError *error = nil;
+    XCTAssertTrue([self.store saveReminder:seed commit:YES error:&error], @"%@", error);
+
+    // 只改时刻：通知移到新时间，位置提醒仍在，开始时间同步。
+    NSDictionary *moved = [self invokeCommand:@"update-reminder" options:@[@"--id", identifier, @"--due", @"2027-02-05T07:30:00"] exit:&status];
+    XCTAssertEqual(status, NOFF_EXIT_SUCCESS, @"%@", moved);
+    XCTAssertEqualObjects(moved[@"data"][@"notify"], @YES);
+    XCTAssertEqualObjects(moved[@"data"][@"is_all_day"], @NO);
+    EKReminder *saved = [self savedReminder:identifier];
+    XCTAssertEqual([self timeAlarms:saved].count, 1u);
+    XCTAssertEqualObjects([self timeAlarms:saved].firstObject.absoluteDate, noff_parse_date(@"2027-02-05T07:30:00"));
+    XCTAssertEqual(saved.alarms.count, 2u);
+    XCTAssertEqual(saved.startDateComponents.day, 5);
+    XCTAssertEqual(saved.startDateComponents.hour, 7);
+
+    // 改成纯日期：去掉时间通知，位置提醒保留，变为全天。
+    NSDictionary *dateOnly = [self invokeCommand:@"update-reminder" options:@[@"--id", identifier, @"--due", @"2027-02-06"] exit:&status];
+    XCTAssertEqual(status, NOFF_EXIT_SUCCESS, @"%@", dateOnly);
+    XCTAssertEqualObjects(dateOnly[@"data"][@"notify"], @NO);
+    XCTAssertEqualObjects(dateOnly[@"data"][@"is_all_day"], @YES);
+    XCTAssertEqualObjects(dateOnly[@"data"][@"due"], @"2027-02-06");
+    saved = [self savedReminder:identifier];
+    XCTAssertEqual([self timeAlarms:saved].count, 0u);
+    XCTAssertEqual(saved.alarms.count, 1u);
+    XCTAssertNotNil(saved.alarms.firstObject.structuredLocation);
+    XCTAssertEqual(saved.startDateComponents.day, 6);
+
+    // 改回带时刻：原来没有通知，按创建时的默认加上。
+    NSDictionary *timedAgain = [self invokeCommand:@"update-reminder" options:@[@"--id", identifier, @"--due", @"2027-02-07T08:00:00"] exit:&status];
+    XCTAssertEqual(status, NOFF_EXIT_SUCCESS, @"%@", timedAgain);
+    XCTAssertEqualObjects(timedAgain[@"data"][@"notify"], @YES);
+
+    // --notify off 去掉时间通知；--notify on 在当前截止时间加回来。
+    NSDictionary *silent = [self invokeReminderCommand:@"update" options:@[@"--id", identifier, @"--notify", @"off"] exit:&status];
+    XCTAssertEqual(status, NOFF_EXIT_SUCCESS, @"%@", silent);
+    XCTAssertEqualObjects(silent[@"data"][@"notify"], @NO);
+    saved = [self savedReminder:identifier];
+    XCTAssertEqual([self timeAlarms:saved].count, 0u);
+    XCTAssertEqual(saved.alarms.count, 1u);
+    NSDictionary *loud = [self invokeReminderCommand:@"update" options:@[@"--id", identifier, @"--notify", @"on"] exit:&status];
+    XCTAssertEqual(status, NOFF_EXIT_SUCCESS, @"%@", loud);
+    XCTAssertEqualObjects(loud[@"data"][@"notify"], @YES);
+    saved = [self savedReminder:identifier];
+    XCTAssertEqualObjects([self timeAlarms:saved].firstObject.absoluteDate, noff_parse_date(@"2027-02-07T08:00:00"));
+
+    // 改成纯日期并同时 --notify on：保留一个通知。
+    NSDictionary *kept = [self invokeCommand:@"update-reminder" options:@[@"--id", identifier, @"--due", @"2027-02-08", @"--notify", @"on"] exit:&status];
+    XCTAssertEqual(status, NOFF_EXIT_SUCCESS, @"%@", kept);
+    XCTAssertEqualObjects(kept[@"data"][@"notify"], @YES);
+
+    // 无效取值：invalid_args，提醒不变。
+    NSDictionary *bad = [self invokeCommand:@"update-reminder" options:@[@"--id", identifier, @"--title", @"Bad", @"--notify", @"maybe"] exit:&status];
+    XCTAssertEqual(status, NOFF_EXIT_INVALID_ARGS, @"%@", bad);
+    XCTAssertNotEqualObjects([self savedReminder:identifier].title, @"Bad");
+
+    // 没有截止时间时 --notify on 被拒绝。
+    NSDictionary *noDue = [self createReminder:list options:@[] exit:&status];
+    XCTAssertEqual(status, NOFF_EXIT_SUCCESS, @"%@", noDue);
+    NSDictionary *rejected = [self invokeCommand:@"update-reminder" options:@[@"--id", noDue[@"data"][@"id"], @"--notify", @"on"] exit:&status];
+    XCTAssertEqual(status, NOFF_EXIT_INVALID_ARGS, @"%@", rejected);
+}
+
+// M1、B5：写入目标按名称完全一致匹配（忽略大小写）；子串、不存在的名称返回 invalid_args 并列出候选。
+- (void)testExactCalendarAndListNameMatching {
+    NSString *title = self.testCalendar.title;
+    NSString *prefix = [title substringToIndex:title.length - 6];
+    NSArray *window = @[@"--start", @"2027-06-01T09:00:00", @"--end", @"2027-06-01T10:00:00"];
+    int status;
+    NSDictionary *partial = [self invoke:[@[@"--title", @"Partial", @"--calendar", prefix] arrayByAddingObjectsFromArray:window] exit:&status];
+    XCTAssertEqual(status, NOFF_EXIT_INVALID_ARGS, @"%@", partial);
+    XCTAssertEqualObjects(partial[@"error"][@"code"], @"invalid_args");
+    XCTAssertTrue([partial[@"error"][@"message"] containsString:title], @"%@", partial);
+    XCTAssertEqual([self eventCountInTestCalendar], 0u);
+
+    NSDictionary *upper = [self invoke:[@[@"--title", @"Upper", @"--calendar", title.uppercaseString] arrayByAddingObjectsFromArray:window] exit:&status];
+    XCTAssertEqual(status, NOFF_EXIT_SUCCESS, @"%@", upper);
+    XCTAssertEqualObjects(upper[@"data"][@"calendar"], title);
+
+    // update 名称不符：invalid_args，事件保持原日历和原标题。
+    NSDictionary *moved = [self invokeCommand:@"update" options:@[@"--id", upper[@"data"][@"id"], @"--title", @"Changed", @"--calendar", prefix] exit:&status];
+    XCTAssertEqual(status, NOFF_EXIT_INVALID_ARGS, @"%@", moved);
+    XCTAssertTrue([moved[@"error"][@"message"] containsString:title], @"%@", moved);
+    EKEvent *saved = [self savedEvent:upper[@"data"][@"id"]];
+    XCTAssertEqualObjects(saved.title, @"Upper");
+    XCTAssertEqualObjects(saved.calendar.calendarIdentifier, self.calendarID);
+
+    // 提醒清单：同样规则，且不写入默认清单。
+    NSString *list = [self createReminderTestList];
+    NSString *listPrefix = [list substringToIndex:list.length - 6];
+    NSDictionary *reminder = [self createReminder:listPrefix options:@[] exit:&status];
+    XCTAssertEqual(status, NOFF_EXIT_INVALID_ARGS, @"%@", reminder);
+    XCTAssertTrue([reminder[@"error"][@"message"] containsString:list], @"%@", reminder);
+    XCTAssertEqual([self remindersInTestList].count, 0u);
+    NSDictionary *created = [self createReminder:list.lowercaseString options:@[] exit:&status];
+    XCTAssertEqual(status, NOFF_EXIT_SUCCESS, @"%@", created);
+    XCTAssertEqualObjects(created[@"data"][@"list"], list);
+    NSDictionary *badMove = [self invokeCommand:@"update-reminder" options:@[@"--id", created[@"data"][@"id"], @"--title", @"Changed", @"--list", listPrefix] exit:&status];
+    XCTAssertEqual(status, NOFF_EXIT_INVALID_ARGS, @"%@", badMove);
+    XCTAssertTrue([badMove[@"error"][@"message"] containsString:list], @"%@", badMove);
+    XCTAssertNotEqualObjects([self savedReminder:created[@"data"][@"id"]].title, @"Changed");
+}
+
+// M2：事件 create / update / delete 返回 calendar_id、calendar_source；提醒 create / update / complete / delete 返回 list_id、list_source。
+- (void)testOwnershipFields {
+    int status;
+    NSString *source = self.testCalendar.source.title ?: @"";
+    NSDictionary *created = [self createEvent:@[@"--start", @"2027-06-01T09:00:00", @"--end", @"2027-06-01T10:00:00"]];
+    NSString *eventID = created[@"data"][@"id"];
+    XCTAssertEqualObjects(created[@"data"][@"calendar_id"], self.calendarID);
+    XCTAssertEqualObjects(created[@"data"][@"calendar_source"], source);
+    NSDictionary *updated = [self invokeCommand:@"update" options:@[@"--id", eventID, @"--title", @"Owned"] exit:&status];
+    XCTAssertEqual(status, NOFF_EXIT_SUCCESS, @"%@", updated);
+    XCTAssertEqualObjects(updated[@"data"][@"calendar_id"], self.calendarID);
+    XCTAssertEqualObjects(updated[@"data"][@"calendar_source"], source);
+    NSDictionary *deleted = [self invokeCommand:@"delete" options:@[@"--id", eventID] exit:&status];
+    XCTAssertEqual(status, NOFF_EXIT_SUCCESS, @"%@", deleted);
+    XCTAssertEqualObjects(deleted[@"data"][@"calendar_id"], self.calendarID);
+    XCTAssertEqualObjects(deleted[@"data"][@"calendar_source"], source);
+
+    NSString *list = [self createReminderTestList];
+    NSString *listSource = [self.store calendarWithIdentifier:self.reminderCalendarID].source.title ?: @"";
+    NSDictionary *reminder = [self createReminder:list options:@[@"--due", @"2027-06-01"] exit:&status];
+    XCTAssertEqual(status, NOFF_EXIT_SUCCESS, @"%@", reminder);
+    NSString *reminderID = reminder[@"data"][@"id"];
+    XCTAssertEqualObjects(reminder[@"data"][@"list_id"], self.reminderCalendarID);
+    XCTAssertEqualObjects(reminder[@"data"][@"list_source"], listSource);
+    NSDictionary *reminderUpdate = [self invokeCommand:@"update-reminder" options:@[@"--id", reminderID, @"--title", @"Owned"] exit:&status];
+    XCTAssertEqual(status, NOFF_EXIT_SUCCESS, @"%@", reminderUpdate);
+    XCTAssertEqualObjects(reminderUpdate[@"data"][@"list_id"], self.reminderCalendarID);
+    XCTAssertEqualObjects(reminderUpdate[@"data"][@"list_source"], listSource);
+    NSDictionary *completed = [self invokeCommand:@"complete-reminder" options:@[@"--id", reminderID] exit:&status];
+    XCTAssertEqual(status, NOFF_EXIT_SUCCESS, @"%@", completed);
+    XCTAssertEqualObjects(completed[@"data"][@"list_id"], self.reminderCalendarID);
+    XCTAssertEqualObjects(completed[@"data"][@"list_source"], listSource);
+    NSDictionary *removed = [self invokeCommand:@"delete-reminder" options:@[@"--id", reminderID] exit:&status];
+    XCTAssertEqual(status, NOFF_EXIT_SUCCESS, @"%@", removed);
+    XCTAssertEqualObjects(removed[@"data"][@"list_id"], self.reminderCalendarID);
+    XCTAssertEqualObjects(removed[@"data"][@"list_source"], listSource);
+}
+
+// 辅助函数 noff_is_date_only_string / noff_all_day_bounds 的边界。
+- (void)testAllDayHelpers {
+    XCTAssertTrue(noff_is_date_only_string(@"2027-12-01"));
+    XCTAssertFalse(noff_is_date_only_string(@"2027-12-01T09:00"));
+    XCTAssertFalse(noff_is_date_only_string(@"2027-13-01"));
+    XCTAssertFalse(noff_is_date_only_string(@"2027/12/01"));
+    XCTAssertFalse(noff_is_date_only_string(@"-2h"));
+    XCTAssertFalse(noff_is_date_only_string(nil));
+    NSDate *start, *end;
+    noff_all_day_bounds(noff_parse_date(@"2027-12-01T14:00:00"), noff_parse_date(@"2027-12-03T01:00:00"), &start, &end);
+    XCTAssertEqualObjects(start, [self localDay:@"2027-12-01"]);
+    XCTAssertEqualObjects(end, [self localEndOfDay:@"2027-12-03"]);
 }
 @end

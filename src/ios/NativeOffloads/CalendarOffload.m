@@ -22,6 +22,8 @@ static const NSInteger DEFAULT_LIMIT = 100;
 /// below; forward-declared so the reminder LIST command (which appears earlier
 /// in this file) can report an existing geofence too.
 static NSDictionary *reminder_location_dict(EKReminder *reminder);
+/// 提醒列表、创建、更新共用的截止时间输出，定义在提醒通知辅助函数处。
+static void reminder_put_due(NSMutableDictionary *d, EKReminder *r);
 
 static NSString *const HELP_TEXT =
     @"apple-calendar - Query and manage iOS calendar events and reminders\n"
@@ -61,7 +63,12 @@ static NSString *const HELP_TEXT =
      "  --title <title>      Event title (required)\n"
      "  --start <datetime>   Start time (required)\n"
      "  --end <datetime>     End time (required)\n"
-     "  --calendar <name>    Calendar to add to\n"
+     "  --all-day            All-day event from the --start day through the --end day\n"
+     "                       (inclusive; times ignored). Implied when both --start and\n"
+     "                       --end are bare dates (YYYY-MM-DD). End day before start day\n"
+     "                       or --time-zone is invalid_args; all-day has no time zone.\n"
+     "  --calendar <name>    Calendar to add to (exact name, case-insensitive; a miss\n"
+     "                       returns invalid_args listing the available calendars)\n"
      "  --location <loc>     Event location\n"
      "  --notes <text>       Event notes\n"
      "  --alarm <minutes>    Alarm minutes before event\n"
@@ -103,8 +110,13 @@ static NSString *const HELP_TEXT =
      "\n"
      "REMIND OPTIONS:\n"
      "  --title <title>      Reminder title (required)\n"
-     "  --due <datetime>     Due date\n"
-     "  --list <name>        Reminder list name\n"
+     "  --due <datetime>     Due date. A bare date (2026-08-25) is an all-day reminder with\n"
+     "                       no notification. With a time of day (or relative like -2h)\n"
+     "                       a system notification is scheduled at that time.\n"
+     "  --notify <on|off>    Override the notification default. on requires --due.\n"
+     "                       Independent of the geofence alerts below.\n"
+     "  --list <name>        Reminder list name (exact, case-insensitive; a miss returns\n"
+     "                       invalid_args listing the available lists)\n"
      "  --priority <0-9>     Priority level\n"
      "  --notes <text>       Reminder notes\n"
      "  --lat <deg>          Geofence latitude (WGS-84). Requires --lng.\n"
@@ -121,7 +133,10 @@ static NSString *const HELP_TEXT =
      "  --title <title>      New title\n"
      "  --start <datetime>   New start time\n"
      "  --end <datetime>     New end time\n"
-     "  --calendar <name>    Move to a different calendar\n"
+     "  --all-day            Make it all-day (times ignored). Implied when the dates given\n"
+     "                       are all bare (YYYY-MM-DD); a missing end uses the current one.\n"
+     "                       To make it timed again, pass --start/--end with a time.\n"
+     "  --calendar <name>    Move to a different calendar (exact name, case-insensitive)\n"
      "  --location <loc>     New location\n"
      "  --notes <text>       New notes\n"
      "  --alarm <minutes>    New alarm (replaces existing)\n"
@@ -140,8 +155,11 @@ static NSString *const HELP_TEXT =
      "UPDATE-REMINDER OPTIONS:\n"
      "  --id <reminder_id>   Reminder ID (required)\n"
      "  --title <title>      New title\n"
-     "  --due <datetime>     New due date\n"
-     "  --list <name>        Move to a different list\n"
+     "  --due <datetime>     New due date. Switches between all-day (bare date) and timed.\n"
+     "                       An existing notification moves with it; a bare date removes it.\n"
+     "  --notify <on|off>    Force the notification on or off (on needs a due date).\n"
+     "                       Geofence alerts are untouched.\n"
+     "  --list <name>        Move to a different list (exact name, case-insensitive)\n"
      "  --priority <0-9>     New priority\n"
      "  --notes <text>       New notes\n"
      "  --lat/--lng/--location-name/--radius/--proximity\n"
@@ -162,6 +180,8 @@ static NSString *const HELP_TEXT =
      "  apple-calendar list --days 7 --compact -q\n"
      "  apple-calendar freebusy --start 2026-02-24T09:00 --end 2026-02-24T18:00\n"
      "  apple-calendar create --title \"Meeting\" --start 2026-02-25T14:00 --end 2026-02-25T15:00\n"
+     "  # All-day, Dec 1 through Dec 3 inclusive:\n"
+     "  apple-calendar create --title \"Leave\" --start 2026-12-01 --end 2026-12-03\n"
      "  # Every Friday at 23:00, forever — one native recurring event, not many copies:\n"
      "  apple-calendar create --title \"Book train ticket home\" \\\n"
      "      --start 2026-02-27T23:00 --end 2026-02-27T23:15 --recur weekly --recur-days fri\n"
@@ -169,6 +189,7 @@ static NSString *const HELP_TEXT =
      "  apple-calendar create --title \"Standup\" --start 2026-03-02T09:30 --end 2026-03-02T09:45 \\\n"
      "      --recur weekly --recur-interval 2 --recur-days mon,wed --recur-count 10\n"
      "  apple-calendar remind --title \"Buy groceries\" --due 2026-02-25T18:00\n"
+     "  apple-calendar remind --title \"Renew passport\" --due 2026-10-20\n"
      "  # Alert on arrival at a place (geofence, no due date needed):\n"
      "  apple-calendar remind --title \"Pick up parcel\" --location-name \"Shenzhen North\" \\\n"
      "      --lat 22.6099 --lng 114.0289 --radius 200 --proximity enter\n"
@@ -182,6 +203,29 @@ static EKEventStore *eventStore(void) {
         _eventStore = [[EKEventStore alloc] init];
     });
     return _eventStore;
+}
+
+// 写入目标日历/清单按名称完全一致（忽略大小写）匹配。子串匹配会把 "Work" 落到
+// "Workout"，找不到时也不能悄悄改用默认值。找不到返回 nil，并在 *errorOut 中给出
+// 列出全部候选名称的 invalid_args，由调用方选定后重试。list 查询的过滤仍按子串。
+static EKCalendar *noff_resolve_calendar_exact(NSString *name, EKEntityType entityType,
+                                               NSString *action, NSDictionary **errorOut) {
+    // 外部刚创建的日历可能尚未进入缓存；先刷新来源再匹配。
+    [eventStore() refreshSourcesIfNecessary];
+    NSArray<EKCalendar *> *cals = [eventStore() calendarsForEntityType:entityType];
+    for (EKCalendar *cal in cals) {
+        if ([cal.title localizedCaseInsensitiveCompare:name] == NSOrderedSame) return cal;
+    }
+    NSMutableArray<NSString *> *titles = [NSMutableArray array];
+    for (EKCalendar *cal in cals) {
+        if (cal.title.length > 0) [titles addObject:[NSString stringWithFormat:@"'%@'", cal.title]];
+    }
+    NSString *kind = entityType == EKEntityTypeReminder ? @"reminder list" : @"calendar";
+    NSString *message = [NSString stringWithFormat:
+        @"No %@ named '%@' (exact match, case-insensitive). Available: %@",
+        kind, name, titles.count ? [titles componentsJoinedByString:@", "] : @"(none)"];
+    if (errorOut) *errorOut = noff_json_error(TOOL_NAME, action, NOFF_ERR_INVALID_ARGS, message);
+    return nil;
 }
 
 // Serial queue to prevent concurrent authorization dialogs
@@ -329,7 +373,8 @@ static BOOL calendar_option_has_value(NSString *key) {
     return [@[@"--title", @"--start", @"--end", @"--calendar", @"--location", @"--notes",
               @"--alarm", @"--time-zone", @"--id", @"--occurrence-date", @"--span",
               @"--days", @"--limit", @"--due", @"--list", @"--priority",
-              @"--lat", @"--lng", @"--location-name", @"--radius", @"--proximity", @"--parent-id"] containsObject:key];
+              @"--lat", @"--lng", @"--location-name", @"--radius", @"--proximity", @"--parent-id",
+              @"--notify"] containsObject:key];
 }
 
 // 只在选项位置匹配；字符串取值可以合法包含另一个选项的名称。
@@ -399,7 +444,7 @@ static BOOL parse_recurrence(int argc, char **argv, NSDate *start, NSTimeZone *t
     for (int i = 2; i < argc; i++) {
         NSString *key = [NSString stringWithUTF8String:argv[i]];
         if (calendar_option_has_value(key)) { i++; continue; }
-        if ([@[@"--compact", @"--quiet", @"-q"] containsObject:key]) continue;
+        if ([@[@"--compact", @"--quiet", @"-q", @"--all-day"] containsObject:key]) continue;
         NSMutableDictionary *selected = [names containsObject:key] ? options :
             [upstreamNames containsObject:key] ? upstreamOptions : nil;
         if (!selected || selected[key] || i + 1 >= argc ||
@@ -789,10 +834,7 @@ int calendar_cmd_reminders(int argc, char **argv, int stdout_fd, BOOL compact, B
         d[@"list"] = r.calendar.title ?: @"";
         d[@"priority"] = @(r.priority);
         d[@"notes"] = r.notes ?: [NSNull null];
-        if (r.dueDateComponents) {
-            NSDate *due = [[NSCalendar currentCalendar] dateFromComponents:r.dueDateComponents];
-            d[@"due"] = due ? noff_format_date(due) : [NSNull null];
-        }
+        reminder_put_due(d, r);
         // [T-reminders-location-alarm] Present only for geofenced reminders, so
         // existing time-only output is unchanged.
         NSDictionary *rLoc = reminder_location_dict(r);
@@ -1138,13 +1180,23 @@ static int cmd_create(int argc, char **argv, int stdout_fd, int stderr_fd, BOOL 
         if (calendar_option_has_value(key) || [key hasPrefix:@"--recur"]) i++;
     }
     NSTimeZone *zone = zoneName ? [NSTimeZone timeZoneWithName:zoneName] : [NSTimeZone localTimeZone];
+    // 显式 --all-day，或起止都是纯日期时创建全天事件。
+    BOOL allDay = calendar_option_index(argc, argv, "--all-day") >= 0
+        || (noff_is_date_only_string(startStr) && noff_is_date_only_string(endStr));
+    NSCalendar *localCalendar = [NSCalendar currentCalendar];
     NSString *recurrenceError = nil;
     EKRecurrenceRule *recurrence = nil;
-    if ([endDate compare:startDate] != NSOrderedDescending) {
+    if (allDay && [[localCalendar startOfDayForDate:endDate] compare:[localCalendar startOfDayForDate:startDate]] == NSOrderedAscending) {
+        recurrenceError = @"An all-day event's end date must not be earlier than its start date.";
+    } else if (allDay && zonePresent) {
+        recurrenceError = @"An all-day event has no time zone; remove --time-zone.";
+    } else if (!allDay && [endDate compare:startDate] != NSOrderedDescending) {
         recurrenceError = @"--end must be later than --start.";
     } else if (!zone || invalidZoneOption) {
         recurrenceError = @"--time-zone must name an IANA time zone, e.g. Asia/Shanghai.";
     } else {
+        // 先规整为整天范围再解析重复规则，until 校验与首次发生才一致。
+        if (allDay) noff_all_day_bounds(startDate, endDate, &startDate, &endDate);
         parse_recurrence(argc, argv, startDate, zone, &recurrence, &recurrenceError);
     }
     if (recurrenceError) {
@@ -1165,8 +1217,11 @@ static int cmd_create(int argc, char **argv, int stdout_fd, int stderr_fd, BOOL 
     event.title = title;
     event.startDate = startDate;
     event.endDate = endDate;
+    // 须在日期之后设置；此时范围已是整天对齐。
+    event.allDay = allDay;
     // 普通单次事件保留原 EventKit 默认时区行为；重复系列绑定时区，跨夏令时保持当地钟点。
-    if (recurrence || zoneName) event.timeZone = zone;
+    // 全天事件不绑定时区，按设备当地日历展开。
+    if (!allDay && (recurrence || zoneName)) event.timeZone = zone;
     if (recurrence) [event addRecurrenceRule:recurrence];
 
     NSString *location = calendar_option_value(argc, argv, "--location");
@@ -1181,19 +1236,13 @@ static int cmd_create(int argc, char **argv, int stdout_fd, int stderr_fd, BOOL 
         [event addAlarm:alarm];
     }
 
-    // 外部刚创建的日历可能尚未触发缓存更新；刷新来源后再选择，找不到时不能写到默认日历。
-    [eventStore() refreshSourcesIfNecessary];
+    // 找不到时返回候选名称，不能写到默认日历。
     NSString *calName = calendar_option_value(argc, argv, "--calendar");
     if (calName) {
-        for (EKCalendar *cal in [eventStore() calendarsForEntityType:EKEntityTypeEvent]) {
-            if ([cal.title localizedCaseInsensitiveContainsString:calName]) {
-                event.calendar = cal;
-                break;
-            }
-        }
+        NSDictionary *matchError = nil;
+        event.calendar = noff_resolve_calendar_exact(calName, EKEntityTypeEvent, @"create", &matchError);
         if (!event.calendar) {
-            noff_emit_json(stdout_fd, noff_json_error(TOOL_NAME, @"create", NOFF_ERR_INVALID_ARGS,
-                [NSString stringWithFormat:@"Calendar not found: %@. List calendars and retry.", calName]), compact, quiet);
+            noff_emit_json(stdout_fd, matchError, compact, quiet);
             return NOFF_EXIT_INVALID_ARGS;
         }
     } else {
@@ -1218,6 +1267,10 @@ static int cmd_create(int argc, char **argv, int stdout_fd, int stderr_fd, BOOL 
         @"start": noff_format_date(startDate),
         @"end": noff_format_date(endDate),
         @"calendar": event.calendar.title ?: @"",
+        @"calendar_id": event.calendar.calendarIdentifier ?: @"",
+        @"calendar_source": event.calendar.source.title ?: @"",
+        // 取自保存后的事件，而不是我们设置的值。
+        @"is_all_day": @(event.isAllDay),
         @"is_recurring": @(event.hasRecurrenceRules),
         @"recurrence_rules": recurrence_to_array(event),
         @"time_zone": event.timeZone.name ?: [NSNull null],
@@ -1312,19 +1365,75 @@ static int cmd_update(int argc, char **argv, int stdout_fd, int stderr_fd, BOOL 
         return NOFF_EXIT_ERROR;
     }
 
+    // 写入前先完成全部校验：失败时不能留下未保存的改动。
+    EKCalendar *targetCalendar = nil;
+    NSString *calName = noff_find_arg(argc, argv, "--calendar");
+    if (calName) {
+        NSDictionary *matchError = nil;
+        targetCalendar = noff_resolve_calendar_exact(calName, EKEntityTypeEvent, @"update", &matchError);
+        if (!targetCalendar) {
+            noff_emit_json(stdout_fd, matchError, compact, quiet);
+            return NOFF_EXIT_INVALID_ARGS;
+        }
+    }
+
+    NSString *startStr = noff_find_arg(argc, argv, "--start");
+    NSString *endStr = noff_find_arg(argc, argv, "--end");
+    NSDate *newStart = startStr ? noff_parse_date(startStr) : nil;
+    NSDate *newEnd = endStr ? noff_parse_date(endStr) : nil;
+    // 无法解析的日期直接报错，不能忽略后继续改动（否则全天事件会被误转为定时）。
+    if ((startStr && !newStart) || (endStr && !newEnd)) {
+        noff_emit_json(stdout_fd, noff_json_error(TOOL_NAME, @"update", NOFF_ERR_INVALID_ARGS,
+            @"Invalid date format for --start or --end"), compact, quiet);
+        return NOFF_EXIT_INVALID_ARGS;
+    }
+
+    // 转为全天：显式 --all-day，或传入的起止全是纯日期。只改其他字段时全天状态不变；
+    // 只传了带时刻的起止则转为定时。没传的一端沿用事件原来的日期。
+    BOOL sawDateArg = startStr != nil || endStr != nil;
+    BOOL bareDatesOnly = sawDateArg
+        && (!startStr || noff_is_date_only_string(startStr))
+        && (!endStr || noff_is_date_only_string(endStr));
+    BOOL toAllDay = calendar_option_index(argc, argv, "--all-day") >= 0 || bareDatesOnly;
+    NSDate *allDayStart = nil, *allDayEnd = nil;
+    if (toAllDay) {
+        NSDate *s = newStart ?: event.startDate, *e = newEnd ?: event.endDate;
+        NSCalendar *localCalendar = [NSCalendar currentCalendar];
+        if (s && e && [[localCalendar startOfDayForDate:e] compare:[localCalendar startOfDayForDate:s]] == NSOrderedAscending) {
+            noff_emit_json(stdout_fd, noff_json_error(TOOL_NAME, @"update", NOFF_ERR_INVALID_ARGS,
+                @"An all-day event's end date must not be earlier than its start date."), compact, quiet);
+            return NOFF_EXIT_INVALID_ARGS;
+        }
+        if (s && e) noff_all_day_bounds(s, e, &allDayStart, &allDayEnd);
+    }
+
     NSString *title = noff_find_arg(argc, argv, "--title");
     if (title) event.title = title;
 
-    NSString *startStr = noff_find_arg(argc, argv, "--start");
-    if (startStr) {
-        NSDate *d = noff_parse_date(startStr);
-        if (d) event.startDate = d;
-    }
-
-    NSString *endStr = noff_find_arg(argc, argv, "--end");
-    if (endStr) {
-        NSDate *d = noff_parse_date(endStr);
-        if (d) event.endDate = d;
+    // 全天标志为 YES 时 EventKit 会静默丢弃对起止时间的写入，所以写日期前先放下标志；
+    // 转全天则在日期写完之后再置位。
+    if (event.isAllDay && (toAllDay || sawDateArg)) event.allDay = NO;
+    if (toAllDay) {
+        // 全天事件不绑定时区（D4）。须在写日期前清除：否则按当地日历算出的整天范围会被
+        // 原时区重新解释，东京时区的事件转全天后会多跨一天（模拟器实测）。
+        event.timeZone = nil;
+        if (allDayStart && allDayEnd) {
+            event.startDate = allDayStart;
+            event.endDate = allDayEnd;
+        }
+        event.allDay = YES;
+    } else if (newStart && newEnd) {
+        // 先写会使范围变宽的一端，避免中间出现结束早于开始的状态。
+        if ([newStart compare:event.endDate] == NSOrderedDescending) {
+            event.endDate = newEnd;
+            event.startDate = newStart;
+        } else {
+            event.startDate = newStart;
+            event.endDate = newEnd;
+        }
+    } else {
+        if (newStart) event.startDate = newStart;
+        if (newEnd) event.endDate = newEnd;
     }
 
     NSString *location = noff_find_arg(argc, argv, "--location");
@@ -1343,15 +1452,7 @@ static int cmd_update(int argc, char **argv, int stdout_fd, int stderr_fd, BOOL 
         [event addAlarm:alarm];
     }
 
-    NSString *calName = noff_find_arg(argc, argv, "--calendar");
-    if (calName) {
-        for (EKCalendar *cal in [eventStore() calendarsForEntityType:EKEntityTypeEvent]) {
-            if ([cal.title localizedCaseInsensitiveContainsString:calName]) {
-                event.calendar = cal;
-                break;
-            }
-        }
-    }
+    if (targetCalendar) event.calendar = targetCalendar;
 
     NSError *saveErr = nil;
     BOOL saved = [eventStore() saveEvent:event span:resolve_event_span(argc, argv) commit:YES error:&saveErr];
@@ -1369,6 +1470,9 @@ static int cmd_update(int argc, char **argv, int stdout_fd, int stderr_fd, BOOL 
         @"start": event.startDate ? noff_format_date(event.startDate) : @"",
         @"end": event.endDate ? noff_format_date(event.endDate) : @"",
         @"calendar": event.calendar.title ?: @"",
+        @"calendar_id": event.calendar.calendarIdentifier ?: @"",
+        @"calendar_source": event.calendar.source.title ?: @"",
+        @"is_all_day": @(event.isAllDay),
     };
     noff_emit_json(stdout_fd, noff_json_envelope(TOOL_NAME, @"update", data), compact, quiet);
     return NOFF_EXIT_SUCCESS;
@@ -1403,6 +1507,9 @@ static int cmd_delete(int argc, char **argv, int stdout_fd, BOOL compact, BOOL q
 
     NSString *eventTitle = event.title ?: @"";
     NSString *calTitle = event.calendar.title ?: @"";
+    // 删除后事件对象不可用，先取归属字段。
+    NSString *calId = event.calendar.calendarIdentifier ?: @"";
+    NSString *calSource = event.calendar.source.title ?: @"";
     // Capture the resolved occurrence's start before removal so we can verify the right
     // instance is gone (the series master may still exist after a single-occurrence delete).
     NSDate *targetStart = event.startDate;
@@ -1444,6 +1551,8 @@ static int cmd_delete(int argc, char **argv, int stdout_fd, BOOL compact, BOOL q
         @"id": eventId,
         @"title": eventTitle,
         @"calendar": calTitle,
+        @"calendar_id": calId,
+        @"calendar_source": calSource,
         @"deleted": @YES,
     };
     noff_emit_json(stdout_fd, noff_json_envelope(TOOL_NAME, @"delete", data), compact, quiet);
@@ -1632,6 +1741,80 @@ static int apply_location_alarm_args(int argc, char **argv, EKReminder *reminder
     return 0;
 }
 
+// ── 提醒的全天截止与到点通知 ──
+//
+// dueDateComponents 只是元数据，通知来自时间型 EKAlarm。带时刻的截止默认加一个
+// 绝对时间的 EKAlarm；纯日期是全天提醒（组件不含时分），默认不通知。
+
+/// --due 字符串是否带时刻。NSDate 分不清 "2026-08-25" 和 "2026-08-25T00:00"，
+/// 区别只在输入里：相对时间（-2h）总有时刻，'T' 或空格后接数字才算带时刻。
+static BOOL due_string_has_time_of_day(NSString *dueStr) {
+    if (dueStr.length == 0) return NO;
+    if ([dueStr hasPrefix:@"-"]) return YES;
+    NSRange sep = [dueStr rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@"T "]];
+    if (sep.location == NSNotFound) return NO;
+    NSUInteger next = sep.location + sep.length;
+    if (next >= dueStr.length) return NO;
+    return [[NSCharacterSet decimalDigitCharacterSet] characterIsMember:[dueStr characterAtIndex:next]];
+}
+
+/// 纯日期只取年月日；带时刻再加时分。
+static NSDateComponents *reminder_due_components(NSDate *due, BOOL dateOnly) {
+    NSCalendarUnit units = NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitDay;
+    if (!dateOnly) units |= NSCalendarUnitHour | NSCalendarUnitMinute;
+    return [[NSCalendar currentCalendar] components:units fromDate:due];
+}
+
+/// 截止没有时刻即全天提醒（包括在提醒事项 App 中创建的）。
+static BOOL reminder_is_all_day(EKReminder *r) {
+    NSDateComponents *c = r.dueDateComponents;
+    return c != nil && c.hour == NSDateComponentUndefined;
+}
+
+/// 写入 `is_all_day` 与 `due`。全天截止直接用组件拼 YYYY-MM-DD，不经过时区转换；
+/// 定时截止保持 ISO 8601。没有截止时什么也不写。
+static void reminder_put_due(NSMutableDictionary *d, EKReminder *r) {
+    NSDateComponents *c = r.dueDateComponents;
+    if (!c) return;
+    BOOL allDay = reminder_is_all_day(r);
+    d[@"is_all_day"] = @(allDay);
+    if (allDay && c.year != NSDateComponentUndefined
+        && c.month != NSDateComponentUndefined && c.day != NSDateComponentUndefined) {
+        d[@"due"] = [NSString stringWithFormat:@"%04ld-%02ld-%02ld",
+                     (long)c.year, (long)c.month, (long)c.day];
+        return;
+    }
+    NSDate *due = [[NSCalendar currentCalendar] dateFromComponents:c];
+    d[@"due"] = due ? noff_format_date(due) : [NSNull null];
+}
+
+/// 解析 --notify on|off。返回 YES 表示给出了有效值（写入 *out）；
+/// 未给出返回 NO；取值无效或缺失时 *malformed 为 YES。
+static BOOL parse_notify_flag(int argc, char **argv, BOOL *out, BOOL *malformed) {
+    *malformed = NO;
+    int index = calendar_option_index(argc, argv, "--notify");
+    if (index < 0) return NO;
+    NSString *value = index + 1 < argc ? [[NSString stringWithUTF8String:argv[index + 1]] lowercaseString] : @"";
+    if ([value isEqualToString:@"on"]) { *out = YES; return YES; }
+    if ([value isEqualToString:@"off"]) { *out = NO; return YES; }
+    *malformed = YES;
+    return NO;
+}
+
+/// 只移除时间型通知（absoluteDate）；位置提醒由 apply_location_alarm_args 管理，保持不变。
+static void remove_time_alarms(EKReminder *reminder) {
+    for (EKAlarm *a in [reminder.alarms copy] ?: @[]) {
+        if (a.absoluteDate && a.proximity == EKAlarmProximityNone) [reminder removeAlarm:a];
+    }
+}
+
+static BOOL has_time_alarm(EKReminder *reminder) {
+    for (EKAlarm *a in reminder.alarms ?: @[]) {
+        if (a.absoluteDate && a.proximity == EKAlarmProximityNone) return YES;
+    }
+    return NO;
+}
+
 int calendar_cmd_remind(int argc, char **argv, int stdout_fd, int stderr_fd, BOOL compact, BOOL quiet) {
     if (reject_advanced_reminder_recurrence(argc, argv, @"remind", stdout_fd, compact, quiet)) {
         return NOFF_EXIT_INVALID_ARGS;
@@ -1663,10 +1846,9 @@ int calendar_cmd_remind(int argc, char **argv, int stdout_fd, int stderr_fd, BOO
         NSDate *due = noff_parse_date(dueStr);
         if (due) {
             dueDate = due;
-            reminder.dueDateComponents = [[NSCalendar currentCalendar]
-                components:(NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitDay |
-                            NSCalendarUnitHour | NSCalendarUnitMinute)
-                fromDate:due];
+            reminder.dueDateComponents = reminder_due_components(due, noff_is_date_only_string(dueStr));
+            // 隐藏的开始时间与截止保持一致，它是重复规则内部使用的锚点。
+            reminder.startDateComponents = reminder.dueDateComponents;
         }
     }
 
@@ -1724,16 +1906,29 @@ int calendar_cmd_remind(int argc, char **argv, int stdout_fd, int stderr_fd, BOO
     // Find reminder list by name
     NSString *listName = noff_find_arg(argc, argv, "--list");
     if (listName) {
-        for (EKCalendar *cal in [eventStore() calendarsForEntityType:EKEntityTypeReminder]) {
-            if ([cal.title localizedCaseInsensitiveContainsString:listName]) {
-                reminder.calendar = cal;
-                break;
-            }
+        NSDictionary *matchError = nil;
+        reminder.calendar = noff_resolve_calendar_exact(listName, EKEntityTypeReminder, @"remind", &matchError);
+        if (!reminder.calendar) {
+            noff_emit_json(stdout_fd, matchError, compact, quiet);
+            return NOFF_EXIT_INVALID_ARGS;
         }
     }
     if (!reminder.calendar) {
         reminder.calendar = [eventStore() defaultCalendarForNewReminders];
     }
+
+    // 到点通知：带时刻的截止默认开，纯日期默认关；--notify 覆盖默认。
+    // 在保存前校验，无效时不留下半成品。
+    BOOL notifyFlag = NO, notifyMalformed = NO;
+    BOOL notifyGiven = parse_notify_flag(argc, argv, &notifyFlag, &notifyMalformed);
+    if (notifyMalformed || (notifyGiven && notifyFlag && !dueDate)) {
+        NSString *message = notifyMalformed ? @"--notify expects on or off."
+            : @"--notify on requires --due: a notification needs a time to fire at.";
+        noff_emit_json(stdout_fd, noff_json_error(TOOL_NAME, @"remind", NOFF_ERR_INVALID_ARGS, message), compact, quiet);
+        return NOFF_EXIT_INVALID_ARGS;
+    }
+    BOOL wantNotify = notifyGiven ? notifyFlag : (dueDate != nil && due_string_has_time_of_day(dueStr));
+    if (wantNotify && dueDate) [reminder addAlarm:[EKAlarm alarmWithAbsoluteDate:dueDate]];
 
     // [T-reminders-location-alarm] Attach a geofence alarm when location args
     // are present. Runs BEFORE save so a permission denial or a bad coordinate
@@ -1759,9 +1954,16 @@ int calendar_cmd_remind(int argc, char **argv, int stdout_fd, int stderr_fd, BOO
         @"id": reminder.calendarItemIdentifier ?: @"",
         @"title": title,
         @"list": reminder.calendar.title ?: @"",
+        @"list_id": reminder.calendar.calendarIdentifier ?: @"",
+        @"list_source": reminder.calendar.source.title ?: @"",
     } mutableCopy];
     NSDictionary *locInfo = reminder_location_dict(reminder);
     if (locInfo) data[@"location"] = locInfo;
+    reminder_put_due(data, reminder);
+    if (dueDate) {
+        data[@"notify"] = @(has_time_alarm(reminder));
+        if (has_time_alarm(reminder)) data[@"notify_at"] = noff_format_date(dueDate);
+    }
     // [T-reminders-recurrence] Echo the stored rule so the caller can confirm
     // what was actually saved without a follow-up list call (same rationale as
     // the event create path).
@@ -1821,18 +2023,36 @@ int calendar_cmd_update_reminder(int argc, char **argv, int stdout_fd, BOOL comp
         return NOFF_EXIT_ERROR;
     }
 
+    // 先校验目标清单和 --notify，失败时不改动提醒对象。
+    EKCalendar *targetList = nil;
+    NSString *listName = noff_find_arg(argc, argv, "--list");
+    if (listName) {
+        NSDictionary *matchError = nil;
+        targetList = noff_resolve_calendar_exact(listName, EKEntityTypeReminder, @"update", &matchError);
+        if (!targetList) {
+            noff_emit_json(stdout_fd, matchError, compact, quiet);
+            return NOFF_EXIT_INVALID_ARGS;
+        }
+    }
+    NSString *dueStr = noff_find_arg(argc, argv, "--due");
+    NSDate *newDueDate = dueStr ? noff_parse_date(dueStr) : nil;
+    BOOL updNotify = NO, updNotifyMalformed = NO;
+    BOOL updNotifyGiven = parse_notify_flag(argc, argv, &updNotify, &updNotifyMalformed);
+    BOOL hasDue = newDueDate != nil || reminder.dueDateComponents != nil;
+    if (updNotifyMalformed || (updNotifyGiven && updNotify && !hasDue)) {
+        NSString *message = updNotifyMalformed ? @"--notify expects on or off."
+            : @"--notify on requires the reminder to have a due date: pass --due, or set one first.";
+        noff_emit_json(stdout_fd, noff_json_error(TOOL_NAME, @"update", NOFF_ERR_INVALID_ARGS, message), compact, quiet);
+        return NOFF_EXIT_INVALID_ARGS;
+    }
+
     NSString *title = noff_find_arg(argc, argv, "--title");
     if (title) reminder.title = title;
 
-    NSString *dueStr = noff_find_arg(argc, argv, "--due");
-    if (dueStr) {
-        NSDate *due = noff_parse_date(dueStr);
-        if (due) {
-            reminder.dueDateComponents = [[NSCalendar currentCalendar]
-                components:(NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitDay |
-                            NSCalendarUnitHour | NSCalendarUnitMinute)
-                fromDate:due];
-        }
+    if (newDueDate) {
+        // 纯日期与带时刻之间可双向切换；开始时间同步为相同的值。
+        reminder.dueDateComponents = reminder_due_components(newDueDate, noff_is_date_only_string(dueStr));
+        reminder.startDateComponents = reminder.dueDateComponents;
     }
 
     NSString *notes = noff_find_arg(argc, argv, "--notes");
@@ -1841,15 +2061,7 @@ int calendar_cmd_update_reminder(int argc, char **argv, int stdout_fd, BOOL comp
     NSString *priorityStr = noff_find_arg(argc, argv, "--priority");
     if (priorityStr) reminder.priority = (NSUInteger)[priorityStr integerValue];
 
-    NSString *listName = noff_find_arg(argc, argv, "--list");
-    if (listName) {
-        for (EKCalendar *cal in [eventStore() calendarsForEntityType:EKEntityTypeReminder]) {
-            if ([cal.title localizedCaseInsensitiveContainsString:listName]) {
-                reminder.calendar = cal;
-                break;
-            }
-        }
-    }
+    if (targetList) reminder.calendar = targetList;
 
     // [T-reminders-recurrence] Same builder / flags as create and as
     // `apple-calendar`. The anchor is the reminder's EFFECTIVE due date — the
@@ -1878,6 +2090,21 @@ int calendar_cmd_update_reminder(int argc, char **argv, int stdout_fd, BOOL comp
         reminder.recurrenceRules = nil;
     }
     if (updRecurRule) reminder.recurrenceRules = @[updRecurRule];
+
+    // 通知随截止时间同步，只增删时间型通知：
+    //   --notify off：去掉；--notify on：在当前截止时间加一个；
+    //   只改 --due：已有通知移到新时间，原来没有则按创建时的默认；
+    //   改成纯日期：去掉通知（除非同时 --notify on）。
+    if (updNotifyGiven) {
+        remove_time_alarms(reminder);
+        if (updNotify && effectiveDue) [reminder addAlarm:[EKAlarm alarmWithAbsoluteDate:effectiveDue]];
+    } else if (newDueDate) {
+        BOOL hadTimeAlarm = has_time_alarm(reminder);
+        remove_time_alarms(reminder);
+        if (!noff_is_date_only_string(dueStr) && (hadTimeAlarm || due_string_has_time_of_day(dueStr))) {
+            [reminder addAlarm:[EKAlarm alarmWithAbsoluteDate:newDueDate]];
+        }
+    }
 
     // [T-reminders-location-alarm] --clear-location removes an existing
     // geofence (there is otherwise no way to undo one from the CLI); the
@@ -1911,15 +2138,16 @@ int calendar_cmd_update_reminder(int argc, char **argv, int stdout_fd, BOOL comp
         @"title": reminder.title ?: @"",
         @"completed": @(reminder.isCompleted),
         @"list": reminder.calendar.title ?: @"",
+        @"list_id": reminder.calendar.calendarIdentifier ?: @"",
+        @"list_source": reminder.calendar.source.title ?: @"",
         @"priority": @(reminder.priority),
         @"notes": reminder.notes ?: [NSNull null],
     } mutableCopy];
-    if (reminder.dueDateComponents) {
-        NSDate *due = [[NSCalendar currentCalendar] dateFromComponents:reminder.dueDateComponents];
-        data[@"due"] = due ? noff_format_date(due) : [NSNull null];
-    }
+    reminder_put_due(data, reminder);
     NSDictionary *updLoc = reminder_location_dict(reminder);
     if (updLoc) data[@"location"] = updLoc;
+    // 更新后总是返回：只改 --due 也会让已有通知移动。
+    data[@"notify"] = @(has_time_alarm(reminder));
     if (reminder.hasRecurrenceRules && reminder.recurrenceRules.count > 0) {
         data[@"recurrence"] = recurrence_to_dict(reminder.recurrenceRules.firstObject);
     }
@@ -1973,6 +2201,8 @@ int calendar_cmd_complete_reminder(int argc, char **argv, int stdout_fd, BOOL co
         @"title": reminder.title ?: @"",
         @"completed": @(reminder.isCompleted),
         @"list": reminder.calendar.title ?: @"",
+        @"list_id": reminder.calendar.calendarIdentifier ?: @"",
+        @"list_source": reminder.calendar.source.title ?: @"",
     };
     noff_emit_json(stdout_fd, noff_json_envelope(TOOL_NAME, @"complete", data), compact, quiet);
     return NOFF_EXIT_SUCCESS;
@@ -2007,6 +2237,9 @@ int calendar_cmd_delete_reminder(int argc, char **argv, int stdout_fd, BOOL comp
 
     NSString *title = reminder.title ?: @"";
     NSString *list = reminder.calendar.title ?: @"";
+    // 删除后对象不可用，先取归属字段。
+    NSString *listId = reminder.calendar.calendarIdentifier ?: @"";
+    NSString *listSource = reminder.calendar.source.title ?: @"";
 
     NSError *removeErr = nil;
     BOOL removed = [eventStore() removeReminder:reminder commit:YES error:&removeErr];
@@ -2022,6 +2255,8 @@ int calendar_cmd_delete_reminder(int argc, char **argv, int stdout_fd, BOOL comp
         @"id": reminderId,
         @"title": title,
         @"list": list,
+        @"list_id": listId,
+        @"list_source": listSource,
         @"deleted": @YES,
     };
     noff_emit_json(stdout_fd, noff_json_envelope(TOOL_NAME, @"delete", data), compact, quiet);

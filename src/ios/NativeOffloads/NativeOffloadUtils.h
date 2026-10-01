@@ -54,6 +54,21 @@ NSDate *_Nullable noff_parse_date(NSString *str);
 /// Format a date as ISO 8601 with timezone.
 NSString *noff_format_date(NSDate *date);
 
+// ── 全天事件辅助 ──
+
+/// 恰好是不带时刻的日期（`YYYY-MM-DD`，10 个字符）时为 YES。
+/// 事件的 --start/--end 都是纯日期时按全天事件处理。
+BOOL noff_is_date_only_string(NSString *_Nullable str);
+
+/// 按设备当地日历把 [start, end] 规整为 EventKit 的全天范围：
+/// `*outStart` 为开始日 00:00:00，`*outEnd` 为结束日 23:59:59（含结束日）。
+/// 调用方须先确认结束日不早于开始日（MinisX 按 invalid_args 处理）；
+/// 这里对更早的结束日仅作兜底，收成单天。
+/// 用日历单位运算而不是 `+ 86399`，夏令时切换日也落在当天最后一秒。
+void noff_all_day_bounds(NSDate *start, NSDate *end,
+                         NSDate *_Nonnull *_Nonnull outStart,
+                         NSDate *_Nonnull *_Nonnull outEnd);
+
 // ── JSON output ──
 
 /// Build a success envelope: {ok:true, tool, action, data, timestamp}.

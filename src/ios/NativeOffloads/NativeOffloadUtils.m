@@ -130,6 +130,35 @@ NSString *noff_format_date(NSDate *date) {
     return [fmt stringFromDate:date];
 }
 
+// ── 全天事件辅助 ──
+
+BOOL noff_is_date_only_string(NSString *_Nullable str) {
+    if (str.length != 10) return NO;
+    // 逐位检查：日期格式化器会容忍尾随内容，无法区分纯日期与日期时间的前缀。
+    for (NSUInteger i = 0; i < 10; i++) {
+        unichar c = [str characterAtIndex:i];
+        if (i == 4 || i == 7) {
+            if (c != '-') return NO;
+        } else if (c < '0' || c > '9') {
+            return NO;
+        }
+    }
+    return noff_parse_date(str) != nil;
+}
+
+void noff_all_day_bounds(NSDate *start, NSDate *end,
+                         NSDate *_Nonnull *_Nonnull outStart,
+                         NSDate *_Nonnull *_Nonnull outEnd) {
+    NSCalendar *cal = [NSCalendar currentCalendar];
+    NSDate *startDay = [cal startOfDayForDate:start];
+    NSDate *endDay = [cal startOfDayForDate:end ?: start];
+    if ([endDay compare:startDay] == NSOrderedAscending) endDay = startDay;
+    // 结束日 23:59:59 = 次日零点减 1 秒。
+    NSDate *nextMidnight = [cal dateByAddingUnit:NSCalendarUnitDay value:1 toDate:endDay options:0];
+    *outStart = startDay;
+    *outEnd = [nextMidnight dateByAddingTimeInterval:-1] ?: endDay;
+}
+
 // ── JSON output ──
 
 NSDictionary *noff_json_envelope(NSString *tool, NSString *action, id data) {

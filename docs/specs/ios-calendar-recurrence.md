@@ -4,7 +4,7 @@ description: apple-calendar 重复事件创建、两套参数兼容、结束条�
 
 # MinisX 日历重复创建接口
 
-导航：[Spec 索引](index.md)。
+导航：[Spec 索引](index.md)。全天事件、提醒通知与名称匹配见 [日历全天与提醒通知](ios-calendar-all-day-and-reminders.md)。
 
 范围：`apple-calendar create` 创建重复事件的参数、兼容规则、结束条件与回读。`--recur` 是 OpenMinis v1.13 的兼容参数族，`--recurrence` 是 MinisX 的高级参数族。最低 iOS 26.0。
 
@@ -19,8 +19,8 @@ apple-calendar create --title "组会" \
 - **B1** 保存的是系统原生的重复系列；查询某个时间窗口即可得到各次发生，不需要 App 在后台逐次创建。
 - **B2** `--start` / `--end` 定义第一次发生，开始日期应符合筛选条件；之后每次保持事件时区中的本地时间。
 - **B3** 重复系列的 `--time-zone` 默认为设备当地时区；普通单次事件不指定时不设置时区，沿用 EventKit 默认。指定其他时区时，起止时间都应带明确的 UTC 偏移。
-- **B4** 结束时间必须晚于开始时间。
-- **B5** `--calendar` 按名称做忽略大小写的子串匹配，取第一个匹配的日历；找不到时返回 `invalid_args`，不静默写入默认日历。名称可能有歧义时，先列出日历再使用完整名称。
+- **B4** 定时事件的结束时间必须晚于开始时间；全天事件按 [D3](ios-calendar-all-day-and-reminders.md#全天事件)。
+- **B5** `--calendar` 按 [M1](ios-calendar-all-day-and-reminders.md#名称匹配与归属) 做完全一致的名称匹配；找不到时返回 `invalid_args` 并列出候选，不写入默认日历。
 - **B6** 保存重复系列时使用 `EKSpanFutureEvents`（沿用 v1.13）。
 
 ## 两套参数

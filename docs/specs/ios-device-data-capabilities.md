@@ -20,7 +20,7 @@ description: MinisX iOS 原生设备数据、系统能力与命令入口的当�
 
 | 类别与命令 | 读取 | 写入或动作 | 边界 |
 | --- | --- | --- | --- |
-| 日历 `apple-calendar` | 日历、事件、忙闲 | 创建、更新、删除，含重复事件 | 重复与系列修改规则见 [日历重复创建](ios-calendar-recurrence.md)。[CalendarOffload.m](../../src/ios/NativeOffloads/CalendarOffload.m) |
+| 日历 `apple-calendar` | 日历、事件、忙闲 | 创建、更新、删除，含重复事件 | 重复与系列修改规则见 [日历重复创建](ios-calendar-recurrence.md)；全天、提醒通知与名称匹配见 [日历全天与提醒通知](ios-calendar-all-day-and-reminders.md)。[CalendarOffload.m](../../src/ios/NativeOffloads/CalendarOffload.m) |
 | 提醒事项 `apple-reminders` | 列表、提醒状态 | 创建、更新、删除、完成与撤销完成 | 支持基础重复和位置提醒；不能创建列表或子任务。[RemindersOffload.m](../../src/ios/NativeOffloads/RemindersOffload.m) |
 | 照片与视频 `apple-photos` | 查询、相册、统计、导出 | 导入、建相册、加入相册、收藏、删除 | 可见范围取决于照片授权；删除需要资源 id 和命令级确认；不能删除或重命名相册，不能原位编辑照片。[PhotosOffload.m](../../src/ios/NativeOffloads/PhotosOffload.m) |
 | 健康 `apple-healthkit` | 步数、心率、睡眠、运动、血氧、营养等已注册类型 | 写入支持的数量与分类样本、血压；删除本 App 写入的支持样本 | 见下方“健康数据” |
