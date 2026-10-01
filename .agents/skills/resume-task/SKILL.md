@@ -6,7 +6,7 @@ description: 继续 tasks/active/ 中已有的 MinisX 任务：读记录、核�
 # 恢复任务
 
 1. **选任务**：用户已指定就直接用；否则只列出 `tasks/active/` 下各任务的标题和状态行，让用户选。不读 `tasks/archive/`。
-2. **读记录**：完整读 `task.md` 和其中列出的 Spec。
+2. **读记录**：完整读 `task.md` 和其中列出的 Spec。同目录的 `verification.md`（验证记录）需要时再读。
 3. **核对现状**：运行 `git status` 和 `git log --oneline -5`，对照记录的进度。
    - 记录与代码不符时以代码为准，并更新记录。
    - 不为迎合记录而回退、清理或覆盖代码。

@@ -1,10 +1,18 @@
 # YY-mm-dd 任务名称
 
-状态：active　｜　Spec：`docs/specs/xxx.md`（本任务新增 A4–A5，修改 A2）
+状态：待确认 / active　｜　Spec：`docs/specs/xxx.md`（本任务新增 A4–A5，修改 A2）　｜　验证：[verification.md](verification.md)（可选，没有就删去）
 
 ## 目标
 
 完成后用户能观察到的行为；明确不做的内容。
+
+## 方案
+
+选择的路线及理由；涉及模块协作或数据流时附 Mermaid 关系图和典型场景图。
+
+## 拟议规则（仅规划阶段；确认后移入 Spec，删去本节）
+
+- **A4** ……
 
 ## 验收（有证据才打勾，注明证据位置）
 
