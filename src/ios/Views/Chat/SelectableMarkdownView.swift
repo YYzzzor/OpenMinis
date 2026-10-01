@@ -1248,9 +1248,19 @@ fileprivate final class MarkdownNSRenderer {
             // Set .backgroundColor to trigger fillBackgroundRectArray in MinisLayoutManager
             // The actual color is drawn there with rounded corners; this just triggers the callback.
             codeAttrs[.backgroundColor] = theme.inlineCodeBackground
-            // Add hair spaces for visual padding inside the background highlight.
-            return NSAttributedString(string: "\u{200A}\(Self.breakableInlineCode(code))\u{200A}",
-                                      attributes: codeAttrs)
+            // MinisX：首尾留白字符改用上下文字体，再用字距撑到与 MinisLayoutManager
+            // 的尾部内边距相当。原先两端都是 Menlo 里的 U+200A，等宽字体下占满一个
+            // 字符宽，首部看起来像多了一个空格。
+            // 首部用不可断行的 U+202F：U+200A 可断行，代码换到下一行行首时留白会
+            // 留在上一行末尾，代码就贴着左边沿。尾部仍用 U+200A，会被绘制时裁掉。
+            var padAttrs = codeAttrs
+            if let contextFont { padAttrs[.font] = contextFont }
+            padAttrs[.kern] = MinisLayoutManager.inlineCodeTrailingInset - 2
+            let span = NSMutableAttributedString(string: MinisLayoutManager.inlineCodeLeadingPad, attributes: padAttrs)
+            span.append(NSAttributedString(string: Self.breakableInlineCode(code), attributes: codeAttrs))
+            padAttrs[.kern] = MinisLayoutManager.inlineCodeTrailingInset - 0.5
+            span.append(NSAttributedString(string: "\u{200A}", attributes: padAttrs))
+            return span
 
         case .emphasis(let children):
             var emphAttrs = attrs
@@ -4848,7 +4858,10 @@ final class MinisLayoutManager: NSLayoutManager {
     /// visible glyph on a wrapped line. Mirrors the ~0.5-1pt of slack the
     /// unclamped rect carries on a tight single-line span, so a wrapped line's
     /// pill doesn't look clipped against its final character.
-    private static let inlineCodeTrailingInset: CGFloat = 2
+    /// MinisX：由 2 调到 3，并兼作折行续行的左侧内边距；行内代码首尾留白的字距也由它推出。
+    static let inlineCodeTrailingInset: CGFloat = 3
+    /// MinisX：行内代码首部留白字符（窄不换行空格），复制与朗读时需去掉。
+    static let inlineCodeLeadingPad = "\u{202F}"
 
     /// [T-ios-inline-code-wrap-gap] Corner radius of the inline-code pill.
     /// Named because the multi-line joining below has to reason about it: a
@@ -4919,6 +4932,8 @@ final class MinisLayoutManager: NSLayoutManager {
             // so inside a list the pill ran back to the bubble's left edge
             // while the text it belongs to sat one indent level in.
             var visibleMinX: CGFloat = .nan
+            // MinisX：本行片段是否以首部留白 U+202F 开头（即代码段的第一行）。
+            var startsWithPad = false
             enumerateLineFragments(forGlyphRange: glyphRange) { lineFragRect, usedRect, _, lineGlyphRange, _ in
                 guard lineFragRect.midY >= rawRect.minY && lineFragRect.midY <= rawRect.maxY else { return }
                 let overlapStart = max(glyphRange.location, lineGlyphRange.location)
@@ -4929,6 +4944,7 @@ final class MinisLayoutManager: NSLayoutManager {
                 let overlapText = (textStorage.string as NSString).substring(with: overlapCharRange)
                 if !overlapText.trimmingCharacters(in: .whitespaces).isEmpty {
                     hasVisibleText = true
+                    if overlapText.hasPrefix(Self.inlineCodeLeadingPad) { startsWithPad = true }
 
                     // [T-ios-inline-code-quote-band] Measure out to the last
                     // non-whitespace character of this line's slice. A wrapped
@@ -5010,6 +5026,14 @@ final class MinisLayoutManager: NSLayoutManager {
             if !visibleMinX.isNaN, visibleMinX > rawRect.minX, visibleMinX < rawRect.maxX {
                 rawRect.size.width -= visibleMinX - rawRect.minX
                 rawRect.origin.x = visibleMinX
+            }
+            // MinisX：折行后的续行没有首部留白字符，底色会贴着首个字形。
+            // 向左补与尾部相同的内边距；正文行首有 5pt lineFragmentPadding 可用，
+            // 表格单元格的 padding 为 0，按 x ≥ 0 截断，避免画到容器外。
+            if !startsWithPad {
+                let extend = min(Self.inlineCodeTrailingInset, max(0, rawRect.minX))
+                rawRect.origin.x -= extend
+                rawRect.size.width += extend
             }
 
             if !visibleMaxX.isNaN, visibleMaxX > rawRect.minX {
@@ -5894,6 +5918,7 @@ final class SelectableMarkdownTextView: UITextView, UIGestureRecognizerDelegate 
         let snippet = String(text[range])
             .replacingOccurrences(of: "\u{200B}", with: "")
             .replacingOccurrences(of: "\u{200A}", with: "")
+            .replacingOccurrences(of: MinisLayoutManager.inlineCodeLeadingPad, with: "")
         NotificationCenter.default.post(
             name: .chatInputAppendRequested,
             object: nil,
@@ -5994,6 +6019,7 @@ final class SelectableMarkdownTextView: UITextView, UIGestureRecognizerDelegate 
         return out
             .replacingOccurrences(of: "\u{200B}", with: "")
             .replacingOccurrences(of: "\u{200A}", with: "")
+            .replacingOccurrences(of: MinisLayoutManager.inlineCodeLeadingPad, with: "")
     }
 
     override func buildMenu(with builder: UIMenuBuilder) {
