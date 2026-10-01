@@ -8179,6 +8179,10 @@ struct SelectableMarkdownView: UIViewRepresentable {
             }
         }
         if !fastPathTaken {
+            // MinisX：整体替换前先结束进行中的淡入。字符串仍是追加（不触发
+            // isContentRewrite），但属性已重排时（如闭合反引号把 `/ 变成代码），
+            // 动画记录的旧颜色会被逐帧写回新内容的同一位置，`/var` 的 `/` 因此变黑。
+            context.coordinator.fadeAnimator.cancelAll()
             textView.attributedText = attributed
         }
 
