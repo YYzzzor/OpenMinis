@@ -18,7 +18,6 @@ README 中的 OpenMinis App Store / TestFlight 链接属于上游项目，与 Mi
 
 - Build 7：维护者手机是否已安装使用。
 - Build 7：带时刻的提醒到点是否弹出通知横幅（模拟器只能验证 `EKAlarm` 已写入）。
-- Build 7：构建号 6 → 7 的改动尚未提交（`project.pbxproj` 八处配置）。
 - Build 4、5 上传时：8 项第三方框架缺少 dSYM（FFmpeg、RealTimeCutVADCXXLibrary 及 6 个 libav / libsw 库），第三方崩溃符号化可能不完整；Build 6、7 未单独核查。
 - 语音（Build 5–6）：真机首字延迟、长停顿、长语音、离线语言与耗电未做专项体验；最终 0.8 倍波形测试未复跑；阿里 / 讯飞原有 HTTP 接入与官方 WebSocket 协议不符，未修复。
 
@@ -29,7 +28,7 @@ README 中的 OpenMinis App Store / TestFlight 链接属于上游项目，与 Mi
 ### 1.13（7）— 2026-10-01
 
 - **上传**：维护者在 Xcode 手动 Archive（09:47）并 Distribute，09:59:16 上传成功；归档元数据 `uploadedBuildNumber=7`，分发记录 ID `766ec9b6-05b0-434b-8e8d-f24b5f45300e`。
-- **源码**：分支 `feat/calendar-all-day`，HEAD `adadbba`，另加未提交的构建号 6 → 7。已推送到 `origin/feat/calendar-all-day`，尚未合并进 `main`。归档二进制中能找到本次日历改动新增的错误信息字符串，确认包含这些代码。
+- **源码**：分支 `feat/calendar-all-day`，HEAD `adadbba`，另加当时未提交的构建号 6 → 7（随后提交为 `4a1af94`）。2026-10-01 快进合并进 `main`。归档二进制中能找到本次日历改动新增的错误信息字符串，确认包含这些代码。
 - **新增内容**（相对 Build 6）：
   - [DeepSeek 会话费用与账户余额](<../tasks/archive/26-09-29 DeepSeek 会话费用与账户余额/task.md>)（`5f38e91`）。
   - [日历全天事件与提醒通知](<../tasks/archive/26-10-01 日历全天事件与提醒通知/task.md>)（`345acc5`、`a3a9352`、`adadbba`）：全天事件的创建与切换；全天提醒；带时刻的提醒自动到点通知，`--notify on|off` 可覆盖；日历名、清单名精确匹配，同名时报歧义并支持 `--calendar-id` / `--list-id`；事件命令拒绝提醒专用参数；全天事件只给开始时刻时默认 22:00 结束。
