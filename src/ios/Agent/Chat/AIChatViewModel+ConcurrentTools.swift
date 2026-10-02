@@ -40,6 +40,17 @@ extension AIChatViewModel {
         set { runningCommandPid = newValue.first ?? 0 }
     }
 
+    private static func webReadRequest(from args: [String: Any]) -> WebReadRequest {
+        WebReadRequest(
+            url: args["url"] as? String,
+            queryTarget: args["query_target"] as? String,
+            renderRequested: args["render"] as? Bool ?? false,
+            documentID: args["document_id"] as? String,
+            offset: args["offset"] as? Int,
+            limit: args["limit"] as? Int
+        )
+    }
+
     /// Tiny actor wrapping the per-turn image budget so concurrent tool
     /// tasks can race-free claim a slot for their image bytes.
     /// `reserveSlot()` returns true iff a slot was claimed; the caller
@@ -85,15 +96,22 @@ extension AIChatViewModel {
         tu: StreamResult.ToolEntry,
         msgIdx: Int,
         tools: [AgentToolDefinition],
-        batchBudget: BatchImageBudget
+        batchBudget: BatchImageBudget,
+        webReadBatchID: String? = nil,
+        webReadScope: WebReadScope? = nil,
+        webReadDeadline: Date? = nil
     ) async -> ToolExecOutcome {
         let blockIdx = tu.blockIdx
+        let earlyWebReadRequest = tu.name == "web_read" ? Self.webReadRequest(from: tu.args) : nil
 
         // Graceful cancel pre-check: any task that begins after the user
         // tapped Stop short-circuits with a synthetic cancellation result
         // so history stays paired.
-        if Task.isCancelled || self.userDidCancel {
-            let cancelContent = "<system-reminder>The user cancelled this operation. The returned result may be incomplete.</system-reminder>"
+        if Task.isCancelled || self.userDidCancel
+            || ((tu.name == "web_read" || tu.name == "browser_use") && commandCancelledByUser) {
+            let cancelContent = earlyWebReadRequest.map {
+                WebReadService.immediateOutcome(request: $0, status: .cancelled, limitation: "读取在开始前已停止。").json
+            } ?? "<system-reminder>The user cancelled this operation. The returned result may be incomplete.</system-reminder>"
             if msgIdx < messages.count, blockIdx < messages[msgIdx].blocks.count {
                 messages[msgIdx].blocks[blockIdx].toolStatus = .cancelled
                 messages[msgIdx].blocks[blockIdx].content = cancelContent
@@ -105,7 +123,7 @@ extension AIChatViewModel {
             )
             return ToolExecOutcome(
                 toolId: tu.id, toolName: tu.name,
-                resultPart: .toolResult(id: tu.id, name: tu.name, content: cancelContent, isError: true),
+                resultPart: .toolResult(id: tu.id, name: tu.name, content: cancelContent, isError: tu.name != "web_read"),
                 snapshotEntry: (toolName: tu.name, snapshot: cancelSnap),
                 snapshotItem: item,
                 cancelled: true
@@ -124,10 +142,13 @@ extension AIChatViewModel {
         // in a runaway pattern (unknown tool spam, no-progress polling, etc).
         let loopPreCheck = toolLoopDetector.check(toolName: tu.name, params: tu.args)
         if loopPreCheck.level == .critical, let blockedMsg = loopPreCheck.message {
-            toolOutput = blockedMsg
+            let modelBlockedMessage = earlyWebReadRequest.map {
+                WebReadService.immediateOutcome(request: $0, status: .failed, limitation: "读取被循环保护器阻止。").json
+            } ?? blockedMsg
+            toolOutput = modelBlockedMessage
             toolSuccess = false
             if msgIdx < messages.count, blockIdx < messages[msgIdx].blocks.count {
-                messages[msgIdx].blocks[blockIdx].content = blockedMsg
+                messages[msgIdx].blocks[blockIdx].content = modelBlockedMessage
                 messages[msgIdx].blocks[blockIdx].toolStatus = .failed(message: "loop blocked")
             }
             toolLoopDetector.record(
@@ -141,7 +162,7 @@ extension AIChatViewModel {
             )
             return ToolExecOutcome(
                 toolId: tu.id, toolName: tu.name,
-                resultPart: .toolResult(id: tu.id, name: tu.name, content: blockedMsg, isError: true),
+                resultPart: .toolResult(id: tu.id, name: tu.name, content: modelBlockedMessage, isError: true),
                 snapshotEntry: (toolName: tu.name, snapshot: blockedSnap),
                 snapshotItem: item,
                 cancelled: false
@@ -246,9 +267,15 @@ extension AIChatViewModel {
                 "[ToolPreflight] BLOCKED tool=\(tu.name) id=\(tu.id) reason=\"\(preflightError)\" argsKeys=[\(tu.args.keys.sorted().joined(separator: ","))] chunkCount=\(chunkRing.count) lastChunk=<<<\(chunkRing.last?.prefix(500) ?? "")>>>"
             )
             let uiMessage = AppLocalized("Blocked invalid tool call")
-            let modelMessage = "Error: Tool call rejected before execution. \(preflightError) The arguments your client sent were empty or missing required fields — re-issue the call with all required parameters filled in. Do not retry with the same empty arguments."
+            let plainModelMessage = "Error: Tool call rejected before execution. \(preflightError) The arguments your client sent were empty or missing required fields — re-issue the call with all required parameters filled in. Do not retry with the same empty arguments."
+            let modelMessage = tu.name == "web_read"
+                ? WebReadService.immediateOutcome(
+                    request: Self.webReadRequest(from: toolArgs), status: .failed,
+                    limitation: "读取参数无效，未发出网络请求。"
+                ).json
+                : plainModelMessage
             if msgIdx < messages.count, blockIdx < messages[msgIdx].blocks.count {
-                messages[msgIdx].blocks[blockIdx].content = uiMessage
+                messages[msgIdx].blocks[blockIdx].content = tu.name == "web_read" ? modelMessage : uiMessage
                 messages[msgIdx].blocks[blockIdx].toolStatus = .failed(message: uiMessage)
             }
             toolLoopDetector.record(
@@ -544,6 +571,35 @@ extension AIChatViewModel {
                 await MainActor.run { SkillStore.shared.reload() }
             }
 
+        case "web_read":
+            let request = Self.webReadRequest(from: toolArgs)
+            let resolvedScope = webReadScope ?? WebReadScope(
+                sessionID: sessionId ?? "unsaved-session",
+                userRequestID: msgIdx < messages.count ? messages[msgIdx].id.uuidString : tu.id
+            )
+            let resolvedBatchID = webReadBatchID ?? "direct-" + UUID().uuidString.lowercased()
+            let rawOutcome = await webReadService.read(
+                request: request, scope: resolvedScope, callID: tu.id,
+                batchID: resolvedBatchID, deadline: webReadDeadline
+            )
+            let outcome = truncationRepairTag == nil
+                ? rawOutcome
+                : webReadService.addingInputTruncationLimitation(to: rawOutcome, queryTarget: request.queryTarget)
+            toolOutput = outcome.json
+            toolSuccess = !outcome.isError
+            cancelledHere = outcome.status.rawValue == "cancelled"
+            if let resultData = outcome.json.data(using: .utf8),
+               let resultObject = try? JSONSerialization.jsonObject(with: resultData) as? [String: Any] {
+                toolPageURL = resultObject["url"] as? String
+            }
+            if msgIdx < messages.count, blockIdx < messages[msgIdx].blocks.count {
+                messages[msgIdx].blocks[blockIdx].content = outcome.json
+                messages[msgIdx].blocks[blockIdx].browserURL = toolPageURL
+                messages[msgIdx].blocks[blockIdx].toolStatus = cancelledHere
+                    ? .cancelled
+                    : (toolSuccess ? .success : .failed(message: "web_read failed"))
+            }
+
         case "browser_use":
             var browserResult: BrowserActionResult
             if let input = BrowserActionInput.parse(from: argsJson) {
@@ -804,11 +860,13 @@ extension AIChatViewModel {
             toolSuccess = false
         }
         } catch is CancellationError {
-            let cancelContent = "<system-reminder>The user cancelled this operation. The returned result may be incomplete.</system-reminder>"
+            let cancelContent = earlyWebReadRequest.map {
+                WebReadService.immediateOutcome(request: $0, status: .cancelled, limitation: "读取已取消。").json
+            } ?? "<system-reminder>The user cancelled this operation. The returned result may be incomplete.</system-reminder>"
             let existing = (msgIdx < messages.count && blockIdx < messages[msgIdx].blocks.count)
                 ? messages[msgIdx].blocks[blockIdx].content : ""
-            toolOutput = existing.isEmpty ? cancelContent : existing + "\n" + cancelContent
-            toolSuccess = false
+            toolOutput = tu.name == "web_read" ? cancelContent : (existing.isEmpty ? cancelContent : existing + "\n" + cancelContent)
+            toolSuccess = tu.name == "web_read"
             cancelledHere = true
             if msgIdx < messages.count, blockIdx < messages[msgIdx].blocks.count {
                 messages[msgIdx].blocks[blockIdx].toolStatus = .cancelled
@@ -820,9 +878,15 @@ extension AIChatViewModel {
         }
 
         // Tail cancel-detection: if Task got cancelled mid-execution.
-        if !cancelledHere && Task.isCancelled && self.userDidCancel {
+        if !cancelledHere && (Task.isCancelled && self.userDidCancel
+            || ((tu.name == "web_read" || tu.name == "browser_use") && commandCancelledByUser)) {
             cancelledHere = true
-            toolOutput += "\n<system-reminder>The user cancelled this operation. The returned result may be incomplete.</system-reminder>"
+            if tu.name == "web_read", let request = earlyWebReadRequest {
+                toolOutput = WebReadService.immediateOutcome(request: request, status: .cancelled, limitation: "读取已取消。").json
+                toolSuccess = true
+            } else {
+                toolOutput += "\n<system-reminder>The user cancelled this operation. The returned result may be incomplete.</system-reminder>"
+            }
             if msgIdx < messages.count, blockIdx < messages[msgIdx].blocks.count {
                 messages[msgIdx].blocks[blockIdx].content = toolOutput
                 messages[msgIdx].blocks[blockIdx].toolStatus = .cancelled
@@ -897,7 +961,7 @@ extension AIChatViewModel {
             blk.toolDuration = toolDuration
             if cancelledHere {
                 blk.toolStatus = .cancelled
-            } else if toolSuccess, truncationRepairTag != nil {
+            } else if toolSuccess, truncationRepairTag != nil, tu.name != "web_read" {
                 // [T-truncated-args-visibility #119] A repaired call must not
                 // render as a clean success — that is exactly the silence the
                 // user reported. Surface it with the same weight the blocked
@@ -920,7 +984,7 @@ extension AIChatViewModel {
         var finalOutput: String
         if toolOutput.isEmpty {
             finalOutput = "(no output)"
-        } else if toolOutput.count > maxToolResultLength {
+        } else if tu.name != "web_read" && toolOutput.count > maxToolResultLength {
             let offloadResult = offloadToolOutput(toolOutput, toolName: tu.name, toolId: tu.id)
             let offloadMinisURL = linuxPathToMinisURL(offloadResult.linuxPath)
             let truncatedBody: String
@@ -964,7 +1028,7 @@ extension AIChatViewModel {
             errorMessage: toolSuccess ? nil : finalOutput,
             toolCallId: tu.id
         )
-        if postCheck.level == .warning, let warningMsg = postCheck.message {
+        if postCheck.level == .warning, let warningMsg = postCheck.message, tu.name != "web_read" {
             if finalOutput.isEmpty {
                 finalOutput = warningMsg
             } else {
@@ -981,7 +1045,7 @@ extension AIChatViewModel {
         // has no way to know its own arguments were altered, and silently
         // assuming they were intact is how a half-truth propagates downstream.
         // Stating it lets the model verify rather than guess.
-        if let tag = truncationRepairTag {
+        if let tag = truncationRepairTag, tu.name != "web_read" {
             finalOutput += "\n\n<system-reminder>The argument stream for this call was truncated in "
                 + "transit and auto-closed by the client (repair strategy: \(tag)) before execution. "
                 + "The arguments actually used may be incomplete — verify the result and re-issue "

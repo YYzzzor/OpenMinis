@@ -155,6 +155,12 @@
 		E59000002 /* AnthropicAgentProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E59000012 /* AnthropicAgentProvider.swift */; };
 		E59000003 /* GeminiAgentProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E59000013 /* GeminiAgentProvider.swift */; };
 		E5A000001 /* default_mount in Resources */ = {isa = PBXBuildFile; fileRef = E5A000011 /* default_mount */; };
+		E5A90001 /* WebReadModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5A90011 /* WebReadModels.swift */; };
+		E5A90002 /* WebReadDocumentStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5A90012 /* WebReadDocumentStore.swift */; };
+		E5A90003 /* WebReadURLSessionTransport.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5A90013 /* WebReadURLSessionTransport.swift */; };
+		E5A90004 /* WebReadHTMLExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5A90014 /* WebReadHTMLExtractor.swift */; };
+		E5A90005 /* WebReadRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5A90015 /* WebReadRenderer.swift */; };
+		E5A90006 /* WebReadService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5A90016 /* WebReadService.swift */; };
 		E5AS00001 /* AppShortcuts.strings in Resources */ = {isa = PBXBuildFile; fileRef = E5AS00010 /* AppShortcuts.strings */; };
 		E5AT00003 /* AudioTogglePlaybackIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5AT00011 /* AudioTogglePlaybackIntent.swift */; };
 		E5AT00004 /* AudioTogglePlaybackIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5AT00011 /* AudioTogglePlaybackIntent.swift */; };
@@ -828,6 +834,12 @@
 		E59000012 /* AnthropicAgentProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnthropicAgentProvider.swift; sourceTree = "<group>"; };
 		E59000013 /* GeminiAgentProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeminiAgentProvider.swift; sourceTree = "<group>"; };
 		E5A000011 /* default_mount */ = {isa = PBXFileReference; lastKnownFileType = folder; path = default_mount; sourceTree = "<group>"; };
+		E5A90011 /* WebReadModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebReadModels.swift; sourceTree = "<group>"; };
+		E5A90012 /* WebReadDocumentStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebReadDocumentStore.swift; sourceTree = "<group>"; };
+		E5A90013 /* WebReadURLSessionTransport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebReadURLSessionTransport.swift; sourceTree = "<group>"; };
+		E5A90014 /* WebReadHTMLExtractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebReadHTMLExtractor.swift; sourceTree = "<group>"; };
+		E5A90015 /* WebReadRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebReadRenderer.swift; sourceTree = "<group>"; };
+		E5A90016 /* WebReadService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebReadService.swift; sourceTree = "<group>"; };
 		E5AS00011 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/AppShortcuts.strings; sourceTree = "<group>"; };
 		E5AS00012 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/AppShortcuts.strings"; sourceTree = "<group>"; };
 		E5AS00013 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/AppShortcuts.strings"; sourceTree = "<group>"; };
@@ -1604,6 +1616,7 @@
 				F1A00014 /* Background */,
 				BKP000010 /* Backup */,
 				E57000030 /* BrowserUse */,
+				E5A90030 /* WebRead */,
 				F1A00010 /* Chat */,
 				E5T000030 /* Intents */,
 				F1A00016 /* ISH */,
@@ -1701,6 +1714,19 @@
 				E58000013 /* GeminiOAuthManager.swift */,
 			);
 			path = OAuth;
+			sourceTree = "<group>";
+		};
+		E5A90030 /* WebRead */ = {
+			isa = PBXGroup;
+			children = (
+				E5A90011 /* WebReadModels.swift */,
+				E5A90012 /* WebReadDocumentStore.swift */,
+				E5A90013 /* WebReadURLSessionTransport.swift */,
+				E5A90014 /* WebReadHTMLExtractor.swift */,
+				E5A90015 /* WebReadRenderer.swift */,
+				E5A90016 /* WebReadService.swift */,
+			);
+			path = WebRead;
 			sourceTree = "<group>";
 		};
 		E5B000030 /* iSH */ = {
@@ -2914,6 +2940,12 @@
 				E57000006 /* BrowserManagementView.swift in Sources */,
 				E57000007 /* BrowserTabPool.swift in Sources */,
 				E57000008 /* BrowserHistory.swift in Sources */,
+				E5A90001 /* WebReadModels.swift in Sources */,
+				E5A90002 /* WebReadDocumentStore.swift in Sources */,
+				E5A90003 /* WebReadURLSessionTransport.swift in Sources */,
+				E5A90004 /* WebReadHTMLExtractor.swift in Sources */,
+				E5A90005 /* WebReadRenderer.swift in Sources */,
+				E5A90006 /* WebReadService.swift in Sources */,
 				E5CKB0001 /* CookieBackupStore.swift in Sources */,
 				E55000001 /* ISHShellExecutor.m in Sources */,
 				E5L000001 /* FFmpegOffload.m in Sources */,
@@ -3568,7 +3600,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = Minis.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_ASSET_PATHS = "\"Preview Content\"";
 				DEVELOPMENT_TEAM = 42486W5YRY;
 				ENABLE_PREVIEWS = YES;
@@ -3648,7 +3680,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = Minis.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_ASSET_PATHS = "\"Preview Content\"";
 				DEVELOPMENT_TEAM = 42486W5YRY;
 				ENABLE_PREVIEWS = YES;
@@ -3723,7 +3755,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = ShareExtension/ShareExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_TEAM = 42486W5YRY;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ShareExtension/Info.plist;
@@ -3750,7 +3782,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = ShareExtension/ShareExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_TEAM = 42486W5YRY;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ShareExtension/Info.plist;
@@ -3777,7 +3809,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = FileProvider/FileProvider.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_TEAM = 42486W5YRY;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FileProvider/Info.plist;
@@ -3804,7 +3836,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = FileProvider/FileProvider.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_TEAM = 42486W5YRY;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FileProvider/Info.plist;

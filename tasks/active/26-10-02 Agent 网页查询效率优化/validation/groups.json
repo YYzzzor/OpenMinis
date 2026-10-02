@@ -1,0 +1,956 @@
+{
+  "schema_version": 1,
+  "title": "web_read 第一版分组验收计划",
+  "approval_date": "2026-10-02",
+  "execution_status": "partially_executed",
+  "case_catalog_reference": "cases.json",
+  "legacy_catalog_reference": "../research/02-browser-http-comparison/evidence/cases.json",
+  "result_contract_reference": "result-contract.md",
+  "counts": {
+    "catalog_cases": 66,
+    "new_cases": 48,
+    "legacy_cases": 18,
+    "main_groups": 20,
+    "mandatory_new_cases": 42,
+    "optional_new_cases": 6,
+    "legacy_reference_cases_in_groups": 17,
+    "legacy_deferred_content_cases": 1,
+    "agent_query_templates": 5
+  },
+  "evidence_policy": [
+    "主组是执行和展示单位，组内必测输入变体仍逐项验证。",
+    "网站自检只证明测试输入，不能替代 iOS 产品、模型或真机证据。",
+    "产品组优先自动化验证确定性行为，代表 Agent 查询验证工具选择和最终回答。",
+    "代表查询仅证明实际覆盖的限制；没有关联的模型层场景由产品证据判定。",
+    "G20 独立保存真实混合批次配对及重载后正常 Agent 查询证据。",
+    "组状态必须有全部必测变体的证据才可通过；同一轨迹可关联多个已观察判据。",
+    "历史案例只用作输入和覆盖参考，原运行结果不算新工具通过。",
+    "5类查询可以含多个参数化输入，不等于只执行5次。",
+    "先通过正确性、隔离、停止和预算边界，再比较完整查询耗时。"
+  ],
+  "execution_order": [
+    [
+      "G01",
+      "G02",
+      "G03",
+      "G04",
+      "G05",
+      "G06",
+      "G07",
+      "G08"
+    ],
+    [
+      "G09",
+      "G10",
+      "G11",
+      "G12",
+      "G13",
+      "G14",
+      "G15",
+      "G16",
+      "G17"
+    ],
+    [
+      "G18",
+      "G20"
+    ],
+    [
+      "G19"
+    ]
+  ],
+  "groups": [
+    {
+      "id": "G01",
+      "title": "公开正文与结构",
+      "case_ids": [
+        "content-code-table-structure"
+      ],
+      "legacy_reference_ids": [
+        "amap_mcp",
+        "python_async",
+        "mdn_fetch",
+        "vite_guide",
+        "github_limits",
+        "bbc_news"
+      ],
+      "required_variants": [
+        "HTML、纯文本及 Markdown 分别读取。",
+        "跨 HTML 标签代码标识符、段落、链接及表格行列分别检查。"
+      ],
+      "spec_rules": [
+        "W1",
+        "C1",
+        "C2"
+      ],
+      "primary_layer": "ios_product",
+      "agent_query_refs": [
+        "Q01",
+        "Q02"
+      ],
+      "steps_reference": "ios-acceptance.md#长文未命中与未覆盖",
+      "additional_assertions": [],
+      "execution_status": "partially_executed",
+      "evidence_requirement": "证据记录组号、案例编号、输入变体、构建配置和实际结果；每个必测变体单独判定。",
+      "observed_evidence": "提取器与 Service 正文、代码、表格和 Markdown 测试通过；未覆盖全部公开站点。",
+      "implementation_evidence_reference": "../evidence/web-read-implementation-final.json",
+      "first_five_simulator_evidence": {
+        "reference": "../evidence/first-five-simulator-20261002/README.md",
+        "observation": "合并单元格关系回归测试失败；公开官方正文两个真实模型样本通过。"
+      },
+      "first_five_fix_evidence": {
+        "reference": "../evidence/first-five-fixes-20261002/README.md",
+        "observation": "合并单元格、标题、单元格次序及有界降级修复，47项套件通过。"
+      }
+    },
+    {
+      "id": "G02",
+      "title": "明确提供的备用正文",
+      "case_ids": [
+        "content-public-markdown-fallback"
+      ],
+      "legacy_reference_ids": [],
+      "required_variants": [
+        "页面明确链接的公开 Markdown 摘录。",
+        "适配过的公开内嵌数据。",
+        "备用正文只覆盖部分原文时，模型结果说明来源关系。",
+        "没有候选来源时，不扫描通用接口。"
+      ],
+      "spec_rules": [
+        "W2",
+        "C1",
+        "C2",
+        "F1",
+        "R1"
+      ],
+      "primary_layer": "ios_product",
+      "agent_query_refs": [
+        "Q01",
+        "Q02"
+      ],
+      "steps_reference": "ios-acceptance.md#模型结果与诊断分离",
+      "additional_assertions": [],
+      "execution_status": "partially_executed",
+      "evidence_requirement": "证据记录组号、案例编号、输入变体、构建配置和实际结果；每个必测变体单独判定。",
+      "observed_evidence": "JSON-LD articleBody 提取测试通过；备用 URL 完整路线仍缺少 iOS 变体证据。",
+      "implementation_evidence_reference": "../evidence/web-read-implementation-final.json",
+      "first_five_simulator_evidence": {
+        "reference": "../evidence/first-five-simulator-20261002/README.md",
+        "observation": "显式Markdown备用URL及来源范围说明通过。"
+      }
+    },
+    {
+      "id": "G03",
+      "title": "动态正文与定向补充",
+      "case_ids": [
+        "content-partial-targeted-continuation"
+      ],
+      "legacy_reference_ids": [
+        "apple_urlsession",
+        "fixture_dynamic"
+      ],
+      "required_variants": [
+        "空壳或加载提示触发内部机械回退。",
+        "部分静态正文与延迟动态目标并存。",
+        "模型明确要求补充动态内容。",
+        "补充中取消后，迟到回调不再提交。"
+      ],
+      "spec_rules": [
+        "W2",
+        "W3",
+        "F1",
+        "F2",
+        "C3",
+        "R2"
+      ],
+      "primary_layer": "ios_product",
+      "agent_query_refs": [
+        "Q02"
+      ],
+      "steps_reference": "ios-acceptance.md#长文未命中与未覆盖",
+      "additional_assertions": [],
+      "execution_status": "partially_executed",
+      "evidence_requirement": "证据记录组号、案例编号、输入变体、构建配置和实际结果；每个必测变体单独判定。",
+      "observed_evidence": "真实匿名 WebKit 等待动态目标通过。",
+      "implementation_evidence_reference": "../evidence/web-read-implementation-final.json",
+      "first_five_simulator_evidence": {
+        "reference": "../evidence/first-five-simulator-20261002/README.md",
+        "observation": "定向动态补充通过；Loading无目标状态错误已由产品测试及真实模型复现。"
+      },
+      "first_five_fix_evidence": {
+        "reference": "../evidence/first-five-fixes-20261002/README.md",
+        "observation": "Loading范围、busy状态及HTML/readiness同快照修复；最终动态样本两次各1web_read、约4秒，目标正确。"
+      }
+    },
+    {
+      "id": "G04",
+      "title": "正文就绪后结束无用加载",
+      "case_ids": [
+        "resource-body-before-slow-subresource"
+      ],
+      "legacy_reference_ids": [
+        "fixture_slow_resource"
+      ],
+      "required_variants": [
+        "正文已就绪，但装饰资源仍加载。",
+        "正文提取后观察器及临时加载实际停止。",
+        "已有浏览器导航及登录保持可用。"
+      ],
+      "spec_rules": [
+        "C1",
+        "F2",
+        "R1",
+        "R4",
+        "I4"
+      ],
+      "primary_layer": "ios_product",
+      "agent_query_refs": [
+        "Q01"
+      ],
+      "steps_reference": "ios-acceptance.md#当前文档与旧-dom",
+      "additional_assertions": [],
+      "execution_status": "not_executed",
+      "evidence_requirement": "证据记录组号、案例编号、输入变体、构建配置和实际结果；每个必测变体单独判定。"
+    },
+    {
+      "id": "G05",
+      "title": "当前文档与导航代次",
+      "case_ids": [
+        "content-current-document-not-stale"
+      ],
+      "legacy_reference_ids": [
+        "fixture_redirect"
+      ],
+      "required_variants": [
+        "旧文档 A 后请求延迟 B。",
+        "同一网址重新导航。",
+        "导航成功、失败及重定向分别执行。"
+      ],
+      "spec_rules": [
+        "C1",
+        "F2",
+        "R4"
+      ],
+      "primary_layer": "ios_product",
+      "agent_query_refs": [],
+      "steps_reference": "ios-acceptance.md#当前文档与旧-dom",
+      "additional_assertions": [],
+      "execution_status": "partially_executed",
+      "evidence_requirement": "证据记录组号、案例编号、输入变体、构建配置和实际结果；每个必测变体单独判定。",
+      "observed_evidence": "正文编号复用且不重新下载通过；完整 Agent 复用决策尚未执行。",
+      "implementation_evidence_reference": "../evidence/web-read-implementation-final.json",
+      "first_five_simulator_evidence": {
+        "reference": "../evidence/first-five-simulator-20261002/README.md",
+        "observation": "真实重定向终点通过；编号续读送达Provider。"
+      }
+    },
+    {
+      "id": "G06",
+      "title": "模型 JSON 与诊断边界",
+      "case_ids": [],
+      "legacy_reference_ids": [],
+      "required_variants": [
+        "正文、部分正文、仅资源、受限、失败和取消终态分别检查。",
+        "来源替换、备用摘录、定位和续读字段条件分别检查。",
+        "工具格式化、通用截断、文件转存和警告分别检查最终 Provider 结果。",
+        "被测配置启用的 Provider 分别验证结果编码及原调用配对。"
+      ],
+      "spec_rules": [
+        "C1",
+        "C2",
+        "C3",
+        "C4",
+        "F3",
+        "I3",
+        "A1"
+      ],
+      "primary_layer": "ios_product",
+      "agent_query_refs": [
+        "Q01",
+        "Q02",
+        "Q04",
+        "Q05"
+      ],
+      "steps_reference": "ios-acceptance.md#模型结果与诊断分离",
+      "additional_assertions": [
+        "JSON 可解析，content 保留 Markdown 目标片段。",
+        "详细耗时、资源计数与内部请求时序只保留在诊断。",
+        "模型结果准确保留影响判断的限制。",
+        "正文编号、返回范围及 next_offset 不超过实际保存边界。"
+      ],
+      "execution_status": "partially_executed",
+      "evidence_requirement": "证据记录组号、案例编号、输入变体、构建配置和实际结果；每个必测变体单独判定。",
+      "observed_evidence": "必需字段、合法 JSON、派发、裁剪与转存测试通过。",
+      "implementation_evidence_reference": "../evidence/web-read-implementation-final.json",
+      "first_five_simulator_evidence": {
+        "reference": "../evidence/first-five-simulator-20261002/README.md",
+        "observation": "高德15份实际模型JSON可解析；诊断截断不等于实际工具输出截断。"
+      }
+    },
+    {
+      "id": "G07",
+      "title": "长文目标与续读",
+      "case_ids": [
+        "content-long-output-tail-preserved"
+      ],
+      "legacy_reference_ids": [
+        "wikipedia_zh"
+      ],
+      "required_variants": [
+        "目标位于长文中部和尾部。",
+        "最终输出被限制时，目标片段或可用续读信息保留。",
+        "编号续读不重新下载，Unicode 位置与固定正文一致。"
+      ],
+      "spec_rules": [
+        "C2",
+        "C3",
+        "C4",
+        "I3",
+        "R3"
+      ],
+      "primary_layer": "ios_product",
+      "agent_query_refs": [
+        "Q02"
+      ],
+      "steps_reference": "ios-acceptance.md#长文未命中与未覆盖",
+      "additional_assertions": [],
+      "execution_status": "partially_executed",
+      "evidence_requirement": "证据记录组号、案例编号、输入变体、构建配置和实际结果；每个必测变体单独判定。",
+      "observed_evidence": "Unicode 位置、完整目标及续读测试通过；真实 Provider 链路尚未执行。",
+      "implementation_evidence_reference": "../evidence/web-read-implementation-final.json",
+      "first_five_simulator_evidence": {
+        "reference": "../evidence/first-five-simulator-20261002/README.md",
+        "observation": "指定工具的两次读取把完整尾部函数及价格送达Provider；自主路由仍有失败。"
+      }
+    },
+    {
+      "id": "G08",
+      "title": "未命中与尚未覆盖",
+      "case_ids": [
+        "content-not-found-versus-uncovered"
+      ],
+      "legacy_reference_ids": [],
+      "required_variants": [
+        "完整固定正文中的不存在目标。",
+        "同一长文被截断后的真实尾部目标。",
+        "只承诺实际保存的范围，不将未命中断言为整页不存在。"
+      ],
+      "spec_rules": [
+        "C3",
+        "C4",
+        "F2"
+      ],
+      "primary_layer": "ios_product",
+      "agent_query_refs": [
+        "Q02"
+      ],
+      "steps_reference": "ios-acceptance.md#长文未命中与未覆盖",
+      "additional_assertions": [],
+      "execution_status": "partially_executed",
+      "evidence_requirement": "证据记录组号、案例编号、输入变体、构建配置和实际结果；每个必测变体单独判定。",
+      "observed_evidence": "保存范围完整与不完整时的未命中状态测试通过。",
+      "implementation_evidence_reference": "../evidence/web-read-implementation-final.json"
+    },
+    {
+      "id": "G09",
+      "title": "PDF 资源与格式边界",
+      "case_ids": [
+        "pdf-direct-resource-handoff",
+        "pdf-encrypted",
+        "pdf-corrupt",
+        "pdf-wrong-mime",
+        "pdf-disconnected-response"
+      ],
+      "legacy_reference_ids": [],
+      "required_variants": [
+        "直接 PDF、加密、损坏、错误 MIME 和中途断开分别检查。",
+        "未提取内容时报告资源和能力限制，不解析页内文字或实施 OCR。",
+        "交接只承诺实际可定位的资源，截断下载不冒充完整资源。"
+      ],
+      "spec_rules": [
+        "C1",
+        "F3",
+        "R1",
+        "R2",
+        "R3"
+      ],
+      "primary_layer": "ios_product",
+      "agent_query_refs": [],
+      "steps_reference": "ios-acceptance.md#模型结果与诊断分离",
+      "additional_assertions": [],
+      "execution_status": "partially_executed",
+      "evidence_requirement": "证据记录组号、案例编号、输入变体、构建配置和实际结果；每个必测变体单独判定。",
+      "observed_evidence": "真实 HTTP 的 PDF 类型和错误 MIME 识别通过；未执行内容提取。",
+      "implementation_evidence_reference": "../evidence/web-read-implementation-final.json",
+      "first_five_simulator_evidence": {
+        "reference": "../evidence/first-five-simulator-20261002/README.md",
+        "observation": "真实PDF、损坏、错误MIME、断连资源的not_read边界通过；加密变体见定向复测。"
+      }
+    },
+    {
+      "id": "G10",
+      "title": "图片资源与正文关系",
+      "case_ids": [
+        "image-direct-resource-handoff",
+        "image-relative-src",
+        "image-broken-resource",
+        "image-misleading-alt-text"
+      ],
+      "legacy_reference_ids": [
+        "fixture_image_table"
+      ],
+      "required_variants": [
+        "PNG 和 JPEG 直接资源分别检查。",
+        "相对地址、缺失资源和误导 alt 文本分别检查。",
+        "图片中的数值不能由 alt 或邻近正文推定。"
+      ],
+      "spec_rules": [
+        "C1",
+        "C2",
+        "F3"
+      ],
+      "primary_layer": "ios_product",
+      "agent_query_refs": [
+        "Q05"
+      ],
+      "steps_reference": "ios-acceptance.md#模型结果与诊断分离",
+      "additional_assertions": [],
+      "execution_status": "partially_executed",
+      "evidence_requirement": "证据记录组号、案例编号、输入变体、构建配置和实际结果；每个必测变体单独判定。",
+      "observed_evidence": "真实 HTTP 的直接 PNG 资源交接通过；未执行 OCR。",
+      "implementation_evidence_reference": "../evidence/web-read-implementation-final.json",
+      "first_five_simulator_evidence": {
+        "reference": "../evidence/first-five-simulator-20261002/README.md",
+        "observation": "PNG/JPEG交接、相对图片与alt边界通过；真实read_image读取价格成功，但未经过web_read交接。"
+      }
+    },
+    {
+      "id": "G11",
+      "title": "认证与访问限制",
+      "case_ids": [
+        "auth-401-anonymous",
+        "auth-403-denied",
+        "auth-200-login-form",
+        "auth-redirect-to-login",
+        "auth-public-plus-restricted"
+      ],
+      "legacy_reference_ids": [
+        "fixture_login"
+      ],
+      "required_variants": [
+        "401、403 和 200 登录表单分别检查。",
+        "跳转到登录页及受限页面分别检查。",
+        "公开正文与未读取受限链接分别说明。"
+      ],
+      "spec_rules": [
+        "W3",
+        "W6",
+        "C1",
+        "F3"
+      ],
+      "primary_layer": "ios_product",
+      "agent_query_refs": [
+        "Q04"
+      ],
+      "steps_reference": "ios-acceptance.md#工具选择与证据复用",
+      "additional_assertions": [],
+      "execution_status": "partially_executed",
+      "evidence_requirement": "证据记录组号、案例编号、输入变体、构建配置和实际结果；每个必测变体单独判定。",
+      "observed_evidence": "真实 HTTP 401、403、Basic 认证挑战和 WebKit 403 通过。",
+      "implementation_evidence_reference": "../evidence/web-read-implementation-final.json",
+      "first_five_simulator_evidence": {
+        "reference": "../evidence/first-five-simulator-20261002/README.md",
+        "observation": "HTTP200登录表单、登录重定向、401/403限制通过。"
+      }
+    },
+    {
+      "id": "G12",
+      "title": "匿名身份及诊断脱敏",
+      "case_ids": [
+        "isolation-shared-browser-to-anonymous-http",
+        "isolation-internal-webkit",
+        "isolation-no-cookie-backup-or-sensitive-logs"
+      ],
+      "legacy_reference_ids": [],
+      "required_variants": [
+        "既有浏览器模拟登录后，匿名 HTTP 和匿名 WebKit 分别读取同域受保护页面。",
+        "Cookie、认证存储、响应缓存及备份恢复路径分别核对。",
+        "成功、失败、取消后的缓存、普通日志及诊断分别审计。",
+        "既有浏览器登录在读取结束后仍可用。"
+      ],
+      "spec_rules": [
+        "I1",
+        "I2",
+        "I3",
+        "F3",
+        "R2"
+      ],
+      "primary_layer": "ios_product",
+      "agent_query_refs": [
+        "Q04"
+      ],
+      "steps_reference": "ios-acceptance.md#同网址正文编号与身份作用域",
+      "additional_assertions": [],
+      "execution_status": "partially_executed",
+      "evidence_requirement": "证据记录组号、案例编号、输入变体、构建配置和实际结果；每个必测变体单独判定。",
+      "observed_evidence": "HTTP 共享存储与 WebKit 默认存储中的合成 Cookie 均未进入匿名请求，原存储保留；未导出真实凭据。",
+      "implementation_evidence_reference": "../evidence/web-read-implementation-final.json"
+    },
+    {
+      "id": "G13",
+      "title": "正文编号与身份作用域",
+      "case_ids": [
+        "isolation-cross-session-cache"
+      ],
+      "legacy_reference_ids": [],
+      "required_variants": [
+        "原聊天当前请求有效。",
+        "其他聊天、后续用户请求及测试身份 revision 改变分别拒绝旧编号。",
+        "所有变体使用同一绝对网址，释放旧身份迟到结果后核对。"
+      ],
+      "spec_rules": [
+        "I1",
+        "I2",
+        "I3",
+        "C4",
+        "R3"
+      ],
+      "primary_layer": "ios_product",
+      "agent_query_refs": [
+        "Q02"
+      ],
+      "steps_reference": "ios-acceptance.md#同网址正文编号与身份作用域",
+      "additional_assertions": [],
+      "execution_status": "partially_executed",
+      "evidence_requirement": "证据记录组号、案例编号、输入变体、构建配置和实际结果；每个必测变体单独判定。",
+      "observed_evidence": "聊天、请求、身份隔离和淘汰测试通过；排队新请求切换完成静态审查。",
+      "implementation_evidence_reference": "../evidence/web-read-implementation-final.json"
+    },
+    {
+      "id": "G14",
+      "title": "响应及共同资源预算",
+      "case_ids": [
+        "pdf-response-budget",
+        "resource-concurrent-limit",
+        "coexist-global-render-capacity"
+      ],
+      "legacy_reference_ids": [],
+      "required_variants": [
+        "PDF 和普通大响应分别实际超过被测产品限额。",
+        "读取并发、等待队列和共同实例上限分别覆盖。",
+        "浏览器先占据部分及全部容量。",
+        "反向先启动匿名读取，再创建浏览器标签。",
+        "资源压力、重复释放、公平恢复及活动或接管标签不被抢占。"
+      ],
+      "spec_rules": [
+        "R1",
+        "R3",
+        "R5",
+        "I4",
+        "A4"
+      ],
+      "primary_layer": "ios_product",
+      "agent_query_refs": [],
+      "steps_reference": "ios-acceptance.md#共同资源预算",
+      "additional_assertions": [],
+      "execution_status": "partially_executed",
+      "evidence_requirement": "证据记录组号、案例编号、输入变体、构建配置和实际结果；每个必测变体单独判定。",
+      "observed_evidence": "HTTP 响应字节、正文与提取放大限制测试通过；并发全局上限与真机资源未完整测量。",
+      "implementation_evidence_reference": "../evidence/web-read-implementation-final.json"
+    },
+    {
+      "id": "G15",
+      "title": "累计截止时间与超时",
+      "case_ids": [
+        "resource-slow-main-response",
+        "resource-timeout-status",
+        "resource-shared-deadline-all-phases"
+      ],
+      "legacy_reference_ids": [
+        "fixture_slow_main"
+      ],
+      "required_variants": [
+        "主响应延迟及超时后正常读取。",
+        "排队、HTTP、重定向、备用、渲染和提取共用总截止时间。",
+        "各阶段未超自身限制但累计超过总限制。",
+        "过期后不启动下一路线，实际请求和等待结束。"
+      ],
+      "spec_rules": [
+        "R1",
+        "R2",
+        "R3",
+        "C1"
+      ],
+      "primary_layer": "ios_product",
+      "agent_query_refs": [],
+      "steps_reference": "ios-acceptance.md#统一截止时间与停止矩阵",
+      "additional_assertions": [],
+      "execution_status": "partially_executed",
+      "evidence_requirement": "证据记录组号、案例编号、输入变体、构建配置和实际结果；每个必测变体单独判定。",
+      "observed_evidence": "Service 截止时间、超时后复用及 WebKit 临近截止测试通过；未覆盖全部前后台阶段。",
+      "implementation_evidence_reference": "../evidence/web-read-implementation-final.json"
+    },
+    {
+      "id": "G16",
+      "title": "停止范围与阶段释放",
+      "case_ids": [
+        "pdf-cancel-slow-download",
+        "resource-stop-releases-work",
+        "coexist-timeout-isolation",
+        "coexist-session-and-batch-stop"
+      ],
+      "legacy_reference_ids": [],
+      "required_variants": [
+        "排队、HTTP 或重定向、备用、渲染、提取及正文写入逐阶段执行 Stop、异常及会话删除。",
+        "PDF 慢下载单独检查取消和部分文件清理。",
+        "单次超时或内部取消只清理该调用；反向浏览器超时不停止匿名读取。",
+        "工具气泡按批次停止，会话 Stop 按当前活动请求停止。",
+        "只有 web_read 活动或排队时，停止入口仍有效。",
+        "释放迟到回调，核对不启动路线、不提交正文且其他聊天继续。"
+      ],
+      "spec_rules": [
+        "R1",
+        "R2",
+        "R3",
+        "R6",
+        "I4",
+        "A1",
+        "A4"
+      ],
+      "primary_layer": "ios_product",
+      "agent_query_refs": [],
+      "steps_reference": "ios-acceptance.md#取消范围与结果配对",
+      "additional_assertions": [],
+      "execution_status": "partially_executed",
+      "evidence_requirement": "证据记录组号、案例编号、输入变体、构建配置和实际结果；每个必测变体单独判定。",
+      "observed_evidence": "单调用取消不影响同批兄弟调用通过；全部停止阶段仍待覆盖。",
+      "implementation_evidence_reference": "../evidence/web-read-implementation-final.json"
+    },
+    {
+      "id": "G17",
+      "title": "浏览器状态与用户接管",
+      "case_ids": [
+        "coexist-tab-state-and-takeover"
+      ],
+      "legacy_reference_ids": [],
+      "required_variants": [
+        "匿名 HTTP 和匿名渲染分别与用户浏览器操作并行。",
+        "用户接管后分别控制读取完成、取消及超时。",
+        "同会话既有调用及其他聊天并行分别执行。",
+        "核对标签、DOM、输入、滚动、UA、viewport、登录和接管事件。"
+      ],
+      "spec_rules": [
+        "I2",
+        "I4",
+        "R6",
+        "A4"
+      ],
+      "primary_layer": "ios_product",
+      "agent_query_refs": [
+        "Q04"
+      ],
+      "steps_reference": "ios-acceptance.md#并行状态与接管",
+      "additional_assertions": [],
+      "execution_status": "partially_executed",
+      "evidence_requirement": "证据记录组号、案例编号、输入变体、构建配置和实际结果；每个必测变体单独判定。",
+      "first_five_simulator_evidence": {
+        "reference": "../evidence/first-five-simulator-20261002/README.md",
+        "observation": "BrowserTabPool并发状态用例首次动态目标未命中；测试目标等待窗口从1秒调整为4秒后通过，URL、选定DOM、输入、滚动、UA/viewport和合成登录保持。完整UI接管及交互后Agent仍未验证。"
+      },
+      "first_five_fix_evidence": {
+        "reference": "../evidence/first-five-fixes-20261002/README.md",
+        "observation": "实时接管入口展示本地页面；测试输入未成功、模型读取为空，完整接管未通过。"
+      }
+    },
+    {
+      "id": "G18",
+      "title": "模型工具选择与证据复用",
+      "case_ids": [
+        "coexist-public-tool-routing",
+        "coexist-existing-evidence-no-refetch",
+        "coexist-authenticated-browser-routing"
+      ],
+      "legacy_reference_ids": [
+        "google_search",
+        "bing_search"
+      ],
+      "required_variants": [
+        "已知公开来源和搜索操作分别使用正常提示。",
+        "同一用户请求中的充分证据及明确缺口分别检查。",
+        "既有登录与用户交互后页面分别选择对应 browser_use 标签。",
+        "内部回退属于一个 web_read 调用，不启动 browser_use 或额外模型轮次。"
+      ],
+      "spec_rules": [
+        "W4",
+        "W5",
+        "W6",
+        "I1",
+        "I2",
+        "I3",
+        "A1",
+        "A2",
+        "A4"
+      ],
+      "primary_layer": "ios_product",
+      "agent_query_refs": [
+        "Q01",
+        "Q02",
+        "Q03",
+        "Q04"
+      ],
+      "steps_reference": "ios-acceptance.md#工具选择与证据复用",
+      "additional_assertions": [],
+      "execution_status": "partially_executed",
+      "evidence_requirement": "证据记录组号、案例编号、输入变体、构建配置和实际结果；每个必测变体单独判定。",
+      "first_five_simulator_evidence": {
+        "reference": "../evidence/first-five-simulator-20261002/README.md",
+        "observation": "公开官方页两次通过、合成登录页通过；本地静态页重复下载、长文/动态/图片路由存在失败。"
+      },
+      "first_five_fix_evidence": {
+        "reference": "../evidence/first-five-fixes-20261002/README.md",
+        "observation": "最终公开页、动态两次及此前长文样本通过；中途同源并行、动态重复读取失败均保留。混合重载及其他变体待验证。"
+      },
+      "system_prompt_grounding_evidence": {
+        "reference": "../evidence/system-prompt-grounding-20261002/README.md",
+        "observation": "初版两次超时；最终两个完成样本收费未知表述有所改善，但仍有无依据配额断言或数量统计错误，整体未通过。"
+      }
+    },
+    {
+      "id": "G19",
+      "title": "代表查询与真机对照",
+      "case_ids": [
+        "agent-real-tool-end-to-end",
+        "resource-device-lock-screen"
+      ],
+      "legacy_reference_ids": [
+        "amap_price"
+      ],
+      "required_variants": [
+        "5类代表查询使用正常生产提示和全部工具。",
+        "每类在相同模型及配置下重复，记录实际样本数和失败结果。",
+        "图片价格经现有图像工具实际读取，协议错误独立记录。",
+        "代表查询在相同已开启后台配置下分别执行前台和锁屏真机对照。",
+        "分别观察 App 和 WebContent 实际阶段、内存及能耗，未观测项保持未验证。"
+      ],
+      "spec_rules": [
+        "W3",
+        "A1",
+        "A2",
+        "A3",
+        "R1",
+        "R2"
+      ],
+      "primary_layer": "ios_product",
+      "agent_query_refs": [
+        "Q01",
+        "Q02",
+        "Q03",
+        "Q04",
+        "Q05"
+      ],
+      "steps_reference": "ios-acceptance.md#完整-agent-查询",
+      "additional_assertions": [],
+      "execution_status": "partially_executed",
+      "evidence_requirement": "证据记录组号、案例编号、输入变体、构建配置和实际结果；每个必测变体单独判定。",
+      "maintainer_reported_evidence": {
+        "date": "2026-10-02",
+        "environment": "iPhone 18 Pro / iOS 27.0 Simulator",
+        "query": "高德 MCP 服务的支持范围以及如何收费",
+        "reported_outcome": "维护者反馈查询完成，大概不到一分钟。",
+        "timing_source": "维护者估计，未核对日志",
+        "verified_scope": "一次模拟器实际 Agent 查询的完成与主观等待体验",
+        "not_verified": [
+          "模型与工具路线",
+          "答案及引用准确性",
+          "精确耗时",
+          "同条件重复对照",
+          "真机前台与锁屏",
+          "内存与能耗"
+        ],
+        "reference": "../verification.md#2026-10-02-维护者模拟器手动查询反馈"
+      },
+      "first_five_simulator_evidence": {
+        "reference": "../evidence/first-five-simulator-20261002/README.md",
+        "observation": "原高德49.517秒由消息时间戳核实，部分收费许可断言依据不足；本轮12份网页查询及1份准备记录，未进行真机对照。"
+      },
+      "first_five_fix_evidence": {
+        "reference": "../evidence/first-five-fixes-20261002/README.md",
+        "observation": "最终高德78.855秒完成，但不单独收费断言仍依据不足；没有整体提速、真机、锁屏及资源结论。"
+      },
+      "system_prompt_grounding_evidence": {
+        "reference": "../evidence/system-prompt-grounding-20261002/README.md",
+        "observation": "初版两次超时；最终两个完成样本收费未知表述有所改善，但仍有无依据配额断言或数量统计错误，整体未通过。"
+      }
+    },
+    {
+      "id": "G20",
+      "title": "并发结果配对与会话重载",
+      "case_ids": [
+        "coexist-result-pairing-and-reload"
+      ],
+      "legacy_reference_ids": [],
+      "required_variants": [
+        "真实混合批次使用不同来源、目标和调用标识。",
+        "反向完成两种工具，并分别混入超时和取消。",
+        "核对界面、Provider history 和数据库的来源、身份及终态。",
+        "重载会话后再检查配对，并继续正常 Agent 查询。"
+      ],
+      "spec_rules": [
+        "C1",
+        "I3",
+        "A1",
+        "A4",
+        "R6"
+      ],
+      "primary_layer": "ios_product",
+      "agent_query_refs": [],
+      "steps_reference": "ios-acceptance.md#取消范围与结果配对",
+      "additional_assertions": [
+        "混合批次采用真实产品派发路径；通过可控延迟生成乱序，不假定模型必定生成指定并发形态。",
+        "真实 Agent 重载后的后续查询必须保存轨迹，产品配对检查不能替代它。"
+      ],
+      "execution_status": "partially_executed",
+      "evidence_requirement": "证据记录组号、案例编号、输入变体、构建配置和实际结果；每个必测变体单独判定。",
+      "observed_evidence": "实际工具派发、原 JSON 转存及消息重载配对测试通过；真实模型混合批次和数据库重载尚未执行。",
+      "implementation_evidence_reference": "../evidence/web-read-implementation-final.json"
+    }
+  ],
+  "agent_queries": [
+    {
+      "id": "Q01",
+      "title": "公开官方说明与已有证据",
+      "purpose": "验证已知网址优先 web_read，取得充分证据后直接回答。",
+      "input_variants": [
+        "公开官方说明及带慢装饰资源的可控页面。",
+        "充分证据与存在明确缺口分别执行，不追加消息冒充同一请求。"
+      ],
+      "group_refs": [
+        "G01",
+        "G02",
+        "G04",
+        "G06",
+        "G18",
+        "G19"
+      ],
+      "execution_status": "partially_executed",
+      "prompt_policy": "正常生产提示和全部工具，不强制指定工具来证明自主选择。",
+      "repetition_policy": "在相同模型、提示、构建、网络及缓存配置下重复；记录实际样本数和失败结果。",
+      "evidence_requirement": "保存完整轨迹、最终模型可见 JSON、事实来源、调用增量及诊断关联；只覆盖实际输入。",
+      "first_five_simulator_evidence": {
+        "reference": "../evidence/first-five-simulator-20261002/README.md",
+        "observation": "官方页两个样本通过，本地两个样本重复读取。"
+      }
+    },
+    {
+      "id": "Q02",
+      "title": "长文定位与动态目标补充",
+      "purpose": "验证目标片段送达、编号续读及明确动态补充。",
+      "input_variants": [
+        "长文中部、尾部代码或表格分别定位。",
+        "静态正文可读但动态目标稍后出现时补充读取。",
+        "未命中或未覆盖时准确说明，不能臆造答案。"
+      ],
+      "group_refs": [
+        "G01",
+        "G02",
+        "G03",
+        "G06",
+        "G07",
+        "G08",
+        "G13",
+        "G18",
+        "G19"
+      ],
+      "execution_status": "partially_executed",
+      "prompt_policy": "正常生产提示和全部工具，不强制指定工具来证明自主选择。",
+      "repetition_policy": "在相同模型、提示、构建、网络及缓存配置下重复；记录实际样本数和失败结果。",
+      "evidence_requirement": "保存完整轨迹、最终模型可见 JSON、事实来源、调用增量及诊断关联；只覆盖实际输入。",
+      "first_five_simulator_evidence": {
+        "reference": "../evidence/first-five-simulator-20261002/README.md",
+        "observation": "正常路由失败/部分成功；指定工具数据送达通过，动态状态报告失败。"
+      }
+    },
+    {
+      "id": "Q03",
+      "title": "搜索操作与公开正文读取",
+      "purpose": "验证搜索沿用 browser_use，选定来源后优先 web_read。",
+      "input_variants": [
+        "正常提示要求搜索公开官方来源，再回答明确问题。",
+        "搜索入口或网页访问失败时记录实际失败，不沿用历史成功结果。"
+      ],
+      "group_refs": [
+        "G18",
+        "G19"
+      ],
+      "execution_status": "partially_executed",
+      "prompt_policy": "正常生产提示和全部工具，不强制指定工具来证明自主选择。",
+      "repetition_policy": "在相同模型、提示、构建、网络及缓存配置下重复；记录实际样本数和失败结果。",
+      "evidence_requirement": "保存完整轨迹、最终模型可见 JSON、事实来源、调用增量及诊断关联；只覆盖实际输入。",
+      "first_five_simulator_evidence": {
+        "reference": "../evidence/first-five-simulator-20261002/README.md",
+        "observation": "原高德搜索及网页读取轨迹已核对，非受控重复搜索对照。"
+      }
+    },
+    {
+      "id": "Q04",
+      "title": "已授权登录与交互后的浏览器页面",
+      "purpose": "验证模型继续使用对应浏览器标签，匿名读取限制准确。",
+      "input_variants": [
+        "仅在既有浏览器建立合成登录，私人正文不提前注入模型。",
+        "受控用户交互后的页面状态单独执行。"
+      ],
+      "group_refs": [
+        "G06",
+        "G11",
+        "G12",
+        "G17",
+        "G18",
+        "G19"
+      ],
+      "execution_status": "partially_executed",
+      "prompt_policy": "正常生产提示和全部工具，不强制指定工具来证明自主选择。",
+      "repetition_policy": "在相同模型、提示、构建、网络及缓存配置下重复；记录实际样本数和失败结果。",
+      "evidence_requirement": "保存完整轨迹、最终模型可见 JSON、事实来源、调用增量及诊断关联；只覆盖实际输入。",
+      "first_five_simulator_evidence": {
+        "reference": "../evidence/first-five-simulator-20261002/README.md",
+        "observation": "合成登录页通过；用户交互及接管未完成。"
+      }
+    },
+    {
+      "id": "Q05",
+      "title": "图片价格与现有工具交接",
+      "purpose": "验证 web_read 说明图片未读取，再由现有图像工具提供事实依据。",
+      "input_variants": [
+        "可控图片价格查询。",
+        "高德价格查询作为公开真实来源参考，缺失或协议失败独立记录。"
+      ],
+      "group_refs": [
+        "G06",
+        "G10",
+        "G19"
+      ],
+      "execution_status": "partially_executed",
+      "prompt_policy": "正常生产提示和全部工具，不强制指定工具来证明自主选择。",
+      "repetition_policy": "在相同模型、提示、构建、网络及缓存配置下重复；记录实际样本数和失败结果。",
+      "evidence_requirement": "保存完整轨迹、最终模型可见 JSON、事实来源、调用增量及诊断关联；只覆盖实际输入。",
+      "first_five_simulator_evidence": {
+        "reference": "../evidence/first-five-simulator-20261002/README.md",
+        "observation": "单张价格图片实际读取成功，web_read交接路线未覆盖。"
+      }
+    }
+  ],
+  "future_content_capabilities": {
+    "new_case_ids": [
+      "pdf-multipage-text-table",
+      "pdf-scanned-no-text",
+      "image-direct-png-jpeg",
+      "image-html-mixed-content",
+      "image-multiple-resources",
+      "image-delayed-lazy-resource"
+    ],
+    "legacy_reference_ids": [
+      "pdf_document"
+    ],
+    "execution_status": "not_executed",
+    "scope_note": "本任务不实施 PDF 文字提取或 OCR。web_read 图片理解仍待决定。已有图像工具的实际交接由 Q05 验证，不将可选 native 内容案例标记为通过。"
+  }
+}

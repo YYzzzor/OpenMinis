@@ -1418,6 +1418,10 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
 
     // MARK: - Browser
     let browserTabPool = BrowserTabPool()
+    /// 可注入的匿名网页读取服务，生产默认使用进程级资源预算。
+    var webReadService: WebReadService = .shared
+    /// 当前工具批次的 web_read 标识；Stop 通过它取消排队及活动读取。
+    var activeWebReadBatchID: String?
     /// When true, the agent loop pauses at the next checkpoint to let the user operate the browser.
     @Published var browserTakeoverActive = false
 
@@ -1958,11 +1962,17 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
         // is preserved inside SystemPromptBuilder.identityTemplate so we
         // don't regress model behavior that depended on it.
         SystemPromptBuilder.identitySection()
-            + "You should proactively use shell commands to accomplish the user's tasks — installing packages (apk add), "
-            + "writing and running scripts, managing files, networking, and any other operations a Linux terminal can perform.\n\n"
+            + "Evidence and answer accuracy:\n"
+            + "- For researched factual claims, separate what a read source explicitly establishes, your inference, and what remains unknown. Preserve the source's conditions, scope, and exceptions. Search snippets and generated search summaries are leads, not substitutes for the underlying source.\n"
+            + "- State fees, free eligibility, authentication requirements, or mandatory licenses as confirmed only when directly supported by the source you actually read. Link that source beside the claim. Generic platform prices do not by themselves establish a particular service's billing rules.\n"
+            + "- Absence of evidence is not evidence of absence: 'I found no separate pricing statement' means 'separate fees are unconfirmed', not 'there are no separate fees'. 'Noncommercial users qualify for a free allowance' does not establish 'every commercial user must buy a license'. A listed license price establishes its price, not that everyone must buy it.\n"
+            + "- Before sending the final answer, check each decisive claim against its supporting passage. If the passage does not directly support it, remove the claim or mark it unconfirmed at the point of use, including headings, tables, summaries, and recommendations. Do not state it as fact first and qualify it later. Do not expose this internal check.\n"
+            + "- A useful answer may give confirmed findings and explicitly identify remaining unknowns. After reading the relevant official pages, allow at most two targeted follow-up reads/searches for an unsupported fee or licensing claim, including unread relevant sections. If direct support is still missing or inaccessible, mark that claim unconfirmed and deliver the answer. Do not start more searches, switch tools, or repeat downloads merely to turn missing evidence into a definite yes/no.\n\n"
+            + "Use shell commands proactively for file, code, system, and network-engineering tasks.\n\n"
             + "Available tools:\n"
-            + "- shell_execute: Run any shell command. Each invocation is an isolated process with stdout/stderr captured. "
-            + "Prefer this for most tasks — it is a real Linux environment with persistent filesystem. "
+            + "- shell_execute: Run commands for file, code, system, and network-engineering work. For ordinary page-content queries at a known HTTP(S) URL, including a reachable loopback URL, use web_read first; do not bypass it with shell downloads. "
+            + "When the user asks for raw HTML, response headers, custom HTTP/API requests, endpoint tests, or network debugging, use shell networking as requested. "
+            + "Transfer a specific binary resource to a suitable reader when needed. "
             + "Common tools (python3, pip, curl, wget, git, ssh, etc.) can be installed via apk add; Python packages via pip install. "
             + "Use `which <cmd>` to check if a tool is already installed before running apk add — many packages persist across sessions. "
             + "When you need to wait before checking results (e.g. polling, waiting for a process), use the `delay` parameter instead of `sleep` in the command — "
@@ -1984,8 +1994,12 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
             + "- file_read: Read file contents (faster than cat).\n"
             + "- file_write: Create new files or overwrite existing files (faster than echo/tee).\n"
             + "- file_edit: Edit existing files with exact string replacement (old_string → new_string). Preferred over file_write for modifications — always file_read first.\n"
-            + "- browser_use: Web browsing (navigate, screenshot, click, type, get_text, scroll, scroll_and_collect, get_readable, get_backbone, fetch, etc.). "
-            + "Starts with a desktop Safari user agent. Use screenshot to see the page.\n"
+            + "Web reading policy: for ordinary content queries at a known HTTP(S) URL, including a reachable loopback URL, call web_read alone first and inspect its content, status, and limitations. If it contains the requested details without a relevant loading gap, answer even when the user mentions later or dynamic content; do not request another render or use sleep/delay just to confirm. Supplement only an actual gap or resource handoff, and do not launch same-source shell or browser downloads in parallel with the first read. "
+            + "For long text, use query_target and continue the same document_id. "
+            + "Use browser_use for search, interactions, existing browser state, or a specific resource handoff. "
+            + "- web_read: Read an HTTP(S) page anonymously and return Markdown with source, range, and limitations. Use query_target to locate a heading, identifier, or phrase; "
+            + "continue long text from document_id with offset/limit. It may render internally during a read; use render=true only for a specific dynamic-content gap identified by a prior result. It does not use browser cookies or sign in.\n"
+            + "- browser_use: Interact with pages, search results, or existing browser sessions; use fetch to hand off a specific resource for another reader.\n"
             + "Web search policy: use Google as the default search engine. "
             + "If Google is inaccessible due to network, connection, or access errors, fall back to Bing. "
             + "Do not use Baidu for web search.\n"
@@ -2086,11 +2100,10 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
             + "Example: {\"messages\":[{\"role\":\"user\",\"content\":\"<prompt>\"}],\"generation_config\":{\"size\":\"1024x1024\",\"n\":1}}. "
             + "IMPORTANT: image generation is SLOW (typically 1-5 min) — a single long blocking call with a large timeout (e.g. timeout: 600) is correct here (one render, one wait); use `delay` chains only when repeatedly CHECKING on something, not for one slow command. "
             + "Run with --help for full usage.\n"
-            + "minis-browser-use: CLI wrapper around the in-app browser_use tool — accepts the exact same actions and parameters as the browser_use tool call, just exposed as `<action> --flag value` pairs (or `--json '<obj>'`). "
-            + "Run `minis-browser-use` with no arguments (or --help) for the full action list. "
-            + "Example: `minis-browser-use navigate --url https://example.com`. "
-            + "Prefer this over the browser_use tool call when you need multi-step or batch browser flows: write a bash script that chains multiple minis-browser-use invocations (scrape N pages in a loop, click-through forms, navigate→extract→navigate pipelines) and run it with shell_execute. "
-            + "Output is JSON, same shape as the tool call result.\n"
+            + "minis-browser-use: CLI wrapper around browser_use for a specific interaction, existing-session content, or resource handoff. "
+            + "For known HTTP(S) page text, use web_read first and reuse sufficient results; do not use CLI loops to download page bodies. "
+            + "For multi-step interactions or transferring a specific asset for another reader, chain CLI actions through shell_execute as needed. "
+            + "Run `minis-browser-use --help` for the action list.\n"
             + "Interactive terminal: minis://open_terminal opens a terminal for tasks that require interactive stdin (passwords, ssh, TUI apps like htop/vi). "
             + "Write it as a Markdown link in your response — the app opens it when tapped. "
             + "The optional init_command parameter pre-fills (NOT executes) a command; it MUST be fully percent-encoded (spaces → %20, & → %26, | → %7C, etc.). "
@@ -4075,6 +4088,9 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
             SessionConcurrencyManager.shared.cancelWait(sessionId: sid)
         }
         stopCurrentCommand()
+        if let sid = sessionId {
+            webReadService.cancelSession(sid)
+        }
         // If the loop is suspended waiting for foreground, resume it so
         // Task cancellation can propagate through the continuation.
         backgroundSuspended = false
@@ -4873,6 +4889,21 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
     }
 
     private func runAgentLoop(resumingAt existingMsgIdx: Int? = nil, committedBlocks: Int? = nil) async throws {
+        func scopeForUserRequest(anchoredAt anchor: Int) -> WebReadScope {
+            let upperBound = min(max(0, anchor), max(0, messages.count - 1))
+            let requestID = messages.indices.reversed().first { index in
+                index <= upperBound && messages[index].role == .user && !messages[index].isQueued
+            }.map { messages[$0].id.uuidString } ?? UUID().uuidString
+            return WebReadScope(
+                sessionID: sessionId ?? "unsaved-\(requestID)",
+                userRequestID: requestID
+            )
+        }
+        var requestScope = scopeForUserRequest(anchoredAt: existingMsgIdx ?? max(0, messages.count - 1))
+        defer {
+            // Stop/resume retains the anonymous document; a completed request releases it.
+            if !canResume { webReadService.endRequest(scope: requestScope) }
+        }
         // REPRO-DIAG(2026-05-16): bump global round counter and emit a clear
         // BEGIN/END marker so the user can grep `ROUND \d+` to slice the log
         // by attempt. A "round" = one runAgentLoop invocation, which is
@@ -6011,7 +6042,11 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
                     // usage for the fresh assistant message.
                     // [T-ios-inloop-compact-freeze] msgIdx now points at the fresh
                     // assistant message — retarget the stable anchor with it.
-                    if msgIdx < messages.count { runMsgId = messages[msgIdx].id }
+                    if msgIdx < messages.count {
+                        webReadService.endRequest(scope: requestScope)
+                        requestScope = scopeForUserRequest(anchoredAt: msgIdx)
+                        runMsgId = messages[msgIdx].id
+                    }
                     canResume = false
                     turnUsage = TokenUsage()
                     continue
@@ -6044,6 +6079,17 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
             var toolResultParts: [AgentContentPart] = []
             var pendingSnapshots: [String: (toolName: String, snapshot: ToolSnapshot)] = [:]
             var cancelledDuringToolExecution = false
+            let webReadBatchEnteredAt = Date()
+            let containsWebRead = toolEntries.contains { $0.name == "web_read" }
+            let webReadBatchID = containsWebRead ? UUID().uuidString.lowercased() : nil
+            let webReadScope: WebReadScope? = containsWebRead ? requestScope : nil
+            let webReadDeadline = containsWebRead
+                ? webReadBatchEnteredAt.addingTimeInterval(webReadService.configuration.totalTimeout)
+                : nil
+            if let webReadBatchID, let webReadScope {
+                activeWebReadBatchID = webReadBatchID
+                webReadService.beginBatch(id: webReadBatchID, sessionID: webReadScope.sessionID, scope: webReadScope)
+            }
 
             // Image budget for this batch of tool results.
             //
@@ -6114,16 +6160,23 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
                     logger.info("[ToolLifecycle] DISPATCHED toolId=\(tu.id.prefix(20)) tool=\(tu.name) sid=\(self.sessionId?.prefix(8) ?? "nil") appState=\(UIApplication.shared.applicationState == .active ? "fg" : "bg") suspended=\(self.streamingUIUpdatesSuspended) isProcessing=\(self.isProcessing)")
                     group.addTask { [weak self] in
                         guard let self else {
-                            // Self torn down mid-batch: synthesize a cancelled outcome
-                            let cancelMsg = "<system-reminder>The session was torn down before this tool could execute.</system-reminder>"
+                            // Self torn down mid-batch: keep web_read's model payload parseable.
+                            let cancelMsg = tu.name == "web_read"
+                                ? await WebReadService.immediateOutcome(
+                                    request: WebReadRequest(url: tu.args["url"] as? String),
+                                    status: .cancelled, limitation: "会话在读取期间结束。"
+                                ).json
+                                : "<system-reminder>The session was torn down before this tool could execute.</system-reminder>"
                             return (idx, ToolExecOutcome(
                                 toolId: tu.id, toolName: tu.name,
-                                resultPart: .toolResult(id: tu.id, name: tu.name, content: cancelMsg, isError: true),
+                                resultPart: .toolResult(id: tu.id, name: tu.name, content: cancelMsg, isError: tu.name != "web_read"),
                                 snapshotEntry: nil, snapshotItem: nil, cancelled: true
                             ))
                         }
                         let outcome = await self.executeSingleToolUse(
-                            tu: tu, msgIdx: msgIdx, tools: toolsSnapshot, batchBudget: imageBudgetActor
+                            tu: tu, msgIdx: msgIdx, tools: toolsSnapshot, batchBudget: imageBudgetActor,
+                            webReadBatchID: webReadBatchID, webReadScope: webReadScope,
+                            webReadDeadline: webReadDeadline
                         )
                         return (idx, outcome)
                     }
@@ -6133,6 +6186,12 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
                 for await pair in group {
                     outcomesByIndex[pair.0] = pair.1
                     harvested += 1
+                }
+            }
+            if let webReadBatchID {
+                webReadService.finishBatch(id: webReadBatchID)
+                if activeWebReadBatchID == webReadBatchID {
+                    activeWebReadBatchID = nil
                 }
             }
 
@@ -6252,7 +6311,11 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
                 ) {
                     // [T-ios-inloop-compact-freeze] Retarget the stable anchor
                     // alongside msgIdx (fresh assistant message for the new turn).
-                    if msgIdx < messages.count { runMsgId = messages[msgIdx].id }
+                    if msgIdx < messages.count {
+                        webReadService.endRequest(scope: requestScope)
+                        requestScope = scopeForUserRequest(anchoredAt: msgIdx)
+                        runMsgId = messages[msgIdx].id
+                    }
                     canResume = false
                     turnUsage = TokenUsage()
                     continue

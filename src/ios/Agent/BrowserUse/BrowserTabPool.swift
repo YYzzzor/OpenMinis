@@ -29,6 +29,7 @@ final class BrowserTabPoolRegistry {
         weak var pool: BrowserTabPool?
     }
     private var pools: [ObjectIdentifier: WeakPool] = [:]
+    private var anonymousWebReadRenderers: Set<String> = []
     private var memoryWarningObserver: NSObjectProtocol?
 
     private init() {
@@ -58,6 +59,26 @@ final class BrowserTabPoolRegistry {
         return pools.values.reduce(0) { $0 + ($1.pool?.tabs.count ?? 0) }
     }
 
+    /// 为匿名读取的临时 WebContent 保留全局标签预算中的一个槽位。
+    func acquireAnonymousWebReadRenderer(callID: String) -> Bool {
+        compactPools()
+        guard !anonymousWebReadRenderers.contains(callID),
+              anonymousWebReadRenderers.count < 1,
+              totalLiveTabs() + anonymousWebReadRenderers.count < Self.globalTabCap else {
+            return false
+        }
+        anonymousWebReadRenderers.insert(callID)
+        return true
+    }
+
+    func releaseAnonymousWebReadRenderer(callID: String) {
+        anonymousWebReadRenderers.remove(callID)
+    }
+
+    var anonymousWebReadRendererCount: Int {
+        anonymousWebReadRenderers.count
+    }
+
     /// Try to make room for one more tab in `requester`. Prefers an idle
     /// (non-`inUse`) sibling tab; if none exist, preempts the oldest
     /// `inUse` sibling tab — the agent driving that tab will see a single
@@ -68,7 +89,10 @@ final class BrowserTabPoolRegistry {
     @discardableResult
     func requestSlot(for requester: BrowserTabPool) -> Bool {
         compactPools()
-        if totalLiveTabs() < Self.globalTabCap { return true }
+        let liveTabs = totalLiveTabs()
+        if liveTabs + anonymousWebReadRenderers.count < Self.globalTabCap { return true }
+        // 读取 renderer 占用剩余槽位时，不回收或抢占浏览器标签。
+        if !anonymousWebReadRenderers.isEmpty && liveTabs < Self.globalTabCap { return false }
 
         let requesterId = ObjectIdentifier(requester)
 
@@ -111,6 +135,11 @@ final class BrowserTabPoolRegistry {
     /// the agent is actively driving stay alive so in-flight actions don't
     /// fail mid-step.
     private func handleMemoryWarning() {
+        let webRead = WebReadService.shared.handleMemoryWarning()
+        registryLogger.warning(
+            "Memory warning — anonymous web_read resource_limit: cancelledCalls=\(webRead.cancelledCalls) " +
+                "removedDocuments=\(webRead.removedDocuments) releasedBytes=\(webRead.releasedBytes)"
+        )
         compactPools()
         var evicted = 0
         for weak in pools.values {
@@ -387,11 +416,11 @@ final class BrowserTabPool: ObservableObject {
             return 0
         }
         // Otherwise create tab 0, restoring saved URL if available.
-        // Ask the registry for a global slot — may evict an idle tab in
-        // another session's pool. If denied (everyone is busy), we still
-        // create the tab: the agent needs *some* surface to act on, and
-        // failing here would surface as an unrecoverable tool error.
-        BrowserTabPoolRegistry.shared.requestSlot(for: self)
+        // 资源不足时返回无效 id；execute(action:) 会转成明确的资源限制结果。
+        guard BrowserTabPoolRegistry.shared.requestSlot(for: self) else {
+            logger.info("Cannot create a browser tab while the shared WebContent budget is full")
+            return -1
+        }
         let manager = makeManager()
         let tab = Tab(id: 0, manager: manager, inUse: true)
         tabs.append(tab)

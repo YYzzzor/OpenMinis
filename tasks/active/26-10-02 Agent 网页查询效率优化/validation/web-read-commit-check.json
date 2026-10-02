@@ -1,0 +1,203 @@
+{
+  "date": "2026-10-02",
+  "branch": "investigate/build8-agent-latency",
+  "parent_head": "b0b53c46e8fe289e448002d17eee1c6935e2f71c",
+  "maintainer_feedback": {
+    "no_observed_bug_in_daily_use": true,
+    "subjectively_faster_than_without_web_read": true,
+    "controlled_performance_comparison": false,
+    "authorized_stage_commit_and_separate_browser_use_task": true
+  },
+  "commit_scope": [
+    "docs/minisx-release-status.md",
+    "docs/specs/index.md",
+    "src/ios/Agent/BrowserUse/BrowserTabPool.swift",
+    "src/ios/Agent/Chat/AIChatViewModel+BackgroundTask.swift",
+    "src/ios/Agent/Chat/AIChatViewModel+ConcurrentTools.swift",
+    "src/ios/Agent/Chat/AIChatViewModel+Offloading.swift",
+    "src/ios/Agent/Chat/AIChatViewModel+ToolDefinitions.swift",
+    "src/ios/Agent/Chat/AIChatViewModel.swift",
+    "src/ios/Minis.xcodeproj/project.pbxproj",
+    "src/ios/NativeOffloads/BrowserUseOffload.m",
+    "docs/specs/ios-web-read.md",
+    "src/ios/Agent/WebRead/WebReadDocumentStore.swift",
+    "src/ios/Agent/WebRead/WebReadHTMLExtractor.swift",
+    "src/ios/Agent/WebRead/WebReadModels.swift",
+    "src/ios/Agent/WebRead/WebReadRenderer.swift",
+    "src/ios/Agent/WebRead/WebReadService.swift",
+    "src/ios/Agent/WebRead/WebReadURLSessionTransport.swift",
+    "src/ios/MinisTests/WebReadServiceTests.swift",
+    "tasks/active/26-10-02 Agent 网页查询效率优化/research/01-build8-agent-latency/history.md",
+    "tasks/active/26-10-02 Agent 网页查询效率优化/research/01-build8-agent-latency/reproduction.md",
+    "tasks/active/26-10-02 Agent 网页查询效率优化/research/01-build8-agent-latency/verification.md",
+    "tasks/active/26-10-02 Agent 网页查询效率优化/research/02-browser-http-comparison/history.md",
+    "tasks/active/26-10-02 Agent 网页查询效率优化/research/02-browser-http-comparison/verification.md",
+    "tasks/active/26-10-02 Agent 网页查询效率优化/research/03-web-read-proposal.md",
+    "tasks/active/26-10-02 Agent 网页查询效率优化/research/04-web-read-design-references.md",
+    "tasks/active/26-10-02 Agent 网页查询效率优化/research/README.md",
+    "tasks/active/26-10-02 Agent 网页查询效率优化/task.md",
+    "tasks/active/26-10-02 Agent 网页查询效率优化/validation/README.md",
+    "tasks/active/26-10-02 Agent 网页查询效率优化/validation/cases.json",
+    "tasks/active/26-10-02 Agent 网页查询效率优化/validation/fixture_server.py",
+    "tasks/active/26-10-02 Agent 网页查询效率优化/validation/fixtures/corrupt.pdf",
+    "tasks/active/26-10-02 Agent 网页查询效率优化/validation/fixtures/encrypted.pdf",
+    "tasks/active/26-10-02 Agent 网页查询效率优化/validation/fixtures/large.pdf",
+    "tasks/active/26-10-02 Agent 网页查询效率优化/validation/fixtures/misleading-alt.png",
+    "tasks/active/26-10-02 Agent 网页查询效率优化/validation/fixtures/multipage-table.pdf",
+    "tasks/active/26-10-02 Agent 网页查询效率优化/validation/fixtures/price-table.jpg",
+    "tasks/active/26-10-02 Agent 网页查询效率优化/validation/fixtures/price-table.png",
+    "tasks/active/26-10-02 Agent 网页查询效率优化/validation/fixtures/sales-chart.png",
+    "tasks/active/26-10-02 Agent 网页查询效率优化/validation/fixtures/scanned-only.pdf",
+    "tasks/active/26-10-02 Agent 网页查询效率优化/validation/generate_fixtures.py",
+    "tasks/active/26-10-02 Agent 网页查询效率优化/validation/groups.json",
+    "tasks/active/26-10-02 Agent 网页查询效率优化/validation/ios-acceptance.md",
+    "tasks/active/26-10-02 Agent 网页查询效率优化/validation/result-contract.md",
+    "tasks/active/26-10-02 Agent 网页查询效率优化/validation/verify_fixtures.py",
+    "tasks/active/26-10-02 Agent 网页查询效率优化/verification.md",
+    "tasks/active/26-10-02 Agent 网页查询效率优化/validation/web-read-commit-check.json",
+    "tasks/active/26-10-02 Agent 网页查询效率优化/validation/.gitattributes"
+  ],
+  "excluded_unrelated_files_sha256": {
+    ".agents/skills/archive-task/SKILL.md": "63dc906c9df635fc387380d651e6efb62380ddfb8603b02e38d1d70f64b811ce",
+    ".agents/skills/plan-task/SKILL.md": "980f3a3434645c6d09ae43a2f951f2bb8a8c6e2575b7307768eecf4e4494b2a8",
+    ".agents/skills/resume-task/SKILL.md": "59b24c12990a0405ed6d10a9b1a6527e8bc9ecd4cc3376ae7c15827830860d52",
+    ".agents/skills/review-task/SKILL.md": "2d5eda0f6dfdadbceb9f6eb43247597a4fa8bc442a284757f794b3e9087eaccd",
+    ".agents/skills/update-spec/SKILL.md": "afd1a36e96f265cb72dff3886e9f853bc7d0a9d0c07e86df44575ea7a9d57f75",
+    "AGENTS.md": "0d0d6c4ce5ae3aefe2bddfb5a078eff54d1bd3047299b1dc680e1bdbb7147690",
+    "docs/harness/contract.md": "79e6171fa5837a71596d925900ec0cee190d62f0b72762d7ca988cdab1f414fc"
+  },
+  "source_sha256": {
+    "src/ios/Agent/BrowserUse/BrowserTabPool.swift": "30a2f7e8973731bc435d1ca050183fa39b2d219cb3b612090d735cd748579f10",
+    "src/ios/Agent/Chat/AIChatViewModel+BackgroundTask.swift": "2a6c0da812dae08e3f2580455f277f065a937d527df52263b3becd339b5cea70",
+    "src/ios/Agent/Chat/AIChatViewModel+ConcurrentTools.swift": "3792eb52d270df347b7b6dca5f7c33d2c5a0651a2eadde05a41f607816671d5a",
+    "src/ios/Agent/Chat/AIChatViewModel+Offloading.swift": "10bee6cfafd1505e8d2130fd4df3f5eff78ecb4345d75ee093a75d85c4dc89d7",
+    "src/ios/Agent/Chat/AIChatViewModel+ToolDefinitions.swift": "e75712ba7fd9f3c441e2214ce09a8f3ed57cefc83006d00220d3300d1c017e8e",
+    "src/ios/Agent/Chat/AIChatViewModel.swift": "e3da55a2d3421cbf62e007d89ed23e89454ed0c19b2aa78945a74979fc2484ac",
+    "src/ios/Minis.xcodeproj/project.pbxproj": "e1f77f90077279a0bed7179bb5596a119fff5258692183fd01f72c1ee1b90e11",
+    "src/ios/NativeOffloads/BrowserUseOffload.m": "6175d6111e2d7f061d2ed9c842c5a1e4c0515ab098b1a8bd7fd931f001098a65",
+    "src/ios/Agent/WebRead/WebReadDocumentStore.swift": "4c05b942e8d177cb094dced3fc8e4d9d7cca5a61b667b44ba9ace378092a36a1",
+    "src/ios/Agent/WebRead/WebReadHTMLExtractor.swift": "5d147eaaa9c86230e6660af78063563df5e98ee169ac6e490174183ddb73f7e6",
+    "src/ios/Agent/WebRead/WebReadModels.swift": "5f3a585bcdc57e59274ac3b4c0a77f76a9e8d42ac199be89fd0e51881cefb11e",
+    "src/ios/Agent/WebRead/WebReadRenderer.swift": "1b9c221e56c9ba2a62a977a994a2167f8ff971ea1a14b3354c06325c32e324c5",
+    "src/ios/Agent/WebRead/WebReadService.swift": "c7f1cb9d3753a75240a572faa9e89f801af625c72700d1fd0c6b1bc7e995167f",
+    "src/ios/Agent/WebRead/WebReadURLSessionTransport.swift": "6bdf1a7666fcded6bf660780f323ab3c7aa96ab8055e95fb4de0d008d2eb6358",
+    "src/ios/MinisTests/WebReadServiceTests.swift": "6cd7fb3a0b1a830cf440d013ef10eedc9b85e86a9af894fba42c21b64fb41823"
+  },
+  "latest_source_snapshot": {
+    "path": "tasks/active/26-10-02 Agent 网页查询效率优化/evidence/system-prompt-grounding-20261002/final-source-hashes.json",
+    "checked_files": 11,
+    "all_match": true
+  },
+  "initial_unchanged_integration_files": 4,
+  "historical_test_summaries": [
+    {
+      "source": "evidence/first-five-fixes-20261002/tests-2-summary.json",
+      "result": "Passed",
+      "passedTests": 47,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "totalTestCount": 47
+    },
+    {
+      "source": "evidence/first-five-fixes-20261002/tests-3-prompt-summary.json",
+      "result": "Passed",
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "totalTestCount": 1
+    },
+    {
+      "source": "evidence/system-prompt-grounding-20261002/final-test-summary.json",
+      "result": "Passed",
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "totalTestCount": 1
+    }
+  ],
+  "fresh_checks": [
+    {
+      "command": [
+        "python3",
+        "-B",
+        "scripts/harness/spec_index.py",
+        "--check"
+      ],
+      "exit_code": 0,
+      "output": "Spec index is current."
+    },
+    {
+      "command": [
+        "plutil",
+        "-lint",
+        "src/ios/Minis.xcodeproj/project.pbxproj"
+      ],
+      "exit_code": 0,
+      "output": "src/ios/Minis.xcodeproj/project.pbxproj: OK"
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "output": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--cached",
+        "--check"
+      ],
+      "exit_code": 0,
+      "output": "PDF fixtures are marked binary; maintained text has no whitespace errors."
+    }
+  ],
+  "acceptance": [
+    {
+      "item": "取得当前目标页面正文",
+      "status": "部分验证"
+    },
+    {
+      "item": "长文目标内容读取",
+      "status": "部分验证"
+    },
+    {
+      "item": "PDF、图片与访问限制",
+      "status": "部分验证"
+    },
+    {
+      "item": "匿名身份与既有浏览器状态",
+      "status": "部分验证"
+    },
+    {
+      "item": "时间、资源上限及停止范围",
+      "status": "部分验证"
+    },
+    {
+      "item": "工具选择与结果配对",
+      "status": "部分验证"
+    },
+    {
+      "item": "真实查询与设备效率",
+      "status": "未整体通过；新增维护者正面体验反馈"
+    }
+  ],
+  "ignored_evidence_policy": "Original generated logs, screenshots and xcresult remain local. Historical test summaries are captured here; no raw runtime evidence is force-added.",
+  "new_runtime_tests_executed_this_turn": false,
+  "product_spec_rules_remain_proposed": 27,
+  "fixture_format_check": {
+    "python_trailing_spaces_removed": 2,
+    "pdf_attributes": "tasks/active/26-10-02 Agent 网页查询效率优化/validation/.gitattributes",
+    "pdf_original_bytes_preserved": true,
+    "pdf_sha256": {
+      "tasks/active/26-10-02 Agent 网页查询效率优化/validation/fixtures/scanned-only.pdf": "27971178e8a7a2503a8a7c9b12eb7d5b9fae2bac4819fbb2364383ddb9ddd6f8",
+      "tasks/active/26-10-02 Agent 网页查询效率优化/validation/fixtures/encrypted.pdf": "6a1a5fe61604689d9afa3754e53bd93d6a0c55874c7299bee2e2154847409f23",
+      "tasks/active/26-10-02 Agent 网页查询效率优化/validation/fixtures/multipage-table.pdf": "6fd9b9908f382435ac028b7a85dffd3cb4d02e6d071ed927afe26cf339151761",
+      "tasks/active/26-10-02 Agent 网页查询效率优化/validation/fixtures/corrupt.pdf": "cec4184016749a43d3c67ec86b71c72c141c2ceb6cee0a6f193086c27905bbfb",
+      "tasks/active/26-10-02 Agent 网页查询效率优化/validation/fixtures/large.pdf": "0d5d2e356a90a21989a0f946ab1415946804a79b1a7e3b277c407f5f7d837ab9"
+    }
+  }
+}

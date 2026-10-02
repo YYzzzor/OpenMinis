@@ -630,8 +630,12 @@ extension AIChatViewModel {
         // here because runningCommandPids was empty. Bail only when NONE apply,
         // so random taps don't poison the flag for a future real invocation.
         let browserLoading = browserTabPool.hasLoadingTab
-        guard !runningCommandPids.isEmpty || toolDelayWaitActive || browserLoading else { return }
+        let webReadBatch = activeWebReadBatchID
+        guard !runningCommandPids.isEmpty || toolDelayWaitActive || browserLoading || webReadBatch != nil else { return }
         commandCancelledByUser = true
+        if let webReadBatch {
+            webReadService.cancelBatch(webReadBatch)
+        }
         // Stop any in-flight browser page loads. stopLoading() resolves the
         // manager's navigationContinuation, so the awaited browserTabPool
         // .execute(action:) returns and the hung tool call completes.

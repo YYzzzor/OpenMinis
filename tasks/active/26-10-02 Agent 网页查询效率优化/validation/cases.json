@@ -1,0 +1,1974 @@
+{
+  "schema_version": 1,
+  "title": "网页读取新增验证案例",
+  "legacy_cases_reference": "../research/02-browser-http-comparison/evidence/cases.json",
+  "legacy_case_count": 18,
+  "legacy_cases_are_unchanged": true,
+  "execution_status": "partially_executed",
+  "layer_definitions": {
+    "fixture_selfcheck": "实际本地请求及格式检查确认测试网站和样本符合预期，只证明测试输入。",
+    "ios_product": "在 Simulator 或真机执行真实 MinisX 工具。需要真机的案例单独标注。",
+    "agent_e2e": "真实 MinisX Agent 调用产品工具，并生成依据充分的回答。网站自检不能替代。"
+  },
+  "classifications": {
+    "boundary_mandatory": "第一版必须通过的资源或访问边界验收。",
+    "content_capability_optional": "样本已准备。对应内容能力纳入已确认范围后，才要求验收。",
+    "product_specific_mandatory": "第一版必须通过的产品专项，需要 iOS 或真实 Agent 证据。"
+  },
+  "cases": [
+    {
+      "id": "pdf-direct-resource-handoff",
+      "category": "pdf",
+      "classification": "boundary_mandatory",
+      "preconditions": [
+        "测试网站已经启动。",
+        "使用第一版真实 web_read 入口。"
+      ],
+      "action": "读取 /pdf/text。记录最终网址、HTTP 状态、MIME 类型、字节数及用户交接入口。",
+      "expected_result": "工具返回 PDF 类型及可定位资源地址。工具说明文字尚未读取（not_read），并允许用户后续处理。第一版不要求提取 PDF 文字。",
+      "oracle": {
+        "fixture": "路由返回有效 PDF，类型为 application/pdf。pypdf 有效性检查仅属于测试网站自检。",
+        "product": "核对真实 iOS 结果中的资源地址、类型及未读取状态，不要求页内文字。"
+      },
+      "applicable_layers": [
+        "fixture_selfcheck",
+        "ios_product",
+        "agent_e2e"
+      ],
+      "layer_requirement": {
+        "fixture_selfcheck": "required",
+        "ios_product": "mandatory_boundary",
+        "agent_e2e": "grouped_representative_evidence"
+      },
+      "execution_status": "partially_executed",
+      "spec_rules": [
+        "F3",
+        "R1",
+        "R2",
+        "R3"
+      ],
+      "title": "直接 PDF 的资源交接",
+      "execution_group": "G09",
+      "agent_query_refs": [],
+      "execution_policy": "产品层按本案例判据执行全部必测变体；Agent 层由关联代表查询或 G20 后续查询取证，不逐案例重复完整查询。",
+      "first_five_simulator_evidence": {
+        "reference": "../evidence/first-five-simulator-20261002/README.md",
+        "scope": "仅对应本轮报告中明确观察的产品/Agent判据，未执行的变体和层级不自动通过。"
+      }
+    },
+    {
+      "id": "pdf-multipage-text-table",
+      "category": "pdf",
+      "classification": "content_capability_optional",
+      "preconditions": [
+        "测试网站已经启动。",
+        "被测构建已启用且已纳入 PDF 文字提取能力。"
+      ],
+      "action": "读取 /pdf/text。回答表格中两种方案的价格，并指出第2页标记。",
+      "expected_result": "工具按顺序提供两页内容。表格价格对应正确方案，末页标记完整。",
+      "oracle": {
+        "fixture": "pypdf 确认2页。已知值为 PDF-PAGE-ONE-4107、Basic=39、Pro=99 和 PDF-END-MARKER-82C1。",
+        "product": "核对每项事实均有页码或表格依据，并检查最终工具输出。标记命中不能单独证明事实关系。"
+      },
+      "applicable_layers": [
+        "fixture_selfcheck",
+        "ios_product",
+        "agent_e2e"
+      ],
+      "layer_requirement": {
+        "fixture_selfcheck": "required",
+        "ios_product": "optional_capability",
+        "agent_e2e": "optional_capability"
+      },
+      "execution_status": "not_executed",
+      "spec_rules": [
+        "F3",
+        "R1",
+        "R2",
+        "R3"
+      ],
+      "title": "多页 PDF 的文字和表格",
+      "current_scope_status": "deferred",
+      "scope_note": "维护者明确暂不实施 PDF 提取和 OCR。本案例保留为后续资料，不作为当前内容验收。",
+      "execution_group": "future_content_capabilities",
+      "agent_query_refs": [],
+      "execution_policy": "对应能力纳入范围后再验收；当前不执行本案例内容要求。"
+    },
+    {
+      "id": "pdf-scanned-no-text",
+      "category": "pdf",
+      "classification": "content_capability_optional",
+      "preconditions": [
+        "测试网站已经启动。",
+        "OCR 或 PDF 图像读取能力已纳入范围时，执行内容验收。"
+      ],
+      "action": "读取 /pdf/scanned。报告 OCR 能力；能力启用时读取扫描标记和两种价格。",
+      "expected_result": "样本没有文字层。文字路线说明限制；OCR 路线需要实际读取可见事实，并区分 OCR 与 PDF 文字提取。",
+      "oracle": {
+        "fixture": "pypdf 确认1页且无可抽取文字。页面显示 SCAN-OCR-MARKER-59D2、BASIC 39 和 PRO 99。",
+        "product": "只有实际读取图像并正确对应方案和价格时，OCR 内容验收才通过。HTTP 成功或字符串搜索不能证明 OCR。"
+      },
+      "applicable_layers": [
+        "fixture_selfcheck",
+        "ios_product",
+        "agent_e2e"
+      ],
+      "layer_requirement": {
+        "fixture_selfcheck": "required",
+        "ios_product": "optional_capability",
+        "agent_e2e": "optional_capability"
+      },
+      "execution_status": "not_executed",
+      "spec_rules": [
+        "F3",
+        "R1",
+        "R2",
+        "R3"
+      ],
+      "title": "无文字层的扫描 PDF",
+      "current_scope_status": "deferred",
+      "scope_note": "维护者明确暂不实施 PDF 提取和 OCR。本案例保留为后续资料，不作为当前内容验收。",
+      "execution_group": "future_content_capabilities",
+      "agent_query_refs": [],
+      "execution_policy": "对应能力纳入范围后再验收；当前不执行本案例内容要求。"
+    },
+    {
+      "id": "pdf-encrypted",
+      "category": "pdf",
+      "classification": "boundary_mandatory",
+      "preconditions": [
+        "测试网站已经启动。",
+        "不向产品提供密码或凭据。"
+      ],
+      "action": "匿名读取 /pdf/encrypted。",
+      "expected_result": "工具返回 PDF 地址和元数据，并准确说明内容尚未读取或能力不支持。第一版不要求识别加密细节或索取密码。",
+      "oracle": {
+        "fixture": "pypdf 确认样本加密，只证明测试输入真实。",
+        "product": "核对资源类型、可定位地址及未读取或交接状态。加密检测和页内提取不属于本项要求。"
+      },
+      "applicable_layers": [
+        "fixture_selfcheck",
+        "ios_product",
+        "agent_e2e"
+      ],
+      "layer_requirement": {
+        "fixture_selfcheck": "required",
+        "ios_product": "mandatory_boundary",
+        "agent_e2e": "grouped_representative_evidence"
+      },
+      "execution_status": "partially_executed",
+      "spec_rules": [
+        "F3",
+        "R1",
+        "R2",
+        "R3"
+      ],
+      "title": "加密 PDF 的资源边界",
+      "execution_group": "G09",
+      "agent_query_refs": [],
+      "execution_policy": "产品层按本案例判据执行全部必测变体；Agent 层由关联代表查询或 G20 后续查询取证，不逐案例重复完整查询。",
+      "first_five_simulator_evidence": {
+        "reference": "../evidence/first-five-simulator-20261002/README.md",
+        "scope": "仅对应本轮报告中明确观察的产品/Agent判据，未执行的变体和层级不自动通过。"
+      }
+    },
+    {
+      "id": "pdf-corrupt",
+      "category": "pdf",
+      "classification": "boundary_mandatory",
+      "preconditions": [
+        "测试网站已经启动。"
+      ],
+      "action": "读取 /pdf/corrupt。",
+      "expected_result": "工具返回资源地址及元数据。文件无法读取时说明 not_read 或 unsupported，不编造文字。",
+      "oracle": {
+        "fixture": "pypdf 拒绝样本，只证明测试输入损坏。",
+        "product": "核对仅资源信息或未读取状态，以及可用地址。不要求分类 PDF 解析错误。"
+      },
+      "applicable_layers": [
+        "fixture_selfcheck",
+        "ios_product",
+        "agent_e2e"
+      ],
+      "layer_requirement": {
+        "fixture_selfcheck": "required",
+        "ios_product": "mandatory_boundary",
+        "agent_e2e": "grouped_representative_evidence"
+      },
+      "execution_status": "partially_executed",
+      "spec_rules": [
+        "F3",
+        "R1",
+        "R2",
+        "R3"
+      ],
+      "title": "损坏 PDF 的资源边界",
+      "execution_group": "G09",
+      "agent_query_refs": [],
+      "execution_policy": "产品层按本案例判据执行全部必测变体；Agent 层由关联代表查询或 G20 后续查询取证，不逐案例重复完整查询。",
+      "first_five_simulator_evidence": {
+        "reference": "../evidence/first-five-simulator-20261002/README.md",
+        "scope": "仅对应本轮报告中明确观察的产品/Agent判据，未执行的变体和层级不自动通过。"
+      }
+    },
+    {
+      "id": "pdf-wrong-mime",
+      "category": "pdf",
+      "classification": "boundary_mandatory",
+      "preconditions": [
+        "测试网站已经启动。"
+      ],
+      "action": "读取 /pdf/wrong-mime。该响应实际为 PDF，但 Content-Type 为 text/html。",
+      "expected_result": "工具识别实际格式或明确说明格式不一致，不将二进制字节作为 HTML 正文。",
+      "oracle": {
+        "fixture": "响应声明 text/html，字节以 %PDF 开始，pypdf 可以读取两页。",
+        "product": "根据实际响应核对 MIME 与文件特征处理，并检查最终结果准确。"
+      },
+      "applicable_layers": [
+        "fixture_selfcheck",
+        "ios_product",
+        "agent_e2e"
+      ],
+      "layer_requirement": {
+        "fixture_selfcheck": "required",
+        "ios_product": "mandatory_boundary",
+        "agent_e2e": "grouped_representative_evidence"
+      },
+      "execution_status": "partially_executed",
+      "spec_rules": [
+        "F3",
+        "R1",
+        "R2",
+        "R3"
+      ],
+      "title": "PDF 响应声明了错误格式",
+      "execution_group": "G09",
+      "agent_query_refs": [],
+      "execution_policy": "产品层按本案例判据执行全部必测变体；Agent 层由关联代表查询或 G20 后续查询取证，不逐案例重复完整查询。",
+      "first_five_simulator_evidence": {
+        "reference": "../evidence/first-five-simulator-20261002/README.md",
+        "scope": "仅对应本轮报告中明确观察的产品/Agent判据，未执行的变体和层级不自动通过。"
+      }
+    },
+    {
+      "id": "pdf-response-budget",
+      "category": "pdf",
+      "classification": "product_specific_mandatory",
+      "preconditions": [
+        "网站单响应上限为1 MiB。",
+        "记录被测产品的响应和总时间预算。"
+      ],
+      "action": "读取 /pdf/large 和 /large?bytes=768000。记录实际字节数和总耗时；确保超限样本确实大于产品配置。",
+      "expected_result": "产品执行自身响应和时间上限。发生截断时说明范围及限制，不分配或输出无限正文。",
+      "oracle": {
+        "fixture": "固定 PDF 有效且超过500 KiB，约606 KiB。/large 返回真实768000字节的有界响应。",
+        "product": "在 iOS 核对字节数、耗时、部分状态和资源释放。样本不足时降低并记录测试预算，或补充受控输入。"
+      },
+      "applicable_layers": [
+        "fixture_selfcheck",
+        "ios_product",
+        "agent_e2e"
+      ],
+      "layer_requirement": {
+        "fixture_selfcheck": "required_support",
+        "ios_product": "mandatory_product",
+        "agent_e2e": "grouped_representative_evidence"
+      },
+      "execution_status": "not_executed",
+      "spec_rules": [
+        "F3",
+        "R1",
+        "R2",
+        "R3"
+      ],
+      "title": "PDF 和大响应的产品预算",
+      "execution_group": "G14",
+      "agent_query_refs": [],
+      "execution_policy": "产品层按本案例判据执行全部必测变体；Agent 层由关联代表查询或 G20 后续查询取证，不逐案例重复完整查询。"
+    },
+    {
+      "id": "pdf-cancel-slow-download",
+      "category": "pdf",
+      "classification": "product_specific_mandatory",
+      "preconditions": [
+        "测试网站已经启动。",
+        "可以观察真实 iOS 请求的取消。"
+      ],
+      "action": "启动 /pdf/slow?ms=3000。取消真实请求，再请求 /health 和正常资源。",
+      "expected_result": "取消到达正在执行的请求，结果标记 cancelled。传输和资源槽位释放，后续读取完成。",
+      "oracle": {
+        "fixture": "延迟最长5秒，测试网站关闭可以唤醒等待。",
+        "product": "保存 iOS 请求生命周期和正常后续结果。仅等待时间变短不能证明取消。"
+      },
+      "applicable_layers": [
+        "fixture_selfcheck",
+        "ios_product",
+        "agent_e2e"
+      ],
+      "layer_requirement": {
+        "fixture_selfcheck": "required_support",
+        "ios_product": "mandatory_product",
+        "agent_e2e": "grouped_representative_evidence"
+      },
+      "execution_status": "not_executed",
+      "spec_rules": [
+        "F3",
+        "R1",
+        "R2",
+        "R3"
+      ],
+      "title": "取消慢 PDF 下载",
+      "execution_group": "G16",
+      "agent_query_refs": [],
+      "execution_policy": "产品层按本案例判据执行全部必测变体；Agent 层由关联代表查询或 G20 后续查询取证，不逐案例重复完整查询。"
+    },
+    {
+      "id": "pdf-disconnected-response",
+      "category": "pdf",
+      "classification": "boundary_mandatory",
+      "preconditions": [
+        "测试网站已经启动。"
+      ],
+      "action": "读取 /disconnect。网站声明较长 PDF 长度，只返回短前缀后关闭连接。",
+      "expected_result": "工具报告传输或正文不完整，不将前缀作为有效 PDF 内容。",
+      "oracle": {
+        "fixture": "实际字节数少于 Content-Length，客户端检测到读取不完整。",
+        "product": "核对传输错误及最终状态，不能出现内容读取成功。"
+      },
+      "applicable_layers": [
+        "fixture_selfcheck",
+        "ios_product",
+        "agent_e2e"
+      ],
+      "layer_requirement": {
+        "fixture_selfcheck": "required",
+        "ios_product": "mandatory_boundary",
+        "agent_e2e": "grouped_representative_evidence"
+      },
+      "execution_status": "partially_executed",
+      "spec_rules": [
+        "F3",
+        "R1",
+        "R2",
+        "R3"
+      ],
+      "title": "PDF 响应中途断开",
+      "execution_group": "G09",
+      "agent_query_refs": [],
+      "execution_policy": "产品层按本案例判据执行全部必测变体；Agent 层由关联代表查询或 G20 后续查询取证，不逐案例重复完整查询。",
+      "first_five_simulator_evidence": {
+        "reference": "../evidence/first-five-simulator-20261002/README.md",
+        "scope": "仅对应本轮报告中明确观察的产品/Agent判据，未执行的变体和层级不自动通过。"
+      }
+    },
+    {
+      "id": "image-direct-resource-handoff",
+      "category": "images",
+      "classification": "boundary_mandatory",
+      "preconditions": [
+        "测试网站已经启动。",
+        "使用第一版真实 web_read 入口。"
+      ],
+      "action": "分别读取 /images/direct.png 和 /images/direct.jpg。记录网址、状态、类型、字节数及交接入口；有尺寸信息时一并记录。",
+      "expected_result": "工具识别图片并返回可用资源地址，准确说明内容未读取。第一版不要求 OCR 或视觉理解。",
+      "oracle": {
+        "fixture": "Pillow 确认返回的样本分别为有效 PNG 和 JPEG。",
+        "product": "核对真实 iOS 元数据和交接。图片可以解码不能证明 OCR 能力。"
+      },
+      "applicable_layers": [
+        "fixture_selfcheck",
+        "ios_product",
+        "agent_e2e"
+      ],
+      "layer_requirement": {
+        "fixture_selfcheck": "required",
+        "ios_product": "mandatory_boundary",
+        "agent_e2e": "grouped_representative_evidence"
+      },
+      "execution_status": "partially_executed",
+      "spec_rules": [
+        "C1",
+        "F3",
+        "W3"
+      ],
+      "title": "直接 PNG 和 JPEG 的资源交接",
+      "execution_group": "G10",
+      "agent_query_refs": [
+        "Q05"
+      ],
+      "execution_policy": "产品层按本案例判据执行全部必测变体；Agent 层由关联代表查询或 G20 后续查询取证，不逐案例重复完整查询。",
+      "first_five_simulator_evidence": {
+        "reference": "../evidence/first-five-simulator-20261002/README.md",
+        "scope": "仅对应本轮报告中明确观察的产品/Agent判据，未执行的变体和层级不自动通过。"
+      }
+    },
+    {
+      "id": "image-direct-png-jpeg",
+      "category": "images",
+      "classification": "content_capability_optional",
+      "preconditions": [
+        "测试网站已经启动。",
+        "图片理解或 OCR 已启用并纳入范围时，执行内容验收。"
+      ],
+      "action": "读取 /images/direct.png 和 /images/direct.jpg。回答哪种方案价格为39，哪种为99。",
+      "expected_result": "支持的路线实际理解两张视觉表格。不支持时说明限制，不宣称已经读取价格。",
+      "oracle": {
+        "fixture": "PNG 和 JPEG 均为960×420。视觉事实为 Basic=39、Pro=99。",
+        "product": "核对方案与价格确实来自图片。仅返回图片网址或数字命中不能通过。"
+      },
+      "applicable_layers": [
+        "fixture_selfcheck",
+        "ios_product",
+        "agent_e2e"
+      ],
+      "layer_requirement": {
+        "fixture_selfcheck": "required",
+        "ios_product": "optional_capability",
+        "agent_e2e": "optional_capability"
+      },
+      "execution_status": "partially_executed",
+      "spec_rules": [
+        "C1",
+        "F3",
+        "W3"
+      ],
+      "title": "直接图片中的价格",
+      "execution_group": "future_content_capabilities",
+      "agent_query_refs": [],
+      "execution_policy": "对应能力纳入范围后再验收；当前不执行本案例内容要求。",
+      "first_five_simulator_evidence": {
+        "reference": "../evidence/first-five-simulator-20261002/README.md",
+        "scope": "仅对应本轮报告中明确观察的产品/Agent判据，未执行的变体和层级不自动通过。"
+      }
+    },
+    {
+      "id": "image-html-mixed-content",
+      "category": "images",
+      "classification": "content_capability_optional",
+      "preconditions": [
+        "测试网站已经启动。",
+        "HTML 和图片处理能力已纳入范围时，执行内容验收。"
+      ],
+      "action": "读取 /images/mixed.html。使用其中的 PNG、JPEG 和图表回答依赖图片的问题。",
+      "expected_result": "工具区分 HTML 文字与需要图片理解的事实。回答引用对应图片资源。",
+      "oracle": {
+        "fixture": "HTML 含固定文字标记，并引用3个格式真实的本地资源。",
+        "product": "核对文字与图片证据分别明确，事实对应正确资源。地址可访问不能证明内容理解。"
+      },
+      "applicable_layers": [
+        "fixture_selfcheck",
+        "ios_product",
+        "agent_e2e"
+      ],
+      "layer_requirement": {
+        "fixture_selfcheck": "required",
+        "ios_product": "optional_capability",
+        "agent_e2e": "optional_capability"
+      },
+      "execution_status": "not_executed",
+      "spec_rules": [
+        "C1",
+        "F3",
+        "W3"
+      ],
+      "title": "HTML 与多种图片混合",
+      "execution_group": "future_content_capabilities",
+      "agent_query_refs": [],
+      "execution_policy": "对应能力纳入范围后再验收；当前不执行本案例内容要求。"
+    },
+    {
+      "id": "image-relative-src",
+      "category": "images",
+      "classification": "boundary_mandatory",
+      "preconditions": [
+        "测试网站已经启动。"
+      ],
+      "action": "读取 /images/relative/page.html。基于最终页面网址解析 ../assets/price-table.png。",
+      "expected_result": "资源解析为 /images/assets/price-table.png，并保留其与页面的关系。",
+      "oracle": {
+        "fixture": "该精确路由返回可解码 PNG。",
+        "product": "核对实际解析或请求的地址，以及工具结果中的来源关联。"
+      },
+      "applicable_layers": [
+        "fixture_selfcheck",
+        "ios_product",
+        "agent_e2e"
+      ],
+      "layer_requirement": {
+        "fixture_selfcheck": "required",
+        "ios_product": "mandatory_boundary",
+        "agent_e2e": "grouped_representative_evidence"
+      },
+      "execution_status": "partially_executed",
+      "spec_rules": [
+        "C1",
+        "F3",
+        "W3"
+      ],
+      "title": "相对图片地址",
+      "execution_group": "G10",
+      "agent_query_refs": [
+        "Q05"
+      ],
+      "execution_policy": "产品层按本案例判据执行全部必测变体；Agent 层由关联代表查询或 G20 后续查询取证，不逐案例重复完整查询。",
+      "first_five_simulator_evidence": {
+        "reference": "../evidence/first-five-simulator-20261002/README.md",
+        "scope": "仅对应本轮报告中明确观察的产品/Agent判据，未执行的变体和层级不自动通过。"
+      }
+    },
+    {
+      "id": "image-multiple-resources",
+      "category": "images",
+      "classification": "content_capability_optional",
+      "preconditions": [
+        "测试网站已经启动。",
+        "多图片处理能力已纳入范围时，执行内容验收。"
+      ],
+      "action": "读取 /images/multiple.html。分别报告价格表和图表事实，并引用各自图片。",
+      "expected_result": "工具保留图片顺序和来源关系，不混合无关图片中的事实。",
+      "oracle": {
+        "fixture": "页面引用独立价格表和图表，两者各有固定事实。",
+        "product": "逐项将回答与来源图片比较。图片网址数量不能单独证明关联正确。"
+      },
+      "applicable_layers": [
+        "fixture_selfcheck",
+        "ios_product",
+        "agent_e2e"
+      ],
+      "layer_requirement": {
+        "fixture_selfcheck": "required",
+        "ios_product": "optional_capability",
+        "agent_e2e": "optional_capability"
+      },
+      "execution_status": "not_executed",
+      "spec_rules": [
+        "C1",
+        "F3",
+        "W3"
+      ],
+      "title": "多图片的事实对应",
+      "execution_group": "future_content_capabilities",
+      "agent_query_refs": [],
+      "execution_policy": "对应能力纳入范围后再验收；当前不执行本案例内容要求。"
+    },
+    {
+      "id": "image-delayed-lazy-resource",
+      "category": "images",
+      "classification": "content_capability_optional",
+      "preconditions": [
+        "测试网站已经启动。",
+        "JavaScript 渲染及对应图片能力已纳入范围时，执行内容验收。"
+      ],
+      "action": "读取 /images/lazy.html。在产品正文就绪预算内观察脚本插入的图片。",
+      "expected_result": "工具在预算内取得延迟资源，或明确说明部分及不可用状态，不无限等待。",
+      "oracle": {
+        "fixture": "页面在1.2秒后插入 /images/assets/sales-chart.png，该图片可独立解码。",
+        "product": "核对 iOS 耗时、最终 DOM 和资源状态，以及部分结果说明。"
+      },
+      "applicable_layers": [
+        "fixture_selfcheck",
+        "ios_product",
+        "agent_e2e"
+      ],
+      "layer_requirement": {
+        "fixture_selfcheck": "required",
+        "ios_product": "optional_capability",
+        "agent_e2e": "optional_capability"
+      },
+      "execution_status": "not_executed",
+      "spec_rules": [
+        "C1",
+        "F3",
+        "W3"
+      ],
+      "title": "延迟插入的图片资源",
+      "execution_group": "future_content_capabilities",
+      "agent_query_refs": [],
+      "execution_policy": "对应能力纳入范围后再验收；当前不执行本案例内容要求。"
+    },
+    {
+      "id": "image-broken-resource",
+      "category": "images",
+      "classification": "boundary_mandatory",
+      "preconditions": [
+        "测试网站已经启动。"
+      ],
+      "action": "读取 /images/broken.html，并记录其图片资源的404响应。",
+      "expected_result": "工具说明缺失图片或图片事实不可用，不宣称图片已经读取。",
+      "oracle": {
+        "fixture": "页面引用 /images/missing.png，该路由返回404。",
+        "product": "核对真实失败响应和用户可见限制。附近文字不能代替图片证据。"
+      },
+      "applicable_layers": [
+        "fixture_selfcheck",
+        "ios_product",
+        "agent_e2e"
+      ],
+      "layer_requirement": {
+        "fixture_selfcheck": "required",
+        "ios_product": "mandatory_boundary",
+        "agent_e2e": "grouped_representative_evidence"
+      },
+      "execution_status": "not_executed",
+      "spec_rules": [
+        "C1",
+        "F3",
+        "W3"
+      ],
+      "title": "缺失图片资源",
+      "execution_group": "G10",
+      "agent_query_refs": [
+        "Q05"
+      ],
+      "execution_policy": "产品层按本案例判据执行全部必测变体；Agent 层由关联代表查询或 G20 后续查询取证，不逐案例重复完整查询。"
+    },
+    {
+      "id": "image-misleading-alt-text",
+      "category": "images",
+      "classification": "boundary_mandatory",
+      "preconditions": [
+        "测试网站已经启动。",
+        "测试实际图片路线；第一版未支持理解时检查限制说明。"
+      ],
+      "action": "读取 /images/misleading-alt.html。依据图片回答方案和价格。",
+      "expected_result": "工具不把 alt=Monthly report 作为图片数据。视觉事实实际读取后返回，否则说明不可用。",
+      "oracle": {
+        "fixture": "alt 与视觉内容不一致。图片显示 Basic=39、Pro=99 和 IMAGE-FACT-END-617A。",
+        "product": "核对正确视觉对应，或明确能力限制。alt 或关键词命中不能证明视觉读取。"
+      },
+      "applicable_layers": [
+        "fixture_selfcheck",
+        "ios_product",
+        "agent_e2e"
+      ],
+      "layer_requirement": {
+        "fixture_selfcheck": "required",
+        "ios_product": "mandatory_boundary",
+        "agent_e2e": "grouped_representative_evidence"
+      },
+      "execution_status": "partially_executed",
+      "spec_rules": [
+        "C1",
+        "F3",
+        "W3"
+      ],
+      "title": "图片 alt 文本不能代替视觉数据",
+      "execution_group": "G10",
+      "agent_query_refs": [
+        "Q05"
+      ],
+      "execution_policy": "产品层按本案例判据执行全部必测变体；Agent 层由关联代表查询或 G20 后续查询取证，不逐案例重复完整查询。",
+      "first_five_simulator_evidence": {
+        "reference": "../evidence/first-five-simulator-20261002/README.md",
+        "scope": "仅对应本轮报告中明确观察的产品/Agent判据，未执行的变体和层级不自动通过。"
+      }
+    },
+    {
+      "id": "auth-401-anonymous",
+      "category": "authentication",
+      "classification": "boundary_mandatory",
+      "preconditions": [
+        "测试网站已经启动。",
+        "不提供 Cookie 或账号凭据。"
+      ],
+      "action": "匿名读取 /auth/private。",
+      "expected_result": "工具保留401及登录要求，结果不含私人标记。",
+      "oracle": {
+        "fixture": "匿名响应为401 AUTH-REQUIRED-401。独立模拟登录请求可取得 PRIVATE-MARKER-A7C4。",
+        "product": "核对状态、最终网址、结果和请求身份。仅缺少私人标记不足以证明身份隔离。"
+      },
+      "applicable_layers": [
+        "fixture_selfcheck",
+        "ios_product",
+        "agent_e2e"
+      ],
+      "layer_requirement": {
+        "fixture_selfcheck": "required",
+        "ios_product": "mandatory_boundary",
+        "agent_e2e": "grouped_representative_evidence"
+      },
+      "execution_status": "partially_executed",
+      "spec_rules": [
+        "F3",
+        "I1",
+        "I2"
+      ],
+      "title": "匿名请求返回401",
+      "execution_group": "G11",
+      "agent_query_refs": [
+        "Q04"
+      ],
+      "execution_policy": "产品层按本案例判据执行全部必测变体；Agent 层由关联代表查询或 G20 后续查询取证，不逐案例重复完整查询。",
+      "first_five_simulator_evidence": {
+        "reference": "../evidence/first-five-simulator-20261002/README.md",
+        "scope": "仅对应本轮报告中明确观察的产品/Agent判据，未执行的变体和层级不自动通过。"
+      }
+    },
+    {
+      "id": "auth-403-denied",
+      "category": "authentication",
+      "classification": "boundary_mandatory",
+      "preconditions": [
+        "测试网站已经启动。"
+      ],
+      "action": "读取 /auth/403。",
+      "expected_result": "工具区分访问拒绝与正常正文，不宣称已经取得受限内容。",
+      "oracle": {
+        "fixture": "路由返回403和 ACCESS-DENIED-403。",
+        "product": "核对工具及会话保留拒绝状态，回答没有无依据事实。"
+      },
+      "applicable_layers": [
+        "fixture_selfcheck",
+        "ios_product",
+        "agent_e2e"
+      ],
+      "layer_requirement": {
+        "fixture_selfcheck": "required",
+        "ios_product": "mandatory_boundary",
+        "agent_e2e": "grouped_representative_evidence"
+      },
+      "execution_status": "partially_executed",
+      "spec_rules": [
+        "F3",
+        "I1",
+        "I2"
+      ],
+      "title": "访问拒绝返回403",
+      "execution_group": "G11",
+      "agent_query_refs": [
+        "Q04"
+      ],
+      "execution_policy": "产品层按本案例判据执行全部必测变体；Agent 层由关联代表查询或 G20 后续查询取证，不逐案例重复完整查询。",
+      "first_five_simulator_evidence": {
+        "reference": "../evidence/first-five-simulator-20261002/README.md",
+        "scope": "仅对应本轮报告中明确观察的产品/Agent判据，未执行的变体和层级不自动通过。"
+      }
+    },
+    {
+      "id": "auth-200-login-form",
+      "category": "authentication",
+      "classification": "boundary_mandatory",
+      "preconditions": [
+        "测试网站已经启动。"
+      ],
+      "action": "读取 /auth/form。该响应为200，但内容为登录表单。",
+      "expected_result": "工具说明登录限制，不将表单作为目标文章。",
+      "oracle": {
+        "fixture": "HTML 包含用户名及密码控件，没有私人正文标记。",
+        "product": "核对实际返回状态是登录页或受限内容。200状态和表单关键词不能单独证明处理正确。"
+      },
+      "applicable_layers": [
+        "fixture_selfcheck",
+        "ios_product",
+        "agent_e2e"
+      ],
+      "layer_requirement": {
+        "fixture_selfcheck": "required",
+        "ios_product": "mandatory_boundary",
+        "agent_e2e": "grouped_representative_evidence"
+      },
+      "execution_status": "partially_executed",
+      "spec_rules": [
+        "F3",
+        "I1",
+        "I2"
+      ],
+      "title": "HTTP 200 返回登录表单",
+      "execution_group": "G11",
+      "agent_query_refs": [
+        "Q04"
+      ],
+      "execution_policy": "产品层按本案例判据执行全部必测变体；Agent 层由关联代表查询或 G20 后续查询取证，不逐案例重复完整查询。",
+      "first_five_simulator_evidence": {
+        "reference": "../evidence/first-five-simulator-20261002/README.md",
+        "scope": "仅对应本轮报告中明确观察的产品/Agent判据，未执行的变体和层级不自动通过。"
+      }
+    },
+    {
+      "id": "auth-redirect-to-login",
+      "category": "authentication",
+      "classification": "boundary_mandatory",
+      "preconditions": [
+        "测试网站已经启动。",
+        "不提供凭据。"
+      ],
+      "action": "分别读取 /auth/redirect 和 /auth/restricted-redirect。记录跳转链、最终网址及状态。",
+      "expected_result": "前者到达200登录表单，后者到达401受保护路由。工具不将登录内容误作目标正文。",
+      "oracle": {
+        "fixture": "两个跳转目标固定，状态和内容不同。",
+        "product": "核对 iOS 初始与最终网址、状态及限制说明。"
+      },
+      "applicable_layers": [
+        "fixture_selfcheck",
+        "ios_product",
+        "agent_e2e"
+      ],
+      "layer_requirement": {
+        "fixture_selfcheck": "required",
+        "ios_product": "mandatory_boundary",
+        "agent_e2e": "grouped_representative_evidence"
+      },
+      "execution_status": "partially_executed",
+      "spec_rules": [
+        "F3",
+        "I1",
+        "I2"
+      ],
+      "title": "跳转到登录页或受限页",
+      "execution_group": "G11",
+      "agent_query_refs": [
+        "Q04"
+      ],
+      "execution_policy": "产品层按本案例判据执行全部必测变体；Agent 层由关联代表查询或 G20 后续查询取证，不逐案例重复完整查询。",
+      "first_five_simulator_evidence": {
+        "reference": "../evidence/first-five-simulator-20261002/README.md",
+        "scope": "仅对应本轮报告中明确观察的产品/Agent判据，未执行的变体和层级不自动通过。"
+      }
+    },
+    {
+      "id": "auth-public-plus-restricted",
+      "category": "authentication",
+      "classification": "boundary_mandatory",
+      "preconditions": [
+        "测试网站已经启动。",
+        "不向匿名读取工具提供凭据。"
+      ],
+      "action": "读取 /auth/mixed。仅按产品公开的处理规则访问其中受限链接。",
+      "expected_result": "公开正文可以作为证据，受限详情明确不可用。公开访问不等于取得详情。",
+      "oracle": {
+        "fixture": "页面含 PUBLIC-MARKER-5B31，并链接到匿名返回401的 /auth/private。",
+        "product": "核对回答仅依据已取得公开内容，并单独记录受限页面状态。"
+      },
+      "applicable_layers": [
+        "fixture_selfcheck",
+        "ios_product",
+        "agent_e2e"
+      ],
+      "layer_requirement": {
+        "fixture_selfcheck": "required",
+        "ios_product": "mandatory_boundary",
+        "agent_e2e": "grouped_representative_evidence"
+      },
+      "execution_status": "not_executed",
+      "spec_rules": [
+        "F3",
+        "I1",
+        "I2"
+      ],
+      "title": "公开内容链接到受限详情",
+      "execution_group": "G11",
+      "agent_query_refs": [
+        "Q04"
+      ],
+      "execution_policy": "产品层按本案例判据执行全部必测变体；Agent 层由关联代表查询或 G20 后续查询取证，不逐案例重复完整查询。"
+    },
+    {
+      "id": "isolation-shared-browser-to-anonymous-http",
+      "category": "credential_isolation",
+      "classification": "product_specific_mandatory",
+      "preconditions": [
+        "只使用本地 TEST-COOKIE-7F91。",
+        "既有浏览器先访问 /auth/grant。",
+        "真实匿名 HTTP 请求可以观察。"
+      ],
+      "action": "确认浏览器可读取 /auth/private。用 web_read 读取同一网址，比较请求头、存储及响应。",
+      "expected_result": "浏览器可取得 PRIVATE-MARKER-A7C4，匿名 HTTP 仍返回401。匿名请求不继承或复制浏览器 Cookie。",
+      "oracle": {
+        "fixture": "模拟 Cookie 请求取得私人标记，独立无 Cookie 请求返回401。",
+        "product": "保存 iOS 独立存储及请求证据，再核对不同响应。网站自检不能证明产品隔离。"
+      },
+      "applicable_layers": [
+        "fixture_selfcheck",
+        "ios_product",
+        "agent_e2e"
+      ],
+      "layer_requirement": {
+        "fixture_selfcheck": "required_support",
+        "ios_product": "mandatory_product",
+        "agent_e2e": "grouped_representative_evidence"
+      },
+      "execution_status": "partially_executed",
+      "spec_rules": [
+        "I1",
+        "I2",
+        "I3"
+      ],
+      "title": "浏览器登录不进入匿名 HTTP",
+      "execution_group": "G12",
+      "agent_query_refs": [
+        "Q04"
+      ],
+      "execution_policy": "产品层按本案例判据执行全部必测变体；Agent 层由关联代表查询或 G20 后续查询取证，不逐案例重复完整查询。",
+      "first_five_simulator_evidence": {
+        "reference": "../evidence/first-five-simulator-20261002/README.md",
+        "scope": "仅对应本轮报告中明确观察的产品/Agent判据，未执行的变体和层级不自动通过。"
+      }
+    },
+    {
+      "id": "isolation-internal-webkit",
+      "category": "credential_isolation",
+      "classification": "product_specific_mandatory",
+      "preconditions": [
+        "模拟 Cookie 只存入既有浏览器。",
+        "可以观察内部 WebKit 的存储配置和请求。"
+      ],
+      "action": "通过产品内部 WebKit 读取 /auth/private。检查实际请求和结果。",
+      "expected_result": "匿名 WebKit 返回401，不复制共享浏览器凭据。web_read 登录能力仍不在第一版范围。",
+      "oracle": {
+        "fixture": "固定模拟 Cookie 和私人标记区分登录及匿名请求。",
+        "product": "保存 iOS WebKit 配置及请求证据，确认没有共享 Cookie，也无法取得私人标记。"
+      },
+      "applicable_layers": [
+        "fixture_selfcheck",
+        "ios_product",
+        "agent_e2e"
+      ],
+      "layer_requirement": {
+        "fixture_selfcheck": "required_support",
+        "ios_product": "mandatory_product",
+        "agent_e2e": "grouped_representative_evidence"
+      },
+      "execution_status": "partially_executed",
+      "spec_rules": [
+        "I1",
+        "I2",
+        "I3"
+      ],
+      "title": "浏览器登录不进入匿名 WebKit",
+      "execution_group": "G12",
+      "agent_query_refs": [
+        "Q04"
+      ],
+      "execution_policy": "产品层按本案例判据执行全部必测变体；Agent 层由关联代表查询或 G20 后续查询取证，不逐案例重复完整查询。",
+      "first_five_simulator_evidence": {
+        "reference": "../evidence/first-five-simulator-20261002/README.md",
+        "scope": "仅对应本轮报告中明确观察的产品/Agent判据，未执行的变体和层级不自动通过。"
+      }
+    },
+    {
+      "id": "isolation-cross-session-cache",
+      "category": "credential_isolation",
+      "classification": "product_specific_mandatory",
+      "preconditions": [
+        "准备两个独立 MinisX 聊天。",
+        "测试响应 Cache-Control 为 no-store。"
+      ],
+      "action": "A 的请求 A1 读取 /long/html 并取得正文编号。在 A1、聊天 B、后续请求 A2 和身份 revision 改变后分别使用该编号。",
+      "expected_result": "A1 续读返回固定正文。其他聊天、后续请求或新身份使用旧编号时被拒绝。旧缓存和迟到结果不覆盖当前读取。",
+      "oracle": {
+        "fixture": "所有步骤使用同一 /long/html，避免不同网址掩盖全局缓存错误。",
+        "product": "核对编号作用域、请求次数、失效结果及缓存诊断。仅比较不同路由标记不能证明隔离。"
+      },
+      "applicable_layers": [
+        "fixture_selfcheck",
+        "ios_product",
+        "agent_e2e"
+      ],
+      "layer_requirement": {
+        "fixture_selfcheck": "required_support",
+        "ios_product": "mandatory_product",
+        "agent_e2e": "grouped_representative_evidence"
+      },
+      "execution_status": "not_executed",
+      "product_steps_reference": "ios-acceptance.md#同网址正文编号与身份作用域",
+      "spec_rules": [
+        "I1",
+        "I2",
+        "I3"
+      ],
+      "title": "同网址的正文编号作用域",
+      "execution_group": "G13",
+      "agent_query_refs": [
+        "Q02"
+      ],
+      "execution_policy": "产品层按本案例判据执行全部必测变体；Agent 层由关联代表查询或 G20 后续查询取证，不逐案例重复完整查询。"
+    },
+    {
+      "id": "isolation-no-cookie-backup-or-sensitive-logs",
+      "category": "credential_isolation",
+      "classification": "product_specific_mandatory",
+      "preconditions": [
+        "只使用本地合成 Cookie。",
+        "可以只读检查 iOS 诊断、导出及数据容器。"
+      ],
+      "action": "浏览器访问 /auth/grant 后执行匿名读取。审计 web_read 自有状态、缓存、日志、导出及备份，再确认浏览器登录。",
+      "expected_result": "web_read 自有存储没有复制共享凭据。既有受保护浏览器登录及凭据保存保持原行为。",
+      "oracle": {
+        "fixture": "测试网站关闭访问日志，只提供合成值。",
+        "product": "审计范围限定 web_read，同时确认浏览器仍然登录。既有浏览器凭据存储不能被误判为读取泄漏。"
+      },
+      "applicable_layers": [
+        "fixture_selfcheck",
+        "ios_product",
+        "agent_e2e"
+      ],
+      "layer_requirement": {
+        "fixture_selfcheck": "required_support",
+        "ios_product": "mandatory_product",
+        "agent_e2e": "grouped_representative_evidence"
+      },
+      "execution_status": "not_executed",
+      "spec_rules": [
+        "I1",
+        "I2",
+        "I3"
+      ],
+      "title": "新读取服务不复制凭据到日志或备份",
+      "execution_group": "G12",
+      "agent_query_refs": [
+        "Q04"
+      ],
+      "execution_policy": "产品层按本案例判据执行全部必测变体；Agent 层由关联代表查询或 G20 后续查询取证，不逐案例重复完整查询。"
+    },
+    {
+      "id": "content-partial-targeted-continuation",
+      "category": "content_reading",
+      "classification": "product_specific_mandatory",
+      "preconditions": [
+        "测试网站已经启动。",
+        "真实工具提供部分状态及目标补充入口。"
+      ],
+      "action": "在 /partial 的900毫秒插入完成前读取。识别缺失目标后，明确请求补充对应段落。",
+      "expected_result": "首次说明部分可读。补充在预算内取得 TARGETED-CONTINUATION-8E3，或报告超时，不隐式替换来源。",
+      "oracle": {
+        "fixture": "早期 HTML 含 EARLY-PARTIAL-BODY-19E3，脚本900毫秒后插入目标。",
+        "product": "核对两次工具输出、最终网址、耗时和补充上限。下载源码中有标记不能证明渲染已读取。"
+      },
+      "applicable_layers": [
+        "fixture_selfcheck",
+        "ios_product",
+        "agent_e2e"
+      ],
+      "layer_requirement": {
+        "fixture_selfcheck": "required_support",
+        "ios_product": "mandatory_product",
+        "agent_e2e": "grouped_representative_evidence"
+      },
+      "execution_status": "partially_executed",
+      "spec_rules": [
+        "C2",
+        "C3",
+        "C4",
+        "F1",
+        "F2"
+      ],
+      "title": "局部动态正文的补充",
+      "execution_group": "G03",
+      "agent_query_refs": [
+        "Q02"
+      ],
+      "execution_policy": "产品层按本案例判据执行全部必测变体；Agent 层由关联代表查询或 G20 后续查询取证，不逐案例重复完整查询。",
+      "first_five_simulator_evidence": {
+        "reference": "../evidence/first-five-simulator-20261002/README.md",
+        "scope": "仅对应本轮报告中明确观察的产品/Agent判据，未执行的变体和层级不自动通过。"
+      },
+      "first_five_fix_evidence": {
+        "reference": "../evidence/first-five-fixes-20261002/README.md",
+        "scope": "Loading范围、busy状态及HTML/readiness同快照修复；最终动态样本两次各1web_read、约4秒，目标正确。 仅明确覆盖判据有证据，其他变体不自动通过。"
+      }
+    },
+    {
+      "id": "content-long-output-tail-preserved",
+      "category": "content_reading",
+      "classification": "product_specific_mandatory",
+      "preconditions": [
+        "测试网站已经启动。",
+        "可以完整保存用户及模型可见工具结果。"
+      ],
+      "action": "读取 /long/html，用 fixture_value() 和 END-READ-MARKER-90631 定位。核对跨标签标识符、最终片段、实际长度和编号续读。",
+      "expected_result": "工具重建尾部标识符，并通过结果或有上限的续读提供目标上下文。截断说明与最终输出一致。",
+      "oracle": {
+        "fixture": "长文超过短预览，尾标记位于大量段落、表格和代码之后。",
+        "product": "检查最终模型输入，不只检查提取缓冲区。只有标记但长度或截断错误时不能通过。"
+      },
+      "applicable_layers": [
+        "fixture_selfcheck",
+        "ios_product",
+        "agent_e2e"
+      ],
+      "layer_requirement": {
+        "fixture_selfcheck": "required_support",
+        "ios_product": "mandatory_product",
+        "agent_e2e": "grouped_representative_evidence"
+      },
+      "execution_status": "partially_executed",
+      "product_steps_reference": "ios-acceptance.md#长文未命中与未覆盖",
+      "spec_rules": [
+        "C2",
+        "C3",
+        "C4",
+        "F1",
+        "F2"
+      ],
+      "title": "长文尾部送达最终模型输入",
+      "execution_group": "G07",
+      "agent_query_refs": [
+        "Q02"
+      ],
+      "execution_policy": "产品层按本案例判据执行全部必测变体；Agent 层由关联代表查询或 G20 后续查询取证，不逐案例重复完整查询。",
+      "first_five_simulator_evidence": {
+        "reference": "../evidence/first-five-simulator-20261002/README.md",
+        "scope": "仅对应本轮报告中明确观察的产品/Agent判据，未执行的变体和层级不自动通过。"
+      }
+    },
+    {
+      "id": "content-code-table-structure",
+      "category": "content_reading",
+      "classification": "boundary_mandatory",
+      "preconditions": [
+        "测试网站已经启动。",
+        "结构化提取属于支持路线。"
+      ],
+      "action": "读取 /long/html，回答表格中的方案价格及 fixture_value() 返回值。",
+      "expected_result": "行列及代码可以区分，Basic=39、Pro=99 对应准确。页眉页脚不混入正文事实。",
+      "oracle": {
+        "fixture": "HTML 含表格、pre/code 和独立页眉页脚噪声。",
+        "product": "核对行列、代码边界和来源段落。孤立关键词命中不能通过。"
+      },
+      "applicable_layers": [
+        "fixture_selfcheck",
+        "ios_product",
+        "agent_e2e"
+      ],
+      "layer_requirement": {
+        "fixture_selfcheck": "required",
+        "ios_product": "mandatory_boundary",
+        "agent_e2e": "grouped_representative_evidence"
+      },
+      "execution_status": "partially_executed",
+      "spec_rules": [
+        "C2",
+        "C3",
+        "C4",
+        "F1",
+        "F2"
+      ],
+      "title": "代码及表格结构",
+      "execution_group": "G01",
+      "agent_query_refs": [
+        "Q01",
+        "Q02"
+      ],
+      "execution_policy": "产品层按本案例判据执行全部必测变体；Agent 层由关联代表查询或 G20 后续查询取证，不逐案例重复完整查询。",
+      "first_five_simulator_evidence": {
+        "reference": "../evidence/first-five-simulator-20261002/README.md",
+        "scope": "仅对应本轮报告中明确观察的产品/Agent判据，未执行的变体和层级不自动通过。"
+      },
+      "first_five_fix_evidence": {
+        "reference": "../evidence/first-five-fixes-20261002/README.md",
+        "scope": "合并单元格、标题、单元格次序及有界降级修复，47项套件通过。 仅明确覆盖判据有证据，其他变体不自动通过。"
+      }
+    },
+    {
+      "id": "content-public-markdown-fallback",
+      "category": "content_reading",
+      "classification": "boundary_mandatory",
+      "preconditions": [
+        "测试网站已经启动。",
+        "备用来源范围限定为同源公开 Markdown。"
+      ],
+      "action": "读取 /long/html 并判断缺失范围。产品规则允许且正文不足时，读取明确链接的 /long/public.md。",
+      "expected_result": "工具在预算内使用摘录并保留对应表格和代码。结果说明摘录不能替代完整长文；未使用时保留 HTML 部分状态。",
+      "oracle": {
+        "fixture": "链接明确标注摘录，事实与 HTML 一致，来源标记为 MARKDOWN-EXCERPT-END-4C2D。",
+        "product": "核对实际请求链、最终来源和事实关系。请求发出或标记命中不能证明补充成功。"
+      },
+      "applicable_layers": [
+        "fixture_selfcheck",
+        "ios_product",
+        "agent_e2e"
+      ],
+      "layer_requirement": {
+        "fixture_selfcheck": "required",
+        "ios_product": "mandatory_boundary",
+        "agent_e2e": "grouped_representative_evidence"
+      },
+      "execution_status": "partially_executed",
+      "spec_rules": [
+        "C2",
+        "C3",
+        "C4",
+        "F1",
+        "F2"
+      ],
+      "title": "明确声明的公开 Markdown 摘录",
+      "execution_group": "G02",
+      "agent_query_refs": [
+        "Q01",
+        "Q02"
+      ],
+      "execution_policy": "产品层按本案例判据执行全部必测变体；Agent 层由关联代表查询或 G20 后续查询取证，不逐案例重复完整查询。",
+      "first_five_simulator_evidence": {
+        "reference": "../evidence/first-five-simulator-20261002/README.md",
+        "scope": "仅对应本轮报告中明确观察的产品/Agent判据，未执行的变体和层级不自动通过。"
+      }
+    },
+    {
+      "id": "resource-slow-main-response",
+      "category": "resource_lifecycle",
+      "classification": "boundary_mandatory",
+      "preconditions": [
+        "测试网站已经启动。",
+        "记录产品请求超时配置。"
+      ],
+      "action": "读取 /slow-main?ms=1800。分别记录请求开始、响应完成、工具完成及最终回答时刻。",
+      "expected_result": "时间记录包含服务器主动等待，不报告零耗时。调用在产品总预算内结束。",
+      "oracle": {
+        "fixture": "路由最长等待5秒，返回 SLOW-MAIN-MARKER-3D26。",
+        "product": "比较 iOS 请求与 Agent 阶段时刻。单一总时间不能归因各阶段等待。"
+      },
+      "applicable_layers": [
+        "fixture_selfcheck",
+        "ios_product",
+        "agent_e2e"
+      ],
+      "layer_requirement": {
+        "fixture_selfcheck": "required",
+        "ios_product": "mandatory_boundary",
+        "agent_e2e": "grouped_representative_evidence"
+      },
+      "execution_status": "not_executed",
+      "spec_rules": [
+        "R1",
+        "R2",
+        "R3",
+        "R4"
+      ],
+      "title": "主响应延迟的阶段计时",
+      "execution_group": "G15",
+      "agent_query_refs": [],
+      "execution_policy": "产品层按本案例判据执行全部必测变体；Agent 层由关联代表查询或 G20 后续查询取证，不逐案例重复完整查询。"
+    },
+    {
+      "id": "resource-body-before-slow-subresource",
+      "category": "resource_lifecycle",
+      "classification": "product_specific_mandatory",
+      "preconditions": [
+        "测试网站已经启动。",
+        "可以观察真实 iOS WebKit 生命周期。"
+      ],
+      "action": "读取 /slow-resource-page，比较正文可读时刻和 /hang-resource 完成时刻。",
+      "expected_result": "工具在策略允许时先返回正文，页面加载仍受总时限约束。",
+      "oracle": {
+        "fixture": "主 HTML 立即返回，装饰资源最长等待4.5秒。",
+        "product": "保存 iOS 就绪事件及最终输出。macOS 或 Python HTTP 计时不能证明产品提前返回。"
+      },
+      "applicable_layers": [
+        "fixture_selfcheck",
+        "ios_product",
+        "agent_e2e"
+      ],
+      "layer_requirement": {
+        "fixture_selfcheck": "required_support",
+        "ios_product": "mandatory_product",
+        "agent_e2e": "grouped_representative_evidence"
+      },
+      "execution_status": "not_executed",
+      "spec_rules": [
+        "R1",
+        "R2",
+        "R3",
+        "R4"
+      ],
+      "title": "正文先于装饰资源就绪",
+      "execution_group": "G04",
+      "agent_query_refs": [
+        "Q01"
+      ],
+      "execution_policy": "产品层按本案例判据执行全部必测变体；Agent 层由关联代表查询或 G20 后续查询取证，不逐案例重复完整查询。"
+    },
+    {
+      "id": "resource-timeout-status",
+      "category": "resource_lifecycle",
+      "classification": "boundary_mandatory",
+      "preconditions": [
+        "测试网站已经启动。",
+        "产品超时小于 /timeout 的4.8秒延迟。"
+      ],
+      "action": "读取 /timeout。记录超时后请求 /health。",
+      "expected_result": "工具返回有界超时或部分状态，后续请求仍可完成。",
+      "oracle": {
+        "fixture": "/timeout 延迟4.8秒，/health 立即响应。",
+        "product": "核对 iOS 请求取消、资源释放及后续请求。仅耗时达标不能证明释放。"
+      },
+      "applicable_layers": [
+        "fixture_selfcheck",
+        "ios_product",
+        "agent_e2e"
+      ],
+      "layer_requirement": {
+        "fixture_selfcheck": "required",
+        "ios_product": "mandatory_boundary",
+        "agent_e2e": "grouped_representative_evidence"
+      },
+      "execution_status": "not_executed",
+      "spec_rules": [
+        "R1",
+        "R2",
+        "R3",
+        "R4"
+      ],
+      "title": "超时状态及后续可用性",
+      "execution_group": "G15",
+      "agent_query_refs": [],
+      "execution_policy": "产品层按本案例判据执行全部必测变体；Agent 层由关联代表查询或 G20 后续查询取证，不逐案例重复完整查询。"
+    },
+    {
+      "id": "resource-stop-releases-work",
+      "category": "resource_lifecycle",
+      "classification": "product_specific_mandatory",
+      "preconditions": [
+        "测试网站已经启动。",
+        "可以在真实产品中停止读取并观察阶段。"
+      ],
+      "action": "按专项矩阵，分别在排队、HTTP、备用、渲染、提取及并发批次进入后执行 Stop。同一矩阵另行删除会话和注入异常，再释放迟到回调并执行正常读取。",
+      "expected_result": "规定范围的任务和等待实际结束，调用只结束一次。取消后没有回退、迟到交付或未提交正文编号。删除后旧编号失效；异常后槽位释放，其他聊天继续。",
+      "oracle": {
+        "fixture": "流式路由发送有界512字节块并处理客户端断开，网站并发有上限。",
+        "product": "保存 iOS 取消、请求计数及后续成功证据。界面停止动画不能单独证明清理。"
+      },
+      "applicable_layers": [
+        "fixture_selfcheck",
+        "ios_product",
+        "agent_e2e"
+      ],
+      "layer_requirement": {
+        "fixture_selfcheck": "required_support",
+        "ios_product": "mandatory_product",
+        "agent_e2e": "grouped_representative_evidence"
+      },
+      "execution_status": "not_executed",
+      "product_steps_reference": "ios-acceptance.md#统一截止时间与停止矩阵",
+      "spec_rules": [
+        "R1",
+        "R2",
+        "R3",
+        "R4"
+      ],
+      "cleanup_variants": [
+        "user_stop",
+        "total_deadline",
+        "session_deleted",
+        "phase_exception"
+      ],
+      "title": "各阶段停止、删除和异常清理",
+      "execution_group": "G16",
+      "agent_query_refs": [],
+      "execution_policy": "产品层按本案例判据执行全部必测变体；Agent 层由关联代表查询或 G20 后续查询取证，不逐案例重复完整查询。"
+    },
+    {
+      "id": "resource-concurrent-limit",
+      "category": "resource_lifecycle",
+      "classification": "product_specific_mandatory",
+      "preconditions": [
+        "测试网站并发上限为8线程。",
+        "记录产品自身并发配置。"
+      ],
+      "action": "启动超过产品上限的慢读取。记录在执行任务、队列、限制结果及恢复。",
+      "expected_result": "产品并发保持配置上限，或明确报告容量限制。工作有界，后续请求不会持续饥饿。",
+      "oracle": {
+        "fixture": "网站第9个并发请求可返回503，这只是输入条件。",
+        "product": "测量 iOS 产品任务数及队列。网站线程上限不能证明产品上限。"
+      },
+      "applicable_layers": [
+        "fixture_selfcheck",
+        "ios_product",
+        "agent_e2e"
+      ],
+      "layer_requirement": {
+        "fixture_selfcheck": "required_support",
+        "ios_product": "mandatory_product",
+        "agent_e2e": "grouped_representative_evidence"
+      },
+      "execution_status": "not_executed",
+      "spec_rules": [
+        "R1",
+        "R2",
+        "R3",
+        "R4"
+      ],
+      "title": "读取并发上限",
+      "execution_group": "G14",
+      "agent_query_refs": [],
+      "execution_policy": "产品层按本案例判据执行全部必测变体；Agent 层由关联代表查询或 G20 后续查询取证，不逐案例重复完整查询。"
+    },
+    {
+      "id": "resource-device-lock-screen",
+      "category": "resource_lifecycle",
+      "classification": "product_specific_mandatory",
+      "preconditions": [
+        "准备实体 iPhone。",
+        "产品可以在锁屏前启动真实 Agent 读取。",
+        "应用增强后台运行、实时活动及任务通知均启用。",
+        "系统允许 MinisX 通知及实时活动。",
+        "两组使用相同设备、构建、网络、输入和模型，并观察实际保活状态。"
+      ],
+      "action": "先在前台执行代表查询，再以相同配置重复并记录锁屏时刻。按约定间隔解锁，比较总时间、阶段、结果、取消及资源。",
+      "expected_result": "测试区分持续、暂停、取消和失败。设置启用作为前置事实，效率是否一致由真机证据判定。",
+      "oracle": {
+        "fixture": "有界慢响应可提供固定输入；实体设备另行准备合适连接或受控公开页面。",
+        "product": "保存真机时刻、设置读取值、实际保活、会话结果及释放证据。通知显示、Simulator 或 macOS 探针均不能替代。"
+      },
+      "applicable_layers": [
+        "fixture_selfcheck",
+        "ios_product",
+        "agent_e2e"
+      ],
+      "layer_requirement": {
+        "fixture_selfcheck": "required_support",
+        "ios_product": "mandatory_device",
+        "agent_e2e": "grouped_representative_evidence"
+      },
+      "execution_status": "not_executed",
+      "spec_rules": [
+        "R1",
+        "R2",
+        "R3",
+        "R4"
+      ],
+      "product_steps_reference": "ios-acceptance.md#前台与锁屏对照配置",
+      "title": "真机前台与锁屏对照",
+      "execution_group": "G19",
+      "agent_query_refs": [
+        "Q01",
+        "Q02",
+        "Q03",
+        "Q04",
+        "Q05"
+      ],
+      "execution_policy": "产品层按本案例判据执行全部必测变体；Agent 层由关联代表查询或 G20 后续查询取证，不逐案例重复完整查询。",
+      "first_five_fix_evidence": {
+        "reference": "../evidence/first-five-fixes-20261002/README.md",
+        "scope": "最终高德78.855秒完成，但不单独收费断言仍依据不足；没有整体提速、真机、锁屏及资源结论。 仅明确覆盖判据有证据，其他变体不自动通过。"
+      },
+      "system_prompt_grounding_evidence": {
+        "reference": "../evidence/system-prompt-grounding-20261002/README.md",
+        "observation": "初版两次超时；最终两个完成样本收费未知表述有所改善，但仍有无依据配额断言或数量统计错误，整体未通过。"
+      }
+    },
+    {
+      "id": "agent-real-tool-end-to-end",
+      "category": "agent_acceptance",
+      "classification": "product_specific_mandatory",
+      "preconditions": [
+        "iOS 构建包含真实 web_read。",
+        "准备测试聊天和可访问的测试网站。",
+        "Agent 使用用户已配置并授权的模型。"
+      ],
+      "action": "要求真实 Agent 对照 /images/mixed.html 与静态来源的 Basic/Pro 价格，并引用来源及说明证据缺口。保存完整结果、调用、时间和最终回答。",
+      "expected_result": "Agent 实际调用产品工具，每项支持的事实有对应来源。准确说明图片未读取可通过边界验收，但内容回答仍未完成。",
+      "oracle": {
+        "fixture": "静态及图片路线有各自固定事实，网址仅用于本地测试。",
+        "product": "审阅完整会话及事实对应来源。网站自检、假工具、200或关键词不能替代。准确报告限制时不要求额外模型调用。"
+      },
+      "applicable_layers": [
+        "fixture_selfcheck",
+        "ios_product",
+        "agent_e2e"
+      ],
+      "layer_requirement": {
+        "fixture_selfcheck": "required_support",
+        "ios_product": "mandatory_product",
+        "agent_e2e": "grouped_representative_evidence"
+      },
+      "execution_status": "partially_executed",
+      "product_steps_reference": "ios-acceptance.md#完整-agent-查询",
+      "spec_rules": [
+        "W1",
+        "W2",
+        "W3",
+        "W4",
+        "A1",
+        "A2",
+        "A3"
+      ],
+      "title": "真实 Agent 的完整查询",
+      "execution_group": "G19",
+      "agent_query_refs": [
+        "Q01",
+        "Q02",
+        "Q03",
+        "Q04",
+        "Q05"
+      ],
+      "execution_policy": "产品层按本案例判据执行全部必测变体；Agent 层由关联代表查询或 G20 后续查询取证，不逐案例重复完整查询。",
+      "first_five_simulator_evidence": {
+        "reference": "../evidence/first-five-simulator-20261002/README.md",
+        "scope": "仅对应本轮报告中明确观察的产品/Agent判据，未执行的变体和层级不自动通过。"
+      },
+      "first_five_fix_evidence": {
+        "reference": "../evidence/first-five-fixes-20261002/README.md",
+        "scope": "最终高德78.855秒完成，但不单独收费断言仍依据不足；没有整体提速、真机、锁屏及资源结论。 仅明确覆盖判据有证据，其他变体不自动通过。"
+      },
+      "system_prompt_grounding_evidence": {
+        "reference": "../evidence/system-prompt-grounding-20261002/README.md",
+        "observation": "初版两次超时；最终两个完成样本收费未知表述有所改善，但仍有无依据配额断言或数量统计错误，整体未通过。"
+      }
+    },
+    {
+      "id": "resource-shared-deadline-all-phases",
+      "category": "resource_lifecycle",
+      "classification": "product_specific_mandatory",
+      "preconditions": [
+        "被测 iOS 构建包含真实 web_read。",
+        "配置和脱敏阶段诊断可用。",
+        "测试适配器可以控制各阶段耗时。"
+      ],
+      "action": "记录总预算 D。使排队、HTTP、备用、渲染及提取各阶段分别未超限，但累计超过 D。观察后续阶段、清理和结果。",
+      "expected_result": "截止时间从排队开始，路线切换不重置。过期后停止实际工作且不启动下一阶段，部分内容与未完成状态准确。",
+      "oracle": {
+        "product": "执行专项步骤，保存真实 iOS 时序及工具终态。缺少实现或观测时保持未执行或记录阻断。"
+      },
+      "applicable_layers": [
+        "ios_product"
+      ],
+      "layer_requirement": {
+        "ios_product": "mandatory_product"
+      },
+      "execution_status": "not_executed",
+      "spec_rules": [
+        "R1",
+        "R2",
+        "R3"
+      ],
+      "product_steps_reference": "ios-acceptance.md#统一截止时间与停止矩阵",
+      "title": "所有阶段共享截止时间",
+      "execution_group": "G15",
+      "agent_query_refs": [],
+      "execution_policy": "产品层按本案例判据执行全部必测变体；Agent 层由关联代表查询或 G20 后续查询取证，不逐案例重复完整查询。"
+    },
+    {
+      "id": "content-not-found-versus-uncovered",
+      "category": "content_reading",
+      "classification": "product_specific_mandatory",
+      "preconditions": [
+        "被测 iOS 构建包含真实 web_read。",
+        "可以控制响应上限并观察正文保存范围。"
+      ],
+      "action": "先在完整正文中定位不存在的标识符。再截断同一长文，定位真实尾部标识符。记录两种状态及续读范围。",
+      "expected_result": "工具区分已覆盖范围未命中和目标范围尚未取得。续读只承诺实际保存内容，不将缺失数据断言为原文不存在。",
+      "oracle": {
+        "product": "保存实际工具结果、配置及正文范围证据。缺少观测时保持未执行或阻断。"
+      },
+      "applicable_layers": [
+        "ios_product"
+      ],
+      "layer_requirement": {
+        "ios_product": "mandatory_product"
+      },
+      "execution_status": "not_executed",
+      "spec_rules": [
+        "C3",
+        "C4",
+        "F2"
+      ],
+      "product_steps_reference": "ios-acceptance.md#长文未命中与未覆盖",
+      "title": "未命中与尚未覆盖",
+      "execution_group": "G08",
+      "agent_query_refs": [
+        "Q02"
+      ],
+      "execution_policy": "产品层按本案例判据执行全部必测变体；Agent 层由关联代表查询或 G20 后续查询取证，不逐案例重复完整查询。"
+    },
+    {
+      "id": "content-current-document-not-stale",
+      "category": "content_reading",
+      "classification": "product_specific_mandatory",
+      "preconditions": [
+        "被测 iOS 构建包含真实 web_read。",
+        "可以控制主响应并观察文档代次。"
+      ],
+      "action": "先加载带旧标记的 A，再请求延迟的 B。另测同网址重新加载，并分别控制成功、失败和重定向。",
+      "expected_result": "就绪信号属于本次导航。新文档未就绪时不返回旧 DOM；成功后来源和新标记一致，并结束无用加载。",
+      "oracle": {
+        "product": "保存 iOS 导航、文档代次、最终结果及释放证据。缺少观测时保持未执行或阻断。"
+      },
+      "applicable_layers": [
+        "ios_product"
+      ],
+      "layer_requirement": {
+        "ios_product": "mandatory_product"
+      },
+      "execution_status": "partially_executed",
+      "spec_rules": [
+        "C1",
+        "F2",
+        "R4"
+      ],
+      "product_steps_reference": "ios-acceptance.md#当前文档与旧-dom",
+      "title": "当前文档不能返回旧 DOM",
+      "execution_group": "G05",
+      "agent_query_refs": [],
+      "execution_policy": "产品层按本案例判据执行全部必测变体；Agent 层由关联代表查询或 G20 后续查询取证，不逐案例重复完整查询。",
+      "first_five_simulator_evidence": {
+        "reference": "../evidence/first-five-simulator-20261002/README.md",
+        "scope": "仅对应本轮报告中明确观察的产品/Agent判据，未执行的变体和层级不自动通过。"
+      }
+    },
+    {
+      "id": "coexist-public-tool-routing",
+      "category": "tool_coexistence",
+      "classification": "product_specific_mandatory",
+      "preconditions": [
+        "真实 iOS 构建同时提供 web_read 和 browser_use。",
+        "正常生产提示及全部工具可用。",
+        "已知公开目标不需要交互。"
+      ],
+      "action": "分别提出已知公开文档读取和搜索页面操作请求。以相同模型多次执行，记录工具选择、内部阶段及实际请求。",
+      "expected_result": "公开读取优先 web_read，搜索页面操作使用 browser_use。内部回退属于同一次读取，不隐式启动浏览器工具。",
+      "oracle": {
+        "fixture": "复用公开、认证及慢响应输入。网站自检不验证工具选择或共存行为。",
+        "product": "保存真实 Agent 轨迹、模型可见内容、来源和请求次数。强制指定工具不能证明自主选择。"
+      },
+      "applicable_layers": [
+        "ios_product",
+        "agent_e2e"
+      ],
+      "layer_requirement": {
+        "ios_product": "mandatory",
+        "agent_e2e": "grouped_representative_evidence"
+      },
+      "execution_status": "partially_executed",
+      "spec_rules": [
+        "W4",
+        "W5",
+        "A1",
+        "A2",
+        "A4"
+      ],
+      "product_steps_reference": "ios-acceptance.md#工具选择与证据复用",
+      "title": "公开读取与搜索操作的工具选择",
+      "execution_group": "G18",
+      "agent_query_refs": [
+        "Q01",
+        "Q02",
+        "Q03",
+        "Q04"
+      ],
+      "execution_policy": "产品层按本案例判据执行全部必测变体；Agent 层由关联代表查询或 G20 后续查询取证，不逐案例重复完整查询。",
+      "first_five_simulator_evidence": {
+        "reference": "../evidence/first-five-simulator-20261002/README.md",
+        "scope": "仅对应本轮报告中明确观察的产品/Agent判据，未执行的变体和层级不自动通过。"
+      },
+      "first_five_fix_evidence": {
+        "reference": "../evidence/first-five-fixes-20261002/README.md",
+        "scope": "最终公开页、动态两次及此前长文样本通过；中途同源并行、动态重复读取失败均保留。混合重载及其他变体待验证。 仅明确覆盖判据有证据，其他变体不自动通过。"
+      },
+      "system_prompt_grounding_evidence": {
+        "reference": "../evidence/system-prompt-grounding-20261002/README.md",
+        "observation": "初版两次超时；最终两个完成样本收费未知表述有所改善，但仍有无依据配额断言或数量统计错误，整体未通过。"
+      }
+    },
+    {
+      "id": "coexist-existing-evidence-no-refetch",
+      "category": "tool_coexistence",
+      "classification": "product_specific_mandatory",
+      "preconditions": [
+        "真实 iOS 构建同时提供两种工具。",
+        "同一用户请求已有足够正文、来源和时间信息。",
+        "充分证据场景没有刷新或新增目标要求。"
+      ],
+      "action": "分别执行目标已覆盖及有明确缺口的查询。在同一请求内观察首次取文后的调用增量，不追加用户消息模拟续接。",
+      "expected_result": "模型直接使用充分证据，补充读取对应明确缺口。浏览器结果不复制到匿名缓存，不用两种工具反复证明同一事实。",
+      "oracle": {
+        "fixture": "复用既有输入，网站自检不能证明证据复用。",
+        "product": "核对模型上下文、最终回答及请求增量。匿名缓存只含自身正文，补充正确性另行判断。"
+      },
+      "applicable_layers": [
+        "ios_product",
+        "agent_e2e"
+      ],
+      "layer_requirement": {
+        "ios_product": "mandatory",
+        "agent_e2e": "grouped_representative_evidence"
+      },
+      "execution_status": "partially_executed",
+      "spec_rules": [
+        "W5",
+        "I1",
+        "I3",
+        "A4"
+      ],
+      "product_steps_reference": "ios-acceptance.md#工具选择与证据复用",
+      "title": "已有充分证据不重复读取",
+      "execution_group": "G18",
+      "agent_query_refs": [
+        "Q01",
+        "Q02",
+        "Q03",
+        "Q04"
+      ],
+      "execution_policy": "产品层按本案例判据执行全部必测变体；Agent 层由关联代表查询或 G20 后续查询取证，不逐案例重复完整查询。",
+      "first_five_simulator_evidence": {
+        "reference": "../evidence/first-five-simulator-20261002/README.md",
+        "scope": "仅对应本轮报告中明确观察的产品/Agent判据，未执行的变体和层级不自动通过。"
+      },
+      "first_five_fix_evidence": {
+        "reference": "../evidence/first-five-fixes-20261002/README.md",
+        "scope": "最终公开页、动态两次及此前长文样本通过；中途同源并行、动态重复读取失败均保留。混合重载及其他变体待验证。 仅明确覆盖判据有证据，其他变体不自动通过。"
+      },
+      "system_prompt_grounding_evidence": {
+        "reference": "../evidence/system-prompt-grounding-20261002/README.md",
+        "observation": "初版两次超时；最终两个完成样本收费未知表述有所改善，但仍有无依据配额断言或数量统计错误，整体未通过。"
+      }
+    },
+    {
+      "id": "coexist-authenticated-browser-routing",
+      "category": "tool_coexistence",
+      "classification": "product_specific_mandatory",
+      "preconditions": [
+        "真实 iOS 构建同时提供两种工具。",
+        "浏览器经 /auth/grant 模拟登录，可读 /auth/private。",
+        "登录核对独立完成，私人正文不提前送入本次模型上下文。"
+      ],
+      "action": "匿名读取同域受保护资源。再用正常提示请求已授权浏览器页面，另外读取受控用户交互后的状态。",
+      "expected_result": "web_read 报告限制且没有私人标记。模型需要身份或交互状态时选择对应标签的 browser_use，不循环匿名验证登录内容。",
+      "oracle": {
+        "fixture": "复用认证输入。网站自检不能证明产品工具选择。",
+        "product": "核对来源及身份范围。私人标记只出现在合法浏览器结果，匿名缓存和诊断没有复制凭据或私人正文，原登录保留。"
+      },
+      "applicable_layers": [
+        "ios_product",
+        "agent_e2e"
+      ],
+      "layer_requirement": {
+        "ios_product": "mandatory",
+        "agent_e2e": "grouped_representative_evidence"
+      },
+      "execution_status": "partially_executed",
+      "spec_rules": [
+        "W6",
+        "F3",
+        "I1",
+        "I2",
+        "A4"
+      ],
+      "product_steps_reference": "ios-acceptance.md#工具选择与证据复用",
+      "title": "登录或交互后的页面继续使用浏览器",
+      "execution_group": "G18",
+      "agent_query_refs": [
+        "Q01",
+        "Q02",
+        "Q03",
+        "Q04"
+      ],
+      "execution_policy": "产品层按本案例判据执行全部必测变体；Agent 层由关联代表查询或 G20 后续查询取证，不逐案例重复完整查询。",
+      "first_five_simulator_evidence": {
+        "reference": "../evidence/first-five-simulator-20261002/README.md",
+        "scope": "仅对应本轮报告中明确观察的产品/Agent判据，未执行的变体和层级不自动通过。"
+      },
+      "first_five_fix_evidence": {
+        "reference": "../evidence/first-five-fixes-20261002/README.md",
+        "scope": "最终公开页、动态两次及此前长文样本通过；中途同源并行、动态重复读取失败均保留。混合重载及其他变体待验证。 仅明确覆盖判据有证据，其他变体不自动通过。"
+      },
+      "system_prompt_grounding_evidence": {
+        "reference": "../evidence/system-prompt-grounding-20261002/README.md",
+        "observation": "初版两次超时；最终两个完成样本收费未知表述有所改善，但仍有无依据配额断言或数量统计错误，整体未通过。"
+      }
+    },
+    {
+      "id": "coexist-tab-state-and-takeover",
+      "category": "tool_coexistence",
+      "classification": "product_specific_mandatory",
+      "preconditions": [
+        "真实 iOS 构建同时提供两种工具。",
+        "可以观察 tab_id、URL、DOM、输入、滚动、UA 和 viewport。",
+        "测试适配器可以暂停真实读取阶段。"
+      ],
+      "action": "先启动匿名读取，再由用户操作或接管浏览器。另测其他聊天并行。分别完成、取消和超时，再由用户结束接管。",
+      "expected_result": "读取只导航自身实例，原标签及输入视口不被修改。读取完成或取消不解除接管，原会话由用户结束接管后恢复。",
+      "oracle": {
+        "fixture": "复用既有输入，网站自检不能证明页面状态。",
+        "product": "核对标签、存储和接管事件。区分页面自身变化与工具修改，遵守暂停边界，不在已暂停同会话新发批次。"
+      },
+      "applicable_layers": [
+        "ios_product"
+      ],
+      "layer_requirement": {
+        "ios_product": "mandatory"
+      },
+      "execution_status": "partially_executed",
+      "spec_rules": [
+        "I2",
+        "I4",
+        "R6",
+        "A4"
+      ],
+      "product_steps_reference": "ios-acceptance.md#并行状态与接管",
+      "title": "并行读取保留浏览器状态和接管",
+      "execution_group": "G17",
+      "agent_query_refs": [
+        "Q04"
+      ],
+      "execution_policy": "产品层按本案例判据执行全部必测变体；Agent 层由关联代表查询或 G20 后续查询取证，不逐案例重复完整查询。",
+      "first_five_simulator_evidence": {
+        "reference": "../evidence/first-five-simulator-20261002/README.md",
+        "scope": "仅对应本轮报告中明确观察的产品/Agent判据，未执行的变体和层级不自动通过。"
+      },
+      "first_five_fix_evidence": {
+        "reference": "../evidence/first-five-fixes-20261002/README.md",
+        "scope": "实时接管入口展示本地页面；测试输入未成功、模型读取为空，完整接管未通过。 仅明确覆盖判据有证据，其他变体不自动通过。"
+      }
+    },
+    {
+      "id": "coexist-global-render-capacity",
+      "category": "tool_coexistence",
+      "classification": "product_specific_mandatory",
+      "preconditions": [
+        "真实 iOS 构建同时提供两种工具。",
+        "配置提供共同上限 G、队列上限 Q 和总预算 D。",
+        "可以观察实例归属及注入资源压力。"
+      ],
+      "action": "先让活动或接管浏览器占用部分和全部 G，再从多个聊天请求超额渲染。反向先启动读取再创建标签，随后注入压力并释放持有者。",
+      "expected_result": "两种顺序总占用均不超过 G，队列不超过 Q，排队计入 D。读取不抢占活动或接管标签；资源清理后容量恢复，没有饥饿或泄漏。",
+      "oracle": {
+        "fixture": "复用慢响应输入，网站8线程不是产品 G。",
+        "product": "保存真实创建、销毁和归属事件，核对合计及代表性 App/WebContent 内存。检查过期队列和重复释放。"
+      },
+      "applicable_layers": [
+        "ios_product"
+      ],
+      "layer_requirement": {
+        "ios_product": "mandatory"
+      },
+      "execution_status": "not_executed",
+      "spec_rules": [
+        "R1",
+        "R3",
+        "R5",
+        "I4",
+        "A4"
+      ],
+      "product_steps_reference": "ios-acceptance.md#共同资源预算",
+      "title": "跨工具共同渲染容量",
+      "execution_group": "G14",
+      "agent_query_refs": [],
+      "execution_policy": "产品层按本案例判据执行全部必测变体；Agent 层由关联代表查询或 G20 后续查询取证，不逐案例重复完整查询。"
+    },
+    {
+      "id": "coexist-timeout-isolation",
+      "category": "tool_coexistence",
+      "classification": "product_specific_mandatory",
+      "preconditions": [
+        "真实 iOS 构建同时提供两种工具。",
+        "同聊天有读取 A、B 和浏览器，其他聊天有独立工作。",
+        "可以按调用标识取消并释放迟到回调。"
+      ],
+      "action": "分别在排队、HTTP、渲染和提取使 A 超时或内部取消，再释放迟到回调。另触发浏览器超时并观察匿名读取。",
+      "expected_result": "只清理 A 的队列、请求、临时渲染和未提交正文。B、浏览器及其他聊天继续；迟到结果不启动新路线或写入其他调用。浏览器超时也不取消匿名读取。",
+      "oracle": {
+        "fixture": "复用慢响应输入，网站自检不能证明取消范围。",
+        "product": "保存按调用标识的取消及释放事件，并证明其他工作继续。本项不使用会话或气泡 Stop。"
+      },
+      "applicable_layers": [
+        "ios_product"
+      ],
+      "layer_requirement": {
+        "ios_product": "mandatory"
+      },
+      "execution_status": "not_executed",
+      "spec_rules": [
+        "R1",
+        "R2",
+        "R6",
+        "I4",
+        "A4"
+      ],
+      "product_steps_reference": "ios-acceptance.md#取消范围与结果配对",
+      "title": "单次超时不取消其他调用",
+      "execution_group": "G16",
+      "agent_query_refs": [],
+      "execution_policy": "产品层按本案例判据执行全部必测变体；Agent 层由关联代表查询或 G20 后续查询取证，不逐案例重复完整查询。"
+    },
+    {
+      "id": "coexist-session-and-batch-stop",
+      "category": "tool_coexistence",
+      "classification": "product_specific_mandatory",
+      "preconditions": [
+        "真实 iOS 构建同时提供两种工具。",
+        "聊天 A 的活动请求及批次包含两种工具和队列，B 有独立工作。",
+        "另外准备只有 web_read 活动或排队的批次。"
+      ],
+      "action": "分别执行会话 Stop、工具气泡批次 Stop 和删除会话。另在只有读取工作时点击停止，再释放迟到回调。",
+      "expected_result": "各入口清理对应范围的两种工具及队列，只有读取时也生效。其他聊天继续；Stop 保留已提交结果和登录，删除按原生命周期清理，迟到内容不恢复任务。",
+      "oracle": {
+        "fixture": "复用慢响应输入，网站自检不能证明停止入口。",
+        "product": "记录实际取消目标及请求、观察器、实例和队列释放。气泡停止按批次判定，未开始消息队列沿用原约定。"
+      },
+      "applicable_layers": [
+        "ios_product"
+      ],
+      "layer_requirement": {
+        "ios_product": "mandatory"
+      },
+      "execution_status": "not_executed",
+      "spec_rules": [
+        "R2",
+        "R6",
+        "A1",
+        "A4"
+      ],
+      "product_steps_reference": "ios-acceptance.md#取消范围与结果配对",
+      "title": "批次停止、会话停止及删除",
+      "execution_group": "G16",
+      "agent_query_refs": [],
+      "execution_policy": "产品层按本案例判据执行全部必测变体；Agent 层由关联代表查询或 G20 后续查询取证，不逐案例重复完整查询。"
+    },
+    {
+      "id": "coexist-result-pairing-and-reload",
+      "category": "tool_coexistence",
+      "classification": "product_specific_mandatory",
+      "preconditions": [
+        "真实 iOS 构建同时提供两种工具。",
+        "真实并发批次的调用标识、来源及目标不同。",
+        "可以控制完成顺序。"
+      ],
+      "action": "按相反顺序完成两种工具，并混入超时和取消。检查界面及模型历史，重新加载后检查数据库，再继续正常查询。",
+      "expected_result": "结果对应原调用，来源、身份及终态一致。迟到内容不覆盖已结束调用或其他工具，重载后没有孤立或串用结果。",
+      "oracle": {
+        "fixture": "复用既有输入，网站自检不能证明结果配对。",
+        "product": "核对真实轨迹、最终模型输入及重载消息。单次读取内部阶段不伪造额外模型工具调用。"
+      },
+      "applicable_layers": [
+        "ios_product",
+        "agent_e2e"
+      ],
+      "layer_requirement": {
+        "ios_product": "mandatory",
+        "agent_e2e": "grouped_representative_evidence"
+      },
+      "execution_status": "not_executed",
+      "spec_rules": [
+        "C1",
+        "I3",
+        "A1",
+        "A4",
+        "R6"
+      ],
+      "product_steps_reference": "ios-acceptance.md#取消范围与结果配对",
+      "title": "乱序结果和会话重载的配对",
+      "execution_group": "G20",
+      "agent_query_refs": [],
+      "execution_policy": "产品层按本案例判据执行全部必测变体；Agent 层由关联代表查询或 G20 后续查询取证，不逐案例重复完整查询。"
+    }
+  ],
+  "supplemental_product_steps_reference": "ios-acceptance.md",
+  "new_case_count": 48,
+  "total_catalog_case_count": 66,
+  "current_scope_exclusions": [
+    "pdf_text_extraction",
+    "ocr"
+  ],
+  "execution_groups_reference": "groups.json",
+  "result_contract_reference": "result-contract.md",
+  "layer_requirement_values": {
+    "grouped_representative_evidence": "只以实际覆盖的代表查询或 G20 真实后续查询作为模型层证据，不要求每个变体独立调用模型。产品层必测变体保持逐项要求。"
+  },
+  "execution_plan": {
+    "main_group_count": 20,
+    "mandatory_new_cases": 42,
+    "optional_new_cases": 6,
+    "agent_query_template_count": 5,
+    "all_product_cases_not_executed": true
+  }
+}

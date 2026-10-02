@@ -35,6 +35,45 @@ extension AIChatViewModel {
         return "\(Self.minisOffloadsLinuxDir)/tools/\(fileName)"
     }
 
+    /// 网页结果转存后仍保留 JSON 契约；续读改用持久化文件，避免承诺已经失效的内存编号。
+    private func offloadWebReadResult(_ content: String, toolId: String) -> (json: String, path: String)? {
+        guard let data = content.data(using: .utf8),
+              var object = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any],
+              object["url"] is String, object["read_status"] is String,
+              let body = object["content"] as? String, !body.isEmpty,
+              object["limitations"] is [String],
+              object["offloaded_result_file"] == nil else { return nil }
+        let directory = Self.minisOffloadsPersistentDir(for: sessionId ?? "unknown")
+            .appendingPathComponent("tools", isDirectory: true)
+        let filename = "web_read_\(Self.shortToolId(toolId)).txt"
+        let linuxPath = "\(Self.minisOffloadsLinuxDir)/tools/\(filename)"
+        object["title"] = object["title"] ?? NSNull()
+        object["retrieved_at"] = object["retrieved_at"] ?? NSNull()
+        object["content"] = ""
+        if ["text_ready", "partial"].contains(object["read_status"] as? String ?? "") {
+            object["read_status"] = "partial"
+        }
+        object.removeValue(forKey: "document_id")
+        object.removeValue(forKey: "continuation")
+        object.removeValue(forKey: "locate_status")
+        object["offloaded_result_file"] = linuxPath
+        var limitations = object["limitations"] as? [String] ?? []
+        limitations.append("完整网页结果已保存到 \(linuxPath)，请使用 file_read 读取。当前结果不包含正文，原内存正文编号不保证仍然有效。")
+        object["limitations"] = limitations
+        guard let stubData = try? JSONSerialization.data(withJSONObject: object, options: [.sortedKeys, .withoutEscapingSlashes]),
+              stubData.count < data.count,
+              let stub = String(data: stubData, encoding: .utf8) else { return nil }
+        do {
+            try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+            try data.write(to: directory.appendingPathComponent(filename), options: .atomic)
+            return (stub, linuxPath)
+        } catch {
+            // 文件未可靠保存时保留原结果，不能用无法取回的占位内容替换正文。
+            logger.warning("web_read context offload failed; keeping original result")
+            return nil
+        }
+    }
+
     /// Save context image data to disk for later retrieval.
     /// Returns the Linux-visible path where the file was saved.
     private func offloadContextImage(_ data: Data, toolId: String, mimeType: String) -> String {
@@ -438,6 +477,14 @@ extension AIChatViewModel {
             let toolName: String
         }
 
+        // 持久化重载可能省略结果名称，始终依据原调用编号恢复工具身份。
+        var toolNamesByID: [String: String] = [:]
+        for message in agentHistory {
+            for part in message.parts {
+                if case .toolUse(let id, let name, _) = part { toolNamesByID[id] = name }
+            }
+        }
+
         var candidates: [OffloadCandidate] = []
         var skippedAlreadyOffloaded = 0
         var skippedTooSmall = 0
@@ -447,8 +494,12 @@ extension AIChatViewModel {
             for (partIdx, part) in msg.parts.enumerated() {
                 switch part {
                 case .toolResult(let id, let name, let content, _, let imgData, _, _, _):
+                    let effectiveName = name.isEmpty ? (toolNamesByID[id] ?? "") : name
+                    let webReadObject = effectiveName == "web_read"
+                        ? (try? JSONSerialization.jsonObject(with: Data(content.utf8))) as? [String: Any]
+                        : nil
                     // Skip already-offloaded parts
-                    if content.hasPrefix("[CONTEXT OFFLOADED]") {
+                    if content.hasPrefix("[CONTEXT OFFLOADED]") || webReadObject?["offloaded_result_file"] != nil {
                         skippedAlreadyOffloaded += 1
                         continue
                     }
@@ -462,7 +513,7 @@ extension AIChatViewModel {
 
                     let tokens = BPETokenizer.shared.countPartTokens(part)
                     let bytes = content.utf8.count + (imgData?.count ?? 0)
-                    candidates.append(OffloadCandidate(msgIdx: msgIdx, partIdx: partIdx, tokens: tokens, bytes: bytes, toolId: id, toolName: name))
+                    candidates.append(OffloadCandidate(msgIdx: msgIdx, partIdx: partIdx, tokens: tokens, bytes: bytes, toolId: id, toolName: effectiveName))
 
                 case .toolUse(let id, let name, let input):
                     // Offload large file_write/file_edit tool inputs
@@ -511,9 +562,21 @@ extension AIChatViewModel {
 
             let part = agentHistory[candidate.msgIdx].parts[candidate.partIdx]
             var linuxPath = ""
+            var retainedTokens = 0
 
             switch part {
-            case .toolResult(let id, let name, let content, let isError, let imgData, let imgMime, _, _):
+            case .toolResult(let id, let name, let content, let isError, let imgData, let imgMime, let pageURL, _):
+                if candidate.toolName == "web_read" {
+                    guard let offloaded = offloadWebReadResult(content, toolId: id) else { continue }
+                    linuxPath = offloaded.path
+                    let replacement = AgentContentPart.toolResult(
+                        id: id, name: candidate.toolName, content: offloaded.json,
+                        isError: isError, pageURL: pageURL
+                    )
+                    agentHistory[candidate.msgIdx].parts[candidate.partIdx] = replacement
+                    retainedTokens = BPETokenizer.shared.countPartTokens(replacement)
+                    break
+                }
                 // Offload text content
                 if content.count > 500 {
                     linuxPath = offloadContextContent(content, toolId: id, toolName: name)
@@ -548,8 +611,9 @@ extension AIChatViewModel {
                 continue
             }
 
-            currentTokens -= candidate.tokens
-            freedTokens += candidate.tokens
+            let releasedTokens = max(0, candidate.tokens - retainedTokens)
+            currentTokens -= releasedTokens
+            freedTokens += releasedTokens
             offloadedCount += 1
             let afterPct = Int(Double(currentTokens) / Double(contextWindow) * 100)
             logger.info("  ✂ Offloaded #\(offloadedCount): [\(candidate.toolName)] id:\(candidate.toolId.prefix(8)) ~\(candidate.tokens) tokens (\(candidate.bytes) bytes) → \(linuxPath) [now \(currentTokens) (\(afterPct)%)]")

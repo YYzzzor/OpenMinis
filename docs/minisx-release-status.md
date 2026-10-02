@@ -1,20 +1,23 @@
 # MinisX 发布状态
 
-更新日期：2026-10-01（Asia/Shanghai）。发布步骤见 [TestFlight 发布流程草案](minisx-testflight-release-draft.md)；本文只记录每次发布的事实。
+更新日期：2026-10-02（Asia/Taipei）。发布步骤见 [TestFlight 发布流程草案](minisx-testflight-release-draft.md)；本文只记录每次发布的事实。
 
 ## 当前状态
 
 | 项目 | 状态 |
 | --- | --- |
-| 最新上传 | **1.13（8）**，2026-10-01 12:17 上传成功 |
-| 已确认安装使用 | **1.13（8）**，2026-10-01 维护者确认 |
+| 最新上传 | **1.13（9）**，2026-10-02 18:23:12 上传成功 |
+| 已确认安装使用 | 2026-10-02 维护者确认本轮版本已安装到手机；最新归档为 **1.13（9）**，手机版本号未单独读取 |
 | 分发渠道 | TestFlight Internal，仅维护者本人 |
 | 发布身份 | Team `42486W5YRY`，Bundle ID `com.yyzzzor.minisx`，App Store Connect app ID `6816328476` |
-| 下一次可用 Build 号 | 9（上传前仍需确认后台未占用） |
+| 下一次可用 Build 号 | 10（上传前仍需确认后台未占用） |
 
 README 中的 OpenMinis App Store / TestFlight 链接属于上游项目，与 MinisX 无关。
 
 ## 待确认事项
+
+- 网页读取优化（Build 9）：维护者已在手机完成一个历史问题的查询，反馈约一分多钟取得结果，正在自行持续测试不同案例。后续根据维护者反馈调整，本轮不启动额外测试。
+- Build 9 归档：主应用、Share、FileProvider 为1.13（9），Widget扩展仍为1.13（8）；如实保留产品元数据差异，本轮不修改。
 
 - Build 4、5 上传时：8 项第三方框架缺少 dSYM（FFmpeg、RealTimeCutVADCXXLibrary 及 6 个 libav / libsw 库），第三方崩溃符号化可能不完整；Build 6–8 未单独核查。
 - 语音（Build 5–6）：真机首字延迟、长停顿、长语音、离线语言与耗电未做专项体验；最终 0.8 倍波形测试未复跑；阿里 / 讯飞原有 HTTP 接入与官方 WebSocket 协议不符，未修复。
@@ -22,6 +25,15 @@ README 中的 OpenMinis App Store / TestFlight 链接属于上游项目，与 Mi
 ## 发布记录
 
 每条记录的字段：上传方式与时间、源码、新增内容、证据、验证与边界。新的写在最上面。
+
+### 1.13（9）— 2026-10-02
+
+- **上传**：Xcode归档创建时间18:20:37，18:23:12上传成功（Asia/Taipei）；归档元数据 `uploadedBuildNumber=9`，分发记录ID `fa8839e4-67aa-4979-bc3c-f1a27882f618`。
+- **源码**：当前工作区为 `investigate/build8-agent-latency`，HEAD `b0b53c4`，包含未提交的网页读取与提示调整；未核对归档时完整源码快照。
+- **本轮交付内容**：[Agent网页查询效率优化](<../tasks/active/26-10-02 Agent 网页查询效率优化/task.md>)：公开网页读取、长文定位与续读、加载状态与表格处理，以及工具选择和回答依据的System Prompt约束。
+- **归档证据**：`~/Library/Developer/Xcode/Archives/2026-10-02/`下18:20归档；主应用、MinisShare、MinisFileProvider为1.13（9），AgentWidgetExtension为1.13（8），最低iOS版本均为26.0。
+- **手机安装与体验**：维护者于2026-10-02确认已安装到手机，并使用“排查 Build8 智能体响应缓慢”对话中的最初文字提问，反馈“大概一分多钟就查到了结果”。维护者正在自行持续测试不同例子，有问题再调整。
+- **验证边界**：本次耗时来自维护者估计，未读取手机查询日志、最终回答或模型配置；不据此判定回答准确性或整体验收通过。本轮只更新状态，不启动应用或模型测试。未读取App Store Connect后台处理状态。
 
 ### 1.13（8）— 2026-10-01
 
