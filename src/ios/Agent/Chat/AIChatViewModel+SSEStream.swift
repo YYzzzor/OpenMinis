@@ -462,6 +462,7 @@ extension AIChatViewModel {
                     case "file_write": .fileWriteTool(path: "")
                     case "file_edit": .fileEditTool(path: "")
                     case "browser_use": .browserTool(action: "")
+                    case "web_search": .browserTool(action: "web_search")
                     case "read_image": .readImageTool(path: "")
                     case "memory_write", "memory_get": .memoryTool(action: name)
                     default: .shellTool(command: name)
@@ -705,6 +706,8 @@ extension AIChatViewModel {
                         if let action = extractPartialStringValue("action", from: accumulated) {
                             return .browserTool(action: action)
                         }
+                    case "web_search":
+                        return .browserTool(action: "web_search")
                     case "read_image":
                         if let path = extractPartialStringValue("path", from: accumulated) {
                             return .readImageTool(path: path)
@@ -828,6 +831,8 @@ extension AIChatViewModel {
                                 messages[msgIdx].blocks[blockIdx].browserURL = cur
                             }
                         }
+                    case "web_search":
+                        messages[msgIdx].blocks[blockIdx].kind = .browserTool(action: "web_search")
                     case "read_image":
                         if let path = args["path"] as? String {
                             messages[msgIdx].blocks[blockIdx].kind = .readImageTool(path: path)

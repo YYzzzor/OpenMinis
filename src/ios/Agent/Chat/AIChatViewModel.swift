@@ -1422,6 +1422,9 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
     var webReadService: WebReadService = .shared
     /// 当前工具批次的 web_read 标识；Stop 通过它取消排队及活动读取。
     var activeWebReadBatchID: String?
+    /// 匿名关键词搜索服务与当前工具批次，用于 Stop 和请求作用域清理。
+    var webSearchService: WebSearchService = .shared
+    var activeWebSearchBatchID: String?
     /// When true, the agent loop pauses at the next checkpoint to let the user operate the browser.
     @Published var browserTakeoverActive = false
 
@@ -1970,7 +1973,7 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
             + "- A useful answer may give confirmed findings and explicitly identify remaining unknowns. After reading the relevant official pages, allow at most two targeted follow-up reads/searches for an unsupported fee or licensing claim, including unread relevant sections. If direct support is still missing or inaccessible, mark that claim unconfirmed and deliver the answer. Do not start more searches, switch tools, or repeat downloads merely to turn missing evidence into a definite yes/no.\n\n"
             + "Use shell commands proactively for file, code, system, and network-engineering tasks.\n\n"
             + "Available tools:\n"
-            + "- shell_execute: Run commands for file, code, system, and network-engineering work. For ordinary page-content queries at a known HTTP(S) URL, including a reachable loopback URL, use web_read first; do not bypass it with shell downloads. "
+            + "- shell_execute: Run commands for file, code, system, and network-engineering work. For ordinary keyword discovery, use web_search; for page-content queries at a known HTTP(S) URL, including a reachable loopback URL, use web_read; do not bypass either tool with shell downloads. "
             + "When the user asks for raw HTML, response headers, custom HTTP/API requests, endpoint tests, or network debugging, use shell networking as requested. "
             + "Transfer a specific binary resource to a suitable reader when needed. "
             + "Common tools (python3, pip, curl, wget, git, ssh, etc.) can be installed via apk add; Python packages via pip install. "
@@ -1994,13 +1997,15 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
             + "- file_read: Read file contents (faster than cat).\n"
             + "- file_write: Create new files or overwrite existing files (faster than echo/tee).\n"
             + "- file_edit: Edit existing files with exact string replacement (old_string → new_string). Preferred over file_write for modifications — always file_read first.\n"
+            + "Web search policy: search quality and source coverage take priority over speed. DuckDuckGo is the default public keyword search engine through web_search. For ordinary keyword discovery, call web_search first and inspect its status, every returned title, summary, and source URL. Submit up to two independent keyword searches in the same tool batch when neither depends on the other result. Do not search the same query simultaneously with web_search and browser_use, and do not skip necessary source text or saved result continuations merely to save time. Continue saved results with document_id/offset/limit until the current page is fully covered when needed. If a result_fragment is returned, repeat with its result_index and next_offset, concatenate content chunks in scalar order until next_offset is null, parse the complete JSON entry, then continue at result_index + 1. After you have enough candidate sources, use web_read on selected URLs to inspect supporting text. If web_search reports verification, failure, or insufficient sources, use browser_use according to the browser search fallback policy below. Do not use logged-in browser state for web_search or web_read. "
             + "Web reading policy: for ordinary content queries at a known HTTP(S) URL, including a reachable loopback URL, call web_read alone first and inspect its content, status, and limitations. If it contains the requested details without a relevant loading gap, answer even when the user mentions later or dynamic content; do not request another render or use sleep/delay just to confirm. Supplement only an actual gap or resource handoff, and do not launch same-source shell or browser downloads in parallel with the first read. "
             + "For long text, use query_target and continue the same document_id. "
-            + "Use browser_use for search, interactions, existing browser state, or a specific resource handoff. "
+            + "Use browser_use for interactions, existing browser state, specific resource handoff, or web_search fallback when public results are unavailable or inadequate. "
+            + "- web_search: Search public web sources anonymously by keyword. Inspect each result title, summary, and full source URL; continue with its document_id/offset/limit if the returned page is partial. Use web_read on selected sources once discovery is sufficient. It does not use browser cookies or sign in.\n"
             + "- web_read: Read an HTTP(S) page anonymously and return Markdown with source, range, and limitations. Use query_target to locate a heading, identifier, or phrase; "
             + "continue long text from document_id with offset/limit. It may render internally during a read; use render=true only for a specific dynamic-content gap identified by a prior result. It does not use browser cookies or sign in.\n"
             + "- browser_use: Interact with pages, search results, or existing browser sessions; use fetch to hand off a specific resource for another reader.\n"
-            + "Web search policy: use Google as the default search engine. "
+            + "Browser search fallback policy: use Google as the default browser search engine when web_search is challenged, fails, or provides inadequate sources. "
             + "If Google is inaccessible due to network, connection, or access errors, fall back to Bing. "
             + "Do not use Baidu for web search.\n"
             + "- memory_write: Save a memory entry to today's daily log (YYYY-MM-DD.md). Use proactively to note user preferences, project patterns, and important context.\n"
@@ -4090,6 +4095,7 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
         stopCurrentCommand()
         if let sid = sessionId {
             webReadService.cancelSession(sid)
+            webSearchService.cancelSession(sid)
         }
         // If the loop is suspended waiting for foreground, resume it so
         // Task cancellation can propagate through the continuation.
@@ -4902,7 +4908,10 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
         var requestScope = scopeForUserRequest(anchoredAt: existingMsgIdx ?? max(0, messages.count - 1))
         defer {
             // Stop/resume retains the anonymous document; a completed request releases it.
-            if !canResume { webReadService.endRequest(scope: requestScope) }
+            if !canResume {
+                webReadService.endRequest(scope: requestScope)
+                webSearchService.endRequest(scope: requestScope)
+            }
         }
         // REPRO-DIAG(2026-05-16): bump global round counter and emit a clear
         // BEGIN/END marker so the user can grep `ROUND \d+` to slice the log
@@ -6044,6 +6053,7 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
                     // assistant message — retarget the stable anchor with it.
                     if msgIdx < messages.count {
                         webReadService.endRequest(scope: requestScope)
+                        webSearchService.endRequest(scope: requestScope)
                         requestScope = scopeForUserRequest(anchoredAt: msgIdx)
                         runMsgId = messages[msgIdx].id
                     }
@@ -6081,14 +6091,24 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
             var cancelledDuringToolExecution = false
             let webReadBatchEnteredAt = Date()
             let containsWebRead = toolEntries.contains { $0.name == "web_read" }
+            let containsWebSearch = toolEntries.contains { $0.name == "web_search" }
             let webReadBatchID = containsWebRead ? UUID().uuidString.lowercased() : nil
             let webReadScope: WebReadScope? = containsWebRead ? requestScope : nil
             let webReadDeadline = containsWebRead
                 ? webReadBatchEnteredAt.addingTimeInterval(webReadService.configuration.totalTimeout)
                 : nil
+            let webSearchBatchID = containsWebSearch ? UUID().uuidString.lowercased() : nil
+            let webSearchScope: WebReadScope? = containsWebSearch ? requestScope : nil
+            let webSearchDeadline = containsWebSearch
+                ? webReadBatchEnteredAt.addingTimeInterval(webSearchService.configuration.totalTimeout)
+                : nil
             if let webReadBatchID, let webReadScope {
                 activeWebReadBatchID = webReadBatchID
                 webReadService.beginBatch(id: webReadBatchID, sessionID: webReadScope.sessionID, scope: webReadScope)
+            }
+            if let webSearchBatchID, let webSearchScope {
+                activeWebSearchBatchID = webSearchBatchID
+                webSearchService.beginBatch(id: webSearchBatchID, sessionID: webSearchScope.sessionID, scope: webSearchScope)
             }
 
             // Image budget for this batch of tool results.
@@ -6160,8 +6180,14 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
                     logger.info("[ToolLifecycle] DISPATCHED toolId=\(tu.id.prefix(20)) tool=\(tu.name) sid=\(self.sessionId?.prefix(8) ?? "nil") appState=\(UIApplication.shared.applicationState == .active ? "fg" : "bg") suspended=\(self.streamingUIUpdatesSuspended) isProcessing=\(self.isProcessing)")
                     group.addTask { [weak self] in
                         guard let self else {
-                            // Self torn down mid-batch: keep web_read's model payload parseable.
-                            let cancelMsg = tu.name == "web_read"
+                            // Self torn down mid-batch: keep anonymous web payloads parseable.
+                            let cancelMsg = tu.name == "web_search"
+                                ? WebSearchService.immediateOutcome(
+                                    query: tu.args["query"] as? String ?? "",
+                                    status: .cancelled,
+                                    limitation: "会话在搜索期间结束。"
+                                ).json
+                                : tu.name == "web_read"
                                 ? await WebReadService.immediateOutcome(
                                     request: WebReadRequest(url: tu.args["url"] as? String),
                                     status: .cancelled, limitation: "会话在读取期间结束。"
@@ -6169,14 +6195,16 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
                                 : "<system-reminder>The session was torn down before this tool could execute.</system-reminder>"
                             return (idx, ToolExecOutcome(
                                 toolId: tu.id, toolName: tu.name,
-                                resultPart: .toolResult(id: tu.id, name: tu.name, content: cancelMsg, isError: tu.name != "web_read"),
+                                resultPart: .toolResult(id: tu.id, name: tu.name, content: cancelMsg, isError: tu.name != "web_read" && tu.name != "web_search"),
                                 snapshotEntry: nil, snapshotItem: nil, cancelled: true
                             ))
                         }
                         let outcome = await self.executeSingleToolUse(
                             tu: tu, msgIdx: msgIdx, tools: toolsSnapshot, batchBudget: imageBudgetActor,
                             webReadBatchID: webReadBatchID, webReadScope: webReadScope,
-                            webReadDeadline: webReadDeadline
+                            webReadDeadline: webReadDeadline,
+                            webSearchBatchID: webSearchBatchID, webSearchScope: webSearchScope,
+                            webSearchDeadline: webSearchDeadline
                         )
                         return (idx, outcome)
                     }
@@ -6192,6 +6220,12 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
                 webReadService.finishBatch(id: webReadBatchID)
                 if activeWebReadBatchID == webReadBatchID {
                     activeWebReadBatchID = nil
+                }
+            }
+            if let webSearchBatchID {
+                webSearchService.finishBatch(id: webSearchBatchID)
+                if activeWebSearchBatchID == webSearchBatchID {
+                    activeWebSearchBatchID = nil
                 }
             }
 
@@ -6313,6 +6347,7 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
                     // alongside msgIdx (fresh assistant message for the new turn).
                     if msgIdx < messages.count {
                         webReadService.endRequest(scope: requestScope)
+                        webSearchService.endRequest(scope: requestScope)
                         requestScope = scopeForUserRequest(anchoredAt: msgIdx)
                         runMsgId = messages[msgIdx].id
                     }

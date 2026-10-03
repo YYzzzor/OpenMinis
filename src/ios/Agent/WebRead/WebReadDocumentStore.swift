@@ -1,7 +1,13 @@
 import Foundation
 
+enum WebReadDocumentKind: String, Sendable, Equatable {
+    case webRead = "web_read"
+    case webSearch = "web_search"
+}
+
 struct WebReadSavedDocument: Sendable {
     let id: String
+    let kind: WebReadDocumentKind
     let scope: WebReadScope
     let url: String
     let title: String?
@@ -74,13 +80,20 @@ final class WebReadDocumentStore {
         sourceNote: String?,
         resources: [WebReadResource],
         contentIsComplete: Bool,
+        kind: WebReadDocumentKind = .webRead,
+        maximumScalars: Int? = nil,
         now: Date = Date()
     ) -> WebReadSavedDocument {
         purgeExpired(now: now)
-        let bounded = Self.prefixScalars(content, maximum: configuration.maximumDocumentScalars)
+        // The scalar cap bounds per-document parsing; the byte cap remains an
+        // eviction budget. Capping here by bytes used to turn oversized ASCII
+        // web_read bodies into deceptively complete-looking short documents.
+        let maximum = max(0, maximumScalars ?? configuration.maximumDocumentScalars)
+        let bounded = Self.prefixScalars(content, maximum: maximum)
         let wasCut = bounded.unicodeScalars.count < content.unicodeScalars.count
         let document = WebReadSavedDocument(
             id: "wr_" + UUID().uuidString.lowercased(),
+            kind: kind,
             scope: scope,
             url: url,
             title: title,
@@ -103,6 +116,16 @@ final class WebReadDocumentStore {
         purgeExpired(now: now)
         guard let entry = entries[id] else { return false }
         return entry.document.scope == scope
+    }
+
+    /// Returns a scoped document without applying the web_read slice limit.
+    /// Search archives use this only to decode their bounded structured result list.
+    func document(id: String, scope: WebReadScope, now: Date = Date()) -> WebReadSavedDocument? {
+        purgeExpired(now: now)
+        guard var entry = entries[id], entry.document.scope == scope else { return nil }
+        entry.lastAccess = now
+        entries[id] = entry
+        return entry.document
     }
 
     func read(

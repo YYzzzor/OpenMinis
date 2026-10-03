@@ -258,7 +258,8 @@ final class WebReadService {
             guard isActive(call), Date() < deadline else {
                 return cancellationOutcome(request: request, url: nil, call: call)
             }
-            guard let slice = documentStore.read(
+            guard documentStore.document(id: documentID, scope: scope)?.kind == .webRead,
+                  let slice = documentStore.read(
                 id: documentID,
                 scope: scope,
                 offset: request.offset,
@@ -383,7 +384,10 @@ final class WebReadService {
                     if call.resourceLimited {
                         return cancellationOutcome(request: request, url: url.absoluteString, call: call)
                     }
-                    if call.timedOut { break }
+                    if call.timedOut || Date() >= deadline {
+                        call.timedOut = true
+                        break
+                    }
                     if !isActive(call) || isCancellation(error) {
                         return Self.immediateOutcome(request: request, url: url.absoluteString, status: .cancelled, limitation: "读取已取消。")
                     }
@@ -456,7 +460,11 @@ final class WebReadService {
                     if call.resourceLimited {
                         return cancellationOutcome(request: request, url: url.absoluteString, call: call)
                     }
-                    if call.timedOut {
+                    if call.timedOut || Date() >= deadline {
+                        // The render task and the call-level deadline task can
+                        // resume in either order at the shared deadline. Keep
+                        // the already extracted static body in both orders.
+                        call.timedOut = true
                         limitations.append("读取达到统一截止时间；已返回此前取得的正文。")
                     } else if !isActive(call) || isCancellation(error) {
                         return Self.immediateOutcome(request: request, url: url.absoluteString, status: .cancelled, limitation: "读取已取消。")

@@ -631,10 +631,14 @@ extension AIChatViewModel {
         // so random taps don't poison the flag for a future real invocation.
         let browserLoading = browserTabPool.hasLoadingTab
         let webReadBatch = activeWebReadBatchID
-        guard !runningCommandPids.isEmpty || toolDelayWaitActive || browserLoading || webReadBatch != nil else { return }
+        let webSearchBatch = activeWebSearchBatchID
+        guard !runningCommandPids.isEmpty || toolDelayWaitActive || browserLoading || webReadBatch != nil || webSearchBatch != nil else { return }
         commandCancelledByUser = true
         if let webReadBatch {
             webReadService.cancelBatch(webReadBatch)
+        }
+        if let webSearchBatch {
+            webSearchService.cancelBatch(webSearchBatch)
         }
         // Stop any in-flight browser page loads. stopLoading() resolves the
         // manager's navigationContinuation, so the awaited browserTabPool
@@ -677,6 +681,8 @@ extension AIChatViewModel {
         toolLoopDetector.reset()
 
         if let sessionId {
+            webReadService.cancelSession(sessionId)
+            webSearchService.cancelSession(sessionId)
             Task { await ISHExecutionCoordinator.shared.sessionDidTerminate(sessionId: sessionId) }
             BrowserTabPool.deletePersistedData(for: sessionId)
             BrowserUseOffloadBridge.releasePool(forSession: sessionId)

@@ -157,6 +157,8 @@ final class DebugJSONRPC: @unchecked Sendable {
             return try await handleViewTree(params: params)
         case "debug.search":
             return try await handleSearch(params: params)
+        case "debug.webSearch":
+            return try await handleWebSearch(params: params)
         case "debug.inspect":
             return try await handleInspect(params: params)
         case "debug.highlight":
@@ -684,6 +686,64 @@ final class DebugJSONRPC: @unchecked Sendable {
         return await MainActor.run {
             inspector.search(keyword: keyword, scope: scope)
         }
+    }
+
+    private func handleWebSearch(params: [String: Any]) async throws -> Any {
+        let allowed = Set(["query", "experiment_call", "experiment_scope"])
+        guard Set(params.keys).isSubset(of: allowed) else {
+            throw RPCError(code: -32602, message: "Invalid params: only query, experiment_call, and experiment_scope are accepted")
+        }
+        guard let query = params["query"] as? String else {
+            throw RPCError(code: -32602, message: "Invalid params: 'query' is required")
+        }
+        let normalizedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !normalizedQuery.isEmpty, normalizedQuery.unicodeScalars.count <= 512 else {
+            throw RPCError(code: -32602, message: "Invalid params: query must contain 1–512 Unicode characters")
+        }
+
+        func safeLabel(_ key: String) throws -> String? {
+            guard let value = params[key] as? String else { return nil }
+            let allowedCharacters = CharacterSet(charactersIn: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789._:-")
+            guard !value.isEmpty, value.unicodeScalars.count <= 48,
+                  value.unicodeScalars.allSatisfy({ allowedCharacters.contains($0) }) else {
+                throw RPCError(code: -32602, message: "Invalid params: '\(key)' contains unsafe characters or exceeds 48 characters")
+            }
+            return value
+        }
+        let callLabel = try safeLabel("experiment_call") ?? "direct"
+        let scopeLabel = try safeLabel("experiment_scope") ?? UUID().uuidString.lowercased()
+        let scope = WebReadScope(
+            sessionID: "debug-websearch-\(scopeLabel)-\(UUID().uuidString.lowercased())",
+            userRequestID: "debug-websearch-\(callLabel)-\(UUID().uuidString.lowercased())"
+        )
+        let batchID = "debug-websearch-batch-\(UUID().uuidString.lowercased())"
+        let callID = "debug-websearch-call-\(callLabel)-\(UUID().uuidString.lowercased())"
+        let service = await WebSearchService.shared
+        let configuration = await service.configuration
+        await service.beginBatch(id: batchID, sessionID: scope.sessionID, scope: scope)
+        let started = Date()
+        let outcome = await service.search(
+            request: WebSearchRequest(query: normalizedQuery, limit: 512),
+            scope: scope,
+            callID: callID,
+            batchID: batchID,
+            deadline: started.addingTimeInterval(configuration.totalTimeout)
+        )
+        let diagnostics = await service.recentDiagnostics
+        let diagnostic = diagnostics.last(where: { $0.batchID == batchID && $0.callID == callID })
+        let elapsed = max(0, min(60_000, Int(Date().timeIntervalSince(started) * 1_000)))
+        await service.finishBatch(id: batchID)
+        await service.endRequest(scope: scope)
+
+        return [
+            "tool_json": outcome.json,
+            "durationMs": diagnostic?.durationMilliseconds ?? elapsed,
+            "attempts": min(2, max(0, diagnostic?.networkAttempts ?? 0)),
+            "redirects": min(12, max(0, diagnostic?.redirects ?? 0)),
+            "responseBytes": min(configuration.maximumResponseBytes * 2, max(0, diagnostic?.responseBytes ?? 0)),
+            "fallbackUsed": diagnostic?.fallbackUsed ?? false,
+            "status": outcome.status.rawValue,
+        ] as [String: Any]
     }
 
     private func handleInspect(params: [String: Any]) async throws -> Any {

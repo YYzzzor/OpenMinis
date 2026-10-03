@@ -52,6 +52,17 @@ enum DebugMethodRegistry {
             example: ["keyword": "MiniMax", "scope": "text"]
         ),
         MethodSpec(
+            name: "debug.webSearch",
+            description: "Run one anonymous DuckDuckGo web_search directly through the app service and return its original JSON plus bounded timing and retry diagnostics. No WebView is created on HTTP success.",
+            params: [
+                ParamSpec(name: "query", type: "string", required: true, default: nil, description: "Search terms, up to 512 Unicode characters."),
+                ParamSpec(name: "experiment_call", type: "string", required: false, default: nil, description: "Optional safe diagnostic label (letters, digits, dot, underscore, colon, hyphen; up to 48 characters)."),
+                ParamSpec(name: "experiment_scope", type: "string", required: false, default: nil, description: "Optional safe experiment grouping label with the same character and length limits."),
+            ],
+            returns: "{tool_json, durationMs, attempts, redirects, responseBytes, fallbackUsed, status}",
+            example: ["query": "Cloudflare Clef decision models", "experiment_call": "probe-a", "experiment_scope": "run-1"]
+        ),
+        MethodSpec(
             name: "debug.inspect",
             description: "Return full properties of the view at the given address from debug.viewTree.",
             params: [

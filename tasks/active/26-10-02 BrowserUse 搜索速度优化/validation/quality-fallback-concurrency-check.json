@@ -1,0 +1,34 @@
+{
+  "date": "2026-10-02",
+  "head": "611dbfeba9ba7eab18065b3487a2b681459f9645",
+  "scope": [
+    "task.md",
+    "verification.md"
+  ],
+  "task_bytes": 19810,
+  "proposed_rules": 10,
+  "product_acceptance_items": 10,
+  "product_acceptance_checked": 0,
+  "mermaid_diagrams": 2,
+  "local_links_checked": 15,
+  "whitespace": "passed",
+  "baseline_unchanged": true,
+  "tracked_files_unchanged": 2565,
+  "product_code_changed": false,
+  "new_runtime_tests": false,
+  "confirmed_constraints": [
+    "search quality before speed",
+    "two independent searches concurrently when resources permit",
+    "experiments may use DuckDuckGo and similar services"
+  ],
+  "proposed_fallback_relationship": true,
+  "verification_bytes": 2238,
+  "candidate_service_experiments_authorized": true,
+  "experiment_candidates": [
+    "DuckDuckGo Lite",
+    "DuckDuckGo HTML",
+    "browser search"
+  ],
+  "production_default_engine_selected": false,
+  "unrelated_process_records_removed": true
+}

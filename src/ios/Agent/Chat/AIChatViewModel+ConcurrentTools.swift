@@ -51,6 +51,17 @@ extension AIChatViewModel {
         )
     }
 
+    private static func webSearchRequest(from args: [String: Any], inputWasTruncated: Bool = false) -> WebSearchRequest {
+        WebSearchRequest(
+            query: args["query"] as? String ?? "",
+            documentID: args["document_id"] as? String,
+            offset: args["offset"] as? Int,
+            limit: args["limit"] as? Int,
+            resultIndex: args["result_index"] as? Int,
+            inputWasTruncated: inputWasTruncated
+        )
+    }
+
     /// Tiny actor wrapping the per-turn image budget so concurrent tool
     /// tasks can race-free claim a slot for their image bytes.
     /// `reserveSlot()` returns true iff a slot was claimed; the caller
@@ -99,17 +110,23 @@ extension AIChatViewModel {
         batchBudget: BatchImageBudget,
         webReadBatchID: String? = nil,
         webReadScope: WebReadScope? = nil,
-        webReadDeadline: Date? = nil
+        webReadDeadline: Date? = nil,
+        webSearchBatchID: String? = nil,
+        webSearchScope: WebReadScope? = nil,
+        webSearchDeadline: Date? = nil
     ) async -> ToolExecOutcome {
         let blockIdx = tu.blockIdx
         let earlyWebReadRequest = tu.name == "web_read" ? Self.webReadRequest(from: tu.args) : nil
+        let earlyWebSearchRequest = tu.name == "web_search" ? Self.webSearchRequest(from: tu.args) : nil
 
         // Graceful cancel pre-check: any task that begins after the user
         // tapped Stop short-circuits with a synthetic cancellation result
         // so history stays paired.
         if Task.isCancelled || self.userDidCancel
-            || ((tu.name == "web_read" || tu.name == "browser_use") && commandCancelledByUser) {
-            let cancelContent = earlyWebReadRequest.map {
+            || ((tu.name == "web_read" || tu.name == "web_search" || tu.name == "browser_use") && commandCancelledByUser) {
+            let cancelContent = earlyWebSearchRequest.map {
+                WebSearchService.immediateOutcome(query: $0.query, status: .cancelled, limitation: "搜索在开始前已停止。").json
+            } ?? earlyWebReadRequest.map {
                 WebReadService.immediateOutcome(request: $0, status: .cancelled, limitation: "读取在开始前已停止。").json
             } ?? "<system-reminder>The user cancelled this operation. The returned result may be incomplete.</system-reminder>"
             if msgIdx < messages.count, blockIdx < messages[msgIdx].blocks.count {
@@ -123,7 +140,7 @@ extension AIChatViewModel {
             )
             return ToolExecOutcome(
                 toolId: tu.id, toolName: tu.name,
-                resultPart: .toolResult(id: tu.id, name: tu.name, content: cancelContent, isError: tu.name != "web_read"),
+                resultPart: .toolResult(id: tu.id, name: tu.name, content: cancelContent, isError: tu.name != "web_read" && tu.name != "web_search"),
                 snapshotEntry: (toolName: tu.name, snapshot: cancelSnap),
                 snapshotItem: item,
                 cancelled: true
@@ -142,7 +159,9 @@ extension AIChatViewModel {
         // in a runaway pattern (unknown tool spam, no-progress polling, etc).
         let loopPreCheck = toolLoopDetector.check(toolName: tu.name, params: tu.args)
         if loopPreCheck.level == .critical, let blockedMsg = loopPreCheck.message {
-            let modelBlockedMessage = earlyWebReadRequest.map {
+            let modelBlockedMessage = earlyWebSearchRequest.map {
+                WebSearchService.immediateOutcome(query: $0.query, status: .failed, limitation: "搜索被循环保护器阻止。").json
+            } ?? earlyWebReadRequest.map {
                 WebReadService.immediateOutcome(request: $0, status: .failed, limitation: "读取被循环保护器阻止。").json
             } ?? blockedMsg
             toolOutput = modelBlockedMessage
@@ -268,14 +287,19 @@ extension AIChatViewModel {
             )
             let uiMessage = AppLocalized("Blocked invalid tool call")
             let plainModelMessage = "Error: Tool call rejected before execution. \(preflightError) The arguments your client sent were empty or missing required fields — re-issue the call with all required parameters filled in. Do not retry with the same empty arguments."
-            let modelMessage = tu.name == "web_read"
+            let modelMessage = tu.name == "web_search"
+                ? WebSearchService.immediateOutcome(
+                    query: Self.webSearchRequest(from: toolArgs).query, status: .failed,
+                    limitation: "搜索参数无效，未发出网络请求。"
+                ).json
+                : tu.name == "web_read"
                 ? WebReadService.immediateOutcome(
                     request: Self.webReadRequest(from: toolArgs), status: .failed,
                     limitation: "读取参数无效，未发出网络请求。"
                 ).json
                 : plainModelMessage
             if msgIdx < messages.count, blockIdx < messages[msgIdx].blocks.count {
-                messages[msgIdx].blocks[blockIdx].content = tu.name == "web_read" ? modelMessage : uiMessage
+                messages[msgIdx].blocks[blockIdx].content = (tu.name == "web_read" || tu.name == "web_search") ? modelMessage : uiMessage
                 messages[msgIdx].blocks[blockIdx].toolStatus = .failed(message: uiMessage)
             }
             toolLoopDetector.record(
@@ -600,6 +624,34 @@ extension AIChatViewModel {
                     : (toolSuccess ? .success : .failed(message: "web_read failed"))
             }
 
+        case "web_search":
+            let request = Self.webSearchRequest(from: toolArgs, inputWasTruncated: truncationRepairTag != nil)
+            let resolvedScope = webSearchScope ?? WebReadScope(
+                sessionID: sessionId ?? "unsaved-session",
+                userRequestID: msgIdx < messages.count ? messages[msgIdx].id.uuidString : tu.id
+            )
+            let resolvedBatchID = webSearchBatchID ?? "direct-" + UUID().uuidString.lowercased()
+            let rawOutcome = await webSearchService.search(
+                request: request, scope: resolvedScope, callID: tu.id,
+                batchID: resolvedBatchID, deadline: webSearchDeadline
+            )
+            let outcome = rawOutcome
+            toolOutput = outcome.json
+            toolSuccess = !outcome.isError
+            cancelledHere = outcome.status == .cancelled
+            if let resultData = outcome.json.data(using: .utf8),
+               let resultObject = try? JSONSerialization.jsonObject(with: resultData) as? [String: Any],
+               let firstResult = (resultObject["results"] as? [[String: Any]])?.first {
+                toolPageURL = firstResult["url"] as? String
+            }
+            if msgIdx < messages.count, blockIdx < messages[msgIdx].blocks.count {
+                messages[msgIdx].blocks[blockIdx].content = outcome.json
+                messages[msgIdx].blocks[blockIdx].browserURL = toolPageURL
+                messages[msgIdx].blocks[blockIdx].toolStatus = cancelledHere
+                    ? .cancelled
+                    : (toolSuccess ? .success : .failed(message: "web_search \(outcome.status.rawValue)"))
+            }
+
         case "browser_use":
             var browserResult: BrowserActionResult
             if let input = BrowserActionInput.parse(from: argsJson) {
@@ -860,29 +912,42 @@ extension AIChatViewModel {
             toolSuccess = false
         }
         } catch is CancellationError {
-            let cancelContent = earlyWebReadRequest.map {
+            let cancelContent = earlyWebSearchRequest.map {
+                WebSearchService.immediateOutcome(query: $0.query, status: .cancelled, limitation: "搜索已取消。").json
+            } ?? earlyWebReadRequest.map {
                 WebReadService.immediateOutcome(request: $0, status: .cancelled, limitation: "读取已取消。").json
             } ?? "<system-reminder>The user cancelled this operation. The returned result may be incomplete.</system-reminder>"
             let existing = (msgIdx < messages.count && blockIdx < messages[msgIdx].blocks.count)
                 ? messages[msgIdx].blocks[blockIdx].content : ""
-            toolOutput = tu.name == "web_read" ? cancelContent : (existing.isEmpty ? cancelContent : existing + "\n" + cancelContent)
-            toolSuccess = tu.name == "web_read"
+            toolOutput = (tu.name == "web_read" || tu.name == "web_search")
+                ? cancelContent : (existing.isEmpty ? cancelContent : existing + "\n" + cancelContent)
+            toolSuccess = tu.name == "web_read" || tu.name == "web_search"
             cancelledHere = true
             if msgIdx < messages.count, blockIdx < messages[msgIdx].blocks.count {
+                if tu.name == "web_search" { messages[msgIdx].blocks[blockIdx].content = toolOutput }
                 messages[msgIdx].blocks[blockIdx].toolStatus = .cancelled
             }
         } catch {
             ctLogger.error("Tool execution threw non-cancellation error: \(error)")
-            toolOutput = "Error: \(error.localizedDescription)"
+            toolOutput = tu.name == "web_search"
+                ? WebSearchService.immediateOutcome(query: earlyWebSearchRequest?.query ?? "", status: .failed, limitation: error.localizedDescription).json
+                : "Error: \(error.localizedDescription)"
             toolSuccess = false
+            if tu.name == "web_search", msgIdx < messages.count, blockIdx < messages[msgIdx].blocks.count {
+                messages[msgIdx].blocks[blockIdx].content = toolOutput
+                messages[msgIdx].blocks[blockIdx].toolStatus = .failed(message: "web_search failed")
+            }
         }
 
         // Tail cancel-detection: if Task got cancelled mid-execution.
         if !cancelledHere && (Task.isCancelled && self.userDidCancel
-            || ((tu.name == "web_read" || tu.name == "browser_use") && commandCancelledByUser)) {
+            || ((tu.name == "web_read" || tu.name == "web_search" || tu.name == "browser_use") && commandCancelledByUser)) {
             cancelledHere = true
             if tu.name == "web_read", let request = earlyWebReadRequest {
                 toolOutput = WebReadService.immediateOutcome(request: request, status: .cancelled, limitation: "读取已取消。").json
+                toolSuccess = true
+            } else if let request = earlyWebSearchRequest {
+                toolOutput = WebSearchService.immediateOutcome(query: request.query, status: .cancelled, limitation: "搜索已取消。").json
                 toolSuccess = true
             } else {
                 toolOutput += "\n<system-reminder>The user cancelled this operation. The returned result may be incomplete.</system-reminder>"
@@ -961,7 +1026,7 @@ extension AIChatViewModel {
             blk.toolDuration = toolDuration
             if cancelledHere {
                 blk.toolStatus = .cancelled
-            } else if toolSuccess, truncationRepairTag != nil, tu.name != "web_read" {
+            } else if toolSuccess, truncationRepairTag != nil, tu.name != "web_read" && tu.name != "web_search" {
                 // [T-truncated-args-visibility #119] A repaired call must not
                 // render as a clean success — that is exactly the silence the
                 // user reported. Surface it with the same weight the blocked
@@ -984,7 +1049,7 @@ extension AIChatViewModel {
         var finalOutput: String
         if toolOutput.isEmpty {
             finalOutput = "(no output)"
-        } else if tu.name != "web_read" && toolOutput.count > maxToolResultLength {
+        } else if tu.name != "web_read" && tu.name != "web_search" && toolOutput.count > maxToolResultLength {
             let offloadResult = offloadToolOutput(toolOutput, toolName: tu.name, toolId: tu.id)
             let offloadMinisURL = linuxPathToMinisURL(offloadResult.linuxPath)
             let truncatedBody: String
@@ -1028,7 +1093,7 @@ extension AIChatViewModel {
             errorMessage: toolSuccess ? nil : finalOutput,
             toolCallId: tu.id
         )
-        if postCheck.level == .warning, let warningMsg = postCheck.message, tu.name != "web_read" {
+        if postCheck.level == .warning, let warningMsg = postCheck.message, tu.name != "web_read" && tu.name != "web_search" {
             if finalOutput.isEmpty {
                 finalOutput = warningMsg
             } else {
@@ -1045,7 +1110,7 @@ extension AIChatViewModel {
         // has no way to know its own arguments were altered, and silently
         // assuming they were intact is how a half-truth propagates downstream.
         // Stating it lets the model verify rather than guess.
-        if let tag = truncationRepairTag, tu.name != "web_read" {
+        if let tag = truncationRepairTag, tu.name != "web_read" && tu.name != "web_search" {
             finalOutput += "\n\n<system-reminder>The argument stream for this call was truncated in "
                 + "transit and auto-closed by the client (repair strategy: \(tag)) before execution. "
                 + "The arguments actually used may be incomplete — verify the result and re-issue "

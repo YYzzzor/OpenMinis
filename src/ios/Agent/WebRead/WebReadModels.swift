@@ -182,6 +182,26 @@ struct WebReadFetchRequest: Sendable {
     let deadline: Date
     let maximumBytes: Int
     let maximumRedirects: Int
+    let userAgent: String?
+    let allowsNonSuccessBody: Bool
+
+    init(
+        url: URL,
+        callID: String,
+        deadline: Date,
+        maximumBytes: Int,
+        maximumRedirects: Int,
+        userAgent: String? = nil,
+        allowsNonSuccessBody: Bool = false
+    ) {
+        self.url = url
+        self.callID = callID
+        self.deadline = deadline
+        self.maximumBytes = maximumBytes
+        self.maximumRedirects = maximumRedirects
+        self.userAgent = userAgent
+        self.allowsNonSuccessBody = allowsNonSuccessBody
+    }
 }
 
 struct WebReadFetchedResponse: Sendable {
@@ -221,9 +241,30 @@ protocol WebReadRendering: AnyObject {
         callID: String,
         deadline: Date,
         queryTarget: String?,
-        waitForTarget: Bool
+        waitForTarget: Bool,
+        preserveSearchStructure: Bool
     ) async throws -> WebReadRenderedPage
     func cancel(callID: String)
+}
+
+@MainActor
+extension WebReadRendering {
+    func render(
+        url: URL,
+        callID: String,
+        deadline: Date,
+        queryTarget: String?,
+        waitForTarget: Bool
+    ) async throws -> WebReadRenderedPage {
+        try await render(
+            url: url,
+            callID: callID,
+            deadline: deadline,
+            queryTarget: queryTarget,
+            waitForTarget: waitForTarget,
+            preserveSearchStructure: false
+        )
+    }
 }
 
 enum WebReadFailure: Error, Sendable {

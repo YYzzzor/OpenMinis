@@ -2551,6 +2551,10 @@ actor ChatStore {
         // the on-screen activity.
         Task { @MainActor in
             SessionActivityTracker.shared.setInactive(id, source: "sessionDeleted")
+            // Every deletion route converges here, including remote tombstones
+            // and debug RPC. Removing is a no-op when no ViewModel is cached;
+            // when present, cancel() also stops that session's web searches.
+            ViewModelCache.shared.remove(sessionId: id)
             AgentLiveActivityManager.shared.handleSessionDeleted(id)
         }
     }
@@ -4857,6 +4861,9 @@ extension RawMessage {
                     if !argURL.isEmpty {
                         lastBrowserURL = argURL
                     }
+                case "web_search":
+                    kind = .browserTool(action: "web_search")
+                    content = "Searching public sources..."
                 case "read_image":
                     let path = extractStringParam("path", from: tu.input)
                     kind = .readImageTool(path: path)

@@ -94,6 +94,9 @@ final class URLSessionWebReadTransport: WebReadTransport, @unchecked Sendable {
         urlRequest.httpMethod = "GET"
         urlRequest.cachePolicy = .reloadIgnoringLocalCacheData
         urlRequest.timeoutInterval = max(1, remaining)
+        if let userAgent = request.userAgent, !userAgent.isEmpty {
+            urlRequest.setValue(userAgent, forHTTPHeaderField: "User-Agent")
+        }
 
         do {
             return try await withTaskCancellationHandler {
@@ -112,7 +115,8 @@ final class URLSessionWebReadTransport: WebReadTransport, @unchecked Sendable {
                 let suggestedFilename = http.suggestedFilename
                 let retrievedAt = Date()
 
-                if Self.isUnsupportedMime(mimeType) || !(200..<300).contains(http.statusCode) {
+                if Self.isUnsupportedMime(mimeType)
+                    || (!(200..<300).contains(http.statusCode) && !request.allowsNonSuccessBody) {
                     bytes.task.cancel()
                     return WebReadFetchedResponse(
                         requestedURL: request.url, finalURL: finalURL, statusCode: http.statusCode,

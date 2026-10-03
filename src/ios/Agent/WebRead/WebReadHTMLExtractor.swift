@@ -876,7 +876,7 @@ enum WebReadHTMLExtractor {
         return String(String.UnicodeScalarView(Array(text.unicodeScalars.prefix(count))))
     }
 
-    private static func decodeEntities(_ text: String) -> String {
+    static func decodeEntities(_ text: String) -> String {
         let source = text as NSString
         let matches = entityRegex.matches(in: text, range: NSRange(location: 0, length: source.length))
         guard !matches.isEmpty else { return text }

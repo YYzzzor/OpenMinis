@@ -1,0 +1,676 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0, user-scalable=1;">
+  <meta name="referrer" content="origin">
+  <meta name="HandheldFriendly" content="true" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>&quot;Jev&quot; model AI 分类器 at DuckDuckGo</title>
+  <link title="DuckDuckGo (Lite)" type="application/opensearchdescription+xml" rel="search" href="//duckduckgo.com/opensearch_lite_v2.xml">
+  <link href="//duckduckgo.com/favicon.ico" rel="shortcut icon" />
+  <link rel="icon" href="//duckduckgo.com/favicon.ico" type="image/x-icon" />
+  <link id="icon60" rel="apple-touch-icon" href="//duckduckgo.com/assets/icons/meta/DDG-iOS-icon_60x60.png?v=2"/>
+  <link id="icon76" rel="apple-touch-icon" sizes="76x76" href="//duckduckgo.com/assets/icons/meta/DDG-iOS-icon_76x76.png?v=2"/>
+  <link id="icon120" rel="apple-touch-icon" sizes="120x120" href="//duckduckgo.com/assets/icons/meta/DDG-iOS-icon_120x120.png?v=2"/>
+  <link id="icon152" rel="apple-touch-icon" sizes="152x152" href="//duckduckgo.com/assets/icons/meta/DDG-iOS-icon_152x152.png?v=2"/>
+  <link rel="image_src" href="//duckduckgo.com/assets/icons/meta/DDG-icon_256x256.png">
+  <link rel="stylesheet" media="handheld, all" href="//duckduckgo.com/dist/lr.48ddfe4eadf6a534e93f.css" type="text/css"/>
+</head>
+
+<body>
+  <p class='extra'>&nbsp;</p>
+  <div class="header">
+    DuckDuckGo
+  </div>
+  <p class='extra'>&nbsp;</p>
+
+  <form action="/lite/" method="post">
+      <input class='query' type="text" size="40" name="q" value="&quot;Jev&quot; model AI 分类器">
+      <input class='submit' type="submit" value="Search">
+
+
+
+
+
+      <div class="filters">
+        <select class="submit" name="kl">
+
+            <option value="" >All Regions</option>
+
+            <option value="ar-es" >Argentina</option>
+
+            <option value="au-en" >Australia</option>
+
+            <option value="at-de" >Austria</option>
+
+            <option value="be-fr" >Belgium (fr)</option>
+
+            <option value="be-nl" >Belgium (nl)</option>
+
+            <option value="br-pt" >Brazil</option>
+
+            <option value="bg-bg" >Bulgaria</option>
+
+            <option value="ca-en" >Canada (en)</option>
+
+            <option value="ca-fr" >Canada (fr)</option>
+
+            <option value="ct-ca" >Catalonia</option>
+
+            <option value="cl-es" >Chile</option>
+
+            <option value="cn-zh" >China</option>
+
+            <option value="co-es" >Colombia</option>
+
+            <option value="hr-hr" >Croatia</option>
+
+            <option value="cz-cs" >Czech Republic</option>
+
+            <option value="dk-da" >Denmark</option>
+
+            <option value="ee-et" >Estonia</option>
+
+            <option value="fi-fi" >Finland</option>
+
+            <option value="fr-fr" >France</option>
+
+            <option value="de-de" >Germany</option>
+
+            <option value="gr-el" >Greece</option>
+
+            <option value="hk-tzh" >Hong Kong</option>
+
+            <option value="hu-hu" >Hungary</option>
+
+            <option value="is-is" >Iceland</option>
+
+            <option value="in-en" >India (en)</option>
+
+            <option value="id-en" >Indonesia (en)</option>
+
+            <option value="ie-en" >Ireland</option>
+
+            <option value="il-en" >Israel (en)</option>
+
+            <option value="it-it" >Italy</option>
+
+            <option value="jp-jp" >Japan</option>
+
+            <option value="kr-kr" >Korea</option>
+
+            <option value="lv-lv" >Latvia</option>
+
+            <option value="lt-lt" >Lithuania</option>
+
+            <option value="my-en" >Malaysia (en)</option>
+
+            <option value="mx-es" >Mexico</option>
+
+            <option value="nl-nl" >Netherlands</option>
+
+            <option value="nz-en" >New Zealand</option>
+
+            <option value="no-no" >Norway</option>
+
+            <option value="pk-en" >Pakistan (en)</option>
+
+            <option value="pe-es" >Peru</option>
+
+            <option value="ph-en" >Philippines (en)</option>
+
+            <option value="pl-pl" >Poland</option>
+
+            <option value="pt-pt" >Portugal</option>
+
+            <option value="ro-ro" >Romania</option>
+
+            <option value="ru-ru" >Russia</option>
+
+            <option value="xa-ar" >Saudi Arabia</option>
+
+            <option value="sg-en" >Singapore</option>
+
+            <option value="sk-sk" >Slovakia</option>
+
+            <option value="sl-sl" >Slovenia</option>
+
+            <option value="za-en" >South Africa</option>
+
+            <option value="es-ca" >Spain (ca)</option>
+
+            <option value="es-es" >Spain (es)</option>
+
+            <option value="se-sv" >Sweden</option>
+
+            <option value="ch-de" >Switzerland (de)</option>
+
+            <option value="ch-fr" >Switzerland (fr)</option>
+
+            <option value="tw-tzh" >Taiwan</option>
+
+            <option value="th-en" >Thailand (en)</option>
+
+            <option value="tr-tr" >Turkey</option>
+
+            <option value="us-en" >US (English)</option>
+
+            <option value="us-es" >US (Spanish)</option>
+
+            <option value="ua-uk" >Ukraine</option>
+
+            <option value="uk-en" >United Kingdom</option>
+
+            <option value="vn-en" >Vietnam (en)</option>
+
+        </select>
+
+        <select class="submit" name="df">
+
+            <option value="" selected>Any Time</option>
+
+            <option value="d" >Past Day</option>
+
+            <option value="w" >Past Week</option>
+
+            <option value="m" >Past Month</option>
+
+            <option value="y" >Past Year</option>
+
+        </select>
+      </div>
+  </form>
+
+
+
+
+
+  <p class='extra'>&nbsp;</p>
+
+  <table border="0">
+
+  </table>
+
+  <table border="0">
+
+
+      <!-- Web results are present -->
+
+
+            <tr>
+
+                <td valign="top">
+
+                    1.&nbsp;
+
+                </td>
+                <td>
+                  <a rel="nofollow" href="https://jevmodel.org/" class='result-link'>Jev AI Model (TypeSafe) — Typed System One Decisions</a>
+                </td>
+
+            </tr>
+
+
+
+                <!-- Only show abstract separately if there's a click URL (not EOF) -->
+                <tr>
+                  <td>&nbsp;&nbsp;&nbsp;</td>
+                  <td class='result-snippet'>
+                    <b>Jev</b> is TypeSafe <b>AI&#x27;s</b> System One <b>model</b>: it returns a choice, score, or yes/no probability instead of chat. The hosted API is open as of 21 September 2026. $0.042 per 1M input tokens, output free.
+                  </td>
+                </tr>
+
+
+
+
+              <tr>
+                <td>&nbsp;&nbsp;&nbsp;</td>
+                <td>
+                  <span class='link-text'>jevmodel.org</span>
+
+                </td>
+              </tr>
+
+
+            <tr>
+              <td>&nbsp;</td>
+              <td>&nbsp;</td>
+            </tr>
+
+
+
+
+            <tr>
+
+                <td valign="top">
+
+                    2.&nbsp;
+
+                </td>
+                <td>
+                  <a rel="nofollow" href="https://en.wikipedia.org/wiki/Jev_(AI_model)" class='result-link'>Jev (AI model) - Wikipedia</a>
+                </td>
+
+            </tr>
+
+
+
+                <!-- Only show abstract separately if there's a click URL (not EOF) -->
+                <tr>
+                  <td>&nbsp;&nbsp;&nbsp;</td>
+                  <td class='result-snippet'>
+                    <b>Jev</b> is a proprietary artificial intelligence <b>model</b> developed by TypeSafe <b>AI</b>, a San Francisco-based company founded in 2024. It was released in limited early access on 15 September 2026, alongside the announcement of a US$40 million seed round led by DCVC. [1][2]
+                  </td>
+                </tr>
+
+
+
+
+              <tr>
+                <td>&nbsp;&nbsp;&nbsp;</td>
+                <td>
+                  <span class='link-text'>en.wikipedia.org/wiki/Jev_(AI_model)</span>
+
+                </td>
+              </tr>
+
+
+            <tr>
+              <td>&nbsp;</td>
+              <td>&nbsp;</td>
+            </tr>
+
+
+
+
+            <tr>
+
+                <td valign="top">
+
+                    3.&nbsp;
+
+                </td>
+                <td>
+                  <a rel="nofollow" href="https://github.com/jev-ai" class='result-link'>jev-ai · GitHub</a>
+                </td>
+
+            </tr>
+
+
+
+                <!-- Only show abstract separately if there's a click URL (not EOF) -->
+                <tr>
+                  <td>&nbsp;&nbsp;&nbsp;</td>
+                  <td class='result-snippet'>
+                    <b>Jev</b> <b>AI</b> is an online decision <b>model</b> for software teams that need structured answers from real-world application state. It is designed for the small but important decisions that happen repeatedly inside a product: classify a request, route a ticket, score urgency, check whether an action is safe, or decide whether a person should review the result.
+                  </td>
+                </tr>
+
+
+
+
+              <tr>
+                <td>&nbsp;&nbsp;&nbsp;</td>
+                <td>
+                  <span class='link-text'>github.com/jev-ai</span>
+
+                </td>
+              </tr>
+
+
+            <tr>
+              <td>&nbsp;</td>
+              <td>&nbsp;</td>
+            </tr>
+
+
+
+
+            <tr>
+
+                <td valign="top">
+
+                    4.&nbsp;
+
+                </td>
+                <td>
+                  <a rel="nofollow" href="https://arxiv.org/abs/2609.30216" class='result-link'>Jev in the Wild: A Data-Driven Analysis of the Jev Model&#x27;s ...</a>
+                </td>
+
+            </tr>
+
+
+
+                <!-- Only show abstract separately if there's a click URL (not EOF) -->
+                <tr>
+                  <td>&nbsp;&nbsp;&nbsp;</td>
+                  <td class='result-snippet'>
+                    <b>Jev</b> is a fast, low-cost decision <b>model</b> that answers natural-language questions with choices, binary judgments, and scores. As its public ecosystem grows rapidly, it remains unclear how <b>Jev</b> is used across applications and how public attention relates to project distribution. To answer these questions, we conduct a large-scale, data-driven analysis of 2,170 publicly available <b>Jev</b> projects ...
+                  </td>
+                </tr>
+
+
+
+
+              <tr>
+                <td>&nbsp;&nbsp;&nbsp;</td>
+                <td>
+                  <span class='link-text'>arxiv.org/abs/2609.30216</span>
+
+                    &nbsp;&nbsp;&nbsp;
+                    <span class='timestamp'>2026-09-24T17:46:00.0000000</span>
+
+                </td>
+              </tr>
+
+
+            <tr>
+              <td>&nbsp;</td>
+              <td>&nbsp;</td>
+            </tr>
+
+
+
+
+            <tr>
+
+                <td valign="top">
+
+                    5.&nbsp;
+
+                </td>
+                <td>
+                  <a rel="nofollow" href="https://www.cnblogs.com/sing1ee/p/23098752" class='result-link'>Jev AI Model 是什么？不是聊天、只返回「判断」的决策模型完全指南（2026） - 见路非道 - 博客园</a>
+                </td>
+
+            </tr>
+
+
+
+                <!-- Only show abstract separately if there's a click URL (not EOF) -->
+                <tr>
+                  <td>&nbsp;&nbsp;&nbsp;</td>
+                  <td class='result-snippet'>
+                    核心要点（TL;DR） <b>Jev</b> <b>AI</b> <b>Model</b> 不是聊天机器人，也不生成文本：它是「决策模型」——你传入一个状态（工单、消息、JSON 对象）加若干类型化问题，它返回带概率的结构化答案，代码可以直接拿去做分支判断，完全不需要解析自然语言。 三种问题类型覆盖了软件决策层的大部分场景：Choice（分
+                  </td>
+                </tr>
+
+
+
+
+              <tr>
+                <td>&nbsp;&nbsp;&nbsp;</td>
+                <td>
+                  <span class='link-text'>www.cnblogs.com/sing1ee/p/23098752</span>
+
+                    &nbsp;&nbsp;&nbsp;
+                    <span class='timestamp'>2026-09-23T00:00:00.0000000</span>
+
+                </td>
+              </tr>
+
+
+            <tr>
+              <td>&nbsp;</td>
+              <td>&nbsp;</td>
+            </tr>
+
+
+
+
+            <tr>
+
+                <td valign="top">
+
+                    6.&nbsp;
+
+                </td>
+                <td>
+                  <a rel="nofollow" href="https://agent.nexus/blog/jev-the-model-that-decides" class='result-link'>Jev Explained: The Fast, Cheap AI Classifier, Tested on Live AI Guard ...</a>
+                </td>
+
+            </tr>
+
+
+
+                <!-- Only show abstract separately if there's a click URL (not EOF) -->
+                <tr>
+                  <td>&nbsp;&nbsp;&nbsp;</td>
+                  <td class='result-snippet'>
+                    A big <b>AI</b> <b>model</b> understands language well, but takes seconds per answer, costs add up fast, and needs no training data. <b>Jev</b> understands language well, answers in a fraction of a second, costs almost nothing, and needs no training data because you write the question instead. Table 1, &quot;The old trade off, and where <b>Jev</b> sits&quot;, in the post&#x27;s section 1.
+                  </td>
+                </tr>
+
+
+
+
+              <tr>
+                <td>&nbsp;&nbsp;&nbsp;</td>
+                <td>
+                  <span class='link-text'>agent.nexus/blog/jev-the-model-that-decides</span>
+
+                    &nbsp;&nbsp;&nbsp;
+                    <span class='timestamp'>2026-09-17T00:00:00.0000000</span>
+
+                </td>
+              </tr>
+
+
+            <tr>
+              <td>&nbsp;</td>
+              <td>&nbsp;</td>
+            </tr>
+
+
+
+
+            <tr>
+
+                <td valign="top">
+
+                    7.&nbsp;
+
+                </td>
+                <td>
+                  <a rel="nofollow" href="https://www.geeky-gadgets.com/jev-ai-model-review/" class='result-link'>Jev AI Model Review: Testing 12 Real-World Use Cases - Geeky Gadgets</a>
+                </td>
+
+            </tr>
+
+
+
+                <!-- Only show abstract separately if there's a click URL (not EOF) -->
+                <tr>
+                  <td>&nbsp;&nbsp;&nbsp;</td>
+                  <td class='result-snippet'>
+                    <b>Jev</b> <b>AI</b> <b>model</b> testing reveals it operates 20 to 200 times faster than traditional <b>models</b> for classification. See how it handles 12 use cases.
+                  </td>
+                </tr>
+
+
+
+
+              <tr>
+                <td>&nbsp;&nbsp;&nbsp;</td>
+                <td>
+                  <span class='link-text'>www.geeky-gadgets.com/jev-ai-model-review/</span>
+
+                    &nbsp;&nbsp;&nbsp;
+                    <span class='timestamp'>2026-09-21T00:00:00.0000000</span>
+
+                </td>
+              </tr>
+
+
+            <tr>
+              <td>&nbsp;</td>
+              <td>&nbsp;</td>
+            </tr>
+
+
+
+
+            <tr>
+
+                <td valign="top">
+
+                    8.&nbsp;
+
+                </td>
+                <td>
+                  <a rel="nofollow" href="https://arxiv.org/pdf/2609.30216" class='result-link'>Jev in the Wild: A Data-Driven Analysis of the Jev Model&#x27;s ...</a>
+                </td>
+
+            </tr>
+
+
+
+                <!-- Only show abstract separately if there's a click URL (not EOF) -->
+                <tr>
+                  <td>&nbsp;&nbsp;&nbsp;</td>
+                  <td class='result-snippet'>
+                    <b>Jev</b> is a recently introduced <b>model</b> for fast, low-cost decisions defined through natural language (TypeSafe <b>AI</b>, 2026). Developers specify a decision question and its possible outputs, and <b>Jev</b> returns a choice, probability, or score.
+                  </td>
+                </tr>
+
+
+
+
+              <tr>
+                <td>&nbsp;&nbsp;&nbsp;</td>
+                <td>
+                  <span class='link-text'>arxiv.org/pdf/2609.30216</span>
+
+                </td>
+              </tr>
+
+
+            <tr>
+              <td>&nbsp;</td>
+              <td>&nbsp;</td>
+            </tr>
+
+
+
+
+            <tr>
+
+                <td valign="top">
+
+                    9.&nbsp;
+
+                </td>
+                <td>
+                  <a rel="nofollow" href="https://magazine.sebastianraschka.com/p/classifier-history-and-jev" class='result-link'>Language Models for Text Classification: From Bag-of-Words to Jev</a>
+                </td>
+
+            </tr>
+
+
+
+                <!-- Only show abstract separately if there's a click URL (not EOF) -->
+                <tr>
+                  <td>&nbsp;&nbsp;&nbsp;</td>
+                  <td class='result-snippet'>
+                    The recently released <b>Jev</b> <b>AI</b> <b>model</b> has been quite a cultural phenomenon in technical communities in the past 2 weeks. While <b>Jev</b> aims to classify things, it&#x27;s easy to dismiss <b>Jev</b> as &quot;just a classifier,&quot; and my own view of <b>Jev</b> has evolved quite a bit over the past few days. In particular, my thoughts went from &quot;classifiers used to be my bread &amp; butter; I can easily build this myself ...
+                  </td>
+                </tr>
+
+
+
+
+              <tr>
+                <td>&nbsp;&nbsp;&nbsp;</td>
+                <td>
+                  <span class='link-text'>magazine.sebastianraschka.com/p/classifier-history-and-jev</span>
+
+                    &nbsp;&nbsp;&nbsp;
+                    <span class='timestamp'>2026-09-29T00:00:00.0000000</span>
+
+                </td>
+              </tr>
+
+
+            <tr>
+              <td>&nbsp;</td>
+              <td>&nbsp;</td>
+            </tr>
+
+
+
+
+            <tr>
+
+                <td valign="top">
+
+                    10.&nbsp;
+
+                </td>
+                <td>
+                  <a rel="nofollow" href="https://www.bilibili.com/video/BV1E6hJ6iEb3/" class='result-link'>Jev AI 完整教程：三种决策模式详解，接入 Codex 完整流程</a>
+                </td>
+
+            </tr>
+
+
+
+                <!-- Only show abstract separately if there's a click URL (not EOF) -->
+                <tr>
+                  <td>&nbsp;&nbsp;&nbsp;</td>
+                  <td class='result-snippet'>
+                    <b>Jev</b> 是 TypeSafe <b>AI</b> 推出的决策模型，专门处理分类、评分、真假判断等任务，直接返回结构化结果和概率分布。 这期视频从最基础的操作开始，带你了解 <b>Jev</b> 的工作原理，并通过邮件分类、情侣聊天等案例，演示 Choice、Noul、Score 三种判断模式。 我们还会将 <b>Jev</b> 接入 Codex 智能体，安装 TypeSafe 官方 Skill ...
+                  </td>
+                </tr>
+
+
+
+
+              <tr>
+                <td>&nbsp;&nbsp;&nbsp;</td>
+                <td>
+                  <span class='link-text'>www.bilibili.com/video/BV1E6hJ6iEb3/</span>
+
+                    &nbsp;&nbsp;&nbsp;
+                    <span class='timestamp'>2026-09-22T00:00:00.0000000</span>
+
+                </td>
+              </tr>
+
+
+            <tr>
+              <td>&nbsp;</td>
+              <td>&nbsp;</td>
+            </tr>
+
+
+
+
+
+
+  </table>
+
+  <p class='extra'>&nbsp;</p>
+
+  <form action="/lite/" method="post">
+      <input class='query' type="text" size="40" name="q" value="&quot;Jev&quot; model AI 分类器" >
+      <input class='submit' type="submit" value="Search">
+
+
+
+
+
+        <input name="kl" value="wt-wt" type="hidden">
+
+  </form>
+
+  <p class='extra'>&nbsp;</p>
+
+
+    <img src="//duckduckgo.com/t/sl_l"/>
+
+  <div id='end-spacer'>&nbsp;</div>
+
+</body>
+</html>

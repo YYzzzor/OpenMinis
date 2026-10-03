@@ -28,6 +28,7 @@ final class WebReadRenderer: NSObject, WebReadRendering, WKNavigationDelegate, W
         let deadline: Date
         let queryTarget: String?
         let waitForTarget: Bool
+        let preserveSearchStructure: Bool
         let targetWaitDeadline: Date
         var webView: WKWebView?
         var continuation: CheckedContinuation<WebReadRenderedPage, Error>?
@@ -50,6 +51,7 @@ final class WebReadRenderer: NSObject, WebReadRendering, WKNavigationDelegate, W
             deadline: Date,
             queryTarget: String?,
             waitForTarget: Bool,
+            preserveSearchStructure: Bool,
             targetWaitDeadline: Date
         ) {
             self.callID = callID
@@ -57,6 +59,7 @@ final class WebReadRenderer: NSObject, WebReadRendering, WKNavigationDelegate, W
             self.deadline = deadline
             self.queryTarget = queryTarget
             self.waitForTarget = waitForTarget
+            self.preserveSearchStructure = preserveSearchStructure
             self.targetWaitDeadline = targetWaitDeadline
         }
     }
@@ -74,7 +77,8 @@ final class WebReadRenderer: NSObject, WebReadRendering, WKNavigationDelegate, W
         callID: String,
         deadline: Date,
         queryTarget: String?,
-        waitForTarget: Bool
+        waitForTarget: Bool,
+        preserveSearchStructure: Bool = false
     ) async throws -> WebReadRenderedPage {
         guard Self.isAllowedURL(url), !callID.isEmpty else {
             throw WebReadFailure.restricted
@@ -128,6 +132,7 @@ final class WebReadRenderer: NSObject, WebReadRendering, WKNavigationDelegate, W
             deadline: deadline,
             queryTarget: target,
             waitForTarget: shouldWaitForTarget,
+            preserveSearchStructure: preserveSearchStructure,
             targetWaitDeadline: targetWaitDeadline
         )
         operation.webView = webView
@@ -314,7 +319,10 @@ final class WebReadRenderer: NSObject, WebReadRendering, WKNavigationDelegate, W
         operation.isCapturing = true
 
         do {
-            let script = try Self.renderedPageScript(target: operation.queryTarget)
+            let script = try Self.renderedPageScript(
+                target: operation.queryTarget,
+                preserveSearchStructure: operation.preserveSearchStructure
+            )
             let value = try await evaluate(script, in: operation)
             guard isActive(operation) else { return }
             guard Date() < operation.deadline else {
@@ -639,13 +647,14 @@ final class WebReadRenderer: NSObject, WebReadRendering, WKNavigationDelegate, W
         """
     }
 
-    private static func renderedPageScript(target: String?) throws -> String {
+    private static func renderedPageScript(target: String?, preserveSearchStructure: Bool) throws -> String {
         let targetLiteral = try javascriptString(target)
         let readinessSnapshot = try readinessScript(target: nil)
         return """
         (function() {
             var readiness = \(readinessSnapshot);
             var target = \(targetLiteral);
+            var preserveSearchStructure = \(preserveSearchStructure ? "true" : "false");
             var body = document.body || document.documentElement;
             var targetRoot = document.querySelector("main, article") || body;
             var maxHTML = 524288;
@@ -669,7 +678,8 @@ final class WebReadRenderer: NSObject, WebReadRendering, WKNavigationDelegate, W
             var allowedAttributes = [
                 "href", "src", "alt", "title", "id", "class", "role", "aria-label",
                 "colspan", "rowspan", "scope", "datetime", "width", "height",
-                "type", "autocomplete", "name", "placeholder", "required", "disabled", "readonly"
+                "type", "autocomplete", "name", "placeholder", "required", "disabled", "readonly",
+                "action", "method", "value"
             ];
 
             function isHiddenElement(element) {
@@ -759,10 +769,19 @@ final class WebReadRenderer: NSObject, WebReadRendering, WKNavigationDelegate, W
                 for (var i = 0; i < allowedAttributes.length; i += 1) {
                     var name = allowedAttributes[i];
                     if (!element.hasAttribute(name)) continue;
+                    var isNextForm = preserveSearchStructure && tag === "form" &&
+                        String(element.getAttribute("class") || "").split(/\\s+/).indexOf("next_form") >= 0;
+                    var isNextHiddenInput = preserveSearchStructure && tag === "input" &&
+                        String(element.getAttribute("type") || "").toLowerCase() === "hidden" &&
+                        !!element.closest("form.next_form");
+                    if ((name === "action" || name === "method") && !isNextForm) continue;
+                    if (name === "value" && !isNextHiddenInput) continue;
                     var value = element.getAttribute(name) || "";
-                    if (value.length > 2048) {
+                    if (name !== "href" || !preserveSearchStructure) {
+                      if (value.length > 2048) {
                         value = value.slice(0, 2048);
                         wasTruncated = true;
+                      }
                     }
                     output += " " + name + "=\\"" + escapeText(value) + "\\"";
                 }

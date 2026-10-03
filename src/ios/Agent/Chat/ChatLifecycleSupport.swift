@@ -448,6 +448,9 @@ final class ViewModelCache {
         catch { logger.error("Failed to remove deleted session context usage: \(error)") }
         lruOrder.removeAll { $0 == sessionId }
         if let removed = cache.removeValue(forKey: sessionId) {
+            // Stop-and-continue intentionally preserves queued prompts for an
+            // ordinary user Stop. A deleted session has no queue to resume.
+            removed.promptQueue.removeAll()
             removed.cancel()
             logger.info("🔄SESSION ViewModelCache REMOVE session=\(sessionId) vm=\(removed.vmInstanceId)")
         }
@@ -636,4 +639,3 @@ final class ViewModelCache {
         logger.info("[MoveTo] Discarded pending transfer for target=\(transfer.targetId) reason=\(reason)")
     }
 }
-
