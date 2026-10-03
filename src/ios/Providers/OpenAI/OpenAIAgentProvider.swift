@@ -1661,9 +1661,29 @@ final class OpenAIAgentProvider: AgentProvider {
 
     // MARK: - Responses API Message Conversion
 
-    private func convertMessagesResponsesAPI(_ messages: [AgentMessage]) -> [[String: Any]] {
+    func convertMessagesResponsesAPI(_ messages: [AgentMessage]) -> [[String: Any]] {
         var result: [[String: Any]] = []
+        var pendingToolBatchItems: [[String: Any]] = []
+        let supportsImages = model.capabilities.supportedModalities.contains(.imageInput)
+
         for msg in messages {
+            let containsToolResult = msg.parts.contains {
+                if case .toolResult = $0 { return true }
+                return false
+            }
+            // 相邻的工具结果消息属于同一批次；先输出完整结果，再输出提醒文字和图片。
+            if !containsToolResult, !pendingToolBatchItems.isEmpty {
+                result.append(contentsOf: pendingToolBatchItems)
+                pendingToolBatchItems.removeAll(keepingCapacity: true)
+            }
+            func appendNonResultItem(_ item: [String: Any]) {
+                if containsToolResult {
+                    pendingToolBatchItems.append(item)
+                } else {
+                    result.append(item)
+                }
+            }
+
             // Replay native reasoning items at the head of this assistant turn.
             // Order matters: Responses API rejects reasoning items that appear
             // after function_call items belonging to the same turn. Cross-model
@@ -1688,7 +1708,7 @@ final class OpenAIAgentProvider: AgentProvider {
                         if let encrypted, !encrypted.isEmpty {
                             entry["encrypted_content"] = encrypted
                         }
-                        result.append(entry)
+                        appendNonResultItem(entry)
                     }
                 }
             }
@@ -1696,7 +1716,7 @@ final class OpenAIAgentProvider: AgentProvider {
                 switch part {
                 case .text(let text):
                     let role = msg.role == .user ? "user" : "assistant"
-                    result.append(["role": role, "content": text])
+                    appendNonResultItem(["role": role, "content": text])
 
                 case .toolUse(let id, let name, let input):
                     let argsStr = (try? JSONSerialization.data(withJSONObject: input)).flatMap { String(data: $0, encoding: .utf8) } ?? "{}"
@@ -1728,7 +1748,7 @@ final class OpenAIAgentProvider: AgentProvider {
                         }
                         entry["id"] = "fc_syn_\(safeCallId.suffix(24))"
                     }
-                    result.append(entry)
+                    appendNonResultItem(entry)
 
                 case .toolResult(let id, _, let content, _, let imageData, let imageMime, _, _):
                     let (callId, _) = Self.splitResponsesAPIIds(id)
@@ -1737,17 +1757,11 @@ final class OpenAIAgentProvider: AgentProvider {
                         "call_id": Self.capResponsesId(callId),
                         "output": content,
                     ])
-                    // Same trick as Chat Completions: Responses API's
-                    // function_call_output items don't carry images either,
-                    // so attach any tool-emitted image as a synthetic
-                    // role:"user" item with input_image. Gated on vision
-                    // support so we don't poison text-only o-mini variants.
-                    // [T-openai-tool-result-image]
-                    if let data = imageData,
-                       model.capabilities.supportedModalities.contains(.imageInput) {
+                    // 沿用合成用户消息传递工具图片的兼容方式；仅视觉模型接收图片。
+                    if let data = imageData, supportsImages {
                         let mime = imageMime ?? "image/jpeg"
                         let base64 = data.base64EncodedString()
-                        result.append([
+                        pendingToolBatchItems.append([
                             "role": "user",
                             "content": [
                                 ["type": "input_image", "image_url": "data:\(mime);base64,\(base64)"],
@@ -1756,9 +1770,9 @@ final class OpenAIAgentProvider: AgentProvider {
                     }
 
                 case .imageData(let data, let mimeType, _):
-                    if model.capabilities.supportedModalities.contains(.imageInput) {
+                    if supportsImages {
                         let base64 = data.base64EncodedString()
-                        result.append([
+                        appendNonResultItem([
                             "role": msg.role == .user ? "user" : "assistant",
                             "content": [
                                 ["type": "input_image", "image_url": "data:\(mimeType);base64,\(base64)"],
@@ -1768,6 +1782,7 @@ final class OpenAIAgentProvider: AgentProvider {
                 }
             }
         }
+        result.append(contentsOf: pendingToolBatchItems)
         return result
     }
 
