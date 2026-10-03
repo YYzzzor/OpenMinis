@@ -1,23 +1,22 @@
 # MinisX 发布状态
 
-更新日期：2026-10-02（Asia/Taipei）。发布步骤见 [TestFlight 发布流程草案](minisx-testflight-release-draft.md)；本文只记录每次发布的事实。
+更新日期：2026-10-03（Asia/Taipei）。发布步骤见 [TestFlight 发布流程草案](minisx-testflight-release-draft.md)；本文只记录每次发布的事实。
 
 ## 当前状态
 
 | 项目 | 状态 |
 | --- | --- |
-| 最新上传 | **1.13（9）**，2026-10-02 18:23:12 上传成功 |
-| 已确认安装使用 | 2026-10-02 维护者确认本轮版本已安装到手机；最新归档为 **1.13（9）**，手机版本号未单独读取 |
+| 最新上传 | **1.13（10）**，2026-10-03 10:16:50 上传成功 |
+| 已确认安装使用 | 2026-10-03 维护者确认 **Build 10** 已分发至手机并使用，目前没有问题；手机版本号依据维护者反馈，未单独读取 |
 | 分发渠道 | TestFlight Internal，仅维护者本人 |
 | 发布身份 | Team `42486W5YRY`，Bundle ID `com.yyzzzor.minisx`，App Store Connect app ID `6816328476` |
-| 下一次可用 Build 号 | 10（上传前仍需确认后台未占用） |
+| 下一次可用 Build 号 | 11（上传前仍需确认后台未占用） |
 
 README 中的 OpenMinis App Store / TestFlight 链接属于上游项目，与 MinisX 无关。
 
 ## 待确认事项
 
-- 网页读取优化（Build 9）：维护者已在手机完成一个历史问题的查询，反馈约一分多钟取得结果，正在自行持续测试不同案例。后续根据维护者反馈调整，本轮不启动额外测试。
-- Build 9 归档：主应用、Share、FileProvider 为1.13（9），Widget扩展仍为1.13（8）；如实保留产品元数据差异，本轮不修改。
+- 网页读取优化：维护者此前在 Build 9 完成一个历史问题的查询，反馈约一分多钟取得结果；现已安装 Build 10，反馈目前没有问题。后续根据具体使用反馈调整，本轮不启动额外测试。
 
 - Build 4、5 上传时：8 项第三方框架缺少 dSYM（FFmpeg、RealTimeCutVADCXXLibrary 及 6 个 libav / libsw 库），第三方崩溃符号化可能不完整；Build 6–8 未单独核查。
 - 语音（Build 5–6）：真机首字延迟、长停顿、长语音、离线语言与耗电未做专项体验；最终 0.8 倍波形测试未复跑；阿里 / 讯飞原有 HTTP 接入与官方 WebSocket 协议不符，未修复。
@@ -25,6 +24,18 @@ README 中的 OpenMinis App Store / TestFlight 链接属于上游项目，与 Mi
 ## 发布记录
 
 每条记录的字段：上传方式与时间、源码、新增内容、证据、验证与边界。新的写在最上面。
+
+### 1.13（10）— 2026-10-03
+
+- **上传**：维护者在 Xcode 手动 Archive 并分发，归档创建时间10:14:50，10:16:50上传成功（Asia/Taipei）。归档元数据 `uploadedBuildNumber=10`，分发记录ID `2bb317c8-83c1-47f8-819e-d03811331d64`。
+- **源码**：本轮修复分支为 `fix/responses-tool-result-image-order`，提交前 HEAD 为 `a0bda42`；当时未提交的排序修复现已记录为 `d1b5f90`。未核对归档时完整源码快照。
+- **新增内容**（相对 Build 9）：
+  - [BrowserUse 搜索速度优化](<../tasks/active/26-10-02 BrowserUse 搜索速度优化/task.md>)（`2a5461d`）：网页搜索改为匿名 HTTP 读取 DuckDuckGo Lite，返回完整标题、摘要与来源链接，支持结果续查与两项独立搜索；必要时使用一次匿名渲染回退。
+  - [Responses 工具结果与图片消息顺序修复](<../tasks/archive/26-10-03 Responses 工具结果与图片消息顺序修复/task.md>)（`d1b5f90`）：同批工具返回图片和文字时，应用先排列全部工具结果，再追加图片消息，避免结果序列被图片消息分隔而触发 Provider 400。
+- **不面向用户**：新增8项转换器回归测试、生命周期L8以及修复前后流程与独立审查记录。
+- **归档证据**：`~/Library/Developer/Xcode/Archives/2026-10-03/Minis 10-3-26, 10.14 AM.xcarchive`。主应用、MinisShare、MinisFileProvider、AgentWidgetExtension均为1.13（10），最低iOS版本均为26.0；Build 9 的Widget构建号差异保留于历史记录。
+- **手机安装与体验**：维护者于2026-10-03确认已使用 Build 10 Archive 并分发至手机，反馈“目前没问题”。该反馈证明维护者当前使用正常，没有将其视为特定故障或资源指标的专项真机测试。
+- **验证与边界**：既有8项转换器回归、iPhone 18 Pro实际Provider混合工具请求及新会话全文Markdown文档验证通过；七张原图的内容、顺序、对应段落及原生加载均已核对。本轮只读取本地归档元数据并更新状态，没有再次启动应用或模型测试，也没有读取App Store Connect后台处理状态。
 
 ### 1.13（9）— 2026-10-02
 
