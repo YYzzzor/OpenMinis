@@ -1,0 +1,371 @@
+{
+  "_meta": {
+    "app": "MinisApp",
+    "build": "10",
+    "device": "iPhone 18 Pro · 6354",
+    "version": "1.13"
+  },
+  "id": 1,
+  "jsonrpc": "2.0",
+  "result": {
+    "address": "0x15907aa00",
+    "adjustedContentInset": {
+      "bottom": 0,
+      "left": 0,
+      "right": 0,
+      "top": 0
+    },
+    "alpha": 1,
+    "alwaysBounceHorizontal": false,
+    "alwaysBounceVertical": false,
+    "backgroundColor": "rgba(0,0,0,0.00)",
+    "bounces": true,
+    "bounds": {
+      "h": 19.666666666666664,
+      "w": 346,
+      "x": 0,
+      "y": 0
+    },
+    "childCount": 9,
+    "clipsToBounds": false,
+    "constraints": [
+      {
+        "constant": 0,
+        "description": "<NSLayoutConstraint:0x162dbf2a0 H:|-(0)-[UILabel:0x1591a16c0]   (active, names: '|':Minis.PastableUITextView:0x15907aa00 )>",
+        "id": "0x162dbf2a0",
+        "isActive": true,
+        "priority": 1000
+      },
+      {
+        "constant": 0,
+        "description": "<NSLayoutConstraint:0x162dbfc50 V:|-(0)-[UILabel:0x1591a16c0]   (active, names: '|':Minis.PastableUITextView:0x15907aa00 )>",
+        "id": "0x162dbfc50",
+        "isActive": true,
+        "priority": 1000
+      },
+      {
+        "constant": 0,
+        "description": "<NSLayoutConstraint:0x1592940f0 'UIScrollView-contentLayoutGuide-minX' H:|-(0)-[_UIScrollViewLayoutGuide:0x162e890a0'UIScrollView-contentLayoutGuide'](LTR)   (active, names: '|':Minis.PastableUITextView:0x15907aa00 )>",
+        "id": "0x1592940f0",
+        "isActive": true,
+        "priority": 1000
+      },
+      {
+        "constant": 0,
+        "description": "<NSLayoutConstraint:0x159295630 'UIScrollView-contentLayoutGuide-minY' V:|-(0)-[_UIScrollViewLayoutGuide:0x162e890a0'UIScrollView-contentLayoutGuide']   (active, names: '|':Minis.PastableUITextView:0x15907aa00 )>",
+        "id": "0x159295630",
+        "isActive": true,
+        "priority": 1000
+      },
+      {
+        "constant": 0,
+        "description": "<NSLayoutConstraint:0x159295590 'UIScrollView-frameLayoutGuide-height' UILayoutGuide:0x162e8a3e0'UIScrollView-frameLayoutGuide'.height == Minis.PastableUITextView:0x15907aa00.height   (active)>",
+        "id": "0x159295590",
+        "isActive": true,
+        "priority": 1000
+      },
+      {
+        "constant": 0,
+        "description": "<NSLayoutConstraint:0x159294780 'UIScrollView-frameLayoutGuide-minX' H:|-(0)-[UILayoutGuide:0x162e8a3e0'UIScrollView-frameLayoutGuide'](LTR)   (active, names: '|':Minis.PastableUITextView:0x15907aa00 )>",
+        "id": "0x159294780",
+        "isActive": true,
+        "priority": 1000
+      },
+      {
+        "constant": 0,
+        "description": "<NSLayoutConstraint:0x1592949b0 'UIScrollView-frameLayoutGuide-minY' V:|-(0)-[UILayoutGuide:0x162e8a3e0'UIScrollView-frameLayoutGuide']   (active, names: '|':Minis.PastableUITextView:0x15907aa00 )>",
+        "id": "0x1592949b0",
+        "isActive": true,
+        "priority": 1000
+      },
+      {
+        "constant": 0,
+        "description": "<NSLayoutConstraint:0x1592941e0 'UIScrollView-frameLayoutGuide-width' UILayoutGuide:0x162e8a3e0'UIScrollView-frameLayoutGuide'.width == Minis.PastableUITextView:0x15907aa00.width   (active)>",
+        "id": "0x1592941e0",
+        "isActive": true,
+        "priority": 1000
+      }
+    ],
+    "contentInset": {
+      "bottom": 0,
+      "left": 0,
+      "right": 0,
+      "top": 0
+    },
+    "contentLayoutGuide": {
+      "h": 0,
+      "w": 0,
+      "x": 0,
+      "y": 0
+    },
+    "contentMode": "scaleToFill",
+    "contentOffset": {
+      "x": 0,
+      "y": 0
+    },
+    "contentSize": {
+      "h": 19.666666666666664,
+      "w": 346
+    },
+    "cornerRadius": 0,
+    "frame": {
+      "h": 19.666666666666664,
+      "w": 346,
+      "x": 0,
+      "y": 0
+    },
+    "frameLayoutGuide": {
+      "h": 19.666666666666668,
+      "w": 346,
+      "x": 0,
+      "y": 0
+    },
+    "gestureRecognizers": [
+      {
+        "isEnabled": true,
+        "state": "possible",
+        "type": "UITextMultiTapRecognizer"
+      },
+      {
+        "isEnabled": true,
+        "state": "possible",
+        "type": "UITapAndAHalfRecognizer"
+      },
+      {
+        "isEnabled": true,
+        "state": "possible",
+        "type": "UIVariableDelayLoupeGesture"
+      },
+      {
+        "isEnabled": true,
+        "state": "possible",
+        "type": "_UIPanOrFlickGestureRecognizer"
+      },
+      {
+        "isEnabled": true,
+        "state": "possible",
+        "type": "UITextTapRecognizer"
+      },
+      {
+        "isEnabled": true,
+        "state": "possible",
+        "type": "UITextRangeAdjustmentGestureRecognizer"
+      },
+      {
+        "isEnabled": true,
+        "state": "possible",
+        "type": "UITapGestureRecognizer"
+      },
+      {
+        "isEnabled": false,
+        "state": "possible",
+        "type": "UIScrollViewDelayedTouchesBeganGestureRecognizer"
+      },
+      {
+        "isEnabled": false,
+        "state": "possible",
+        "type": "UIScrollViewPanGestureRecognizer"
+      },
+      {
+        "isEnabled": true,
+        "state": "possible",
+        "type": "UIScrollViewKnobLongPressGestureRecognizer"
+      },
+      {
+        "isEnabled": true,
+        "state": "possible",
+        "type": "UIScrollViewKnobLongPressGestureRecognizer"
+      },
+      {
+        "isEnabled": true,
+        "state": "possible",
+        "type": "UIHoverGestureRecognizer"
+      },
+      {
+        "isEnabled": true,
+        "state": "possible",
+        "type": "_UIDragAutoScrollGestureRecognizer"
+      },
+      {
+        "isEnabled": true,
+        "state": "possible",
+        "type": "_UIPressGestureRecognizer"
+      },
+      {
+        "isEnabled": true,
+        "state": "possible",
+        "type": "_UIDragAddItemsGesture"
+      },
+      {
+        "isEnabled": true,
+        "state": "possible",
+        "type": "_UIDragLiftGestureRecognizer"
+      },
+      {
+        "isEnabled": true,
+        "state": "possible",
+        "type": "_UIRelationshipGestureRecognizer"
+      },
+      {
+        "isEnabled": true,
+        "state": "possible",
+        "type": "_UIRelationshipGestureRecognizer"
+      },
+      {
+        "isEnabled": true,
+        "state": "possible",
+        "type": "_UIDragLiftPointerGestureRecognizer"
+      },
+      {
+        "isEnabled": true,
+        "state": "possible",
+        "type": "_UIRelationshipGestureRecognizer"
+      },
+      {
+        "isEnabled": true,
+        "state": "possible",
+        "type": "_UIRelationshipGestureRecognizer"
+      },
+      {
+        "isEnabled": true,
+        "state": "possible",
+        "type": "_UITouchDurationObservingGestureRecognizer"
+      },
+      {
+        "isEnabled": true,
+        "state": "possible",
+        "type": "_UITouchDurationObservingGestureRecognizer"
+      },
+      {
+        "isEnabled": true,
+        "state": "possible",
+        "type": "_UISimplePressGestureRecognizer"
+      },
+      {
+        "isEnabled": true,
+        "state": "possible",
+        "type": "_UISecondaryClickDriverGestureRecognizer"
+      },
+      {
+        "isEnabled": true,
+        "state": "possible",
+        "type": "_UISecondaryClickDriverGestureRecognizer"
+      },
+      {
+        "isEnabled": true,
+        "state": "possible",
+        "type": "_UIRelationshipGestureRecognizer"
+      },
+      {
+        "isEnabled": true,
+        "state": "possible",
+        "type": "_UIRelationshipGestureRecognizer"
+      },
+      {
+        "isEnabled": true,
+        "state": "possible",
+        "type": "_UIRelationshipGestureRecognizer"
+      },
+      {
+        "isEnabled": true,
+        "state": "possible",
+        "type": "_UIRelationshipGestureRecognizer"
+      },
+      {
+        "isEnabled": true,
+        "state": "possible",
+        "type": "_UITapTapHoldGestureRecognizer"
+      },
+      {
+        "isEnabled": true,
+        "state": "possible",
+        "type": "_UIVoiceCommandButtonTapGestureRecognizer"
+      }
+    ],
+    "gestures": [
+      "UITextMultiTapRecognizer",
+      "UITapAndAHalfRecognizer",
+      "UIVariableDelayLoupeGesture",
+      "_UIPanOrFlickGestureRecognizer",
+      "UITextTapRecognizer",
+      "UITextRangeAdjustmentGestureRecognizer",
+      "UITapGestureRecognizer",
+      "UIScrollViewDelayedTouchesBeganGestureRecognizer(disabled)",
+      "UIScrollViewPanGestureRecognizer(disabled)",
+      "UIScrollViewKnobLongPressGestureRecognizer",
+      "UIScrollViewKnobLongPressGestureRecognizer",
+      "UIHoverGestureRecognizer",
+      "_UIDragAutoScrollGestureRecognizer",
+      "_UIPressGestureRecognizer",
+      "_UIDragAddItemsGesture",
+      "_UIDragLiftGestureRecognizer",
+      "_UIRelationshipGestureRecognizer",
+      "_UIRelationshipGestureRecognizer",
+      "_UIDragLiftPointerGestureRecognizer",
+      "_UIRelationshipGestureRecognizer",
+      "_UIRelationshipGestureRecognizer",
+      "_UITouchDurationObservingGestureRecognizer",
+      "_UITouchDurationObservingGestureRecognizer",
+      "_UISimplePressGestureRecognizer",
+      "_UISecondaryClickDriverGestureRecognizer",
+      "_UISecondaryClickDriverGestureRecognizer",
+      "_UIRelationshipGestureRecognizer",
+      "_UIRelationshipGestureRecognizer",
+      "_UIRelationshipGestureRecognizer",
+      "_UIRelationshipGestureRecognizer",
+      "_UITapTapHoldGestureRecognizer",
+      "_UIVoiceCommandButtonTapGestureRecognizer"
+    ],
+    "interactions": [
+      "_UIZoomEdgeFeedbackGenerator",
+      "_UIScrollEdgeEffectViewInteraction",
+      "_UIScrollPocketRegistrationInteraction",
+      "UIDragInteraction(enabled)",
+      "_UITextMenuLinkInteraction",
+      "UITextContextMenuInteraction",
+      "UIContextMenuInteraction",
+      "_UIClickPresentationInteraction",
+      "_UIClickPresentationFeedbackGenerator",
+      "UIEditMenuInteraction",
+      "_UIEditMenuBridgedContextMenuInteraction",
+      "_UIClickPresentationInteraction",
+      "_UIClickPresentationFeedbackGenerator",
+      "UITextSelectionDisplayInteraction",
+      "UIDropInteraction",
+      "UIWritingToolsCoordinator",
+      "_UIKeyboardBasedTextSelectionInteraction",
+      "UITextInteraction",
+      "UITextRangeAdjustmentInteraction",
+      "UITextIndirectKeyboardInteraction",
+      "UITextIndirectEditableInteraction",
+      "UITextRefinementInteraction",
+      "UITextSelectionInteraction"
+    ],
+    "intrinsicContentSize": {
+      "h": 20,
+      "w": -1
+    },
+    "isDecelerating": false,
+    "isDragging": false,
+    "isEditable": true,
+    "isFirstResponder": true,
+    "isHidden": false,
+    "isPagingEnabled": false,
+    "isScrollEnabled": false,
+    "isSelectable": true,
+    "isTracking": false,
+    "isUserInteractionEnabled": true,
+    "layoutMargins": {
+      "bottom": 8,
+      "left": 8,
+      "right": 8,
+      "top": 8
+    },
+    "showsHorizontalScrollIndicator": true,
+    "showsVerticalScrollIndicator": true,
+    "superviewAddress": "0x162f58c00",
+    "superviewType": "UIKitPlatformViewHost<PlatformViewRepresentableAdaptor<PastableTextView>>",
+    "text": "原有键盘草稿 1003",
+    "type": "PastableUITextView"
+  }
+}

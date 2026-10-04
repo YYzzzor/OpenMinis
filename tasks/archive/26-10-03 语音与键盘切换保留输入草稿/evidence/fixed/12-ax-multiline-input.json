@@ -1,0 +1,14 @@
+{
+  "_meta": {
+    "app": "MinisApp",
+    "build": "10",
+    "device": "iPhone 18 Pro · 6354",
+    "version": "1.13"
+  },
+  "id": 1,
+  "jsonrpc": "2.0",
+  "result": {
+    "length": 18,
+    "ok": true
+  }
+}

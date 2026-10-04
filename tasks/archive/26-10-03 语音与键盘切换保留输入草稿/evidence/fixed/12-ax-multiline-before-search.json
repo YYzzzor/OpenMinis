@@ -1,0 +1,34 @@
+{
+  "_meta": {
+    "app": "MinisApp",
+    "build": "10",
+    "device": "iPhone 18 Pro · 6354",
+    "version": "1.13"
+  },
+  "id": 1,
+  "jsonrpc": "2.0",
+  "result": [
+    {
+      "address": "0x156a46a00",
+      "frame": {
+        "h": 59.33333333333333,
+        "w": 346,
+        "x": 16,
+        "y": 16
+      },
+      "type": "UIKitPlatformViewHost<PlatformViewRepresentableAdaptor<PastableTextView>>"
+    },
+    {
+      "address": "0x15625ea00",
+      "frame": {
+        "h": 59.33333333333333,
+        "w": 346,
+        "x": 0,
+        "y": 0
+      },
+      "text": "原有键盘文字 draft 1003，继续键盘输入\n第二行已有文字\n第三行输入仍应保留",
+      "type": "PastableUITextView",
+      "value": "原有键盘文字 draft 1003，继续键盘输入\n第二行已有文字\n第三行输入仍应保留"
+    }
+  ]
+}

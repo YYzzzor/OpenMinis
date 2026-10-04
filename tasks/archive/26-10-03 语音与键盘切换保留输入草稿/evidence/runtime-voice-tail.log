@@ -1,0 +1,49 @@
+[13:44:27] 2026-10-03 13:44:27.823 Minis[90269:12822789] [Voice] [INFO] [Voice] [capsule-placement] setRect inputBar y=566…840 x=0…402
+[13:44:27] 2026-10-03 13:44:27.978 Minis[90269:12822789] [InputBarLayout] [INFO] inputBarHeight settled=274.0 x=0
+[13:44:28] 2026-10-03 13:44:28.076 Minis[90269:12822789] [Voice] [INFO] [Voice] [capsule-calc] capsule[y784…828 x342…386] rects=2 passes=2 → lift=270 by=inputBar
+[13:44:28] 2026-10-03 13:44:28.076 Minis[90269:12822789] [Voice] [INFO] [Voice] [capsule] APPLY lift 241 → 270 (rise); restingBottom=828 → displayBottom=558
+[13:44:28] 2026-10-03 13:44:28.200 Minis[90269:12822789] [Voice] [INFO] [Voice] [capsule-placement] setRect downloadButton y=462…840 x=0…402
+[13:44:28] 2026-10-03 13:44:28.455 Minis[90269:12822789] [Voice] [INFO] [Voice] [capsule-calc] capsule[y784…828 x342…386] rects=2 passes=2 → lift=374 by=downloadButton
+[13:44:28] 2026-10-03 13:44:28.455 Minis[90269:12822789] [Voice] [INFO] [Voice] [capsule] APPLY lift 270 → 374 (rise); restingBottom=828 → displayBottom=454
+[13:44:47] 2026-10-03 13:44:47.219 Minis[90269:12822789] [Voice] [INFO] [Voice] ASR candidates: [System Recognition (Online), System Recognition (Offline)] active=System Recognition (Online) sticky=none
+[13:44:47] 2026-10-03 13:44:47.220 Minis[90269:12822789] [Voice] [INFO] [Voice] prewarm recognizer for en-US
+[13:44:48] 2026-10-03 13:44:48.183 Minis[90269:12822789] [Voice] [INFO] [Voice] live start locale=en-US onDevice=false
+[13:44:48] 2026-10-03 13:44:48.561 Minis[90269:12822789] [Voice] [INFO] [Voice] [VoiceInputDebug] AVAudioSession: begin(.capture) applied=true waited=170ms
+[13:44:49] 2026-10-03 13:44:49.436 Minis[90269:12822789] [Voice] [INFO] [Voice] installTap: format=1ch 48000Hz
+[13:44:49] 2026-10-03 13:44:49.461 Minis[90269:12822789] [Voice] [INFO] [Voice] audioEngine started OK; isRunning=true
+[13:44:49] 2026-10-03 13:44:49.556 Minis[90269:12822789] [Voice] [INFO] [Voice] AVAudioSession: end(.capture)
+[13:44:49] 2026-10-03 13:44:49.556 Minis[90269:12822789] [Voice] [INFO] [Voice] [voice-failure] transcribeFailed: 实时识别未完成；已保留显示的文字，请检查尾句。Failed to initialize recognizer
+[13:44:49] 2026-10-03 13:44:49.866 Minis[90269:12822789] [Voice] [INFO] [Voice] [capsule-placement] setRect inputBar y=553…839 x=0…402
+[13:44:50] 2026-10-03 13:44:50.041 Minis[90269:12822789] [InputBarLayout] [INFO] inputBarHeight settled=286.33333333333337 x=0
+[13:44:50] 2026-10-03 13:44:50.133 Minis[90269:12822789] [Voice] [INFO] [Voice] [capsule-calc] capsule[y784…828 x342…386] rects=2 passes=2 → lift=374 by=downloadButton
+[13:44:50] 2026-10-03 13:44:50.265 Minis[90269:12822789] [Voice] [INFO] [Voice] [capsule-placement] setRect downloadButton y=449…840 x=0…402
+[13:44:50] 2026-10-03 13:44:50.525 Minis[90269:12822789] [Voice] [INFO] [Voice] [capsule-calc] capsule[y784…828 x342…386] rects=2 passes=2 → lift=386 by=downloadButton
+[13:44:50] 2026-10-03 13:44:50.526 Minis[90269:12822789] [Voice] [INFO] [Voice] [capsule] APPLY lift 374 → 386 (rise); restingBottom=828 → displayBottom=441
+[13:45:17] 2026-10-03 13:45:17.070 Minis[90269:12822789] [Voice] [INFO] [Voice] [capsule-placement] setRect inputBar y=699…840 x=0…402
+[13:45:17] 2026-10-03 13:45:17.105 Minis[90269:12822789] [InputBarLayout] [INFO] inputBarHeight settled=141.0 x=0
+[13:45:17] 2026-10-03 13:45:17.368 Minis[90269:12822789] [Voice] [INFO] [Voice] [capsule-placement] setRect downloadButton y=595…840 x=0…402
+[13:45:17] 2026-10-03 13:45:17.624 Minis[90269:12822789] [Voice] [INFO] [Voice] [capsule-calc] capsule[y784…828 x342…386] rects=2 passes=2 → lift=241 by=downloadButton
+[13:45:17] 2026-10-03 13:45:17.624 Minis[90269:12822789] [Voice] [INFO] [Voice] [capsule] descent 386 → 241 ARMED — applying after 1200ms of stability
+[13:45:18] 2026-10-03 13:45:18.838 Minis[90269:12822789] [Voice] [INFO] [Voice] [capsule-calc] capsule[y784…828 x342…386] rects=2 passes=2 → lift=241 by=downloadButton
+[13:45:18] 2026-10-03 13:45:18.839 Minis[90269:12822789] [Voice] [INFO] [Voice] [capsule] APPLY lift 386 → 241 (settled descent); restingBottom=828 → displayBottom=587
+[13:45:37] 2026-10-03 13:45:37.080 Minis[90269:12822789] [Voice] [INFO] [Voice] [capsule-kbd] willHide → clear
+[13:45:37] 2026-10-03 13:45:37.094 Minis[90269:12822789] [AIChatVM] [INFO] 🔑DRAFT [vm=ACA87F] inputText CLEARED (was 'draft keep 1003') sessionId=nil draftId=__new__DAA2E0C8-CA5F-4FD7-960B-5639F56EB9FB isProcessing=false
+[13:45:37] 2026-10-03 13:45:37.104 Minis[90269:12822789] [Voice] [INFO] [Voice] ASR candidates: [System Recognition (Online), System Recognition (Offline)] active=System Recognition (Online) sticky=none
+[13:45:37] 2026-10-03 13:45:37.106 Minis[90269:12822789] [Voice] [INFO] [Voice] prewarm recognizer for en-US
+[13:45:37] 2026-10-03 13:45:37.250 Minis[90269:12822789] [Voice] [INFO] [Voice] live start locale=en-US onDevice=false
+[13:45:37] 2026-10-03 13:45:37.383 Minis[90269:12822789] [Voice] [INFO] [Voice] [VoiceInputDebug] AVAudioSession: begin(.capture) applied=true waited=133ms
+[13:45:37] 2026-10-03 13:45:37.384 Minis[90269:12822789] [Voice] [INFO] [Voice] installTap: format=1ch 48000Hz
+[13:45:37] 2026-10-03 13:45:37.392 Minis[90269:12822789] [Voice] [INFO] [Voice] audioEngine started OK; isRunning=true
+[13:45:37] 2026-10-03 13:45:37.434 Minis[90269:12822789] [Voice] [INFO] [Voice] AVAudioSession: end(.capture)
+[13:45:37] 2026-10-03 13:45:37.434 Minis[90269:12822789] [Voice] [INFO] [Voice] [voice-failure] transcribeFailed: 实时识别未完成；已保留显示的文字，请检查尾句。Failed to initialize recognizer
+[13:45:37] 2026-10-03 13:45:37.663 Minis[90269:12822789] [Voice] [INFO] [Voice] [capsule-placement] setRect inputBar y=553…839 x=0…402
+[13:45:37] 2026-10-03 13:45:37.869 Minis[90269:12822789] [InputBarLayout] [INFO] inputBarHeight settled=286.33333333333337 x=0
+[13:45:37] 2026-10-03 13:45:37.928 Minis[90269:12822789] [Voice] [INFO] [Voice] [capsule-calc] capsule[y784…828 x342…386] rects=2 passes=2 → lift=282 by=inputBar
+[13:45:37] 2026-10-03 13:45:37.929 Minis[90269:12822789] [Voice] [INFO] [Voice] [capsule] APPLY lift 241 → 282 (rise); restingBottom=828 → displayBottom=545
+[13:45:38] 2026-10-03 13:45:38.086 Minis[90269:12822789] [Voice] [INFO] [Voice] [capsule-placement] setRect downloadButton y=449…840 x=0…402
+[13:45:38] 2026-10-03 13:45:38.340 Minis[90269:12822789] [Voice] [INFO] [Voice] [capsule-calc] capsule[y784…828 x342…386] rects=2 passes=2 → lift=386 by=downloadButton
+[13:45:38] 2026-10-03 13:45:38.341 Minis[90269:12822789] [Voice] [INFO] [Voice] [capsule] APPLY lift 282 → 386 (rise); restingBottom=828 → displayBottom=441
+[13:46:20] 2026-10-03 13:46:20.194 Minis[90269:12822789] [Voice] [INFO] [Voice] [capsule-placement] setRect inputBar y=699…840 x=0…402
+[13:46:20] 2026-10-03 13:46:20.375 Minis[90269:12822789] [InputBarLayout] [INFO] inputBarHeight settled=141.0 x=0
+[13:46:20] 2026-10-03 13:46:20.454 Minis[90269:12822789] [Voice] [INFO] [Voice] [capsule-calc] capsule[y784…828 x342…386] rects=2 passes=2 → lift=386 by=downloadButton
+[13:46:20] 2026-10-03 13:46:20.596 Minis[90269:12822789] [Voice] [INFO] [Voice] [capsule-placement] setRect downloadButton y=595…840 x=0…402

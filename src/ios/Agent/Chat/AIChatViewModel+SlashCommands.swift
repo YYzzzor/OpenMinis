@@ -90,6 +90,17 @@ extension AIChatViewModel {
         slashMenuSelectedIndex = -1
     }
 
+    /// 语音入口只关闭实际显示的斜杠菜单，避免关闭状态下清空普通草稿。
+    func prepareInputForVoiceMode() {
+        guard showSlashMenu else {
+            // 菜单已经隐藏时，旧快照不能覆盖当前输入。
+            savedInputBeforeSlash = nil
+            savedCaretBeforeSlash = nil
+            return
+        }
+        dismissSlashMenu()
+    }
+
     /// Update slash menu state based on current input text.
     func updateSlashMenuState() {
         let text = inputText

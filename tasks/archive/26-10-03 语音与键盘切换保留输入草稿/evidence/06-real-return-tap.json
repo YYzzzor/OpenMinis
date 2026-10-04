@@ -1,0 +1,19 @@
+{
+  "_meta": {
+    "app": "MinisApp",
+    "build": "10",
+    "device": "iPhone 18 Pro · 6354",
+    "version": "1.13"
+  },
+  "id": 1,
+  "jsonrpc": "2.0",
+  "result": {
+    "ok": true,
+    "point": {
+      "x": 341.8333282470703,
+      "y": 595.6666564941406
+    },
+    "strategy": "text=键盘输入 partial=false",
+    "via": "buttonElement:AccessibilityNode"
+  }
+}

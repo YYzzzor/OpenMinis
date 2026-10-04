@@ -1,0 +1,12 @@
+
+PruneExplicitPrecompiledModules /Users/huyuanzhao/Coding/Projects/OpenMinis/build/ios-simulator/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules
+
+PruneExplicitPrecompiledModules /Users/huyuanzhao/Coding/Projects/OpenMinis/build/ios-simulator/SDKExplicitPrecompiledModules
+
+PruneExplicitPrecompiledModules /Users/huyuanzhao/Coding/Projects/OpenMinis/build/ios-simulator/Build/Intermediates.noindex/ExplicitPrecompiledModules
+
+note: Run script build phase 'Generate Debug Skill' will be run during every build because the option to run the script phase "Based on dependency analysis" is unchecked. (in target 'Minis' from project 'Minis')
+note: Run script build phase 'Generate Provider Customization' will be run during every build because the option to run the script phase "Based on dependency analysis" is unchecked. (in target 'Minis' from project 'Minis')
+note: Run script build phase 'Strip Third-Party VAD Framework Symbols' will be run during every build because the option to run the script phase "Based on dependency analysis" is unchecked. (in target 'Minis' from project 'Minis')
+** BUILD SUCCEEDED **
+

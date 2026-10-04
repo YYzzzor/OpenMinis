@@ -1,0 +1,4 @@
+修复版模拟器构建：BUILD SUCCEEDED
+日志：/private/tmp/minisx-voice-draft-fixed-build.log
+目标：iPhone 18 Pro / iOS 27.0 / 479131C9-8187-44E7-8510-A499D7AC3034
+配置：Debug；最低 iOS 26.0 保持。

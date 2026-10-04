@@ -1,0 +1,171 @@
+// !$*UTF8*$!
+{
+    archiveVersion = 1;
+    classes = {};
+    objectVersion = 60;
+    objects = {
+        6A4FAF3D5092459E99D48150 /* VoiceDraftUITests.swift in Sources */ = {
+            isa = PBXBuildFile;
+            fileRef = E5B3122250EB4E0A9E9BAF13 /* VoiceDraftUITests.swift */;
+        };
+        E5B3122250EB4E0A9E9BAF13 /* VoiceDraftUITests.swift */ = {
+            isa = PBXFileReference;
+            lastKnownFileType = sourcecode.swift;
+            path = VoiceDraftUITests.swift;
+            sourceTree = "<group>";
+        };
+        E68A91F3BF2C4255A57DB9EE /* VoiceDraftUIChecks.xctest */ = {
+            isa = PBXFileReference;
+            explicitFileType = wrapper.cfbundle;
+            includeInIndex = 0;
+            path = VoiceDraftUIChecks.xctest;
+            sourceTree = BUILT_PRODUCTS_DIR;
+        };
+        579D24258BED4707817CB206 = {
+            isa = PBXGroup;
+            children = (
+                E5B3122250EB4E0A9E9BAF13 /* VoiceDraftUITests.swift */,
+                B2F8278F667B4C53B694F980 /* Products */,
+            );
+            sourceTree = "<group>";
+        };
+        B2F8278F667B4C53B694F980 /* Products */ = {
+            isa = PBXGroup;
+            children = (
+                E68A91F3BF2C4255A57DB9EE /* VoiceDraftUIChecks.xctest */,
+            );
+            name = Products;
+            sourceTree = "<group>";
+        };
+        16BF97244E244478B5F9888C /* Sources */ = {
+            isa = PBXSourcesBuildPhase;
+            buildActionMask = 2147483647;
+            files = (
+                6A4FAF3D5092459E99D48150 /* VoiceDraftUITests.swift in Sources */,
+            );
+            runOnlyForDeploymentPostprocessing = 0;
+        };
+        0D50939D7739442AA56C7AC9 /* Frameworks */ = {
+            isa = PBXFrameworksBuildPhase;
+            buildActionMask = 2147483647;
+            files = ();
+            runOnlyForDeploymentPostprocessing = 0;
+        };
+        3A95315379DD49649AECAEE7 /* Resources */ = {
+            isa = PBXResourcesBuildPhase;
+            buildActionMask = 2147483647;
+            files = ();
+            runOnlyForDeploymentPostprocessing = 0;
+        };
+        C1F48D8CBB544AF8AADFAB0F /* VoiceDraftUIChecks */ = {
+            isa = PBXNativeTarget;
+            buildConfigurationList = 0A47BEE5FE74402FBFBCE3F0 /* Build configuration list for PBXNativeTarget "VoiceDraftUIChecks" */;
+            buildPhases = (
+                16BF97244E244478B5F9888C /* Sources */,
+                0D50939D7739442AA56C7AC9 /* Frameworks */,
+                3A95315379DD49649AECAEE7 /* Resources */,
+            );
+            buildRules = ();
+            dependencies = ();
+            name = VoiceDraftUIChecks;
+            productName = VoiceDraftUIChecks;
+            productReference = E68A91F3BF2C4255A57DB9EE /* VoiceDraftUIChecks.xctest */;
+            productType = "com.apple.product-type.bundle.ui-testing";
+        };
+        1618712C353D48E495B0974B /* Project object */ = {
+            isa = PBXProject;
+            attributes = {
+                BuildIndependentTargetsInParallel = 1;
+                LastUpgradeCheck = 2620;
+                TargetAttributes = {
+                    C1F48D8CBB544AF8AADFAB0F = { CreatedOnToolsVersion = 26.2; };
+                };
+            };
+            buildConfigurationList = 5255C7F55ECB496290D5E08E /* Build configuration list for PBXProject "VoiceDraftUIChecks" */;
+            compatibilityVersion = "Xcode 14.0";
+            developmentRegion = en;
+            hasScannedForEncodings = 0;
+            knownRegions = (en, Base, "zh-Hans", "zh-Hant");
+            mainGroup = 579D24258BED4707817CB206;
+            productRefGroup = B2F8278F667B4C53B694F980 /* Products */;
+            projectDirPath = "";
+            projectRoot = "";
+            targets = (
+                C1F48D8CBB544AF8AADFAB0F /* VoiceDraftUIChecks */,
+            );
+        };
+        5E4211460BCB4E90BA22EE54 /* Debug */ = {
+            isa = XCBuildConfiguration;
+            buildSettings = {
+                IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+                SDKROOT = iphoneos;
+                SWIFT_VERSION = 6.0;
+            };
+            name = Debug;
+        };
+        5BAF8E3489174469A66C1788 /* Release */ = {
+            isa = XCBuildConfiguration;
+            buildSettings = {
+                IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+                SDKROOT = iphoneos;
+                SWIFT_VERSION = 6.0;
+            };
+            name = Release;
+        };
+        496673B9E6784D9B900591D2 /* Debug */ = {
+            isa = XCBuildConfiguration;
+            buildSettings = {
+                CODE_SIGN_STYLE = Automatic;
+                CURRENT_PROJECT_VERSION = 1;
+                DEVELOPMENT_TEAM = 42486W5YRY;
+                ENABLE_USER_SCRIPT_SANDBOXING = YES;
+                GENERATE_INFOPLIST_FILE = YES;
+                IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+                PRODUCT_BUNDLE_IDENTIFIER = com.minisx.voicechecks;
+                PRODUCT_NAME = "$(TARGET_NAME)";
+                SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+                SWIFT_EMIT_LOC_STRINGS = NO;
+                SWIFT_VERSION = 6.0;
+                TARGETED_DEVICE_FAMILY = 1;
+            };
+            name = Debug;
+        };
+        85377EF18800484A9DAE2F29 /* Release */ = {
+            isa = XCBuildConfiguration;
+            buildSettings = {
+                CODE_SIGN_STYLE = Automatic;
+                CURRENT_PROJECT_VERSION = 1;
+                DEVELOPMENT_TEAM = 42486W5YRY;
+                ENABLE_USER_SCRIPT_SANDBOXING = YES;
+                GENERATE_INFOPLIST_FILE = YES;
+                IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+                PRODUCT_BUNDLE_IDENTIFIER = com.minisx.voicechecks;
+                PRODUCT_NAME = "$(TARGET_NAME)";
+                SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+                SWIFT_EMIT_LOC_STRINGS = NO;
+                SWIFT_VERSION = 6.0;
+                TARGETED_DEVICE_FAMILY = 1;
+            };
+            name = Release;
+        };
+        5255C7F55ECB496290D5E08E /* Build configuration list for PBXProject "VoiceDraftUIChecks" */ = {
+            isa = XCConfigurationList;
+            buildConfigurations = (
+                5E4211460BCB4E90BA22EE54 /* Debug */,
+                5BAF8E3489174469A66C1788 /* Release */,
+            );
+            defaultConfigurationIsVisible = 0;
+            defaultConfigurationName = Release;
+        };
+        0A47BEE5FE74402FBFBCE3F0 /* Build configuration list for PBXNativeTarget "VoiceDraftUIChecks" */ = {
+            isa = XCConfigurationList;
+            buildConfigurations = (
+                496673B9E6784D9B900591D2 /* Debug */,
+                85377EF18800484A9DAE2F29 /* Release */,
+            );
+            defaultConfigurationIsVisible = 0;
+            defaultConfigurationName = Release;
+        };
+    };
+    rootObject = 1618712C353D48E495B0974B /* Project object */;
+}

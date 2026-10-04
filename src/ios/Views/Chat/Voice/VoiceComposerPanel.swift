@@ -14,6 +14,10 @@ enum VoiceComposerStyle {
     static let controlSpacing: CGFloat = 14
     static let sectionSpacing: CGFloat = 8
     static let statusMinHeight: CGFloat = 18
+    /// 标题与正文的固定负间距；正文 8pt 顶部内边距使首行字形仍落在按钮触摸区下方。
+    static let headerBodySpacing: CGFloat = -7.5
+    /// 正文行距基准值，随后按正文 Dynamic Type 比例缩放。
+    static let transcriptLineSpacing: CGFloat = 4
     static let pageInset: CGFloat = 12
     static let transitionDuration: Double = 0.32
     static let slowMotionMultiplier: Double = 3
@@ -56,49 +60,55 @@ struct VoiceComposerPanel<SendControl: View>: View {
 
     @State private var measuredTextHeight: CGFloat = 0
     @ScaledMetric(relativeTo: .body) private var textSize = VoiceComposerStyle.textSize
+    @ScaledMetric(relativeTo: .body) private var textLineSpacing = VoiceComposerStyle.transcriptLineSpacing
     @ScaledMetric(relativeTo: .body) private var textMinHeight = VoiceComposerStyle.textMinHeight
     @ScaledMetric(relativeTo: .body) private var textMaxHeight = VoiceComposerStyle.textMaxHeight
     @ScaledMetric(relativeTo: .caption) private var statusMinHeight = VoiceComposerStyle.statusMinHeight
 
     var body: some View {
         VStack(spacing: VoiceComposerStyle.sectionSpacing) {
-            HStack {
-                Text(title).font(.caption).foregroundStyle(.secondary)
-                Spacer()
-                Button(action: onKeyboard) {
-                    Label("键盘输入", systemImage: "keyboard")
-                        .font(.caption)
-                        .frame(minHeight: VoiceComposerStyle.buttonSize)
-                }
-                .buttonStyle(.plain)
-                .disabled(phase == .transcribing)
-                .accessibilityHint("保留文字；录音中切换会先结束录音并完成转录")
-                .accessibilityIdentifier("voice.keyboard")
-            }
-
-            ScrollViewReader { proxy in
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 0) {
-                        Text(transcript.isEmpty ? "识别文字会显示在这里" : transcript)
-                            .font(.system(size: textSize))
-                            .foregroundStyle(transcript.isEmpty ? .tertiary : .primary)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.vertical, 8)
-                            .padding(.horizontal, 5)
-                            .onGeometryChange(for: CGFloat.self) { $0.size.height } action: {
-                                measuredTextHeight = $0
-                            }
-                        Color.clear.frame(height: 1).id("voiceTextTail")
+            VStack(spacing: VoiceComposerStyle.headerBodySpacing) {
+                HStack {
+                    Text(title).font(.caption).foregroundStyle(.secondary)
+                    Spacer()
+                    Button(action: onKeyboard) {
+                        Label("键盘输入", systemImage: "keyboard")
+                            .font(.caption)
+                            .frame(minHeight: VoiceComposerStyle.buttonSize)
                     }
+                    .buttonStyle(.plain)
+                    .disabled(phase == .transcribing)
+                    .accessibilityHint("保留文字；录音中切换会先结束录音并完成转录")
+                    .accessibilityIdentifier("voice.keyboard")
                 }
-                .frame(height: min(max(textMinHeight, measuredTextHeight), textMaxHeight))
-                .contentShape(Rectangle())
-                .onTapGesture { if phase == .idle { onKeyboard() } }
-                .accessibilityLabel(transcript.isEmpty ? "语音草稿为空" : transcript)
-                .accessibilityAction(named: Text("编辑文字")) {
-                    if phase == .idle { onKeyboard() }
+                // 负间距会覆盖按钮触摸区域的下缘，抬高标题层级以保留键盘按钮命中。
+                .zIndex(1)
+
+                ScrollViewReader { proxy in
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 0) {
+                            Text(transcript.isEmpty ? "识别文字会显示在这里" : transcript)
+                                .font(.system(size: textSize))
+                                .lineSpacing(textLineSpacing)
+                                .foregroundStyle(transcript.isEmpty ? .tertiary : .primary)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.vertical, 8)
+                                .padding(.horizontal, 5)
+                                .onGeometryChange(for: CGFloat.self) { $0.size.height } action: {
+                                    measuredTextHeight = $0
+                                }
+                            Color.clear.frame(height: 1).id("voiceTextTail")
+                        }
+                    }
+                    .frame(height: min(max(textMinHeight, measuredTextHeight), textMaxHeight))
+                    .contentShape(Rectangle())
+                    .onTapGesture { if phase == .idle { onKeyboard() } }
+                    .accessibilityLabel(transcript.isEmpty ? "语音草稿为空" : transcript)
+                    .accessibilityAction(named: Text("编辑文字")) {
+                        if phase == .idle { onKeyboard() }
+                    }
+                    .onChange(of: transcript) { _, _ in proxy.scrollTo("voiceTextTail", anchor: .bottom) }
                 }
-                .onChange(of: transcript) { _, _ in proxy.scrollTo("voiceTextTail", anchor: .bottom) }
             }
 
             if phase == .recording {

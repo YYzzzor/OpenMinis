@@ -1,0 +1,24 @@
+{
+  "_meta": {
+    "app": "MinisApp",
+    "build": "10",
+    "device": "iPhone 18 Pro · 6354",
+    "version": "1.13"
+  },
+  "id": 1,
+  "jsonrpc": "2.0",
+  "result": [
+    {
+      "address": "0x15907aa00",
+      "frame": {
+        "h": 20,
+        "w": 346,
+        "x": 0,
+        "y": 0
+      },
+      "text": "draft keep 1003",
+      "type": "PastableUITextView",
+      "value": "draft keep 1003"
+    }
+  ]
+}

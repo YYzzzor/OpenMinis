@@ -1,0 +1,38 @@
+{
+  "distinctPassedCases": [
+    {
+      "name": "testSingleLineDraftSurvivesVoiceReturnAndAcceptsMoreTyping",
+      "result": "Passed",
+      "resultBundle": "/private/tmp/minisx-voice-ui-checks-default-r2.xcresult"
+    },
+    {
+      "name": "testMultilineDraftSurvivesTwoVoiceRoundTrips",
+      "result": "Passed",
+      "resultBundle": "/private/tmp/minisx-voice-ui-checks-default-r2.xcresult"
+    },
+    {
+      "name": "testVoicePanelShowsWholeDraftAndMicCancelsOpenSlashMenu",
+      "result": "Passed",
+      "resultBundle": "/private/tmp/minisx-voice-ui-checks-default-r2.xcresult"
+    },
+    {
+      "name": "testLongDraftScrollsAndKeyboardReturnRemainsUsable",
+      "result": "Passed",
+      "resultBundle": "/private/tmp/minisx-voice-ui-checks-long-r3.xcresult"
+    }
+  ],
+  "count": 4,
+  "largeFontRepeat": {
+    "result": "Passed",
+    "resultBundle": "/private/tmp/minisx-voice-ui-checks-largefont-settled.xcresult",
+    "fontScaleLevel": "extraLarge / xxxLarge",
+    "keyboardTapNormalizedY": 0.94,
+    "footerVisibleAfterLayoutSettles": true
+  },
+  "harnessRepairs": [
+    "移除键盘弹出后输入框必须位于屏幕下半部的错误假设",
+    "已有相同测试草稿时不重复粘贴"
+  ],
+  "realASRSuccess": false,
+  "reason": "Failed to initialize recognizer"
+}

@@ -1,0 +1,3 @@
+empty base result: 语音新增内容
+preserved base result: 原有键盘文字 语音新增内容
+actual-source draft merge assertions passed

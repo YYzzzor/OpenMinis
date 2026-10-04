@@ -3365,7 +3365,7 @@ struct AIChatView: View {
         guard !voiceVM.isBusyForComposer else { return }
         inputFocused = false
         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-        vm.dismissSlashMenu()
+        vm.prepareInputForVoiceMode()
         vm.voiceUsedInComposition = true
         voiceVM.prepare()
         voiceVM.accumulate = true

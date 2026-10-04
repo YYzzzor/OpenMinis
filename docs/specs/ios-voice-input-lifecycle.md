@@ -13,6 +13,7 @@ description: MinisX iOS 聊天语音输入的权限、采集、流式或分段�
 - **U1** 语音输入是输入框的一种输入方式，不是“录完即发送”。识别文字持续写入同一份可编辑草稿；用户可以停止、等待收尾、用键盘修改、继续录音，最后用普通的发送动作提交。发送前草稿始终可见。
 - **U2** 面板区分以下状态：等待、正在开启麦克风、采集中、识别或收尾中、可编辑结果、失败。
 - **U3** `isBusyForComposer` 是编辑与发送的门禁：权限请求、最终音频派发、未完成的识别、重试或流式收尾尚未结束时，不能发送不完整的草稿。
+- **U4** 语音面板正文使用 17 pt 基准字号，额外行间距为 4 pt；标题行与正文区域的布局间距为 -7.5 pt。正文使用面板现有可用宽度自然换行，默认字号的 iPhone 18 Pro 上约容纳 20 个中文字符；不插入强制换行、不横向平移、不缩小字号。正文最大基准高度为 160 pt，超出时滚动；字号和正文高度继续适配 Dynamic Type，标题和正文不得遮挡键盘按钮。
 
 ## 权限与启动
 
@@ -52,6 +53,8 @@ description: MinisX iOS 聊天语音输入的权限、采集、流式或分段�
 - **K4** 用户手动编辑期间，暂停把识别结果写入草稿；迟到的批量结果如果会覆盖编辑，就丢弃并明确提示，不静默改回机器文字。
 - **K5** 继续录音以当前（可能已编辑的）草稿为基础，新识别的片段追加在后面。
 - **K6** 发送时先使旧 generation 失效并重置语音状态；发送后迟到的 final 不能再填回输入框。
+- **K7** 用户从键盘切到语音时，入口只在 `/` 菜单打开时取消菜单。普通输入不执行菜单取消逻辑。语音输入以保留下来的草稿为基础，新识别片段追加在原草稿后面；不说话立即返回、取消启动或识别失败都不得清空原草稿。
+- **K8** 用户进入语音模式后，面板立即显示原键盘草稿。启动、采集和收尾期间，面板持续显示包含新增语音内容的完整草稿。
 
 ## 错误与重试
 
@@ -69,6 +72,9 @@ description: MinisX iOS 聊天语音输入的权限、采集、流式或分段�
 | 场景 | 期望 |
 | --- | --- |
 | 说话、停止、编辑、发送 | 停止后先显示收尾状态，最终片段到齐才可编辑和发送；发出的内容等于编辑稿；迟到的回调不改写已发送内容或空输入框（U3、K1、K6） |
+| 已有文字、不说话立即返回 | 正式麦克风入口保留原草稿，返回键盘后文字和换行完整保留，继续输入接在原文字后（P4、K7） |
+| 已有文字后语音追加 | 原文字立即显示，partial 只修订当前语音片段，最终文字包含原草稿和新增语音，返回键盘后仍完整（S2、S3、K5、K7、K8） |
+| 多行填满语音正文 | 采用已确认的 4 pt 额外行间距、-7.5 pt 标题行间距和完整可用宽度；正文溢出时滚动，Dynamic Type 和键盘按钮保持可用（U4） |
 | 两个分段乱序返回 | 第二段先到时缓存，第一段完成或失败后按顺序释放；文字不倒序，第一段失败也不丢第二段（S4） |
 | 流式中间结果反复修订 | 较短的 partial 替换较长的；final 只固化一次；同一或更早片段的迟到 partial / final 被忽略（S2、S3、S5） |
 | 切换键盘或离开页面 | 待启动的权限任务和采集被取消，草稿保留；旧回调失效；不会在后台重新开麦（P4、S5） |
@@ -77,6 +83,7 @@ description: MinisX iOS 聊天语音输入的权限、采集、流式或分段�
 
 ## 代码入口
 
+- 正式入口与菜单草稿：[AIChatView](../../src/ios/Views/Chat/AIChatView.swift)、[AIChatViewModel+SlashCommands](../../src/ios/Agent/Chat/AIChatViewModel+SlashCommands.swift)
 - 面板与状态：[VoiceInputPanel](../../src/ios/Views/Chat/Voice/VoiceInputPanel.swift)、[InlineVoiceInputView](../../src/ios/Views/Chat/Voice/InlineVoiceInputView.swift)、[VoiceComposerPanel](../../src/ios/Views/Chat/Voice/VoiceComposerPanel.swift)
 - 采集与 VAD：[VoiceActivityDetector](../../src/ios/Providers/Voice/VoiceActivityDetector.swift)
 - 模型与解析：[VoiceInputModels](../../src/ios/Providers/Voice/VoiceInputModels.swift)、[VoiceProviderResolver](../../src/ios/Providers/Voice/VoiceProviderResolver.swift)

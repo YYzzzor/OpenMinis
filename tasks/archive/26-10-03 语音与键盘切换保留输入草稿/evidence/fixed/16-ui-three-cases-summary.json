@@ -1,0 +1,52 @@
+{
+  "devicesAndConfigurations" : [
+    {
+      "device" : {
+        "architecture" : "arm64",
+        "deviceId" : "479131C9-8187-44E7-8510-A499D7AC3034",
+        "deviceName" : "iPhone 18 Pro",
+        "modelName" : "iPhone 18 Pro",
+        "osBuildNumber" : "24A434",
+        "osVersion" : "27.0",
+        "platform" : "iOS Simulator"
+      },
+      "expectedFailures" : 0,
+      "failedTests" : 1,
+      "passedTests" : 3,
+      "skippedTests" : 0,
+      "testPlanConfiguration" : {
+        "configurationId" : "1",
+        "configurationName" : "Test Scheme Action"
+      }
+    }
+  ],
+  "environmentDescription" : "VoiceDraftUIChecks · Built with macOS 27.0",
+  "expectedFailures" : 0,
+  "failedTests" : 1,
+  "finishTime" : 1791020181.637,
+  "passedTests" : 3,
+  "result" : "Failed",
+  "runtimeWarnings" : [
+
+  ],
+  "skippedTests" : 0,
+  "startTime" : 1791020100.105,
+  "statistics" : [
+
+  ],
+  "testFailures" : [
+    {
+      "failureText" : "XCTAssertEqual failed: (\"Optional(\"语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证\")\") is not equal to (\"Optional(\"语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证语音草稿滚动验证\")\")",
+      "targetName" : "VoiceDraftUIChecks",
+      "testIdentifier" : 1,
+      "testIdentifierString" : "VoiceDraftUITests/testLongDraftScrollsAndKeyboardReturnRemainsUsable()",
+      "testIdentifierURL" : "test://com.apple.xcode/VoiceDraftUIChecks/VoiceDraftUIChecks/VoiceDraftUITests/testLongDraftScrollsAndKeyboardReturnRemainsUsable",
+      "testName" : "testLongDraftScrollsAndKeyboardReturnRemainsUsable()"
+    }
+  ],
+  "title" : "Test - VoiceDraftUIChecks",
+  "topInsights" : [
+
+  ],
+  "totalTestCount" : 4
+}

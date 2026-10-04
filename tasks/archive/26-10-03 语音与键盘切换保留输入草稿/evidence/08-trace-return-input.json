@@ -1,0 +1,32 @@
+{
+  "_meta": {
+    "app": "MinisApp",
+    "build": "10",
+    "device": "iPhone 18 Pro · 6354",
+    "version": "1.13"
+  },
+  "id": 1,
+  "jsonrpc": "2.0",
+  "result": [
+    {
+      "address": "0x162f58c00",
+      "frame": {
+        "h": 19.666666666666664,
+        "w": 346,
+        "x": 16,
+        "y": 16
+      },
+      "type": "UIKitPlatformViewHost<PlatformViewRepresentableAdaptor<PastableTextView>>"
+    },
+    {
+      "address": "0x15907aa00",
+      "frame": {
+        "h": 19.666666666666664,
+        "w": 346,
+        "x": 0,
+        "y": 0
+      },
+      "type": "PastableUITextView"
+    }
+  ]
+}

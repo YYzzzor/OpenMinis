@@ -1,0 +1,16 @@
+Test Suite 'Selected tests' started at 2026-10-03 15:18:09.834.
+Test Suite 'MinisTests.xctest' started at 2026-10-03 15:18:09.839.
+Test Suite 'VoiceComposerLifecycleTests' started at 2026-10-03 15:18:09.839.
+Test Case '-[MinisTests.VoiceComposerLifecycleTests testKeyboardEditsAndNewRecordingRejectOldGeneration]' started.
+Test Case '-[MinisTests.VoiceComposerLifecycleTests testKeyboardEditsAndNewRecordingRejectOldGeneration]' passed (0.015 seconds).
+Test Case '-[MinisTests.VoiceComposerLifecycleTests testRealtimeRevisionsReplaceWholeCurrentPhrase]' started.
+Test Case '-[MinisTests.VoiceComposerLifecycleTests testRealtimeRevisionsReplaceWholeCurrentPhrase]' passed (0.001 seconds).
+Test Case '-[MinisTests.VoiceComposerLifecycleTests testRealtimeTailFinalAndLateCallbacksAfterFinish]' started.
+Test Case '-[MinisTests.VoiceComposerLifecycleTests testRealtimeTailFinalAndLateCallbacksAfterFinish]' passed (0.002 seconds).
+Test Suite 'VoiceComposerLifecycleTests' passed at 2026-10-03 15:18:09.861.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 0.018 (0.023) seconds
+Test Suite 'MinisTests.xctest' passed at 2026-10-03 15:18:09.864.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 0.018 (0.026) seconds
+Test Suite 'Selected tests' passed at 2026-10-03 15:18:09.864.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 0.018 (0.030) seconds
+** TEST SUCCEEDED **

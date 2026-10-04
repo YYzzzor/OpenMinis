@@ -1,0 +1,50 @@
+{
+  "scenario": "键盘输入文字后进入语音模式，全程不说话，立即返回键盘",
+  "spokenOrInjectedAudio": false,
+  "initialText": "原有键盘草稿 1003",
+  "finalText": "",
+  "entryTap": {
+    "_meta": {
+      "app": "MinisApp",
+      "build": "10",
+      "device": "iPhone 18 Pro · 6354",
+      "version": "1.13"
+    },
+    "id": 1,
+    "jsonrpc": "2.0",
+    "result": {
+      "ok": true,
+      "point": {
+        "x": 300,
+        "y": 800
+      },
+      "strategy": "text=开始语音输入 partial=false",
+      "via": "buttonElement:AccessibilityNode"
+    }
+  },
+  "keyboardTap": {
+    "_meta": {
+      "app": "MinisApp",
+      "build": "10",
+      "device": "iPhone 18 Pro · 6354",
+      "version": "1.13"
+    },
+    "id": 1,
+    "jsonrpc": "2.0",
+    "result": {
+      "ok": true,
+      "point": {
+        "x": 341.8333282470703,
+        "y": 753.3333435058594
+      },
+      "strategy": "text=键盘输入 partial=false",
+      "via": "buttonElement:AccessibilityNode"
+    }
+  },
+  "entryActionDurationMs": 154,
+  "keyboardActionIssuedAfterEntryResponseMs": 0,
+  "keyboardActionDurationMs": 84,
+  "totalEntryAndReturnActionMs": 237,
+  "returnedToRealKeyboardControl": true,
+  "implementationModified": false
+}

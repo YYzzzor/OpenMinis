@@ -1,0 +1,34 @@
+{
+  "_meta": {
+    "app": "MinisApp",
+    "build": "10",
+    "device": "iPhone 18 Pro · 6354",
+    "version": "1.13"
+  },
+  "id": 1,
+  "jsonrpc": "2.0",
+  "result": [
+    {
+      "address": "0x1587d1800",
+      "frame": {
+        "h": 104,
+        "w": 354,
+        "x": 0,
+        "y": 0
+      },
+      "label": "draft keep 1003",
+      "type": "HostingScrollView"
+    },
+    {
+      "address": "0x162e029e0",
+      "frame": {
+        "h": 20.33333333333337,
+        "w": 120.33333333333331,
+        "x": 29,
+        "y": 646
+      },
+      "label": "draft keep 1003",
+      "type": "AccessibilityNode"
+    }
+  ]
+}

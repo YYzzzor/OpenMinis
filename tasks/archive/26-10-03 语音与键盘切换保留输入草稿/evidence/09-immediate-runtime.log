@@ -1,0 +1,4 @@
+[13:55:21] 2026-10-03 13:55:21.855 Minis[90269:12822789] [Voice] [INFO] [Voice] [capsule-kbd] willHide → clear
+[13:55:21] 2026-10-03 13:55:21.872 Minis[90269:12822789] [AIChatVM] [INFO] 🔑DRAFT [vm=ACA87F] inputText CLEARED (was '原有键盘草稿 1003') sessionId=nil draftId=__new__DAA2E0C8-CA5F-4FD7-960B-5639F56EB9FB isProcessing=false
+[13:55:21] 2026-10-03 13:55:21.873 Minis[90269:12822789] [Voice] [INFO] [Voice] ASR candidates: [System Recognition (Online), System Recognition (Offline)] active=System Recognition (Online) sticky=none
+[13:55:21] 2026-10-03 13:55:21.873 Minis[90269:12822789] [Voice] [INFO] [Voice] prewarm recognizer for en-US

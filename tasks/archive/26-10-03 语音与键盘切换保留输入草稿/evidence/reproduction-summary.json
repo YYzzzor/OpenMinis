@@ -1,0 +1,26 @@
+{
+  "date": "2026-10-03",
+  "timezone": "Asia/Taipei",
+  "sourceBranch": "optimize_web_search",
+  "branch": "fix/voice-keyboard-draft",
+  "baseCommit": "b51aa64c8427e2d79e2c6d641d85b8ee114bba52",
+  "simulatorName": "iPhone 18 Pro",
+  "simulatorID": "479131C9-8187-44E7-8510-A499D7AC3034",
+  "runtime": "iOS 27.0",
+  "bundleId": "com.yyzzzor.minisx",
+  "version": "1.13",
+  "build": "10",
+  "configuration": "Debug",
+  "buildResult": "BUILD SUCCEEDED",
+  "implementationModified": false,
+  "initialDraft": "draft keep 1003",
+  "secondDraft": "draft trace 1003",
+  "clearStackOldValue": "draft trace 1003",
+  "rootCause": "AIChatView.beginVoiceInput calls dismissSlashMenu unconditionally; savedInputBeforeSlash=nil takes inputText=empty even when showSlashMenu=false",
+  "limitations": [
+    "Keyboard text inserted into real UITextView via debug.inputText",
+    "Formal buttons activated via accessibility actions; call stack confirms MicButton -> beginVoiceInput",
+    "System ASR failed to initialize after draft had already been cleared",
+    "Voice recognition correctness and real-device behavior not validated"
+  ]
+}

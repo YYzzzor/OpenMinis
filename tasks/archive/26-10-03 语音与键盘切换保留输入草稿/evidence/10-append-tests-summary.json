@@ -1,0 +1,18 @@
+{
+  "date": "2026-10-03",
+  "sourceBranch": "fix/voice-keyboard-draft",
+  "sourceCommit": "b51aa64c8427e2d79e2c6d641d85b8ee114bba52",
+  "simulatorID": "479131C9-8187-44E7-8510-A499D7AC3034",
+  "simulatorName": "iPhone 18 Pro",
+  "runtime": "iOS 27.0",
+  "parallelTestingEnabled": false,
+  "tests": [
+    "testRealtimeRevisionsReplaceWholeCurrentPhrase",
+    "testRealtimeTailFinalAndLateCallbacksAfterFinish",
+    "testKeyboardEditsAndNewRecordingRejectOldGeneration"
+  ],
+  "result": "3 passed, 0 failures",
+  "xcresult": "/private/tmp/minisx-voice-append-20261003.xcresult",
+  "boundary": "Existing lifecycle tests with synthetic recognition events; no successful microphone-ASR path verified",
+  "implementationModified": false
+}

@@ -1,0 +1,20 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "\n🐛 LLDB Command\n\n✅ Command executed\n\nOutput:\n  (BOOL) $0 = YES\n"
+    }
+  ],
+  "structuredContent": {
+    "schema": "xcodebuildmcp.output.debug-command-result",
+    "schemaVersion": "2",
+    "didError": false,
+    "error": null,
+    "data": {
+      "command": "expression -l objc++ -- ({ UIView *h=(UIView *)0x10421fb80; NSBlockOperation *op=[NSBlockOperation blockOperationWithBlock:^{ for(id e in (NSArray *)[h accessibilityElements]) { if((BOOL)[(NSString *)[e accessibilityLabel] isEqualToString:@\"键盘输入\"]) { (BOOL)[e accessibilityActivate]; break; } } }]; [op performSelector:@selector(start) withObject:nil afterDelay:0.2]; BOOL activated=NO; for(id e in (NSArray *)[h accessibilityElements]) { if((BOOL)[(NSString *)[e accessibilityLabel] isEqualToString:@\"开始语音输入\"]) { activated=(BOOL)[e accessibilityActivate]; break; } } activated; })",
+      "outputLines": [
+        "(BOOL) $0 = YES"
+      ]
+    }
+  }
+}

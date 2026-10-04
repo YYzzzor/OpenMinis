@@ -62,6 +62,87 @@ final class VoiceComposerLifecycleTests: XCTestCase {
         XCTAssertEqual(vm.transcript, "已有文字")
     }
 
+    @MainActor
+    func testVoicePreparationPreservesSingleLineAndMultilineDrafts() {
+        for draft in ["单行草稿", "第一行\n第二行"] {
+            let chatVM = AIChatViewModel()
+            chatVM.inputText = draft
+
+            chatVM.prepareInputForVoiceMode()
+
+            XCTAssertEqual(chatVM.inputText, draft)
+            XCTAssertFalse(chatVM.showSlashMenu)
+        }
+    }
+
+    @MainActor
+    func testVoicePreparationRestoresDraftOnlyForVisibleSlashMenu() {
+        let activeMenuVM = AIChatViewModel()
+        activeMenuVM.inputText = "斜杠菜单打开前的草稿"
+        activeMenuVM.showSlashMenuOverInput()
+        XCTAssertTrue(activeMenuVM.showSlashMenu)
+        XCTAssertNotNil(activeMenuVM.savedInputBeforeSlash)
+
+        activeMenuVM.prepareInputForVoiceMode()
+
+        XCTAssertEqual(activeMenuVM.inputText, "斜杠菜单打开前的草稿")
+        XCTAssertFalse(activeMenuVM.showSlashMenu)
+        XCTAssertNil(activeMenuVM.savedInputBeforeSlash)
+
+        let hiddenMenuVM = AIChatViewModel()
+        hiddenMenuVM.inputText = "当前普通草稿"
+        hiddenMenuVM.savedInputBeforeSlash = "不应恢复的旧草稿"
+        hiddenMenuVM.savedCaretBeforeSlash = 2
+
+        hiddenMenuVM.prepareInputForVoiceMode()
+
+        XCTAssertEqual(hiddenMenuVM.inputText, "当前普通草稿")
+        XCTAssertFalse(hiddenMenuVM.showSlashMenu)
+        XCTAssertNil(hiddenMenuVM.savedInputBeforeSlash)
+        XCTAssertNil(hiddenMenuVM.savedCaretBeforeSlash)
+    }
+
+    @MainActor
+    func testVoicePreparationKeepsDraftWhenRealtimeFinishesWithoutSpeechOrFails() {
+        for draft in ["单行草稿", "第一行\n第二行"] {
+            let chatVM = AIChatViewModel()
+            chatVM.inputText = draft
+            chatVM.prepareInputForVoiceMode()
+
+            let finishedVM = VoiceInputViewModel()
+            finishedVM.setTranscript(chatVM.inputText)
+            let finishedGeneration = finishedVM.beginStreamingDraft()
+            finishedVM.receiveStreamingEvent(.finished, generation: finishedGeneration)
+            XCTAssertEqual(finishedVM.transcript, draft)
+
+            let failedVM = VoiceInputViewModel()
+            failedVM.setTranscript(chatVM.inputText)
+            let failedGeneration = failedVM.beginStreamingDraft()
+            failedVM.receiveStreamingEvent(.failed("没有识别到语音"), generation: failedGeneration)
+            XCTAssertEqual(failedVM.transcript, draft)
+        }
+    }
+
+    @MainActor
+    func testRealtimeStreamingAfterVoicePreparationAppendsAndRevisesWithoutLosingBase() {
+        let chatVM = AIChatViewModel()
+        chatVM.inputText = "第一行\n第二行"
+        chatVM.prepareInputForVoiceMode()
+
+        let voiceVM = VoiceInputViewModel()
+        voiceVM.setTranscript(chatVM.inputText)
+        let generation = voiceVM.beginStreamingDraft()
+        voiceVM.receiveStreamingEvent(.partial(segmentID: 0, text: "临时识别"), generation: generation)
+        XCTAssertEqual(voiceVM.transcript, "第一行\n第二行 临时识别")
+        voiceVM.receiveStreamingEvent(.partial(segmentID: 0, text: "修订后的识别"), generation: generation)
+        XCTAssertEqual(voiceVM.transcript, "第一行\n第二行 修订后的识别")
+        voiceVM.receiveStreamingEvent(.final(segmentID: 0, text: "最终识别"), generation: generation)
+        voiceVM.receiveStreamingEvent(.partial(segmentID: 1, text: "追加内容"), generation: generation)
+        XCTAssertEqual(voiceVM.transcript, "第一行\n第二行 最终识别 追加内容")
+        voiceVM.receiveStreamingEvent(.finished, generation: generation)
+        XCTAssertEqual(voiceVM.transcript, "第一行\n第二行 最终识别 追加内容")
+    }
+
     func testRealtimeRevisionsReplaceWholeCurrentPhrase() {
         var draft = VoiceStreamingDraft(base: "你好")
         draft.update(segmentID: 0, text: "今天天气怎么样呀", isFinal: false)

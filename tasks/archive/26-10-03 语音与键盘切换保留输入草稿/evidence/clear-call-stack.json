@@ -1,0 +1,47 @@
+{
+  "schema": "xcodebuildmcp.output.debug-stack-result",
+  "schemaVersion": "2",
+  "didError": false,
+  "error": null,
+  "data": {
+    "threads": [
+      {
+        "threadId": 64424509741,
+        "name": "Task 301",
+        "truncated": true,
+        "frames": [
+          {
+            "index": 0,
+            "symbol": "AIChatViewModel.inputText.didset",
+            "displayLocation": "/Users/huyuanzhao/Coding/Projects/OpenMinis/src/ios/Agent/Chat/AIChatViewModel.swift:537"
+          },
+          {
+            "index": 1,
+            "symbol": "AIChatViewModel.inputText.setter",
+            "displayLocation": "/Users/huyuanzhao/Library/Developer/CoreSimulator/Devices/479131C9-8187-44E7-8510-A499D7AC3034/data/Containers/Bundle/Application/8FCCDABF-084B-4B39-9067-20E451C9FF03/Minis.app/Minis.debug.dylib`Minis.AIChatViewModel.inputText.setter : Swift.String:68"
+          },
+          {
+            "index": 2,
+            "symbol": "AIChatViewModel.dismissSlashMenu()",
+            "displayLocation": "/Users/huyuanzhao/Coding/Projects/OpenMinis/src/ios/Agent/Chat/AIChatViewModel+SlashCommands.swift:87"
+          },
+          {
+            "index": 3,
+            "symbol": "AIChatView.beginVoiceInput()",
+            "displayLocation": "/Users/huyuanzhao/Coding/Projects/OpenMinis/src/ios/Views/Chat/AIChatView.swift:3368"
+          },
+          {
+            "index": 4,
+            "symbol": "implicit closure #2 in implicit closure #1 in AIChatView.micButtonContainer.getter",
+            "displayLocation": "/Users/huyuanzhao/Library/Developer/CoreSimulator/Devices/479131C9-8187-44E7-8510-A499D7AC3034/data/Containers/Bundle/Application/8FCCDABF-084B-4B39-9067-20E451C9FF03/Minis.app/Minis.debug.dylib`implicit closure #2 () -> () in implicit closure #1 (Minis.AIChatView) -> () -> () in Minis.AIChatView.micButtonContainer.getter : some:14"
+          },
+          {
+            "index": 5,
+            "symbol": "closure #1 in MicButton.body.getter",
+            "displayLocation": "/Users/huyuanzhao/Coding/Projects/OpenMinis/src/ios/Views/Chat/AIChatView.swift:5868"
+          }
+        ]
+      }
+    ]
+  }
+}

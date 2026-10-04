@@ -1,0 +1,6 @@
+{
+  "src/ios/Views/Chat/AIChatView.swift": "b7511c6ba247a4654448e111bf8bb76c2a9d1d54da660d76f75d02c4135364d4",
+  "src/ios/Agent/Chat/AIChatViewModel+SlashCommands.swift": "6bbf2c6ca7036a5062ed90ed73ce0c1416af3c9010013cba69450f9bd123db8a",
+  "src/ios/Views/Chat/Voice/VoiceComposerPanel.swift": "84f0c836bcee708c2c9fb6e5a6a87b46a6fe7af092ff78e5a5d8ea16ef9dfae2",
+  "src/ios/MinisTests/VoiceComposerLifecycleTests.swift": "8aa0e7ad6cf03a5a43d54c83eb56e8a3195197b7b3ded3dd70f32de7fbf81a44"
+}
