@@ -176,6 +176,8 @@ struct SessionStorageDetailView: View {
     @State private var showClearConfirmation = false
     @State private var isClearing = false
     @State private var currentMinisSize: Int64
+    /// 控制文件浏览器的推入；置为 false 时所有文件夹页一次弹出。
+    @State private var showFileBrowser = false
 
     init(session: StorageManagementViewModel.SessionStorage, onFilesCleared: (() -> Void)? = nil) {
         self.session = session
@@ -202,16 +204,26 @@ struct SessionStorageDetailView: View {
         List {
             Section("MinisX Files") {
                 if currentMinisSize > 0 {
-                    NavigationLink {
-                        FileBrowserView(rootPath: minisURL)
+                    Button {
+                        showFileBrowser = true
                     } label: {
                         HStack {
-                            Label("Browse Files", systemImage: "folder")
+                            Label {
+                                Text("Browse Files")
+                            } icon: {
+                                Image(systemName: "folder")
+                                    .foregroundStyle(.tint)
+                            }
                             Spacer()
                             Text(formatter.string(fromByteCount: currentMinisSize))
                                 .foregroundStyle(.secondary)
+                            Image(systemName: "chevron.forward")
+                                .font(.footnote.weight(.semibold))
+                                .foregroundStyle(.tertiary)
                         }
                     }
+                    // 保持与原 NavigationLink 行一致：文字用主色，不用按钮的强调色。
+                    .foregroundStyle(.primary)
                 } else {
                     Text("No minis files")
                         .foregroundStyle(.secondary)
@@ -243,6 +255,11 @@ struct SessionStorageDetailView: View {
             }
         }
         .navigationTitle(session.title ?? "Session")
+        // 由本页控制推入，文件浏览器深层的 Close 才能一次回到本页。
+        .navigationDestination(isPresented: $showFileBrowser) {
+            FileBrowserView(rootPath: minisURL, showsCloseButton: false,
+                            onExit: { showFileBrowser = false })
+        }
         .navigationBarTitleDisplayMode(.inline)
         .alert("Clear Session Files?", isPresented: $showClearConfirmation) {
             Button("Clear \(formatter.string(fromByteCount: totalFileSize))", role: .destructive) {

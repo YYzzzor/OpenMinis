@@ -58,14 +58,38 @@ struct FileBrowserView: View {
     private let highlightFileName: String?
     @State private var highlightActive = false
     @State private var didLocateHighlight = false
+    /// 点文件夹后写入，由 navigationDestination(item:) 推入新的文件夹页。
+    @State private var pushedFolder: FolderDestination?
+    /// 只有入口打开的第一页才有 Go to Parent Folder。
+    private let isFirstPage: Bool
+    /// 第一页是否显示 Close；推入式入口的第一页已有 `<`，不再显示。
+    private let showsCloseButton: Bool
+    /// 一次退出文件浏览器的动作，传给推入的页面供 Close 使用。
+    /// 为 nil 时用第一页的 dismiss（sheet 入口）；推入式入口须由呈现方提供，
+    /// 因为在深层页面上调用第一页的 dismiss 会关闭更外层的 sheet。
+    private let exitBrowser: (() -> Void)?
 
     enum MoveOrCopyMode { case move, copy }
 
+    /// 入口使用的第一页。`showsCloseButton` 为 false 时（推入式入口）第一页不显示 Close。
     init(rootPath: URL? = nil, initialPath: URL? = nil, rootLabel: String? = nil,
-         highlightFileName: String? = nil) {
+         highlightFileName: String? = nil, showsCloseButton: Bool = true,
+         onExit: (() -> Void)? = nil) {
         let path = rootPath ?? RootfsManager.shared.rootfsPath
         self.highlightFileName = highlightFileName
+        self.isFirstPage = true
+        self.showsCloseButton = showsCloseButton
+        self.exitBrowser = onExit
         _viewModel = StateObject(wrappedValue: FileBrowserViewModel(rootPath: path, initialPath: initialPath, rootLabel: rootLabel))
+    }
+
+    /// 推入的文件夹页：只显示 `directory`，不高亮；Close 调用 `exitBrowser`。
+    private init(rootPath: URL, rootLabel: String, directory: URL, exitBrowser: @escaping () -> Void) {
+        self.highlightFileName = nil
+        self.isFirstPage = false
+        self.showsCloseButton = true
+        self.exitBrowser = exitBrowser
+        _viewModel = StateObject(wrappedValue: FileBrowserViewModel(rootPath: rootPath, initialPath: directory, rootLabel: rootLabel))
     }
 
     var body: some View {
@@ -74,13 +98,9 @@ struct FileBrowserView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 4) {
                     ForEach(viewModel.pathComponents.indices, id: \.self) { index in
-                        Button(action: {
-                            viewModel.navigateToPathComponent(at: index)
-                        }) {
-                            Text(viewModel.pathComponents[index])
-                                .font(.caption)
-                                .foregroundColor(.blue)
-                        }
+                        Text(viewModel.pathComponents[index])
+                            .font(.caption)
+                            .foregroundColor(.blue)
                         if index < viewModel.pathComponents.count - 1 {
                             Image(systemName: "chevron.right")
                                 .font(.caption2)
@@ -114,7 +134,7 @@ struct FileBrowserView: View {
                         ForEach(viewModel.items) { item in
                             FileBrowserRow(item: item, viewModel: viewModel, itemToDelete: $itemToDelete) {
                                 if item.isDirectory {
-                                    viewModel.navigateTo(item)
+                                    pushedFolder = FolderDestination(url: viewModel.childURL(for: item))
                                 } else {
                                     previewingFile = item
                                 }
@@ -148,8 +168,13 @@ struct FileBrowserView: View {
                 }
             }
         }
-        .navigationTitle("Files")
+        .navigationTitle(viewModel.canGoBack ? Text(verbatim: viewModel.directoryName) : Text("Files"))
         .navigationBarTitleDisplayMode(.inline)
+        // 挂在根视图而非 List 内，目标页只在点击后创建。
+        .navigationDestination(item: $pushedFolder) { folder in
+            FileBrowserView(rootPath: viewModel.rootPath, rootLabel: viewModel.rootLabel,
+                            directory: folder.url, exitBrowser: exitBrowser ?? { dismiss() })
+        }
         // [T-ios-copy-abs-path-copied-toast] Self-dismissing "Copied" capsule.
         .overlay(alignment: .bottom) {
             if copiedToast {
@@ -165,9 +190,12 @@ struct FileBrowserView: View {
         }
         .animation(.spring(response: 0.3), value: copiedToast)
         .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button("Close") {
-                    dismiss()
+            // 推入的页面上 Close 排在系统 `<` 右侧。
+            if showsCloseButton {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Close") {
+                        if let exitBrowser { exitBrowser() } else { dismiss() }
+                    }
                 }
             }
             // T-hidden-files a3e7f1d0: trailing toolbar collapsed to a
@@ -254,7 +282,8 @@ struct FileBrowserView: View {
             sortAscending: sortAscending,
             foldersFirst: foldersFirst,
             showHidden: showHidden,
-            apply: syncSort
+            apply: syncSort,
+            reload: { viewModel.loadItems() }
         ))
     }
 
@@ -289,16 +318,10 @@ struct FileBrowserView: View {
         }
     }
 
+    /// 把 @AppStorage 的设置同步给 ViewModel，只重排不读盘。
     private func syncSort() {
-        let listingChanged = viewModel.showHidden != showHidden
         viewModel.showHidden = showHidden
         viewModel.updateSort(key: currentSortKey, ascending: sortAscending, foldersFirst: foldersFirst)
-        // Toggling showHidden changes which entries appear in the listing,
-        // not just the sort order — reload from disk so newly-included /
-        // newly-excluded dotfiles surface immediately.
-        if listingChanged {
-            viewModel.loadItems()
-        }
     }
 
     /// Trailing-toolbar `⋯` menu. Holds every functional action so the
@@ -307,7 +330,7 @@ struct FileBrowserView: View {
     /// files). T-hidden-files a3e7f1d0.
     private var moreMenu: some View {
         Menu {
-            if viewModel.canGoBack {
+            if isFirstPage && viewModel.canGoBack {
                 Button {
                     viewModel.goBack()
                 } label: {
@@ -357,15 +380,29 @@ private struct SortSyncModifier: ViewModifier {
     let foldersFirst: Bool
     let showHidden: Bool
     let apply: () -> Void
+    let reload: () -> Void
 
+    /// 页面出现时先应用设置再读一次目录（首次与从子页返回都走这里）；
+    /// 排序变化只重排，showHidden 变化会改变列表内容，需要重读。
     func body(content: Content) -> some View {
         content
-            .onAppear(perform: apply)
+            .onAppear {
+                apply()
+                reload()
+            }
             .onChange(of: sortKeyRaw) { _ in apply() }
             .onChange(of: sortAscending) { _ in apply() }
             .onChange(of: foldersFirst) { _ in apply() }
-            .onChange(of: showHidden) { _ in apply() }
+            .onChange(of: showHidden) { _ in
+                apply()
+                reload()
+            }
     }
+}
+
+/// 推入文件夹页的导航目标（FileItem 的 id 是随机 UUID，不适合做 Hashable 标识）。
+private struct FolderDestination: Hashable {
+    let url: URL
 }
 
 // MARK: - File Preview
@@ -926,10 +963,22 @@ class FileBrowserViewModel: ObservableObject {
     let rootPath: URL
     let rootLabel: String
     private var currentPath: URL
-    private var pathHistory: [URL] = []
+    /// 递增的读取令牌，用于丢弃过期的目录读取结果。
+    private var loadToken = 0
+    /// 已有读取结果后，重新读取不再显示加载指示器。
+    private var hasLoaded = false
 
     var canGoBack: Bool {
         currentPath.path != rootPath.path
+    }
+
+    /// 当前目录名，用作非根目录页面的标题。
+    var directoryName: String { currentPath.lastPathComponent }
+
+    /// 子目录的逻辑 URL：用 appendingPathComponent 保持 rootPath 内的逻辑路径，
+    /// 不解析符号链接，否则指向 rootPath 之外的绑定挂载目录会破坏前缀判断。
+    func childURL(for item: FileItem) -> URL {
+        currentPath.appendingPathComponent(item.name)
     }
 
     init(rootPath: URL, initialPath: URL? = nil, rootLabel: String? = nil) {
@@ -943,19 +992,21 @@ class FileBrowserViewModel: ObservableObject {
             self.currentPath = self.rootPath
         }
         updatePathComponents()
-        loadItems()
     }
 
+    /// 后台读取当前目录。主线程先取好路径与设置，结果按 token 校验，过期则丢弃。
     func loadItems() {
-        isLoading = true
+        if !hasLoaded { isLoading = true }
+        loadToken += 1
+        let token = loadToken
+        let path = currentPath
+        let showHiddenLocal = showHidden
 
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-            guard let self = self else { return }
-
             do {
                 // Resolve symlinks so contentsOfDirectory works on bind-mounted dirs
                 // (e.g. /var/minis/attachments -> Library/MinisChat/...)
-                let resolvedPath = self.currentPath.resolvingSymlinksInPath()
+                let resolvedPath = path.resolvingSymlinksInPath()
                 // Note: we deliberately do NOT bulk-prefetch iCloud placeholder
                 // files here. A large iCloud folder could contain thousands of
                 // files, and kicking off that many simultaneous downloads just
@@ -972,7 +1023,6 @@ class FileBrowserViewModel: ObservableObject {
                     options: []
                 )
 
-                let showHiddenLocal = self.showHidden
                 let fileItems = contents.compactMap { url -> FileItem? in
                     if !showHiddenLocal && url.lastPathComponent.hasPrefix(".") {
                         return nil
@@ -981,12 +1031,15 @@ class FileBrowserViewModel: ObservableObject {
                 }
 
                 DispatchQueue.main.async {
+                    guard let self, token == self.loadToken else { return }
                     self.rawItems = fileItems
+                    self.hasLoaded = true
                     self.applySort()
                     self.isLoading = false
                 }
             } catch {
                 DispatchQueue.main.async {
+                    guard let self, token == self.loadToken else { return }
                     self.errorMessage = error.localizedDescription
                     self.showError = true
                     self.isLoading = false
@@ -1262,7 +1315,7 @@ class FileBrowserViewModel: ObservableObject {
         // resolved-prefix and raw-prefix checks below miss and the function fell
         // through to `url.lastPathComponent` — copying just the filename
         // (`0419….jpg`) instead of `/var/minis/browser/0419….jpg`.
-        // `currentPath` is never symlink-resolved (init standardizes; navigateTo
+        // `currentPath` is never symlink-resolved (init standardizes; childURL
         // appends names), so `currentPath` relative to `rootPath` is always the
         // true guest directory regardless of bind mounts.
         let rawRootEarly = rootPath.standardized.path
@@ -1353,42 +1406,15 @@ class FileBrowserViewModel: ObservableObject {
         return String(std.dropFirst(dataPrefix.count))
     }
 
-    func navigateTo(_ item: FileItem) {
-        guard item.isDirectory else { return }
-        pathHistory.append(currentPath)
-        // Use appendingPathComponent instead of item.url directly to preserve
-        // the logical path within rootPath. Using item.url.standardizedFileURL
-        // would resolve symlinks, breaking path prefix checks when bind-mounted
-        // directories point outside the rootfs.
-        currentPath = currentPath.appendingPathComponent(item.name)
-        updatePathComponents()
-        loadItems()
-    }
-
     func goBack() {
         guard canGoBack else { return }
         currentPath = currentPath.deletingLastPathComponent()
         if currentPath.path.count < rootPath.path.count {
             currentPath = rootPath
         }
-        pathHistory.removeAll { $0 == currentPath }
         updatePathComponents()
-        loadItems()
-    }
-
-    func navigateToPathComponent(at index: Int) {
-        guard index >= 0 else { return }
-
-        var targetPath = rootPath
-        if index > 0 {
-            for i in 1...index {
-                if i < pathComponents.count {
-                    targetPath = targetPath.appendingPathComponent(pathComponents[i])
-                }
-            }
-        }
-        currentPath = targetPath
-        updatePathComponents()
+        // 目录已换，旧列表不属于新目录：显示加载指示器，避免点到旧条目。
+        hasLoaded = false
         loadItems()
     }
 
