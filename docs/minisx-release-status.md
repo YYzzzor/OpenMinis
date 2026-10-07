@@ -1,20 +1,23 @@
 # MinisX 发布状态
 
-更新日期：2026-10-04（Asia/Taipei）。发布步骤见 [TestFlight 发布流程草案](minisx-testflight-release-draft.md)；本文只记录每次发布的事实。
+更新日期：2026-10-07（Asia/Taipei）。发布步骤见 [TestFlight 发布流程草案](minisx-testflight-release-draft.md)；本文只记录每次发布的事实。
 
 ## 当前状态
 
 | 项目 | 状态 |
 | --- | --- |
-| 最近已核实上传 | **1.13（10）**，2026-10-03 10:16:50 上传成功；本轮没有核对 Build 11 上传记录 |
-| 已确认安装使用 | 2026-10-04 维护者确认语音草稿修复最后两项真机测试通过；本对话前述发布安排为 **Build 11**，本条反馈未另行确认已安装构建号。此前明确确认的手机版本为 Build 10 |
+| 最近已核实上传 | **1.13（13）**，2026-10-07 11:19:39 上传成功；其中 MinisFileProvider 扩展为 1.13（12） |
+| 已确认安装使用 | 2026-10-07 维护者确认在手机上使用一键关闭后的构建，反馈 Close 退出动画流畅；最近上传为 Build 13，维护者没有另行报告构建号 |
 | 分发渠道 | TestFlight Internal，仅维护者本人 |
 | 发布身份 | Team `42486W5YRY`，Bundle ID `com.yyzzzor.minisx`，App Store Connect app ID `6816328476` |
-| 下一次可用 Build 号 | 待确认：前次已核实上传为10；维护者随后安排发布 Build 11，下一次上传前需确认实际上传与后台占用 |
+| 下一次可用 Build 号 | **14** |
 
 README 中的 OpenMinis App Store / TestFlight 链接属于上游项目，与 MinisX 无关。
 
 ## 待确认事项
+
+- Build 13 的 MinisFileProvider 扩展构建号为 12，与主应用的 13 不一致。原因：`project.pbxproj` 中该扩展的 `CURRENT_PROJECT_VERSION` 仍为 12。下次上传前必须把全部 target 改为同一构建号。App Store Connect 是否就此发出警告，未核对。
+- 文件浏览器：真机流畅度与内存、慢速挂载文件夹上反复推入返回的表现尚未专项验证。
 
 - 网页读取优化：维护者此前在 Build 9 完成一个历史问题的查询，反馈约一分多钟取得结果；现已安装 Build 10，反馈目前没有问题。后续根据具体使用反馈调整，本轮不启动额外测试。
 
@@ -24,6 +27,27 @@ README 中的 OpenMinis App Store / TestFlight 链接属于上游项目，与 Mi
 ## 发布记录
 
 每条记录的字段：上传方式与时间、源码、新增内容、证据、验证与边界。新的写在最上面。
+
+### 1.13（13）— 2026-10-07
+
+- **上传**：维护者在 Xcode 手动 Archive 并分发至 TestFlight Internal，归档创建时间11:12:48，11:19:39上传成功（Asia/Taipei）。归档元数据 `uploadedBuildNumber=13`，分发记录ID `d01fc0a8-c8cf-43e7-8db2-a034971c0b31`。
+- **源码**：分支 `feat/file-browser-push-nav`，HEAD `5e3210c`，改动均未提交。文件浏览器两处源码最后修改于10:39，早于归档；归档二进制中能找到 `showFileBrowser` 与 `FolderDestination`，确认包含一键关闭。
+- **新增内容**（相对 Build 12）：
+  - [文件浏览器逐层推入导航](<../tasks/archive/26-10-07 文件浏览器逐层推入导航/task.md>)：第 2 层及以后的文件夹页在 `<` 右侧显示 Close，一次退出文件浏览器；sheet 入口关闭 sheet，"存储"入口回到会话存储页（Spec F6、F7）。
+- **归档证据**：`~/Library/Developer/Xcode/Archives/2026-10-07/` 下11:12归档；主应用、MinisShare、AgentWidgetExtension为1.13（13），MinisFileProvider为1.13（12），最低iOS版本均为26.0。
+- **手机安装与体验**：维护者于2026-10-07确认已在手机上使用，反馈 Close 的退出动画流畅；没有另行报告构建号。
+- **验证与边界**：一键关闭已在 iPhone 18 Pro 模拟器上验收，见任务记录。本轮只读取本地归档元数据，没有读取 App Store Connect 后台处理状态。
+
+### 1.13（12）— 2026-10-07
+
+- **上传**：维护者在 Xcode 手动 Archive 并分发至 TestFlight Internal，归档创建时间10:06:07，10:12:28上传成功（Asia/Taipei）。归档元数据 `uploadedBuildNumber=12`，分发记录ID `25f63b1c-660a-40fc-a538-f0e0a338fd93`。
+- **源码**：分支 `feat/file-browser-push-nav`，HEAD `5e3210c`，未提交改动为文件浏览器两处源码和构建号 11 → 12。`FileBrowserView.swift` 最后修改于09:21，早于归档；归档二进制中能找到新增类型 `FolderDestination`，确认包含本次改动。
+- **新增内容**（相对 Build 11）：
+  - [文件浏览器逐层推入导航](<../tasks/archive/26-10-07 文件浏览器逐层推入导航/task.md>)：点文件夹推入新页面，`<` 和边缘右滑回到上一层，标题显示文件夹名；路径栏只显示位置；"存储"入口去掉多余的 Close，sheet 入口只在第一页显示 Close。规则见 [文件浏览器 Spec](specs/ios-file-browser.md)。
+- **不面向用户**：新增文件浏览器 Spec（F1–F10）、模拟器验收截图与独立审查记录。
+- **归档证据**：`~/Library/Developer/Xcode/Archives/2026-10-07/` 下10:06归档；主应用、MinisShare、MinisFileProvider、AgentWidgetExtension均为1.13（12），最低iOS版本均为26.0。
+- **手机安装与体验**：维护者于2026-10-07在手机上试用，反馈 `<` 返回功能正常，同时要求深层页面增加一键关闭；没有另行报告构建号。
+- **验证与边界**：iPhone 18 Pro 模拟器上 6 个入口的验收与独立审查已完成，见任务记录。本轮只读取本地归档元数据，没有读取 App Store Connect 后台处理状态。
 
 ### Build 11 真机验收反馈 — 2026-10-04
 
