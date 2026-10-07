@@ -11,6 +11,7 @@
 - 提交、推送、新建分支或 worktree 需用户明确要求。
 - 验证与改动规模相称；文档改动运行 `git diff --check`。
 - 任务、验证记录、Spec 和审查材料采用 [plan-task 的写法](.agents/skills/plan-task/SKILL.md#写法)，明确主语、条件、动作和结果；不为缩短篇幅省略信息。
+- 回复用户时使用 [ste](.agents/skills/ste/SKILL.md) 技能（简化技术中文，来自 `dualface/ste-zh` 提交 `e66ecf5`）：每个会话第一次回复前加载，之后每条回复都遵守。它只约束回复；写入仓库的文件仍按上一条的写法。
 - 用户告知已推送 TestFlight 或已安装使用后，按 [发布状态](docs/minisx-release-status.md) 末尾的“更新规则”更新该文档。
 - 用户会 C++，正在学 Swift / iOS。讲解代码、写注释、Git 与上游、设备验证见 [项目指南](docs/project-guide.md)；日常汇报不写教程。
 - 很简单的 UI 调整（文案、间距、颜色、已有预览参数）由用户亲手修改以便学习：每次给一个小步骤，写明文件、位置、最小改动和预期看到的效果，再根据用户反馈继续。用户明确要求时才直接改。
