@@ -62,7 +62,7 @@ README 中的 OpenMinis App Store / TestFlight 链接属于上游项目，与 Mi
 - **上传**：维护者在 Xcode 手动 Archive 并分发，归档创建时间10:14:50，10:16:50上传成功（Asia/Taipei）。归档元数据 `uploadedBuildNumber=10`，分发记录ID `2bb317c8-83c1-47f8-819e-d03811331d64`。
 - **源码**：本轮修复分支为 `fix/responses-tool-result-image-order`，提交前 HEAD 为 `a0bda42`；当时未提交的排序修复现已记录为 `d1b5f90`。未核对归档时完整源码快照。
 - **新增内容**（相对 Build 9）：
-  - [BrowserUse 搜索速度优化](<../tasks/active/26-10-02 BrowserUse 搜索速度优化/task.md>)（`2a5461d`）：网页搜索改为匿名 HTTP 读取 DuckDuckGo Lite，返回完整标题、摘要与来源链接，支持结果续查与两项独立搜索；必要时使用一次匿名渲染回退。
+  - [BrowserUse 搜索速度优化](<../tasks/archive/26-10-02 BrowserUse 搜索速度优化/task.md>)（`2a5461d`）：网页搜索改为匿名 HTTP 读取 DuckDuckGo Lite，返回完整标题、摘要与来源链接，支持结果续查与两项独立搜索；必要时使用一次匿名渲染回退。
   - [Responses 工具结果与图片消息顺序修复](<../tasks/archive/26-10-03 Responses 工具结果与图片消息顺序修复/task.md>)（`d1b5f90`）：同批工具返回图片和文字时，应用先排列全部工具结果，再追加图片消息，避免结果序列被图片消息分隔而触发 Provider 400。
 - **不面向用户**：新增8项转换器回归测试、生命周期L8以及修复前后流程与独立审查记录。
 - **归档证据**：`~/Library/Developer/Xcode/Archives/2026-10-03/Minis 10-3-26, 10.14 AM.xcarchive`。主应用、MinisShare、MinisFileProvider、AgentWidgetExtension均为1.13（10），最低iOS版本均为26.0；Build 9 的Widget构建号差异保留于历史记录。
@@ -73,7 +73,7 @@ README 中的 OpenMinis App Store / TestFlight 链接属于上游项目，与 Mi
 
 - **上传**：Xcode归档创建时间18:20:37，18:23:12上传成功（Asia/Taipei）；归档元数据 `uploadedBuildNumber=9`，分发记录ID `fa8839e4-67aa-4979-bc3c-f1a27882f618`。
 - **源码**：当前工作区为 `investigate/build8-agent-latency`，HEAD `b0b53c4`，包含未提交的网页读取与提示调整；未核对归档时完整源码快照。
-- **本轮交付内容**：[Agent网页查询效率优化](<../tasks/active/26-10-02 Agent 网页查询效率优化/task.md>)：公开网页读取、长文定位与续读、加载状态与表格处理，以及工具选择和回答依据的System Prompt约束。
+- **本轮交付内容**：[Agent网页查询效率优化](<../tasks/archive/26-10-02 Agent 网页查询效率优化/task.md>)：公开网页读取、长文定位与续读、加载状态与表格处理，以及工具选择和回答依据的System Prompt约束。
 - **归档证据**：`~/Library/Developer/Xcode/Archives/2026-10-02/`下18:20归档；主应用、MinisShare、MinisFileProvider为1.13（9），AgentWidgetExtension为1.13（8），最低iOS版本均为26.0。
 - **手机安装与体验**：维护者于2026-10-02确认已安装到手机，并使用“排查 Build8 智能体响应缓慢”对话中的最初文字提问，反馈“大概一分多钟就查到了结果”。维护者正在自行持续测试不同例子，有问题再调整。
 - **验证边界**：本次耗时来自维护者估计，未读取手机查询日志、最终回答或模型配置；不据此判定回答准确性或整体验收通过。本轮只更新状态，不启动应用或模型测试。未读取App Store Connect后台处理状态。
