@@ -324,7 +324,6 @@
 		E5JB10002 /* TextSegmenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5JB00013 /* TextSegmenter.swift */; };
 		E5JB10003 /* jieba.dict.utf8 in Resources */ = {isa = PBXBuildFile; fileRef = E5JB00014 /* jieba.dict.utf8 */; };
 		E5JB10004 /* hmm_model.utf8 in Resources */ = {isa = PBXBuildFile; fileRef = E5JB00015 /* hmm_model.utf8 */; };
-		E5K000001 /* SelectableMarkdownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5K000011 /* SelectableMarkdownView.swift */; };
 		E5K000002 /* ChatTurnScreenshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5K000012 /* ChatTurnScreenshot.swift */; };
 		E5KIMI0A1 /* KimiOAuthRefreshCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5KIMIR01 /* KimiOAuthRefreshCoordinator.swift */; };
 		E5KIMI0A2 /* KimiOAuthRefreshCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5KIMIR01 /* KimiOAuthRefreshCoordinator.swift */; };
@@ -1056,7 +1055,6 @@
 		E5JB00013 /* TextSegmenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextSegmenter.swift; sourceTree = "<group>"; };
 		E5JB00014 /* jieba.dict.utf8 */ = {isa = PBXFileReference; lastKnownFileType = text; name = jieba.dict.utf8; path = Resources/jieba.dict.utf8; sourceTree = "<group>"; };
 		E5JB00015 /* hmm_model.utf8 */ = {isa = PBXFileReference; lastKnownFileType = text; name = hmm_model.utf8; path = Resources/hmm_model.utf8; sourceTree = "<group>"; };
-		E5K000011 /* SelectableMarkdownView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectableMarkdownView.swift; sourceTree = "<group>"; };
 		E5K000012 /* ChatTurnScreenshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTurnScreenshot.swift; sourceTree = "<group>"; };
 		E5KIMIR01 /* KimiOAuthRefreshCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = KimiOAuthRefreshCoordinator.swift; path = Providers/Kimi/OAuth/KimiOAuthRefreshCoordinator.swift; sourceTree = SOURCE_ROOT; };
 		E5KIMIR02 /* KimiDeviceFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = KimiDeviceFlow.swift; path = Providers/Kimi/OAuth/KimiDeviceFlow.swift; sourceTree = SOURCE_ROOT; };
@@ -1346,6 +1344,7 @@
 		BB1000012F700000000000AA /* MinisTests */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (E5EXC0001 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = MinisTests; sourceTree = "<group>"; };
 		E5V3SYNC00000000000000A1 /* CollectionViewMessageListV3 */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = CollectionViewMessageListV3; sourceTree = "<group>"; };
 		E5ACV1SYNC000000000000A1 /* AIChatView */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = AIChatView; sourceTree = "<group>"; };
+		E5MDV1SYNC000000000000A1 /* Markdown */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Markdown; sourceTree = "<group>"; };
 		E5CV5SYNC000000000000A1 /* ContentView */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = ContentView; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
@@ -2376,6 +2375,7 @@
 			isa = PBXGroup;
 			children = (
 				E5ACV1SYNC000000000000A1 /* AIChatView */,
+				E5MDV1SYNC000000000000A1 /* Markdown */,
 				E5F200011 /* MarkdownPrepRegex.swift */,
 				E5F200012 /* MinisMediaViews.swift */,
 				E5F200013 /* AssistantBlockView.swift */,
@@ -2391,7 +2391,6 @@
 				F1W00100 /* PrintHelper.swift */,
 				F1W00060 /* PaginatedMarkdownView.swift */,
 				E8A000012 /* OffloadPermissionDialog.swift */,
-				E5K000011 /* SelectableMarkdownView.swift */,
 				E5K000012 /* ChatTurnScreenshot.swift */,
 				E5N0000152F3B941A00049557 /* SessionMemoryView.swift */,
 				E5N0000122F3B941A00049557 /* SessionSkillsView.swift */,
@@ -2601,6 +2600,7 @@
 				AA0838CB2F3CA8A900049557 /* Terminal */,
 				E5V3SYNC00000000000000A1 /* CollectionViewMessageListV3 */,
 				E5ACV1SYNC000000000000A1 /* AIChatView */,
+				E5MDV1SYNC000000000000A1 /* Markdown */,
 				E5CV5SYNC000000000000A1 /* ContentView */,
 			);
 			name = Minis;
@@ -3248,7 +3248,6 @@
 				E5J000050 /* ObjCExceptionCatcher.m in Sources */,
 				E5J000030 /* NSTextContainerSetSizeGuard.m in Sources */,
 				E5J000040 /* AttributeQueryRecorder.m in Sources */,
-				E5K000001 /* SelectableMarkdownView.swift in Sources */,
 				E5K000002 /* ChatTurnScreenshot.swift in Sources */,
 				E5M000007 /* MarkdownRenderView.swift in Sources */,
 				E5M000003 /* MinisMarkdownParser.swift in Sources */,

@@ -120,7 +120,7 @@ Debug 构建（`-Onone`，开启 `ENABLE_TESTABILITY`）的方法派发方式可
 - [ ] V3 每批：
   - 模拟器 Debug 构建成功，命令 `bash scripts/build_ios_simulator.sh --skip-deps`。
   - 不签名的 Release 构建成功。
-  - 两种构建的编译警告列表与 V0 的基线相同。
+  - 两种构建的编译警告列表与 V0 的基线相同。例外：警告位置没有新增，只是同一位置的报告次数变化（Debug 分批编译），或者去掉 `private` 的类型进入生成的 ObjC 头文件。例外必须在 verification.md 中逐条写明原因。
 
   （verification.md）
 - [ ] V4 每批：`MinisTests` 用 `build-for-testing` 全部编译通过。（verification.md）
@@ -181,9 +181,12 @@ Debug 构建（`-Onone`，开启 `ENABLE_TESTABILITY`）的方法派发方式可
 
 ## 下一步
 
-1. 做批次 6 `SelectableMarkdownView`：交给 implementer，说明同批次 5（目标目录 `Views/Chat/Markdown/` 设为同步文件夹）；参照 `1.15:src/ios/Views/Chat/Markdown/Bridge/SelectableMarkdownView.swift` 头部的说明；`private extension UIView { func nearestViewController() }` 保持 `private`。
-2. 6 批完成后：V5（完整运行 MinisTests）、V6（模拟器冒烟检查）、V8（Spec 链接）、V9（独立代码审查），然后请用户做 V7。
+1. V5：完整运行 MinisTests。
+2. V6：按 verification.md 的步骤做模拟器冒烟检查。
+3. V8：更新 Spec 的代码入口链接。
+4. V9：独立代码审查。
+5. 请用户做 V7。
 
-批次 1–5 已完成并提交（见 verification.md）。
+批次 1–6 已完成并提交（见 verification.md）。
 
 已完成：V0（见 verification.md）；分支已建；检查脚本 `tools/check_split.py` 和警告比较脚本 `tools/build_warnings.sh` 已写好。

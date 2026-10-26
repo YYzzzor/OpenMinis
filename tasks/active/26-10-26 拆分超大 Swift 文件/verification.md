@@ -116,3 +116,24 @@ V2 的规则 6（存储属性留在类型主体中）不由脚本检查。原因
 - V4 通过：主会话重跑 `build-for-testing`，输出 `** TEST BUILD SUCCEEDED **`。
 - V8 的一部分通过：`scripts/register_locale.py:26` 改为指向 `src/ios/Views/Settings/AppearanceSettingsView.swift`；`supportedLanguages` 保持 `private let`。子代理在仓库副本中用不存在的语言 `zz` 运行脚本，退出码 0，副本的 `AppearanceSettingsView.swift:48` 写入了 `LanguageOption(id: "zz", ...)`。
 - 已知：`src/ios/Agent/Markdown/SwiftMathRenderer.swift:28` 和 `src/ios/Views/Chat/SelectableMarkdownView.swift:3616` 的注释写着 `ContentView.swift:6948`。按“不做”的约定，不修改。
+
+## 批次 6：`SelectableMarkdownView`（2026-10-26）
+
+实施：implementer 子代理。主会话复核了 V2、V3 的输出和构建时间，分析了警告差异，重新运行了 V4。
+
+- V1 通过：原文件删除；新目录 `src/ios/Views/Chat/Markdown/`（同步文件夹）中有 29 个文件，按上游分为 `Bridge/`、`TextKit/`、`Attachments/`、`Rendering/`、`Media/`、`Support/`；`plutil -lint` 通过。
+  - 日志声明照上游集中到 `Support/MarkdownLoggers.swift`（改为 internal，不复制）。
+  - `private extension UIView { nearestViewController(), enclosingScrollView() }` 保持 `private`，用到它的代码都在 `Media/MediaPreviewPresentation.swift` 中。
+  - MinisX 独有代码：行内代码内边距在 `Rendering/MarkdownNSRenderer.swift` 和 `TextKit/MinisLayoutManager.swift`；文字淡入在 `Bridge/SelectableMarkdownView.swift`；KaTeX 回退在 `Attachments/MathAttachment.swift`。没有新建 MinisX 专属文件。
+  - 4 个原来写在扩展区的实例存储属性移进 `SelectableMarkdownTextView` 的类主体末尾。静态存储属性留在扩展中，与上游相同（Swift 允许扩展中有静态存储属性）。
+- V2 通过：`check_split.py --self-test` 输出“反向测试：通过”和“无其他差异”（与 `main` 比较，含批次 1–5）。
+- V3 部分通过：Debug 和 Release 完整构建成功（构建目录的创建时间晚于源码最后修改的时间）。警告列表与基线有 3 处差异，主会话核实后接受：
+
+  | 警告 | 基线 → 本批 | 原因 | 运行时影响 |
+  | --- | --- | --- | --- |
+  | `UITextItemInteraction` is deprecated | 8 → 16（Debug 和 Release） | `TableCellTextView` 去掉 `private` 后，进入 Xcode 生成的 ObjC 头文件 `Minis-Swift.h`，8 个 ObjC 编译单元各报一次。上游 1.15 同样去掉了 `private` | 无：头文件只供 ObjC 代码编译 |
+  | `init(title:description:default:supportedTypeIdentifiers:...)` was deprecated | 9 → 10（仅 Debug） | 警告位置相同（`Agent/Intents/` 下 4 个文件），只是同一位置被多报一次。Debug 按文件分批编译，文件数变化后批次划分变了 | 无：Release 中没有差异，警告位置没有新增 |
+  | main actor-isolated static property `shared` | 4 → 5（仅 Debug） | 同上：`UnifiedModelPicker.swift:252` 被多报一次，没有新的位置 | 无 |
+
+  核对方法：从 `debug.log` 中按“文件:行:列”统计每条警告的位置，比较基线与本批。
+- V4 通过：主会话重跑 `build-for-testing`，输出 `** TEST BUILD SUCCEEDED **`。
