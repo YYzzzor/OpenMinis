@@ -181,8 +181,9 @@ Debug 构建（`-Onone`，开启 `ENABLE_TESTABILITY`）的方法派发方式可
 
 ## 下一步
 
-1. 做批次 5 `ContentView`：交给 implementer，说明同批次 4（目标目录 `Views/ContentView/` 设为同步文件夹）；另把 `SettingsSheet` 和 `AppearanceSettingsView` 拆到 `Views/Settings/`（逐个加入工程），`supportedLanguages` 保持 `private`；参照 `1.15:src/ios/Views/ContentView/ContentView.swift` 头部的文件地图。
+1. 做批次 6 `SelectableMarkdownView`：交给 implementer，说明同批次 5（目标目录 `Views/Chat/Markdown/` 设为同步文件夹）；参照 `1.15:src/ios/Views/Chat/Markdown/Bridge/SelectableMarkdownView.swift` 头部的说明；`private extension UIView { func nearestViewController() }` 保持 `private`。
+2. 6 批完成后：V5（完整运行 MinisTests）、V6（模拟器冒烟检查）、V8（Spec 链接）、V9（独立代码审查），然后请用户做 V7。
 
-批次 1–4 已完成并提交（见 verification.md）。
+批次 1–5 已完成并提交（见 verification.md）。
 
 已完成：V0（见 verification.md）；分支已建；检查脚本 `tools/check_split.py` 和警告比较脚本 `tools/build_warnings.sh` 已写好。

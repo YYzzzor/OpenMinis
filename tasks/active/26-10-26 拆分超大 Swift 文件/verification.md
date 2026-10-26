@@ -101,3 +101,18 @@ V2 的规则 6（存储属性留在类型主体中）不由脚本检查。原因
 - V3 通过：主会话用最终文件重跑 `build_warnings.sh`（全新 DerivedData），Debug 和 Release 构建成功，警告列表与基线相同。
 - V4 通过：主会话重跑 `build-for-testing`，输出 `** TEST BUILD SUCCEEDED **`。
 - 留到 V8：`ios-voice-input-lifecycle.md:86` 和 `ios-usage-cost-and-balance.md:91` 仍链接已删除的 `src/ios/Views/Chat/AIChatView.swift`。
+
+## 批次 5：`ContentView`（2026-10-26）
+
+实施：implementer 子代理。主会话复核了 V2、V3 的输出和构建时间，重新运行了 V4。
+
+- V1 通过：原文件删除；新目录 `src/ios/Views/ContentView/`（同步文件夹）中有 32 个文件；`SettingsSheet.swift` 和 `AppearanceSettingsView.swift` 放进 `src/ios/Views/Settings/`，在 `project.pbxproj` 中逐个加入；`plutil -lint` 通过。
+  - 只有扩展文件用到的 9 个存储属性改为 internal，移到 struct 主体末尾，与上游相同。
+  - DEBUG 下的 `rowHeightSeenLock`、`rowHeightSeen` 和 `probeRowHeight` 只在 `Sidebar/SidebarDebugProbes.swift` 中，没有复制。
+  - MinisX 独有代码：`loadInitialSessionState` 放进 `ContentView+SessionRefresh.swift`；`body` 的分段属性留在主文件。文件地图中都标了“MinisX”。没有新建 MinisX 专属文件。
+  - `enum SessionMenuAction` 去掉了 `private`。原因：其他文件的属性用到这个类型，不改就无法编译。
+- V2 通过：`check_split.py --self-test` 输出“反向测试：通过”和“无其他差异”（与 `main` 比较，含批次 1–4）。
+- V3 通过：Debug 和 Release 完整构建成功，警告列表与基线相同。构建目录的创建时间晚于源码的最后修改时间，所以构建使用的是最终文件。
+- V4 通过：主会话重跑 `build-for-testing`，输出 `** TEST BUILD SUCCEEDED **`。
+- V8 的一部分通过：`scripts/register_locale.py:26` 改为指向 `src/ios/Views/Settings/AppearanceSettingsView.swift`；`supportedLanguages` 保持 `private let`。子代理在仓库副本中用不存在的语言 `zz` 运行脚本，退出码 0，副本的 `AppearanceSettingsView.swift:48` 写入了 `LanguageOption(id: "zz", ...)`。
+- 已知：`src/ios/Agent/Markdown/SwiftMathRenderer.swift:28` 和 `src/ios/Views/Chat/SelectableMarkdownView.swift:3616` 的注释写着 `ContentView.swift:6948`。按“不做”的约定，不修改。
