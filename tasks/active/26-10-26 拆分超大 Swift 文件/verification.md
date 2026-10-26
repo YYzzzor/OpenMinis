@@ -73,3 +73,17 @@ V2 的规则 6（存储属性留在类型主体中）不由脚本检查。原因
   - 例外：5 个属性从 `private(set) var` 改成 `var`（`keepAliveHistory`、`keepAliveSystemPrompt`、`keepAliveTools`、`streamingUIUpdatesSuspended`、`transitionSuspended`）。原因：给它们赋值的代码移到了其他文件，`private(set)` 的 setter 不可用，构建失败。这与去掉 `private` 是同一类改动。上游 1.15 中这 5 个也是 `var`。检查脚本已改为也删去 `private(set)` 和 `fileprivate(set)`。
 - V3 通过：Debug 和 Release 完整构建成功，警告列表与基线相同。
 - V4 通过：主会话重新运行 `build-for-testing`，输出 `** TEST BUILD SUCCEEDED **`。
+
+## 批次 3：`ChatStore`（2026-10-26）
+
+实施：implementer 子代理。主会话复核了 V2、V3 的输出，重新运行了 V4，并检查了文件级全局变量。
+
+- V1 通过：`ChatStore.swift` 从 7506 行减到 241 行，只留 actor 主体（全部存储属性、`init`/`deinit`、重启保护、关闭和重载数据库、同步延迟标记）和中文文件地图。新增 23 个文件，都在 `project.pbxproj` 的 Minis target 中；`plutil -lint` 通过。
+  - 没有建 `ChatStore+StoredPreview.swift`：MinisX 没有对应代码。
+  - MinisX 独有的会话费用账本（`sessionCostSummary`、`beginSessionCostRequest`、`finishSessionCostRequest`）放进新文件 `ChatStore+SessionCosts.swift`，文件地图中标“MinisX”。
+  - MinisX 独有的 `contextUsageHistoryAnchor` 放进 `ChatStore+Messages.swift`，因为它读消息和压缩标记。
+  - 一段与函数分开的文档注释（“Return all compact markers for a session…”）移回 `compactMarkers(sessionId:)` 上方，与上游相同。
+  - 新文件中没有复制有状态的文件级全局变量：`rg` 在 `ChatStore*.swift` 和两个转换文件中只找到日志声明。
+- V2 通过：`check_split.py --self-test` 输出“反向测试：通过”和“无其他差异”（与 `main` 比较，含批次 1、2）。
+- V3 通过：Debug 和 Release 完整构建成功，警告列表与基线相同。
+- V4 通过：主会话重新运行 `build-for-testing`，输出 `** TEST BUILD SUCCEEDED **`。
