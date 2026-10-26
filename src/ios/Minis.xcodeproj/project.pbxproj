@@ -129,7 +129,6 @@
 		E52000007 /* ClaudeOAuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E52000016 /* ClaudeOAuthManager.swift */; };
 		E52000009 /* AnthropicModelsAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = E52000018 /* AnthropicModelsAPI.swift */; };
 		E53000001 /* AIChatViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E53000011 /* AIChatViewModel.swift */; };
-		E53000002 /* AIChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E53000012 /* AIChatView.swift */; };
 		E53000004 /* ChatStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E53000014 /* ChatStore.swift */; };
 		772159574A2FA01831EBE326 /* ChatStoreModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0E4E45C1E8753EDA6DEB426 /* ChatStoreModels.swift */; };
 		822F4F83B0036F8C7AA7D491 /* ChatStore+Schema.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03097CD4297C30AC8E0B915B /* ChatStore+Schema.swift */; };
@@ -846,7 +845,6 @@
 		E52000016 /* ClaudeOAuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeOAuthManager.swift; sourceTree = "<group>"; };
 		E52000018 /* AnthropicModelsAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnthropicModelsAPI.swift; sourceTree = "<group>"; };
 		E53000011 /* AIChatViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIChatViewModel.swift; sourceTree = "<group>"; };
-		E53000012 /* AIChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIChatView.swift; sourceTree = "<group>"; };
 		E53000014 /* ChatStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatStore.swift; sourceTree = "<group>"; };
 		A0E4E45C1E8753EDA6DEB426 /* ChatStoreModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatStoreModels.swift; sourceTree = "<group>"; };
 		03097CD4297C30AC8E0B915B /* ChatStore+Schema.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChatStore+Schema.swift"; sourceTree = "<group>"; };
@@ -1345,6 +1343,7 @@
 		AA8A568C2F6FBB7A00A3E54E /* MinisUITests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = MinisUITests; sourceTree = "<group>"; };
 		BB1000012F700000000000AA /* MinisTests */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (E5EXC0001 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = MinisTests; sourceTree = "<group>"; };
 		E5V3SYNC00000000000000A1 /* CollectionViewMessageListV3 */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = CollectionViewMessageListV3; sourceTree = "<group>"; };
+		E5ACV1SYNC000000000000A1 /* AIChatView */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = AIChatView; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2373,7 +2372,7 @@
 		F1V00010 /* Chat */ = {
 			isa = PBXGroup;
 			children = (
-				E53000012 /* AIChatView.swift */,
+				E5ACV1SYNC000000000000A1 /* AIChatView */,
 				E5F200011 /* MarkdownPrepRegex.swift */,
 				E5F200012 /* MinisMediaViews.swift */,
 				E5F200013 /* AssistantBlockView.swift */,
@@ -2596,6 +2595,7 @@
 			fileSystemSynchronizedGroups = (
 				AA0838CB2F3CA8A900049557 /* Terminal */,
 				E5V3SYNC00000000000000A1 /* CollectionViewMessageListV3 */,
+				E5ACV1SYNC000000000000A1 /* AIChatView */,
 			);
 			name = Minis;
 			packageProductDependencies = (
@@ -3009,7 +3009,6 @@
 				E5VMC0006 /* AIChatViewModel+BackgroundTask.swift in Sources */,
 				E5VMC0007 /* AIChatViewModel+ConcurrentTools.swift in Sources */,
 				E5LD00001 /* ToolLoopDetector.swift in Sources */,
-				E53000002 /* AIChatView.swift in Sources */,
 				E5CAL0001 /* CookieAuditLogger.swift in Sources */,
 				E5F200001 /* MarkdownPrepRegex.swift in Sources */,
 				E5F200002 /* MinisMediaViews.swift in Sources */,

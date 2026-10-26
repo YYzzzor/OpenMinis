@@ -87,3 +87,17 @@ V2 的规则 6（存储属性留在类型主体中）不由脚本检查。原因
 - V2 通过：`check_split.py --self-test` 输出“反向测试：通过”和“无其他差异”（与 `main` 比较，含批次 1、2）。
 - V3 通过：Debug 和 Release 完整构建成功，警告列表与基线相同。
 - V4 通过：主会话重新运行 `build-for-testing`，输出 `** TEST BUILD SUCCEEDED **`。
+
+## 批次 4：`AIChatView`（2026-10-26）
+
+实施：implementer 子代理。子代理运行期间，安全检查服务不可用，所以主会话核对了工作区的全部改动，并用最终文件重跑了 V3 和 V4。
+
+- V1 通过：原文件删除；新目录 `src/ios/Views/Chat/AIChatView/` 中有 28 个文件，设为同步文件夹。主文件 `AIChatView.swift`（1556 行）保留全部存储属性、`init`、`body` 和中文文件地图。
+  - 工作区只有 3 项改动：原文件删除、新目录、`project.pbxproj` 中 7 行（删去原文件的 4 处引用，加入同步文件夹）。
+  - MinisX 独有代码：`SessionBillingSection`（DeepSeek 费用）放进 `Sheets/TokenUsageSheet.swift`；语音草稿入口放进 `AIChatView+ComposerControls.swift`；上下文用量胶囊在 `titleView` 中，随 `+NavigationTitle`。没有新建 MinisX 专属文件。
+  - `private extension UIView { var nearestViewController }` 保持 `private`，放进 `Support/UIViewHelpers.swift`，与上游相同。
+  - 上游有、MinisX 没有对应代码的文件没有建，清单写在主文件的文件地图中。
+- V2 通过：`check_split.py --self-test` 输出“反向测试：通过”和“无其他差异”（与 `main` 比较，含批次 1–3）。
+- V3 通过：主会话用最终文件重跑 `build_warnings.sh`（全新 DerivedData），Debug 和 Release 构建成功，警告列表与基线相同。
+- V4 通过：主会话重跑 `build-for-testing`，输出 `** TEST BUILD SUCCEEDED **`。
+- 留到 V8：`ios-voice-input-lifecycle.md:86` 和 `ios-usage-cost-and-balance.md:91` 仍链接已删除的 `src/ios/Views/Chat/AIChatView.swift`。
