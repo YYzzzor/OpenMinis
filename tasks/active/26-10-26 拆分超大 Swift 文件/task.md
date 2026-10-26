@@ -61,7 +61,7 @@ MinisX 的这 6 个文件来自上游 1.13，再加上 MinisX 自己的 1046 行
 
 - **C1 只移动代码。** 与原文件相比，代码只能有以下差异：
   - 每个新文件重复原文件的 `import` 列表。
-  - 被其他文件使用的声明，去掉 `private` 或 `fileprivate`。
+  - 被其他文件使用的声明，去掉 `private` 或 `fileprivate`。被其他文件赋值的属性，去掉 `private(set)`。
   - 扩展文件用 `extension <类型> { ... }` 包住成员。
   - 代码移进嵌套类型的扩展后，为恢复原来的名字解析，可以加顶层的同名别名，例如 `private typealias Section = CollectionViewMessageListV3.Section`。上游 1.15 也这样做。
   - 每个用到日志的文件，复制一份原文件的文件级日志声明，例如 `private let logger = AppLogger(category: "ChatStore")`。上游把日志声明集中到一个共享文件时（`Markdown/Support/MarkdownLoggers.swift`），沿用上游的做法。
@@ -113,7 +113,7 @@ Debug 构建（`-Onone`，开启 `ENABLE_TESTABILITY`）的方法派发方式可
   1. 比较的对象是拆分前的原文件，和拆分后本批涉及的全部文件。
   2. 比较方式是行的多重集合，不比较行的先后顺序。
   3. 每行保留行首空白，逐字比较。多行字符串的缩进变化必须能查出来。
-  4. 比较前，只从每行删去 `private ` 和 `fileprivate ` 两个修饰符。`private(set)` 不删。
+  4. 比较前，只从每行删去 `private`、`fileprivate` 修饰符和它们的 `(set)` 形式。
   5. 新文件中多出来的行，只允许是：`import` 行、日志声明行、注释行、空行、`extension <类型> {` 行和对应的 `}` 行。
   6. C2 由编译器保证：扩展中不能声明实例存储属性，违反时 V3 的构建失败。脚本不检查 C2。
   7. 反向测试：在拆分后的文件中故意改动一行，脚本必须报出这一行。
@@ -181,8 +181,8 @@ Debug 构建（`-Onone`，开启 `ENABLE_TESTABILITY`）的方法派发方式可
 
 ## 下一步
 
-1. 做批次 2 `AIChatViewModel`：交给 implementer，说明同批次 1，另加 MinisX 已有的 21 个 `AIChatViewModel+*.swift` 和 `LLMProviderError.swift`。
+1. 做批次 3 `ChatStore`：交给 implementer，说明同批次 2；参照 `1.15:src/ios/Agent/Chat/ChatStore.swift` 头部的文件地图。
 
-批次 1 已完成并提交（见 verification.md）。
+批次 1、2 已完成并提交（见 verification.md）。
 
 已完成：V0（见 verification.md）；分支已建；检查脚本 `tools/check_split.py` 和警告比较脚本 `tools/build_warnings.sh` 已写好。

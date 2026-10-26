@@ -5,7 +5,7 @@
 - 拆分前：基准提交中这些文件的全部行；
 - 拆分后：工作区中这些文件（含新文件）的全部行。
 
-两边都只删去 `private ` / `fileprivate ` 修饰符，行首空白保留、逐字比较，
+两边都只删去 `private` / `fileprivate` 修饰符（含 `(set)` 形式），行首空白保留、逐字比较，
 按多重集合比较，不看行的先后顺序。拆分后多出的行只能是 import、日志声明、
 注释、空行、`extension X {`、顶格的 `}`
 和顶层同名嵌套类型别名（`typealias Section = 外层.Section`）；拆分前独有的行只能是注释或空行。
@@ -20,7 +20,7 @@ import re
 import subprocess
 import sys
 
-MODIFIER = re.compile(r"\b(?:fileprivate|private) (?!\()")
+MODIFIER = re.compile(r"\b(?:fileprivate|private)(?:\(set\))? ")
 LOGGER = re.compile(r"^(?:(?:private|fileprivate|nonisolated\(unsafe\)) )*let \w+ = (?:AppLogger|Logger|OSLog)\(.*\)\s*$")
 EXTENSION_OPEN = re.compile(r"^extension [\w.<>, ]+(?: where [^{]+)? \{\s*$")
 # 成员移进 `extension 外层.内层` 后，外层的嵌套类型不再能直接查到；

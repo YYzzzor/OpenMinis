@@ -59,3 +59,17 @@ V2 的规则 6（存储属性留在类型主体中）不由脚本检查。原因
 - V3 通过：Debug 和 Release 完整构建成功；警告列表与基线相同（Debug 1505 条，Release 1434 条）。
   - `build_warnings.sh` 改为把 DerivedData 路径换成 `<scratch>`，基线文件做了同样的替换。原因：2 条代码签名警告的文本包含 DerivedData 路径。
 - V4 通过：`build-for-testing` 输出 `** TEST BUILD SUCCEEDED **`。
+
+## 批次 2：`AIChatViewModel`（2026-10-26）
+
+实施：implementer 子代理。主会话复核了 V2、V3 的输出，重新运行了 V4，并检查了工程文件。
+
+- V1 通过：`AIChatViewModel.swift` 从 6773 行减到 1365 行，头部是中文文件地图。新增 15 个 `AIChatViewModel+*.swift` 和 `LLMProviderError.swift`，每个文件在 `project.pbxproj` 中有 4 处条目；`plutil -lint` 通过。
+  - 没有往 MinisX 已有的 21 个扩展文件中追加代码：主文件中没有上游放进这些文件的代码。
+  - 没有建 `+ProgrammaticPrompt`、`+UserAsk`：MinisX 没有对应代码。
+  - MinisX 独有的上下文用量快照函数放进 `+ContextUsage`；没有新建 MinisX 专属文件。
+  - `autoPlayAudioPattern`、`speechEndersForCut`、`DeferredStreamingTextUpdate` 留在类型主体中（上游把前两个放在扩展中）。原因：C2。
+- V2 通过：`check_split.py --self-test` 输出“反向测试：通过”和“无其他差异”（与 `main` 比较，含批次 1）。
+  - 例外：5 个属性从 `private(set) var` 改成 `var`（`keepAliveHistory`、`keepAliveSystemPrompt`、`keepAliveTools`、`streamingUIUpdatesSuspended`、`transitionSuspended`）。原因：给它们赋值的代码移到了其他文件，`private(set)` 的 setter 不可用，构建失败。这与去掉 `private` 是同一类改动。上游 1.15 中这 5 个也是 `var`。检查脚本已改为也删去 `private(set)` 和 `fileprivate(set)`。
+- V3 通过：Debug 和 Release 完整构建成功，警告列表与基线相同。
+- V4 通过：主会话重新运行 `build-for-testing`，输出 `** TEST BUILD SUCCEEDED **`。

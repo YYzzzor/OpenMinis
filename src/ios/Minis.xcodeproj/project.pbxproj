@@ -8,6 +8,22 @@
 
 /* Begin PBXBuildFile section */
 		0D71E772FF8EC0C1C07003C8 /* AIChatViewModel+Billing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 161F76C65ACF19E72D1C6E8D /* AIChatViewModel+Billing.swift */; };
+		5F6AC975F26896E316EB476E /* AIChatViewModel+AgentLoop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1963A5D101C9130241E7146C /* AIChatViewModel+AgentLoop.swift */; };
+		14ACFE3EFFF444CDEACC81C3 /* AIChatViewModel+AutoPlayAudio.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BD595DCF30E063B748E30A2 /* AIChatViewModel+AutoPlayAudio.swift */; };
+		FF1FC02867123D843F7DF76B /* AIChatViewModel+Cancel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F59E1000E83B3E6B3865E361 /* AIChatViewModel+Cancel.swift */; };
+		D68316642E14E236E338E9DB /* AIChatViewModel+ContextUsage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41E49974A51CAF2B3B3A8ED3 /* AIChatViewModel+ContextUsage.swift */; };
+		B4B227709B7443AD5928B906 /* AIChatViewModel+DebugDumps.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E3F4AC3CBF36E996A672044 /* AIChatViewModel+DebugDumps.swift */; };
+		21C32E0B17356544D4C10E09 /* AIChatViewModel+EditMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 556ABC8D1CBA55A9F16038A8 /* AIChatViewModel+EditMessage.swift */; };
+		EF1302CDC557151F7AC9FA66 /* AIChatViewModel+Lifecycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC4C1F358E120CFE8D0DFDE1 /* AIChatViewModel+Lifecycle.swift */; };
+		ED58D81E6767E51DB46D7730 /* AIChatViewModel+PromptQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DB0D5A687CEEC9253909421 /* AIChatViewModel+PromptQueue.swift */; };
+		73ACE7633A460A5968C6BD20 /* AIChatViewModel+Rerun.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F8D5F362709B6A3ECDFEEA2 /* AIChatViewModel+Rerun.swift */; };
+		7DFDC4F6AEA4C94A3A758FD8 /* AIChatViewModel+Send.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2FE25A28618F3DE0A2D1D3A /* AIChatViewModel+Send.swift */; };
+		0525448D894831B0DD145F0A /* AIChatViewModel+Speech.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEF0B849130B767B0177EF2E /* AIChatViewModel+Speech.swift */; };
+		97B9160FF6656C067CE803BA /* AIChatViewModel+StreamingUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F8F4D211E60352656F04B30 /* AIChatViewModel+StreamingUI.swift */; };
+		95B38DF6F15B318CEFFD066F /* AIChatViewModel+SystemPrompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7668E98467D515F13814037 /* AIChatViewModel+SystemPrompt.swift */; };
+		301AADFA9C82C392C96771B3 /* AIChatViewModel+ThinkingLevel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8367CA6DCF90F78F3AA47F5 /* AIChatViewModel+ThinkingLevel.swift */; };
+		2AC36DF876830FED420CC9BE /* AIChatViewModel+TurnCompletion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40677EF39F0554A0573887E6 /* AIChatViewModel+TurnCompletion.swift */; };
+		84FDFA7AEC76F03C9D1C4A7F /* LLMProviderError.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9474EC0B88FB1DEFC2CBDC0 /* LLMProviderError.swift */; };
 		21FED4B7BB6F6D9476C9992E /* VoiceProvider+System.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88993FC8E3F0199C6638F664 /* VoiceProvider+System.swift */; };
 		241D530017827D7F0EB604DE /* VoiceProviderFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2941B643B8A2F048A2B154E /* VoiceProviderFactory.swift */; };
 		2A4FD49F872431D703328384 /* VoiceOutputPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 424510790AF3FB2452D3CCE3 /* VoiceOutputPlayer.swift */; };
@@ -634,6 +650,22 @@
 		0ED149397BEA7E0408C92688 /* GroupVoiceModelsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GroupVoiceModelsView.swift; sourceTree = "<group>"; };
 		0F5379380323FA8C6477708C /* GroupSlotPicker.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GroupSlotPicker.swift; sourceTree = "<group>"; };
 		161F76C65ACF19E72D1C6E8D /* AIChatViewModel+Billing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AIChatViewModel+Billing.swift"; sourceTree = "<group>"; };
+		1963A5D101C9130241E7146C /* AIChatViewModel+AgentLoop.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AIChatViewModel+AgentLoop.swift"; sourceTree = "<group>"; };
+		3BD595DCF30E063B748E30A2 /* AIChatViewModel+AutoPlayAudio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AIChatViewModel+AutoPlayAudio.swift"; sourceTree = "<group>"; };
+		F59E1000E83B3E6B3865E361 /* AIChatViewModel+Cancel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AIChatViewModel+Cancel.swift"; sourceTree = "<group>"; };
+		41E49974A51CAF2B3B3A8ED3 /* AIChatViewModel+ContextUsage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AIChatViewModel+ContextUsage.swift"; sourceTree = "<group>"; };
+		2E3F4AC3CBF36E996A672044 /* AIChatViewModel+DebugDumps.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AIChatViewModel+DebugDumps.swift"; sourceTree = "<group>"; };
+		556ABC8D1CBA55A9F16038A8 /* AIChatViewModel+EditMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AIChatViewModel+EditMessage.swift"; sourceTree = "<group>"; };
+		EC4C1F358E120CFE8D0DFDE1 /* AIChatViewModel+Lifecycle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AIChatViewModel+Lifecycle.swift"; sourceTree = "<group>"; };
+		2DB0D5A687CEEC9253909421 /* AIChatViewModel+PromptQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AIChatViewModel+PromptQueue.swift"; sourceTree = "<group>"; };
+		7F8D5F362709B6A3ECDFEEA2 /* AIChatViewModel+Rerun.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AIChatViewModel+Rerun.swift"; sourceTree = "<group>"; };
+		D2FE25A28618F3DE0A2D1D3A /* AIChatViewModel+Send.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AIChatViewModel+Send.swift"; sourceTree = "<group>"; };
+		DEF0B849130B767B0177EF2E /* AIChatViewModel+Speech.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AIChatViewModel+Speech.swift"; sourceTree = "<group>"; };
+		4F8F4D211E60352656F04B30 /* AIChatViewModel+StreamingUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AIChatViewModel+StreamingUI.swift"; sourceTree = "<group>"; };
+		A7668E98467D515F13814037 /* AIChatViewModel+SystemPrompt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AIChatViewModel+SystemPrompt.swift"; sourceTree = "<group>"; };
+		F8367CA6DCF90F78F3AA47F5 /* AIChatViewModel+ThinkingLevel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AIChatViewModel+ThinkingLevel.swift"; sourceTree = "<group>"; };
+		40677EF39F0554A0573887E6 /* AIChatViewModel+TurnCompletion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AIChatViewModel+TurnCompletion.swift"; sourceTree = "<group>"; };
+		D9474EC0B88FB1DEFC2CBDC0 /* LLMProviderError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LLMProviderError.swift"; sourceTree = "<group>"; };
 		16FF3462D09402F14B610CD6 /* VoiceWaveformView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VoiceWaveformView.swift; sourceTree = "<group>"; };
 		28E23EA0E199D6D50EBC76F2 /* VoiceLog.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VoiceLog.swift; sourceTree = "<group>"; };
 		2BB45FC87D39AE9AB4495BE9 /* VoiceProvider+Vendors.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "VoiceProvider+Vendors.swift"; sourceTree = "<group>"; };
@@ -2089,6 +2121,22 @@
 			isa = PBXGroup;
 			children = (
 				161F76C65ACF19E72D1C6E8D /* AIChatViewModel+Billing.swift */,
+				1963A5D101C9130241E7146C /* AIChatViewModel+AgentLoop.swift */,
+				3BD595DCF30E063B748E30A2 /* AIChatViewModel+AutoPlayAudio.swift */,
+				F59E1000E83B3E6B3865E361 /* AIChatViewModel+Cancel.swift */,
+				41E49974A51CAF2B3B3A8ED3 /* AIChatViewModel+ContextUsage.swift */,
+				2E3F4AC3CBF36E996A672044 /* AIChatViewModel+DebugDumps.swift */,
+				556ABC8D1CBA55A9F16038A8 /* AIChatViewModel+EditMessage.swift */,
+				EC4C1F358E120CFE8D0DFDE1 /* AIChatViewModel+Lifecycle.swift */,
+				2DB0D5A687CEEC9253909421 /* AIChatViewModel+PromptQueue.swift */,
+				7F8D5F362709B6A3ECDFEEA2 /* AIChatViewModel+Rerun.swift */,
+				D2FE25A28618F3DE0A2D1D3A /* AIChatViewModel+Send.swift */,
+				DEF0B849130B767B0177EF2E /* AIChatViewModel+Speech.swift */,
+				4F8F4D211E60352656F04B30 /* AIChatViewModel+StreamingUI.swift */,
+				A7668E98467D515F13814037 /* AIChatViewModel+SystemPrompt.swift */,
+				F8367CA6DCF90F78F3AA47F5 /* AIChatViewModel+ThinkingLevel.swift */,
+				40677EF39F0554A0573887E6 /* AIChatViewModel+TurnCompletion.swift */,
+				D9474EC0B88FB1DEFC2CBDC0 /* LLMProviderError.swift */,
 				E53000011 /* AIChatViewModel.swift */,
 				E5VMA0011 /* AIChatViewModel+Attachments.swift */,
 				E5VMA0012 /* AIChatViewModel+SlashCommands.swift */,
@@ -2785,6 +2833,22 @@
 			buildActionMask = 2147483647;
 			files = (
 				0D71E772FF8EC0C1C07003C8 /* AIChatViewModel+Billing.swift in Sources */,
+				5F6AC975F26896E316EB476E /* AIChatViewModel+AgentLoop.swift in Sources */,
+				14ACFE3EFFF444CDEACC81C3 /* AIChatViewModel+AutoPlayAudio.swift in Sources */,
+				FF1FC02867123D843F7DF76B /* AIChatViewModel+Cancel.swift in Sources */,
+				D68316642E14E236E338E9DB /* AIChatViewModel+ContextUsage.swift in Sources */,
+				B4B227709B7443AD5928B906 /* AIChatViewModel+DebugDumps.swift in Sources */,
+				21C32E0B17356544D4C10E09 /* AIChatViewModel+EditMessage.swift in Sources */,
+				EF1302CDC557151F7AC9FA66 /* AIChatViewModel+Lifecycle.swift in Sources */,
+				ED58D81E6767E51DB46D7730 /* AIChatViewModel+PromptQueue.swift in Sources */,
+				73ACE7633A460A5968C6BD20 /* AIChatViewModel+Rerun.swift in Sources */,
+				7DFDC4F6AEA4C94A3A758FD8 /* AIChatViewModel+Send.swift in Sources */,
+				0525448D894831B0DD145F0A /* AIChatViewModel+Speech.swift in Sources */,
+				97B9160FF6656C067CE803BA /* AIChatViewModel+StreamingUI.swift in Sources */,
+				95B38DF6F15B318CEFFD066F /* AIChatViewModel+SystemPrompt.swift in Sources */,
+				301AADFA9C82C392C96771B3 /* AIChatViewModel+ThinkingLevel.swift in Sources */,
+				2AC36DF876830FED420CC9BE /* AIChatViewModel+TurnCompletion.swift in Sources */,
+				84FDFA7AEC76F03C9D1C4A7F /* LLMProviderError.swift in Sources */,
 				F0F3573D9239DBDD1BF723A2 /* DeepSeekBalanceClient.swift in Sources */,
 				95C2FD7F3A882FEF75997721 /* SessionCostLedger.swift in Sources */,
 				5E96BCE7243CE0A22DE33858 /* DeepSeekRequestUsage.swift in Sources */,
