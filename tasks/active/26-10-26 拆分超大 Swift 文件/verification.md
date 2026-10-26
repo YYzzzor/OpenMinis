@@ -150,7 +150,7 @@ V2 的规则 6（存储属性留在类型主体中）不由脚本检查。原因
   - `ThinkingWireGoldenSnapshotTests.testGoldenSnapshotOfEveryBranch`
   - `ToolLoopDetectorTests` 的 4 个测试：`testArgsHash_ignoresToolTitle`、`testArgsHash_keyOrderInvariant`、`testGlobalCircuitBreaker_blocksAtThirty`、`testPollNoProgress_warningAtTenCriticalAtTwenty`
   - `WebReadServiceTests` 的 3 个测试：`testRendererRejectsDeclaredOversizedMainDocument`、`testRendererReportsHTTP403AsRestricted`、`testURLSessionTransportStopsAtConfiguredResponseByteLimit`
-- V5 原定“全部通过”，没有达到。验收是否改为“与 `main` 的结果相同”，等用户确认。
+- V5 原定“全部通过”，没有达到。用户确认验收改为“每个测试的结果与 `main` 相同”（2026-10-26），据此 V5 通过。
 
 ## V6 模拟器冒烟检查（2026-10-26）
 

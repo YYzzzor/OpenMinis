@@ -124,7 +124,7 @@ Debug 构建（`-Onone`，开启 `ENABLE_TESTABILITY`）的方法派发方式可
 
   （verification.md）
 - [x] V4 每批：`MinisTests` 用 `build-for-testing` 全部编译通过。（verification.md）
-- [ ] V5 全部完成后：完整运行一次 `MinisTests`，全部通过。（verification.md）
+- [x] V5 全部完成后：完整运行一次 `MinisTests`，每个测试的结果（通过、失败、跳过）与 `main` 相同。（verification.md 的“V5 完整测试”：518 个测试逐个相同；10 个失败在 `main` 上同样存在）
 - [x] V6 全部完成后，在模拟器上做冒烟检查：用 debug-server 依次执行下面的操作，每步截图，结果与 V0 的基线一致。（evidence/）
   1. 启动 App，首页会话列表正常显示。
   2. 打开一个长对话，滚动到顶部，再滚动回底部。
@@ -150,6 +150,8 @@ Debug 构建（`-Onone`，开启 `ENABLE_TESTABILITY`）的方法派发方式可
 - ✗ 不移植 AOJIT：用户不运行重的 Python 或 Node 任务，收益很小。（用户，2026-10-26）
 - ✗ 暂不移植定时任务和“后台继续处理”。（用户，2026-10-26）
 - G1 写入 `docs/project-guide.md`，不写进 Spec，因为本任务不改产品行为。（2026-10-26）
+- V5 的验收从“全部通过”改为“每个测试的结果与 `main` 相同”。原因：`main` 上已有 10 个失败，修复它们超出“只移动代码”的范围。（用户，2026-10-26）
+- V7 用 TestFlight 安装本分支的 Release 构建；用户自己 Archive、上传并填写构建号。（用户，2026-10-26）
 - 方案审查（reviewer 子代理，2026-10-26）的处置：全部采纳。
 
   | 意见 | 处置 |
@@ -181,9 +183,9 @@ Debug 构建（`-Onone`，开启 `ENABLE_TESTABILITY`）的方法派发方式可
 
 ## 下一步
 
-1. 请用户确认 V5 的验收改为“与 `main` 的结果相同”（10 个已有的失败，见 verification.md）。
-2. 请用户做 V7。
-3. V5、V7 完成后：按 archive-task 判断能否归档；用户要求时再合入 `main`。
+1. 用户用本分支 Archive 并上传 TestFlight，在手机上做 V7，告诉 Agent 构建号和结果。
+2. 收到后：把 V7 结果记入 verification.md；按 `docs/minisx-release-status.md` 末尾的“更新规则”更新发布状态。
+3. V7 通过后：按 archive-task 判断能否归档；用户要求时再合入 `main`。
 
 批次 1–6 已完成并提交（见 verification.md）。
 
