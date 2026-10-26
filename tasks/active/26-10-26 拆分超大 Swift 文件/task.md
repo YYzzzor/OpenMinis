@@ -125,14 +125,14 @@ Debug 构建（`-Onone`，开启 `ENABLE_TESTABILITY`）的方法派发方式可
   （verification.md）
 - [x] V4 每批：`MinisTests` 用 `build-for-testing` 全部编译通过。（verification.md）
 - [ ] V5 全部完成后：完整运行一次 `MinisTests`，全部通过。（verification.md）
-- [ ] V6 全部完成后，在模拟器上做冒烟检查：用 debug-server 依次执行下面的操作，每步截图，结果与 V0 的基线一致。（evidence/）
+- [x] V6 全部完成后，在模拟器上做冒烟检查：用 debug-server 依次执行下面的操作，每步截图，结果与 V0 的基线一致。（evidence/）
   1. 启动 App，首页会话列表正常显示。
   2. 打开一个长对话，滚动到顶部，再滚动回底部。
   3. 发送一条消息，回复正常流式显示。
   4. 显示含代码块、表格和数学公式的回复。
   5. 打开设置 → 外观，语言列表正常显示。
 - [ ] V7 用户在手机上安装本分支的 Release 构建，打开长对话、滚动、发送消息，确认与拆分前一样流畅。（用户确认，记入 verification.md）
-- [ ] V8 满足 C5：
+- [x] V8 满足 C5：
   - 在仓库的临时副本上，用一个不存在的语言运行 `register_locale.py`，脚本成功写入 `AppearanceSettingsView.swift`。
   - Spec 中每个“代码入口”链接指向的文件，确实包含链接说明的代码。
   - `git diff --check` 通过。
@@ -181,11 +181,9 @@ Debug 构建（`-Onone`，开启 `ENABLE_TESTABILITY`）的方法派发方式可
 
 ## 下一步
 
-1. V5：完整运行 MinisTests。
-2. V6：按 verification.md 的步骤做模拟器冒烟检查。
-3. V8：更新 Spec 的代码入口链接。
-4. V9：独立代码审查。
-5. 请用户做 V7。
+1. V9：独立代码审查（进行中）。
+2. 请用户确认 V5 的验收改为“与 `main` 的结果相同”（10 个已有的失败，见 verification.md）。
+3. 请用户做 V7。
 
 批次 1–6 已完成并提交（见 verification.md）。
 

@@ -137,3 +137,42 @@ V2 的规则 6（存储属性留在类型主体中）不由脚本检查。原因
 
   核对方法：从 `debug.log` 中按“文件:行:列”统计每条警告的位置，比较基线与本批。
 - V4 通过：主会话重跑 `build-for-testing`，输出 `** TEST BUILD SUCCEEDED **`。
+
+## V5 完整测试（2026-10-26）
+
+- 命令：`xcodebuild ... -parallel-testing-enabled NO -only-testing:MinisTests test-without-building`（iPhone 17 Pro，iOS 26.4）。必须关闭并行测试：开启时 xcodebuild 复制模拟器失败（`Failed to clone device named 'iPhone 17 Pro'`），测试没有运行。
+- 分支 `refactor/split-large-files`（批次 1–6 之后）：执行 518 个测试，跳过 14 个，10 个测试失败（日志汇总计为 12 次失败）。
+- `main`（`fbc0aa4`，同样的命令）：执行 518 个测试，跳过 14 个，同样 10 个测试失败。
+- 逐个比较 518 个测试的结果（通过、失败、跳过），分支与 `main` 完全相同。所以这 10 个失败在拆分前就已存在，与本任务无关。
+- 已有的失败：
+  - `CorrectionAdmissionTests.testLatinPhoneticSimilarity`
+  - `ThinkingRulesRegressionTests.testQwenDualSendsAtRootAndExtraBody`
+  - `ThinkingWireGoldenSnapshotTests.testGoldenSnapshotOfEveryBranch`
+  - `ToolLoopDetectorTests` 的 4 个测试：`testArgsHash_ignoresToolTitle`、`testArgsHash_keyOrderInvariant`、`testGlobalCircuitBreaker_blocksAtThirty`、`testPollNoProgress_warningAtTenCriticalAtTwenty`
+  - `WebReadServiceTests` 的 3 个测试：`testRendererRejectsDeclaredOversizedMainDocument`、`testRendererReportsHTTP403AsRestricted`、`testURLSessionTransportStopsAtConfiguredResponseByteLimit`
+- V5 原定“全部通过”，没有达到。验收是否改为“与 `main` 的结果相同”，等用户确认。
+
+## V6 模拟器冒烟检查（2026-10-26）
+
+构建：批次 6 之后的 Debug 构建（`buildDate` 2026-10-26T05:10:13Z），iPhone 17 Pro，iOS 26.4。截图在 `evidence/after/`。
+
+| 步骤 | 截图 | 与基线比较 |
+| --- | --- | --- |
+| 1 首页会话列表 | `1-home.png` | 一致：布局和会话相同（基线之后多了一个基线测试会话） |
+| 2 打开长对话，显示底部 | `2b-bottom.png` | 一致 |
+| 2 滚到顶部 | `2a-top-code.png` | 一致：用户消息、思考块、Swift 代码块 |
+| 3 发送消息，流式回复 | `3-streaming.png` | 一致：回复逐步显示，显示停止按钮 |
+| 3 回复结束后滚到底部 | `2c-bottom-after-send.png` | 一致：新回复的编号列表末尾正常显示 |
+| 4 表格和公式 | `4-table-math.png` | 一致：3 列表格和块级公式 |
+| 5 设置 → 外观 → 语言列表 | `5-appearance-languages.png` | 一致 |
+
+与基线步骤的差别：
+- `debug.tap` 点不中首页的“新建对话”按钮，所以第 3 步在基线时创建的对话“多格式界面测试”中发送。这样也检查了旧回复在新代码下的显示。
+- `simctl spawn defaults write` 写入的 `pendingSettingsReopen`，App 删不掉，所以每次启动都打开外观页。用 `xcrun simctl spawn $D defaults delete com.yyzzzor.minisx pendingSettingsReopen` 删除。这与拆分无关。
+- 本次检查发送了 1 条消息（用户允许）。
+
+## V8（2026-10-26）
+
+- `register_locale.py`：见批次 5。
+- Spec 链接：8 份 Spec 中的 11 个代码入口链接改为指向代码实际所在的文件（`docs(specs)` 提交）。每个链接都用 `rg` 确认目标文件包含链接说明的代码，例如 `recordContextUsage` 在 `AIChatViewModel+ContextUsage.swift`，`SessionBillingSection` 在 `AIChatView/Sheets/TokenUsageSheet.swift`。`docs/specs` 中全部 167 个指向 `src/ios` 的链接都指向存在的文件。
+- `git diff --check` 通过。
