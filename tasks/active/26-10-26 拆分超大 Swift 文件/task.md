@@ -108,8 +108,8 @@ Debug 构建（`-Onone`，开启 `ENABLE_TESTABILITY`）的方法派发方式可
   - 记录模拟器 Debug 构建和 Release 构建的编译警告列表。
 
   （evidence/baseline/，verification.md）
-- [ ] V1 每批：原文件只剩主文件内容，拆出的文件与文件地图一致；满足 C2、C3、C4。（verification.md 中各批的文件清单）
-- [ ] V2 每批：检查脚本比较拆分前后的代码，输出“无其他差异”。（verification.md 中各批的脚本输出）脚本的规则：
+- [x] V1 每批：原文件只剩主文件内容，拆出的文件与文件地图一致；满足 C2、C3、C4。（verification.md 中各批的文件清单）
+- [x] V2 每批：检查脚本比较拆分前后的代码，输出“无其他差异”。（verification.md 中各批的脚本输出）脚本的规则：
   1. 比较的对象是拆分前的原文件，和拆分后本批涉及的全部文件。
   2. 比较方式是行的多重集合，不比较行的先后顺序。
   3. 每行保留行首空白，逐字比较。多行字符串的缩进变化必须能查出来。
@@ -117,13 +117,13 @@ Debug 构建（`-Onone`，开启 `ENABLE_TESTABILITY`）的方法派发方式可
   5. 新文件中多出来的行，只允许是：`import` 行、日志声明行、注释行、空行、`extension <类型> {` 行和对应的 `}` 行。
   6. C2 由编译器保证：扩展中不能声明实例存储属性，违反时 V3 的构建失败。脚本不检查 C2。
   7. 反向测试：在拆分后的文件中故意改动一行，脚本必须报出这一行。
-- [ ] V3 每批：
+- [x] V3 每批：
   - 模拟器 Debug 构建成功，命令 `bash scripts/build_ios_simulator.sh --skip-deps`。
   - 不签名的 Release 构建成功。
   - 两种构建的编译警告列表与 V0 的基线相同。例外：警告位置没有新增，只是同一位置的报告次数变化（Debug 分批编译），或者去掉 `private` 的类型进入生成的 ObjC 头文件。例外必须在 verification.md 中逐条写明原因。
 
   （verification.md）
-- [ ] V4 每批：`MinisTests` 用 `build-for-testing` 全部编译通过。（verification.md）
+- [x] V4 每批：`MinisTests` 用 `build-for-testing` 全部编译通过。（verification.md）
 - [ ] V5 全部完成后：完整运行一次 `MinisTests`，全部通过。（verification.md）
 - [ ] V6 全部完成后，在模拟器上做冒烟检查：用 debug-server 依次执行下面的操作，每步截图，结果与 V0 的基线一致。（evidence/）
   1. 启动 App，首页会话列表正常显示。
