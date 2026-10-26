@@ -96,7 +96,7 @@ description: MinisX iOS Memory 的全局与每日作用域、会话开关、上�
 
 ## 代码入口
 
-- 工具与注入：[MemoryTools](../../src/ios/Agent/Chat/AIChatViewModel+MemoryTools.swift)、[AIChatViewModel+SystemPrompt](../../src/ios/Agent/Chat/AIChatViewModel+SystemPrompt.swift)、[ToolDefinitions](../../src/ios/Agent/Chat/AIChatViewModel+ToolDefinitions.swift)
+- 工具与注入：[MemoryTools](../../src/ios/Agent/Chat/AIChatViewModel+MemoryTools.swift)、[AIChatViewModel+SystemPrompt](../../src/ios/Agent/Chat/AIChatViewModel+SystemPrompt.swift)（`memoryStatusFragment`）、[AIChatViewModel+AgentLoop](../../src/ios/Agent/Chat/AIChatViewModel+AgentLoop.swift)（Agent 循环开始和 fallback 重建时的注入）、[ToolDefinitions](../../src/ios/Agent/Chat/AIChatViewModel+ToolDefinitions.swift)
 - 会话开关：[ChatStore+SessionDeletion](../../src/ios/Agent/Chat/ChatStore+SessionDeletion.swift)（`memory_enabled`）、[SlashCommands](../../src/ios/Agent/Chat/AIChatViewModel+SlashCommands.swift)
 - 界面：[MemoryManagementView](../../src/ios/Views/Settings/MemoryManagementView.swift)、[SessionMemoryView](../../src/ios/Views/Chat/SessionMemoryView.swift)、[MemoryWriteRevoker](../../src/ios/Views/Chat/MemoryWriteRevoker.swift)
 - 同步：[ChatStoreSyncHydrators](../../src/ios/Agent/Sync/V2/ChatStoreSyncHydrators.swift)

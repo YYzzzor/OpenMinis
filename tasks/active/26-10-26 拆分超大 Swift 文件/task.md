@@ -138,7 +138,7 @@ Debug 构建（`-Onone`，开启 `ENABLE_TESTABILITY`）的方法派发方式可
   - `git diff --check` 通过。
 
   （verification.md）
-- [ ] V9 独立代码审查完成，审查意见逐条处置，资源结论由审查给出。（verification.md）
+- [x] V9 独立代码审查完成，审查意见逐条处置，资源结论由审查给出。（verification.md）
 
 ## 决定
 
@@ -181,9 +181,9 @@ Debug 构建（`-Onone`，开启 `ENABLE_TESTABILITY`）的方法派发方式可
 
 ## 下一步
 
-1. V9：独立代码审查（进行中）。
-2. 请用户确认 V5 的验收改为“与 `main` 的结果相同”（10 个已有的失败，见 verification.md）。
-3. 请用户做 V7。
+1. 请用户确认 V5 的验收改为“与 `main` 的结果相同”（10 个已有的失败，见 verification.md）。
+2. 请用户做 V7。
+3. V5、V7 完成后：按 archive-task 判断能否归档；用户要求时再合入 `main`。
 
 批次 1–6 已完成并提交（见 verification.md）。
 

@@ -176,3 +176,22 @@ V2 的规则 6（存储属性留在类型主体中）不由脚本检查。原因
 - `register_locale.py`：见批次 5。
 - Spec 链接：8 份 Spec 中的 11 个代码入口链接改为指向代码实际所在的文件（`docs(specs)` 提交）。每个链接都用 `rg` 确认目标文件包含链接说明的代码，例如 `recordContextUsage` 在 `AIChatViewModel+ContextUsage.swift`，`SessionBillingSection` 在 `AIChatView/Sheets/TokenUsageSheet.swift`。`docs/specs` 中全部 167 个指向 `src/ios` 的链接都指向存在的文件。
 - `git diff --check` 通过。
+
+## V9 独立代码审查（reviewer 子代理，2026-10-26）
+
+范围：`git diff main..HEAD`（10 个提交）。结论：没有确定缺陷。
+
+- 审查者另写了一个更严的检查：对每行代码同时比较所属作用域（按缩进算出的上层声明链）、`#if/#else` 分支栈和去掉 `private` 后的文本。结果零差异：没有代码换到别的类型、别的 `#if` 分支，也没有 `#if` 块被拆开。脚本在 scratchpad 中，未放进仓库。
+- 审查者核对了：去掉 `private` 后没有同名声明改变名字解析；扩展头没有协议遵循或 `@MainActor`；被拆的类型都是 `final class`、`actor` 或 `struct`，派发方式不变；工程文件没有重复编译或遗漏；`register_locale.py` 和 Spec 链接正确。
+
+逐条处置：
+
+| 意见 | 处置 |
+| --- | --- |
+| D1 `ios-memory-lifecycle.md` 的“工具与注入”链接没有指向注入开关所在的 `AIChatViewModel+AgentLoop.swift` | 采纳：加上 `AIChatViewModel+AgentLoop.swift`（第 160、644 行的 `if memoryEnabled`），并注明各链接对应的代码 |
+| S1 `check_split.py` 的日志规则会放行任何新的日志声明 | 采纳：新增的日志声明行必须是原文件中已有声明的副本。重跑：反向测试通过，“无其他差异” |
+| S2 修饰符两边都删，看不出错误地加上 `private` | 采纳为说明：脚本文档写明只检查“删去 private”这一方向。加上 `private` 通常会编译失败 |
+
+资源结论（审查者给出）：
+- 已验证（静态审查和构建记录）：没有新增定时器、观察者、缓存、队列、I/O 或主线程工作；执行的代码行与原来相同，作用域和条件分支相同；派发方式不变；Release 仍是整模块优化、关闭 testability；`#if DEBUG` 探针没有复制，没有进入 Release。
+- 未验证：真机 Release 的流畅度（V7）；没有比较 Release 二进制的大小和符号（审查者认为不必要）。

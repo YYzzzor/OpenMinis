@@ -6,10 +6,10 @@
 - 拆分后：工作区中这些文件（含新文件）的全部行。
 
 两边都只删去 `private` / `fileprivate` 修饰符（含 `(set)` 形式），行首空白保留、逐字比较，
-按多重集合比较，不看行的先后顺序。拆分后多出的行只能是 import、日志声明、
-注释、空行、`extension X {`、顶格的 `}`
+按多重集合比较，不看行的先后顺序。拆分后多出的行只能是 import、
+原有日志声明的副本、注释、空行、`extension X {`、顶格的 `}`
 和顶层同名嵌套类型别名（`typealias Section = 外层.Section`）；拆分前独有的行只能是注释或空行。
-其余差异逐行报出。
+其余差异逐行报出。修饰符两边都删，所以只检查“删去 private”这一方向。
 
 用法：
   check_split.py [--base main] [--self-test]
@@ -61,7 +61,6 @@ def allowed_extra(line):
         is_comment_or_blank(line)
         or s.startswith("import ")
         or s.startswith("@preconcurrency import ")
-        or LOGGER.match(line) is not None
         or EXTENSION_OPEN.match(line) is not None
         or NESTED_ALIAS.match(line) is not None
         or line == "}"
@@ -73,6 +72,9 @@ def compare(before_lines, after_lines):
     after = collections.Counter(normalize(l) for l in after_lines)
     problems = []
     for line, n in sorted((after - before).items()):
+        # 日志声明只能是原文件中已有声明的副本（分类名不变）。
+        if LOGGER.match(line) is not None and line in before:
+            continue
         if not allowed_extra(line):
             problems.append(f"+{n}  {line!r}")
     for line, n in sorted((before - after).items()):
