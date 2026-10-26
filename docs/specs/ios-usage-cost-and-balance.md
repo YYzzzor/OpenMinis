@@ -85,8 +85,8 @@ description: 上下文占用、会话 token 累计、DeepSeek 会话费用估算
 
 ## 代码入口
 
-- 用量：[ChatModels.TokenUsage](../../src/ios/Agent/Chat/ChatModels.swift)、[AIChatViewModel](../../src/ios/Agent/Chat/AIChatViewModel.swift)、[SSEStream](../../src/ios/Agent/Chat/AIChatViewModel+SSEStream.swift)
+- 用量：[ChatModels.TokenUsage](../../src/ios/Agent/Chat/ChatModels.swift)、[AIChatViewModel+ContextUsage](../../src/ios/Agent/Chat/AIChatViewModel+ContextUsage.swift)、[SSEStream](../../src/ios/Agent/Chat/AIChatViewModel+SSEStream.swift)
 - 计价与账本：[Billing](../../src/ios/Agent/Chat/AIChatViewModel+Billing.swift)、[DeepSeekRequestUsage](../../src/ios/Providers/OpenAI/DeepSeekRequestUsage.swift)、[DeepSeekBilling](../../src/ios/Providers/OpenAI/DeepSeekBilling.swift)、[SessionCostLedger](../../src/ios/Providers/OpenAI/SessionCostLedger.swift)
 - 余额：[DeepSeekBalanceClient](../../src/ios/Providers/OpenAI/DeepSeekBalanceClient.swift)
-- 界面：[UsageStatsView](../../src/ios/Views/Chat/UsageStatsView.swift)、[AIChatView 中的 SessionBillingSection](../../src/ios/Views/Chat/AIChatView.swift)
+- 界面：[UsageStatsView](../../src/ios/Views/Chat/UsageStatsView.swift)、[TokenUsageSheet 中的 SessionBillingSection](../../src/ios/Views/Chat/AIChatView/Sheets/TokenUsageSheet.swift)
 - 测试：DeepSeekBillingTests、SessionCostLedgerTests、DeepSeekBalanceModelTests、ContextUsageTests（`src/ios/MinisTests/`）

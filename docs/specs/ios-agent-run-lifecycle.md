@@ -103,7 +103,7 @@ description: iOS Agent 从发送、流式响应和工具循环到停止、重试
 
 ## 代码入口
 
-- 发送、重试、恢复、取消、Agent 循环：[AIChatViewModel](../../src/ios/Agent/Chat/AIChatViewModel.swift)
+- 发送、重试、恢复、取消、Agent 循环：[Send](../../src/ios/Agent/Chat/AIChatViewModel+Send.swift)、[Rerun](../../src/ios/Agent/Chat/AIChatViewModel+Rerun.swift)、[Cancel](../../src/ios/Agent/Chat/AIChatViewModel+Cancel.swift)、[AgentLoop](../../src/ios/Agent/Chat/AIChatViewModel+AgentLoop.swift)
 - 工具批次：[ConcurrentTools](../../src/ios/Agent/Chat/AIChatViewModel+ConcurrentTools.swift)
 - 压缩：[Compaction](../../src/ios/Agent/Chat/AIChatViewModel+Compaction.swift)；阈值：[ContextPolicy](../../src/ios/Agent/Chat/ContextPolicy.swift)
-- 会话、消息、压缩标记、删除标记：[ChatStore](../../src/ios/Agent/Chat/ChatStore.swift)
+- 会话、消息、压缩标记、删除标记：[SessionCRUD](../../src/ios/Agent/Chat/ChatStore+SessionCRUD.swift)、[Messages](../../src/ios/Agent/Chat/ChatStore+Messages.swift)、[CompactMarkers](../../src/ios/Agent/Chat/ChatStore+CompactMarkers.swift)、[Tombstones](../../src/ios/Agent/Chat/ChatStore+Tombstones.swift)

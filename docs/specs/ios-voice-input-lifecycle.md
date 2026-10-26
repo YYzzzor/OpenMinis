@@ -83,7 +83,7 @@ description: MinisX iOS 聊天语音输入的权限、采集、流式或分段�
 
 ## 代码入口
 
-- 正式入口与菜单草稿：[AIChatView](../../src/ios/Views/Chat/AIChatView.swift)、[AIChatViewModel+SlashCommands](../../src/ios/Agent/Chat/AIChatViewModel+SlashCommands.swift)
+- 正式入口与菜单草稿：[AIChatView+ComposerControls](../../src/ios/Views/Chat/AIChatView/AIChatView+ComposerControls.swift)、[AIChatViewModel+SlashCommands](../../src/ios/Agent/Chat/AIChatViewModel+SlashCommands.swift)
 - 面板与状态：[VoiceInputPanel](../../src/ios/Views/Chat/Voice/VoiceInputPanel.swift)、[InlineVoiceInputView](../../src/ios/Views/Chat/Voice/InlineVoiceInputView.swift)、[VoiceComposerPanel](../../src/ios/Views/Chat/Voice/VoiceComposerPanel.swift)
 - 采集与 VAD：[VoiceActivityDetector](../../src/ios/Providers/Voice/VoiceActivityDetector.swift)
 - 模型与解析：[VoiceInputModels](../../src/ios/Providers/Voice/VoiceInputModels.swift)、[VoiceProviderResolver](../../src/ios/Providers/Voice/VoiceProviderResolver.swift)

@@ -104,4 +104,4 @@ description: MinisX iOS 同步的启停、记录与文件生命周期、冲突�
 - 核心与 transport：[SyncCore](../../src/ios/Agent/Sync/V2/SyncCore.swift)、[PortableRecord](../../src/ios/Agent/Sync/V2/PortableRecord.swift)
 - 类别与文件上限：[UploadPolicy](../../src/ios/Agent/Sync/V2/UploadPolicy.swift)
 - 业务记录转换：[ChatStoreSyncHydrators](../../src/ios/Agent/Sync/V2/ChatStoreSyncHydrators.swift)、[SyncCoreHydrators](../../src/ios/Agent/Sync/V2/SyncCoreHydrators.swift)
-- 删除：[TombstoneManager](../../src/ios/Agent/Sync/V2/TombstoneManager.swift)、[ChatStore](../../src/ios/Agent/Chat/ChatStore.swift)（`markDirty`、删除标记）
+- 删除：[TombstoneManager](../../src/ios/Agent/Sync/V2/TombstoneManager.swift)、[ChatStore+SyncDirty](../../src/ios/Agent/Chat/ChatStore+SyncDirty.swift)（`markDirty`）、[ChatStore+Tombstones](../../src/ios/Agent/Chat/ChatStore+Tombstones.swift)（删除标记）

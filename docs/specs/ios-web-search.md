@@ -79,7 +79,7 @@ S7 只规定测试方法，已于 2026-10-12 删除，编号不再使用。实�
 
 - 工具定义：[ToolDefinitions](../../src/ios/Agent/Chat/AIChatViewModel+ToolDefinitions.swift)
 - 派发：[ConcurrentTools](../../src/ios/Agent/Chat/AIChatViewModel+ConcurrentTools.swift)
-- 生命周期和提示：[AIChatViewModel](../../src/ios/Agent/Chat/AIChatViewModel.swift)
+- 生命周期和提示：[AIChatViewModel](../../src/ios/Agent/Chat/AIChatViewModel.swift)（工具批次状态）、[AIChatViewModel+SystemPrompt](../../src/ios/Agent/Chat/AIChatViewModel+SystemPrompt.swift)（系统提示）
 - 匿名网络实现：[URLSessionWebReadTransport](../../src/ios/Agent/WebRead/WebReadURLSessionTransport.swift)
 
 - 搜索服务：[WebSearchService](../../src/ios/Agent/WebRead/WebSearchService.swift)

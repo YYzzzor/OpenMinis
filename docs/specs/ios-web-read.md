@@ -209,7 +209,7 @@ A2、A3 只规定测试方法，已于 2026-10-12 删除，编号不再使用。
 | --- | --- |
 | [ToolDefinitions](../../src/ios/Agent/Chat/AIChatViewModel+ToolDefinitions.swift) | 工具定义。 |
 | [ConcurrentTools](../../src/ios/Agent/Chat/AIChatViewModel+ConcurrentTools.swift) | 派发及结果处理。 |
-| [AIChatViewModel](../../src/ios/Agent/Chat/AIChatViewModel.swift) | 系统提示及命令行引导。 |
+| [AIChatViewModel+SystemPrompt](../../src/ios/Agent/Chat/AIChatViewModel+SystemPrompt.swift) | 系统提示及命令行引导。 |
 | [BackgroundTask](../../src/ios/Agent/Chat/AIChatViewModel+BackgroundTask.swift) | 停止入口。 |
 | [BrowserUseManager](../../src/ios/Agent/BrowserUse/BrowserUseManager.swift) | WebKit 创建方式。 |
 | [BrowserTabPool](../../src/ios/Agent/BrowserUse/BrowserTabPool.swift) | 浏览器资源统计。 |

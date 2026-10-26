@@ -91,4 +91,4 @@ description: MinisX iOS Provider 实例、模型条目、会话绑定、模型�
 - 身份与存储：[ProviderInstance](../../src/ios/Providers/ProviderInstance.swift)、[ProviderConfigStore](../../src/ios/Providers/ProviderConfigStore.swift)、[LLMTypes](../../src/ios/Providers/LLMTypes.swift)
 - 模型组与路由：[ModelGroup](../../src/ios/Providers/ModelGroup.swift)、[ModelGroupRouter](../../src/ios/Providers/ModelGroupRouter.swift)
 - 创建 provider 与 fallback：[ProviderFactory](../../src/ios/Agent/Chat/AIChatViewModel+ProviderFactory.swift)、[Fallback](../../src/ios/Agent/Chat/AIChatViewModel+Fallback.swift)
-- 用量：[AIChatViewModel](../../src/ios/Agent/Chat/AIChatViewModel.swift)（`recordContextUsage`）、[Billing](../../src/ios/Agent/Chat/AIChatViewModel+Billing.swift)
+- 用量：[AIChatViewModel+ContextUsage](../../src/ios/Agent/Chat/AIChatViewModel+ContextUsage.swift)（`recordContextUsage`）、[Billing](../../src/ios/Agent/Chat/AIChatViewModel+Billing.swift)
