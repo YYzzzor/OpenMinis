@@ -1,6 +1,6 @@
 # 26-10-26 拆分超大 Swift 文件
 
-状态：active（用户确认于 2026-10-26）　｜　规则：`docs/project-guide.md`“Git 与上游”最后一条（G1）；不新增、不修改 Spec 规则，Spec 中“代码入口”链接随代码位置更新　｜　验证：[verification.md](verification.md)（实施时创建）
+状态：完成（2026-10-28；用户确认于 2026-10-26）　｜　规则：`docs/project-guide.md`“Git 与上游”最后一条（G1）；不新增、不修改 Spec 规则，Spec 中“代码入口”链接随代码位置更新　｜　验证：[verification.md](verification.md)（实施时创建）
 
 ## 目标
 
@@ -131,7 +131,7 @@ Debug 构建（`-Onone`，开启 `ENABLE_TESTABILITY`）的方法派发方式可
   3. 发送一条消息，回复正常流式显示。
   4. 显示含代码块、表格和数学公式的回复。
   5. 打开设置 → 外观，语言列表正常显示。
-- [ ] V7 用户在手机上安装本分支的 Release 构建，打开长对话、滚动、发送消息，确认与拆分前一样流畅。（用户确认，记入 verification.md）
+- [x] V7 用户在手机上安装本分支的 Release 构建，打开长对话、滚动、发送消息，确认与拆分前一样流畅。（用户 2026-10-28 确认 TestFlight Build 1.13（14）使用没有问题；verification.md 的“V7 手机检查”）
 - [x] V8 满足 C5：
   - 在仓库的临时副本上，用一个不存在的语言运行 `register_locale.py`，脚本成功写入 `AppearanceSettingsView.swift`。
   - Spec 中每个“代码入口”链接指向的文件，确实包含链接说明的代码。
@@ -181,12 +181,8 @@ Debug 构建（`-Onone`，开启 `ENABLE_TESTABILITY`）的方法派发方式可
 - 部署目标保持 iOS 26.0。
 - 不修改 `src/android` 及任何 Android 文件。
 
-## 下一步
+## 遗留事项
 
-1. 用户用本分支 Archive 并上传 TestFlight，在手机上做 V7，告诉 Agent 构建号和结果。
-2. 收到后：把 V7 结果记入 verification.md；按 `docs/minisx-release-status.md` 末尾的“更新规则”更新发布状态。
-3. V7 通过后：按 archive-task 判断能否归档；用户要求时再合入 `main`。
-
-批次 1–6 已完成并提交（见 verification.md）。
-
-已完成：V0（见 verification.md）；分支已建；检查脚本 `tools/check_split.py` 和警告比较脚本 `tools/build_warnings.sh` 已写好。
+- `main` 上已有 10 个测试失败（清单见 verification.md 的“V5 完整测试”）。建议另建任务修复。
+- 3 处源码注释仍写着旧文件名和行号，例如 `SwiftMathRenderer.swift:28` 和 `SelectableMarkdownView+Coordinator.swift` 中的 `ContentView.swift:6948`。按“不做”的约定没有修改。
+- 下一个任务：移植上游 1.15 的 Ask User。

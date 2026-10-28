@@ -1,22 +1,21 @@
 # MinisX 发布状态
 
-更新日期：2026-10-07（Asia/Taipei）。发布步骤见 [TestFlight 发布流程草案](minisx-testflight-release-draft.md)；本文只记录每次发布的事实。
+更新日期：2026-10-28（Asia/Taipei）。发布步骤见 [TestFlight 发布流程草案](minisx-testflight-release-draft.md)；本文只记录每次发布的事实。
 
 ## 当前状态
 
 | 项目 | 状态 |
 | --- | --- |
-| 最近已核实上传 | **1.13（13）**，2026-10-07 11:19:39 上传成功；其中 MinisFileProvider 扩展为 1.13（12） |
-| 已确认安装使用 | 2026-10-07 维护者确认在手机上使用一键关闭后的构建，反馈 Close 退出动画流畅；最近上传为 Build 13，维护者没有另行报告构建号 |
+| 最近已核实上传 | **1.13（14）**，2026-10-27 14:44:31 上传成功；主应用和 3 个扩展都是 1.13（14） |
+| 已确认安装使用 | 2026-10-28 维护者确认 Build 14 已推送到手机，目前使用没有问题 |
 | 分发渠道 | TestFlight Internal，仅维护者本人 |
 | 发布身份 | Team `42486W5YRY`，Bundle ID `com.yyzzzor.minisx`，App Store Connect app ID `6816328476` |
-| 下一次可用 Build 号 | **14** |
+| 下一次可用 Build 号 | **15** |
 
 README 中的 OpenMinis App Store / TestFlight 链接属于上游项目，与 MinisX 无关。
 
 ## 待确认事项
 
-- Build 13 的 MinisFileProvider 扩展构建号为 12，与主应用的 13 不一致。原因：`project.pbxproj` 中该扩展的 `CURRENT_PROJECT_VERSION` 仍为 12。下次上传前必须把全部 target 改为同一构建号。App Store Connect 是否就此发出警告，未核对。
 - 文件浏览器：真机流畅度与内存、慢速挂载文件夹上反复推入返回的表现尚未专项验证。
 
 - 网页读取优化：维护者此前在 Build 9 完成一个历史问题的查询，反馈约一分多钟取得结果；现已安装 Build 10，反馈目前没有问题。后续根据具体使用反馈调整，本轮不启动额外测试。
@@ -27,6 +26,16 @@ README 中的 OpenMinis App Store / TestFlight 链接属于上游项目，与 Mi
 ## 发布记录
 
 每条记录的字段：上传方式与时间、源码、新增内容、证据、验证与边界。新的写在最上面。
+
+### 1.13（14）— 2026-10-27
+
+- **上传**：维护者在 Xcode 手动 Archive 并分发至 TestFlight Internal，归档创建时间14:25:35，14:44:31上传成功（Asia/Taipei）。归档元数据 `uploadedBuildNumber=14`，分发记录ID `5ff8b3c2-5d75-4b5b-bc90-8c11f6bce51c`。
+- **源码**：分支 `refactor/split-large-files`，HEAD `6844c52`；未提交改动只有构建号 13 → 14（全部 8 处 `CURRENT_PROJECT_VERSION`）和 Xcode 对 `project.pbxproj` 的重新排序。源码最后一次提交早于归档。
+- **新增内容**（相对 Build 13）：无产品变化。
+  - 不面向用户：[拆分超大 Swift 文件](<../tasks/archive/26-10-26 拆分超大 Swift 文件/task.md>)，6 个超过 5000 行的文件按上游 1.15 的文件地图拆分，只移动代码。
+- **归档证据**：`~/Library/Developer/Xcode/Archives/2026-10-27/` 下14:25归档；主应用、MinisShare、AgentWidgetExtension、MinisFileProvider 都是 1.13（14）。Build 13 的扩展构建号不一致问题已不存在。
+- **手机安装与体验**：维护者于2026-10-28确认已推送到手机，目前使用没有问题。这是拆分任务验收 V7 的证据。
+- **验证与边界**：本轮只读取本地归档元数据，没有读取 App Store Connect 后台处理状态。纯重构没有新的字符串，所以没有在归档二进制中搜索。
 
 ### 1.13（13）— 2026-10-07
 
