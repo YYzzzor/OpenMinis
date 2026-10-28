@@ -77,6 +77,16 @@ description: MinisX iOS 同步的启停、记录与文件生命周期、冲突�
 
 - **F1** `fullFetchAndReconcile()` 请求全量批次，但**不会**把本批中没有出现的本地会话判定为云端已删除，因为 CloudKit 返回的批次可能不完整；日志注明 “reconcile skipped”。显式的远端删除照常应用。
 
+## CloudKit 数据结构
+
+Debug 构建使用 CloudKit 的 Development 环境，TestFlight 和 App Store 构建使用 Production 环境。Production 不自动创建记录类型和字段，只接受从 Development 部署的数据结构；部署后的类型和字段不能删除，也不能改类型。
+
+- **S1** [拟议] 仓库保存数据结构文件 `src/ios/CloudKit/MinisX.ckdb`，包含 `SyncedTypesBootstrap.registerAll()` 注册的全部记录类型。
+- **S2** [拟议] 文件中的字段与 `ICloudSharedZoneTransport.applyPortable` 实际写入的字段一致：注册表字段按 `string` → `STRING`、`int` → `INT64`、`date` → `TIMESTAMP` 映射；`SessionFileV2.asset` 和 `SkillV2.bundleAsset` 各生成 `ASSET`、`<名>_size`（`INT64`）、`<名>_mime`（`STRING`）；每种类型另有 `syncSchemaVersion` 和 `syncMinimumCompatibleVersion`（`INT64`）。注册表出现其他 kind 时，先补映射。
+- **S3** [拟议] 索引覆盖 Release 代码中的查询：每种类型的记录名可查询；`fetchRecentV2` 中各类型的日期字段可查询、可排序；`SessionV2`、`MessageV2`、`CompactMarkerV2` 的 `sessionId` 可查询。
+- **S4** [拟议] `MinisTests` 中的测试从注册表生成数据结构，与 `MinisX.ckdb` 不同时失败，并打印生成文件的路径。
+- **S5** [拟议] `MinisX.ckdb` 有改动时，上传 TestFlight 之前，先导入 Development，导出比较一致后，再部署到 Production。步骤见 [TestFlight 发布流程草案](../minisx-testflight-release-draft.md)。
+
 ## 用户可见状态
 
 - **U1** 同步界面至少区分：未启用、启动或拉取中、已暂停、有待发送、限流或暂时失败、永久失败，以及最近一次成功的时间。“同步已开启”不代表队列已清空。
@@ -98,6 +108,7 @@ description: MinisX iOS 同步的启停、记录与文件生命周期、冲突�
 | 设备 A 删除会话，设备 B 仍有旧副本 | A 排队删除并写入近期删除标记；旧副本在窗口内回流不复活；B 收到远端删除后会话与子数据消失，且不回写同一删除（D1、D4） |
 | 用户关闭某个同步类别 | 之后该类别既不上传也不应用入站变化；云端已有记录不被删除；重新开启后分别核查补拉和本地补传（Q4，待决定） |
 | 全量拉取只返回了部分结果 | 本批没有出现的本地会话不被删除；显式删除仍然应用；日志说明跳过了对账（F1） |
+| `MinisX.ckdb` 有改动，准备上传 TestFlight | 测试与文件一致；导入 Development 后导出的结构与文件一致；部署 Production 后，TestFlight 构建的上传和查询都不被拒绝（S1–S5） |
 
 ## 代码入口
 
@@ -105,3 +116,4 @@ description: MinisX iOS 同步的启停、记录与文件生命周期、冲突�
 - 类别与文件上限：[UploadPolicy](../../src/ios/Agent/Sync/V2/UploadPolicy.swift)
 - 业务记录转换：[ChatStoreSyncHydrators](../../src/ios/Agent/Sync/V2/ChatStoreSyncHydrators.swift)、[SyncCoreHydrators](../../src/ios/Agent/Sync/V2/SyncCoreHydrators.swift)
 - 删除：[TombstoneManager](../../src/ios/Agent/Sync/V2/TombstoneManager.swift)、[ChatStore+SyncDirty](../../src/ios/Agent/Chat/ChatStore+SyncDirty.swift)（`markDirty`）、[ChatStore+Tombstones](../../src/ios/Agent/Chat/ChatStore+Tombstones.swift)（删除标记）
+- 数据结构：[MinisX.ckdb](../../src/ios/CloudKit/MinisX.ckdb)（文件在本任务中创建）
