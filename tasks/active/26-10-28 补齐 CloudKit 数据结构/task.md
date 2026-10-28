@@ -73,17 +73,14 @@
 - [x] A1 满足 S1–S3：`MinisX.ckdb` 包含 19 种记录类型；抽查 `SessionV2`、`SessionFileV2`、`SkillV2`、`ProviderInstanceV3` 的字段类型和索引，符合 Spec S2、S3。（verification.md）
 - [x] A2 满足 S4：测试通过；在本地临时把一个字段改为另一种 kind，测试失败并打印临时路径（反向测试，改动不提交）。（verification.md）
 - [x] A3 `import-schema` 对 Development 成功；随后导出的 Development 数据结构与 `MinisX.ckdb` 相同，只有系统字段的格式差异。（命令输出，verification.md）
-- [ ] A4 在两个模拟器（iPhone 17 Pro 和 iPhone 18 Pro，团队签名的 Debug 构建，同一个 iCloud 账号）上验证 Development 同步：
-  1. 先在一个模拟器上确认：iCloud 账号状态可用，3 个区域创建成功。
-  2. 两个模拟器都打开同步。
-  3. 在模拟器 A 上新建一个对话，带一个会话文件，并对它做强制同步。
-  4. 在模拟器 A 上对一个 Skill 做强制同步。
-  5. 至少等 3 分钟（启动延迟 15 秒，轮询间隔 120 秒），让模拟器 B 的 17 种类型都查询过至少一轮。
-  6. 模拟器 B 的“Other Devices”中出现模拟器 A；会话列表中出现这个对话，消息和会话文件相同；Skill 出现。
-  7. 两个模拟器的日志中没有 `permanent push failure`，也没有查询错误。调试服务的端口同一时间只能给一个模拟器用，所以逐个模拟器读取日志。
+- [x] A4 在开发环境中验证同步。验证设备按用户决定改为新 iPhone 上 Xcode 安装的 Debug 构建，原因：模拟器的 iCloud 账号报 `Account Temporarily Unavailable`，不能使用 CloudKit。
+  1. 打开同步后，3 个区域可用。
+  2. 设备记录、对话、消息、Skill（带附件字段）和 Provider 记录上传成功，没有 `permanent push failure`。
+  3. 17 种类型的查询每轮都成功。
+  4. “另一台设备收到数据”改由 A7 验证。
 
-  （evidence/ 截图，verification.md 中的日志摘录）
-- [ ] A5 A4 之后，再导出 Development 的数据结构，与 `MinisX.ckdb` 相同，只有系统字段的格式差异。这证明 A4 期间没有自动补建任何字段。（verification.md）
+  （verification.md 的“A4”）
+- [x] A5 A4 之后，再导出 Development 的数据结构，与 `MinisX.ckdb` 相同，只有系统字段的格式差异。这证明 A4 期间没有自动补建任何字段。（verification.md）
 - [ ] A6 用户在 Console 中部署到 Production 后，Production 中显示与 Development 相同的记录类型。（用户确认）
 - [ ] A7 部署后，两部 iPhone 都重启 MinisX。旧 iPhone（Build 14）按下表做强制同步；新 iPhone 上出现对应数据：
 
@@ -101,6 +98,7 @@
 
 - 用生成数据结构文件的方案。（用户，2026-10-28）
 - 新建分支 `fix/cloudkit-schema` 并在分支上提交；模拟器的 iCloud 由用户登录。（用户，2026-10-28）
+- A4 改用新 iPhone 上的 Debug 构建验证，“另一台设备收到数据”移到 A7。（用户，2026-10-28）
 - 方案审查（reviewer 子代理，2026-10-28）的处置：全部采纳。
 
   | 意见 | 处置 |
@@ -138,7 +136,8 @@
 
 ## 下一步
 
-1. 用户登录两个模拟器的 iCloud（同一个 Apple ID）。
-2. Agent 安装团队签名的 Debug 构建，做 A4，再做 A5。
+1. 用户在 CloudKit Console 中把 Development 部署到 Production（A6）。
+2. Agent 导出 Production，与 `MinisX.ckdb` 比较。
+3. 用户从 TestFlight 重新安装新 iPhone 上的 Build 14，两部 iPhone 都重启 MinisX，按 A7 的表做强制同步和检查。
 
-已完成：A1–A3（见 verification.md）；S1–S5 写入 Spec（`[拟议]`）；分支 `fix/cloudkit-schema`。
+已完成：A1–A5（见 verification.md）。

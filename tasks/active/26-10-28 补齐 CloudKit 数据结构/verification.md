@@ -26,3 +26,41 @@
 - `xcrun cktool import-schema --environment development --file src/ios/CloudKit/MinisX.ckdb` 成功。
 - 导入后导出的 Development 数据结构，与仓库文件比较（去掉引号、合并空白后 `diff`）：相同。
 - 第一次比较时，CloudKit 把 `Users` 按名字排序，而文件把它放在最前面。测试改为全部类型按名字排序后，重新生成文件，比较一致。
+
+## A4 开发环境同步验证（2026-10-28）
+
+验证方式按用户决定调整：模拟器的 iCloud 账号不能使用 CloudKit，改用新 iPhone（iPhone 18 Pro Max，UDID `00008160-0016290030434036`）上由 Xcode 安装的 Debug 构建。
+
+模拟器失败的记录（iPhone 18 Pro，团队签名的 Debug 构建）：
+- 创建区域时报 `Failed user key sync`；之后每次请求报 `Account Temporarily Unavailable`（代码 36），共 85 次；查询报 `Zone does not exist`。
+- 这发生在数据结构之前，原因未确认（日志指向 iCloud 加密密钥同步）。
+
+新 iPhone 的日志（`Library/Logs/minis-2026-10-28.log`，用 `xcrun devicectl device copy from` 复制）中有两次运行：
+
+| 时间 | 构建 | 环境 | 结果 |
+| --- | --- | --- | --- |
+| 23:05 | TestFlight Build 14 | Production | `permanent push failure type=SyncDeviceV2 ... Cannot create new type SyncDeviceV2 in production schema`；`SkillV2` 同样失败。这直接证实了问题的原因 |
+| 23:06:21 起 | Xcode 安装的 Debug 构建 | Development | 见下 |
+
+Debug 构建的结果（23:06–23:23）：
+- 上传：全部批次 `permanent=0`。
+
+  | 批次 | 结果 |
+  | --- | --- |
+  | `SyncDeviceV2=1` | `ok=1` |
+  | `SkillV2=1`（带附件字段 `bundleAsset`） | `ok=1` |
+  | `MessageV2=2 ProviderConfigV2=1 SessionV2=1` | `ok=4` |
+  | `ProviderConfigV2=1 ProviderInstanceV3=1 ProviderModelEntryV3=2` | `ok=4` |
+  | `ProviderConfigV2=1 ProviderModelGroupV3=2` | `ok=3` |
+
+- 查询：17 种类型的 `fetchRecentV2` 每轮都完成，输出 `fetchRecentV2 ok`，没有 `failed`。
+- 两个 `crash-*.log` 都是 `SIGKILL`、前台、内存 20 MB，时间与 Xcode 安装重合，是安装时结束旧进程，与同步无关。
+
+未验证：
+- “另一台设备收到数据”：只有一台设备在开发环境中运行。改由 A7 在两部 iPhone 上验证。
+- `SessionFileV2` 的附件上传：本次没有产生会话文件。它与 `SkillV2` 使用同样的 `ASSET` 字段类型，`SkillV2` 已上传成功。
+
+## A5 验证后的数据结构比较（2026-10-28）
+
+- A4 之后导出 Development 的数据结构，与 `MinisX.ckdb` 比较（去掉引号、合并空白后 `diff`）：相同。
+- 所以 A4 期间 Development 没有自动补建任何字段，`MinisX.ckdb` 覆盖了实际写入的全部字段。
