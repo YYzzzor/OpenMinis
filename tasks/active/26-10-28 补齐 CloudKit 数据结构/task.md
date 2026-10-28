@@ -70,9 +70,9 @@
 
 ## 验收（有证据才打勾，注明证据位置）
 
-- [ ] A1 满足 S1–S3：`MinisX.ckdb` 包含 19 种记录类型；抽查 `SessionV2`、`SessionFileV2`、`SkillV2`、`ProviderInstanceV3` 的字段类型和索引，符合 Spec S2、S3。（verification.md）
-- [ ] A2 满足 S4：测试通过；在本地临时把一个字段改为另一种 kind，测试失败并打印临时路径（反向测试，改动不提交）。（verification.md）
-- [ ] A3 `import-schema` 对 Development 成功；随后导出的 Development 数据结构与 `MinisX.ckdb` 相同，只有系统字段的格式差异。（命令输出，verification.md）
+- [x] A1 满足 S1–S3：`MinisX.ckdb` 包含 19 种记录类型；抽查 `SessionV2`、`SessionFileV2`、`SkillV2`、`ProviderInstanceV3` 的字段类型和索引，符合 Spec S2、S3。（verification.md）
+- [x] A2 满足 S4：测试通过；在本地临时把一个字段改为另一种 kind，测试失败并打印临时路径（反向测试，改动不提交）。（verification.md）
+- [x] A3 `import-schema` 对 Development 成功；随后导出的 Development 数据结构与 `MinisX.ckdb` 相同，只有系统字段的格式差异。（命令输出，verification.md）
 - [ ] A4 在两个模拟器（iPhone 17 Pro 和 iPhone 18 Pro，团队签名的 Debug 构建，同一个 iCloud 账号）上验证 Development 同步：
   1. 先在一个模拟器上确认：iCloud 账号状态可用，3 个区域创建成功。
   2. 两个模拟器都打开同步。
@@ -138,7 +138,7 @@
 
 ## 下一步
 
-1. 用户创建并保存 CloudKit 管理令牌（部署步骤第 3 步）。
-2. Agent 导出空的 Development 数据结构作为格式基线（第 1 步）。
+1. 用户登录两个模拟器的 iCloud（同一个 Apple ID）。
+2. Agent 安装团队签名的 Debug 构建，做 A4，再做 A5。
 
-已完成：S1–S5 写入 Spec（`[拟议]`）；分支 `fix/cloudkit-schema` 已建。
+已完成：A1–A3（见 verification.md）；S1–S5 写入 Spec（`[拟议]`）；分支 `fix/cloudkit-schema`。
