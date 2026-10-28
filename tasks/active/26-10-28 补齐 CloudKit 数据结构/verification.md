@@ -64,3 +64,8 @@ Debug 构建的结果（23:06–23:23）：
 
 - A4 之后导出 Development 的数据结构，与 `MinisX.ckdb` 比较（去掉引号、合并空白后 `diff`）：相同。
 - 所以 A4 期间 Development 没有自动补建任何字段，`MinisX.ckdb` 覆盖了实际写入的全部字段。
+
+## A6 部署到 Production（2026-10-28）
+
+- 用户在 CloudKit Console 中把 Development 的数据结构部署到 Production。
+- Agent 用 `xcrun cktool export-schema --environment production` 导出：20 个 `RECORD TYPE`（`Users` 和 19 种记录类型）；与 `MinisX.ckdb` 比较（去掉引号、合并空白后 `diff`）：相同。

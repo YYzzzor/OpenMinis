@@ -81,7 +81,7 @@
 
   （verification.md 的“A4”）
 - [x] A5 A4 之后，再导出 Development 的数据结构，与 `MinisX.ckdb` 相同，只有系统字段的格式差异。这证明 A4 期间没有自动补建任何字段。（verification.md）
-- [ ] A6 用户在 Console 中部署到 Production 后，Production 中显示与 Development 相同的记录类型。（用户确认）
+- [x] A6 用户在 Console 中部署到 Production 后，Production 中显示与 Development 相同的记录类型。（用户 2026-10-28 部署；导出的 Production 与 `MinisX.ckdb` 相同，见 verification.md 的“A6”）
 - [ ] A7 部署后，两部 iPhone 都重启 MinisX。旧 iPhone（Build 14）按下表做强制同步；新 iPhone 上出现对应数据：
 
   | 类别 | 旧 iPhone 上的操作 | 新 iPhone 上的预期 |
@@ -136,8 +136,6 @@
 
 ## 下一步
 
-1. 用户在 CloudKit Console 中把 Development 部署到 Production（A6）。
-2. Agent 导出 Production，与 `MinisX.ckdb` 比较。
-3. 用户从 TestFlight 重新安装新 iPhone 上的 Build 14，两部 iPhone 都重启 MinisX，按 A7 的表做强制同步和检查。
+1. 用户从 TestFlight 重新安装新 iPhone 上的 Build 14，两部 iPhone 都重启 MinisX，按 A7 的表做强制同步和检查。
 
-已完成：A1–A5（见 verification.md）。
+已完成：A1–A6（见 verification.md）。
