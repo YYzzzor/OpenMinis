@@ -69,3 +69,14 @@ Debug 构建的结果（23:06–23:23）：
 
 - 用户在 CloudKit Console 中把 Development 的数据结构部署到 Production。
 - Agent 用 `xcrun cktool export-schema --environment production` 导出：20 个 `RECORD TYPE`（`Users` 和 19 种记录类型）；与 `MinisX.ckdb` 比较（去掉引号、合并空白后 `diff`）：相同。
+
+## A7 两部 iPhone 同步（2026-10-29）
+
+- 用户在新 iPhone 上从 TestFlight 重新安装 Build 14，两部 iPhone 重启 MinisX，在旧 iPhone 上做强制同步。
+- 用户确认：新 iPhone 上同步正常（“费了不少劲终于弄好了”）。
+- 用户随后发现：同步过来的会话不显示“费用与余额”。核实结果：这是 Spec L1、D1 规定的行为（账本只在本机新建会话时登记，不随同步）。用户在新 iPhone 上新建对话后，这一部分正常显示。不是本任务的问题。
+
+## A8 发布流程文档（2026-10-29）
+
+- `docs/minisx-testflight-release-draft.md`：“发布前核对”表增加 “CloudKit 数据结构” 一行；增加 “CloudKit 数据结构部署” 一节，写明 7 个步骤和管理令牌的来源。
+- `git diff --check` 通过。

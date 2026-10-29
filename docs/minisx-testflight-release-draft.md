@@ -21,12 +21,27 @@
 | 发布内容固定 | 记录最终构建输入；若允许发布未提交代码，同时保存纳入发布的差异、未跟踪文件清单和摘要，不能只记录 HEAD |
 | Xcode | 核对实际版本、iOS SDK及当时 Apple 的上传要求；每条命令指定已核实的开发目录 |
 | 签名 | 开发/分发身份和自动签名配置可用；主应用及扩展 Team、Bundle ID、App Group、iCloud 权益匹配 |
+| CloudKit 数据结构 | 自上次部署以来 `src/ios/CloudKit/MinisX.ckdb` 有改动时，先按下文“CloudKit 数据结构部署”完成部署，再上传；没有改动时注明“未改动” |
 | Apple 认证 | 优先使用 Xcode 已登录账户；需要 API 密钥时单独配置，不在文档、仓库或日志中保存秘密值 |
 | 发布证据位置 | 选择仓库外的独立归档/分发目录，保留日志与 dSYM（崩溃定位符号），不覆盖已有产物 |
 
 当前参考值：工程 `src/ios/Minis.xcodeproj`，共享 Scheme `Minis`，Team `42486W5YRY`，主 Bundle ID `com.yyzzzor.minisx`。这些是本项目的已核对配置，不是对任意检出目录的假设。
 
 本机曾发现 `xcode-select` 指向 Command Line Tools。可对单条命令设置 `DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer`，无需切换全局设置。若沙箱中签名身份不可见或校验返回信任错误，应按工具权限流程复核，不能直接认定证书失效，也不能为此更改证书信任设置。
+
+### CloudKit 数据结构部署
+
+TestFlight 构建使用 CloudKit 的 Production 环境。Production 不自动创建记录类型和字段，缺少时上传全部被拒绝（Spec [同步 S1–S5](specs/ios-sync-and-conflict-resolution.md#cloudkit-数据结构)）。`MinisX.ckdb` 有改动时，上传前按以下步骤部署：
+
+1. 运行 `CloudKitSchemaTests`，确认测试通过。
+2. 运行 `xcrun cktool import-schema --team-id 42486W5YRY --container-id iCloud.com.yyzzzor.minisx --environment development --file src/ios/CloudKit/MinisX.ckdb`。
+3. 运行 `xcrun cktool export-schema`（`--environment development`），与 `MinisX.ckdb` 比较，必须一致。
+4. 用 Xcode 在真机上安装 Debug 构建，打开同步，确认日志中没有 `permanent push failure` 和查询错误。模拟器的 iCloud 账号可能不能使用 CloudKit。
+5. 再导出 Development 比较一次，必须仍然一致。
+6. 维护者在 CloudKit Console 中点 “Deploy Schema Changes”，部署到 Production。这一步不能撤销：部署后的记录类型和字段不能删除，也不能改类型。
+7. 导出 Production（`--environment production`）比较，必须一致。
+
+`cktool` 需要管理令牌：维护者在 CloudKit Console 的账号菜单 → Manage Tokens 中创建，用 `xcrun cktool save-token --type management` 保存到钥匙串。
 
 ## 3. 分配版本号和 Build
 

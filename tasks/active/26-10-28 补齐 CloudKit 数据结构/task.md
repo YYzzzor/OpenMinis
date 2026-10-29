@@ -82,7 +82,7 @@
   （verification.md 的“A4”）
 - [x] A5 A4 之后，再导出 Development 的数据结构，与 `MinisX.ckdb` 相同，只有系统字段的格式差异。这证明 A4 期间没有自动补建任何字段。（verification.md）
 - [x] A6 用户在 Console 中部署到 Production 后，Production 中显示与 Development 相同的记录类型。（用户 2026-10-28 部署；导出的 Production 与 `MinisX.ckdb` 相同，见 verification.md 的“A6”）
-- [ ] A7 部署后，两部 iPhone 都重启 MinisX。旧 iPhone（Build 14）按下表做强制同步；新 iPhone 上出现对应数据：
+- [x] A7 部署后，两部 iPhone 都重启 MinisX。旧 iPhone（Build 14）按下表做强制同步；新 iPhone 上出现对应数据：
 
   | 类别 | 旧 iPhone 上的操作 | 新 iPhone 上的预期 |
   | --- | --- | --- |
@@ -90,8 +90,8 @@
   | Skills、Provider、Memory、Soul | 在各自的管理页点强制同步 | 出现对应数据 |
   | 文件夹、MCP、环境变量 | 没有强制同步入口 | 历史数据不出现；之后的新修改会同步。记入“遗留” |
 
-  （用户确认）
-- [ ] A8 满足 S5：`docs/minisx-testflight-release-draft.md` 写入部署步骤；`git diff --check` 通过。（verification.md）
+  （用户 2026-10-29 确认同步正常；verification.md 的“A7”）
+- [x] A8 满足 S5：`docs/minisx-testflight-release-draft.md` 写入部署步骤；`git diff --check` 通过。（verification.md 的“A8”）
 - [ ] A9 代码审查完成，意见逐条处置；资源结论由审查给出。（verification.md）
 
 ## 决定
@@ -136,6 +136,7 @@
 
 ## 下一步
 
-1. 用户从 TestFlight 重新安装新 iPhone 上的 Build 14，两部 iPhone 都重启 MinisX，按 A7 的表做强制同步和检查。
+1. A9：代码审查（进行中）。
+2. 审查处置后：去掉 Spec S1–S5 的 `[拟议]`，按 archive-task 归档。
 
-已完成：A1–A6（见 verification.md）。
+已完成：A1–A8（见 verification.md）。
