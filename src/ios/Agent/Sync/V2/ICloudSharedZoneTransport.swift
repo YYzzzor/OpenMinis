@@ -682,6 +682,8 @@ final class ICloudSharedZoneTransport: NSObject, SyncTransport {
         // peer device never arrived (the CKSyncEngine token path did not cover
         // them either). ProviderModelEntryV3 / ProviderModelGroupV3 carry only
         // updatedAt (no createdAt), so sort all V3 types by updatedAt.
+        // 这里的日期字段在 CloudKit 中必须可查询、可排序。改动时同步更新
+        // MinisTests/CloudKitSchemaTests.recentQueryDateKeys 和 CloudKit/MinisX.ckdb（Spec S3）。
         let typesAndKeys: [(String, String)] = [
             ("SessionV2", "createdAt"),
             ("MessageV2", "createdAt"),
@@ -928,6 +930,7 @@ final class ICloudSharedZoneTransport: NSObject, SyncTransport {
         // Querying `id == X` returns CloudKit "Unknown field 'id'" and
         // aborts the whole Force Pull. Match the same `sessionId` field
         // used by MessageV2/CompactMarkerV2.
+        // 按 sessionId 查询的类型改动时，同步更新 CloudKitSchemaTests.sessionIdQueryTypes（Spec S3）。
         let typesAndPredicate: [(String, NSPredicate)] = [
             ("SessionV2", NSPredicate(format: "sessionId == %@", sessionId)),
             ("MessageV2", NSPredicate(format: "sessionId == %@", sessionId)),

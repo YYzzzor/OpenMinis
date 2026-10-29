@@ -413,6 +413,7 @@ enum ChatStoreSyncHydrators {
         var portable = SyncableTypeRegistry.shared.metadata(for: "SessionFileV2")?.buildPortable(synced)
         // Inject the asset (the registry's buildPortable doesn't know
         // about transport-managed asset payloads).
+        // 附件名改动时同步更新 CloudKitSchemaTests.assetFields 和 MinisX.ckdb（Spec S2）。
         if var p = portable {
             let asset = PortableAsset(key: "asset", fileURL: fileURL, size: fileSize, mimeType: mime)
             p = PortableRecord(
@@ -509,6 +510,7 @@ enum ChatStoreSyncHydrators {
             bodyText: snap.bodyText, bundleZipURL: bundleAssetURL
         )
         var portable = SyncableTypeRegistry.shared.metadata(for: "SkillV2")?.buildPortable(synced)
+        // 附件名改动时同步更新 CloudKitSchemaTests.assetFields 和 MinisX.ckdb（Spec S2）。
         if var p = portable, let zipURL = bundleAssetURL,
            let size = try? FileManager.default.attributesOfItem(atPath: zipURL.path)[.size] as? Int {
             let asset = PortableAsset(key: "bundleAsset", fileURL: zipURL, size: size, mimeType: "application/zip")

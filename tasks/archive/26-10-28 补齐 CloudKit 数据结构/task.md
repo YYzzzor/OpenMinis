@@ -1,6 +1,6 @@
 # 26-10-28 补齐 CloudKit 数据结构
 
-状态：active（用户确认于 2026-10-28）　｜　Spec：`docs/specs/ios-sync-and-conflict-resolution.md` 的“CloudKit 数据结构”一节（本任务新增 S1–S5，均为 `[拟议]`）　｜　验证：[verification.md](verification.md)（实施时创建）
+状态：完成（2026-10-29；用户确认于 2026-10-28）　｜　Spec：`docs/specs/ios-sync-and-conflict-resolution.md` 的“CloudKit 数据结构”一节（本任务新增 S1–S5，已生效）　｜　验证：[verification.md](verification.md)（实施时创建）
 
 ## 目标
 
@@ -92,7 +92,7 @@
 
   （用户 2026-10-29 确认同步正常；verification.md 的“A7”）
 - [x] A8 满足 S5：`docs/minisx-testflight-release-draft.md` 写入部署步骤；`git diff --check` 通过。（verification.md 的“A8”）
-- [ ] A9 代码审查完成，意见逐条处置；资源结论由审查给出。（verification.md）
+- [x] A9 代码审查完成，意见逐条处置；资源结论由审查给出。（verification.md 的“A9”）
 
 ## 决定
 
@@ -129,14 +129,11 @@
 - 设备：两个模拟器必须登录同一个 iCloud 账号（用户同意自己登录，2026-10-28）。A7 在用户的两部 iPhone 上完成。
 - 不修改 `src/android` 及任何 Android 文件。
 
-## 遗留（任务完成时核对）
+## 遗留事项
 
 - 文件夹、MCP、环境变量没有强制同步入口，历史数据不会补传。可以另建任务增加入口。
-- 同步设置页的文案 “Toggle takes effect on next app launch.” 已经过时：开关现在立即生效（`SyncV2Bootstrap.setEnabled`）。
-
-## 下一步
-
-1. A9：代码审查（进行中）。
-2. 审查处置后：去掉 Spec S1–S5 的 `[拟议]`，按 archive-task 归档。
-
-已完成：A1–A8（见 verification.md）。
+- `CloudKitSchemaTests` 中的 3 张表（附件字段、`fetchRecentV2` 的日期字段、按 `sessionId` 查询的类型）抄自 App 源码，靠源码中的提醒注释保持同步。可以另建任务把这些常量移到 `ICloudSharedZoneTransport` 的 `static let`，让测试直接引用。
+- `SessionFileV2` 附件的实际上传没有验证；它与 `SkillV2` 使用同一种 `ASSET` 字段，`SkillV2` 已上传成功。
+- 从注册表删除已部署字段时的处理方法，写入 Spec 的待决定项。
+- 同步设置页的文案 “Toggle takes effect on next app launch.” 已经过时：开关现在立即生效。
+- 模拟器的 iCloud 账号不能使用 CloudKit（`Account Temporarily Unavailable`），原因未确认。以后的 CloudKit 验证用真机。

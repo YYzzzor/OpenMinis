@@ -80,3 +80,20 @@ Debug 构建的结果（23:06–23:23）：
 
 - `docs/minisx-testflight-release-draft.md`：“发布前核对”表增加 “CloudKit 数据结构” 一行；增加 “CloudKit 数据结构部署” 一节，写明 7 个步骤和管理令牌的来源。
 - `git diff --check` 通过。
+
+## A9 代码审查（reviewer 子代理，2026-10-29）
+
+范围：`git diff main..HEAD`。结论：现在的 `MinisX.ckdb` 与 App 的写入和查询一致；发布流程和测试有 3 个缺陷。
+
+| 意见 | 处置 |
+| --- | --- |
+| D1 发布核对按“文件是否改动”判断，测试不一定被运行 | 采纳：核对改为每次发布都运行测试并导出 Production 比较；S5 的前提同步修改 |
+| D2 测试中的 3 张表抄自 App 源码，脱节时测试发现不了 | 部分采纳：在 `ICloudSharedZoneTransport.swift` 的 `typesAndKeys`、`typesAndPredicate` 和 `ChatStoreSyncHydrators.swift` 的两处附件注入旁加中文提醒注释；S2 写明手工同步。不把常量移到 App 源码：超出“不改 App 代码”的范围，记入遗留 |
+| D3 发布文档缺比较方法，`export-schema` 命令不完整 | 采纳：写出完整的导入、导出、测试命令和 `norm` 比较函数 |
+| Q1 删除已部署字段后，S4 和 S5 不能同时成立 | 采纳为 Spec 的待决定项 |
+| Q2 读不到文件时误报“不一致” | 采纳：改为 `try` 读取，读取失败单独报错 |
+| 可简化：多余的排序；Spec 中会过时的注释 | 采纳 |
+
+修改后重新运行 `CloudKitSchemaTests`：`Executed 1 test, with 0 failure`。`git diff --check` 通过。
+
+资源结论（审查者给出）：不适用。App 运行代码没有改动（只加注释）；测试只在 `MinisTests` 中运行一次；`.ckdb` 不打包进 App。

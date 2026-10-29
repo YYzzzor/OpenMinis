@@ -81,11 +81,11 @@ description: MinisX iOS 同步的启停、记录与文件生命周期、冲突�
 
 Debug 构建使用 CloudKit 的 Development 环境，TestFlight 和 App Store 构建使用 Production 环境。Production 不自动创建记录类型和字段，只接受从 Development 部署的数据结构；部署后的类型和字段不能删除，也不能改类型。
 
-- **S1** [拟议] 仓库保存数据结构文件 `src/ios/CloudKit/MinisX.ckdb`，包含 `SyncedTypesBootstrap.registerAll()` 注册的全部记录类型。
-- **S2** [拟议] 文件中的字段与 `ICloudSharedZoneTransport.applyPortable` 实际写入的字段一致：注册表字段按 `string` → `STRING`、`int` → `INT64`、`date` → `TIMESTAMP` 映射；`SessionFileV2.asset` 和 `SkillV2.bundleAsset` 各生成 `ASSET`、`<名>_size`（`INT64`）、`<名>_mime`（`STRING`）；每种类型另有 `syncSchemaVersion` 和 `syncMinimumCompatibleVersion`（`INT64`）。注册表出现其他 kind 时，先补映射。
-- **S3** [拟议] 索引覆盖 Release 代码中的查询：每种类型的记录名可查询；`fetchRecentV2` 中各类型的日期字段可查询、可排序；`SessionV2`、`MessageV2`、`CompactMarkerV2` 的 `sessionId` 可查询。
-- **S4** [拟议] `MinisTests` 中的测试从注册表生成数据结构，与 `MinisX.ckdb` 不同时失败，并打印生成文件的路径。
-- **S5** [拟议] `MinisX.ckdb` 有改动时，上传 TestFlight 之前，先导入 Development，导出比较一致后，再部署到 Production。步骤见 [TestFlight 发布流程草案](../minisx-testflight-release-draft.md)。
+- **S1** 仓库保存数据结构文件 `src/ios/CloudKit/MinisX.ckdb`，包含 `SyncedTypesBootstrap.registerAll()` 注册的全部记录类型。
+- **S2** 文件中的字段与 `ICloudSharedZoneTransport.applyPortable` 实际写入的字段一致：注册表字段按 `string` → `STRING`、`int` → `INT64`、`date` → `TIMESTAMP` 映射；`SessionFileV2.asset` 和 `SkillV2.bundleAsset` 各生成 `ASSET`、`<名>_size`（`INT64`）、`<名>_mime`（`STRING`）；每种类型另有 `syncSchemaVersion` 和 `syncMinimumCompatibleVersion`（`INT64`）。注册表出现其他 kind 时，先补映射。附件字段表和 S3 的查询字段表在测试中手工维护，改动 hydrator 或查询时必须同步更新。
+- **S3** 索引覆盖 Release 代码中的查询：每种类型的记录名可查询；`fetchRecentV2` 中各类型的日期字段可查询、可排序；`SessionV2`、`MessageV2`、`CompactMarkerV2` 的 `sessionId` 可查询。
+- **S4** `MinisTests` 中的测试从注册表生成数据结构，与 `MinisX.ckdb` 不同时失败，并打印生成文件的路径。
+- **S5** 每次上传 TestFlight 之前，测试必须通过，且导出的 Production 数据结构与 `MinisX.ckdb` 一致；不一致时，先导入 Development，导出比较一致后，再部署到 Production。步骤见 [TestFlight 发布流程草案](../minisx-testflight-release-draft.md)。
 
 ## 用户可见状态
 
@@ -98,6 +98,7 @@ Debug 构建使用 CloudKit 的 Development 环境，TestFlight 和 App Store �
 - [待决定] 未知记录类型默认允许，是否符合长期的隐私和分类策略（C2）。
 - [待决定] 永久失败后是否提供可恢复的手动重试入口（Q5）。
 - [待决定] 能证明集合完整的安全全量对账，以及 LAN transport（F1、T1）。
+- [待决定] 从注册表删除已部署到 Production 的字段或类型时，`MinisX.ckdb` 如何保留这些字段，使 S4 和 S5 同时成立（S4、S5）。
 
 ## 验收场景
 
@@ -116,4 +117,4 @@ Debug 构建使用 CloudKit 的 Development 环境，TestFlight 和 App Store �
 - 类别与文件上限：[UploadPolicy](../../src/ios/Agent/Sync/V2/UploadPolicy.swift)
 - 业务记录转换：[ChatStoreSyncHydrators](../../src/ios/Agent/Sync/V2/ChatStoreSyncHydrators.swift)、[SyncCoreHydrators](../../src/ios/Agent/Sync/V2/SyncCoreHydrators.swift)
 - 删除：[TombstoneManager](../../src/ios/Agent/Sync/V2/TombstoneManager.swift)、[ChatStore+SyncDirty](../../src/ios/Agent/Chat/ChatStore+SyncDirty.swift)（`markDirty`）、[ChatStore+Tombstones](../../src/ios/Agent/Chat/ChatStore+Tombstones.swift)（删除标记）
-- 数据结构：[MinisX.ckdb](../../src/ios/CloudKit/MinisX.ckdb)（文件在本任务中创建）
+- 数据结构：[MinisX.ckdb](../../src/ios/CloudKit/MinisX.ckdb)、测试 `CloudKitSchemaTests`（`src/ios/MinisTests/`）

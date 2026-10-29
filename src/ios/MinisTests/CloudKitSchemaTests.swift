@@ -13,6 +13,7 @@ final class CloudKitSchemaTests: XCTestCase {
     /// 附件字段由 hydrator 加入 PortableRecord.assets，不在注册表的 fieldKinds 中
     /// （ChatStoreSyncHydrators：SessionFile 的 "asset"、Skill 的 "bundleAsset"）。
     /// applyPortable 为每个附件写入 <名>、<名>_size、<名>_mime 三个字段。
+    /// 本表与下面两张表抄自 App 源码，源码一侧有提醒注释；它们脱节时本测试发现不了。
     private static let assetFields: [String: [String]] = [
         "SessionFileV2": ["asset"],
         "SkillV2": ["bundleAsset"],
@@ -52,7 +53,8 @@ final class CloudKitSchemaTests: XCTestCase {
 
     func testCommittedSchemaMatchesRegistry() throws {
         let generated = try Self.generateSchema()
-        let committed = try? String(contentsOf: Self.schemaURL, encoding: .utf8)
+        // 读取失败（例如在真机上运行，源码路径不存在）单独报错，不误报为“不一致”。
+        let committed = try String(contentsOf: Self.schemaURL, encoding: .utf8)
         if committed != generated {
             let out = FileManager.default.temporaryDirectory.appendingPathComponent("MinisX.ckdb")
             try generated.write(to: out, atomically: true, encoding: .utf8)
@@ -65,7 +67,7 @@ final class CloudKitSchemaTests: XCTestCase {
     private static func generateSchema() throws -> String {
         SyncedTypesBootstrap.registerAll()
         let registry = SyncableTypeRegistry.shared
-        let types = registry.allRecordTypes.sorted()
+        let types = registry.allRecordTypes
 
         // 查询用到的类型和字段必须在注册表中，否则索引写到了不存在的字段上。
         for (type, key) in recentQueryDateKeys {
